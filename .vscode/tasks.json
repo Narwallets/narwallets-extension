@@ -4,7 +4,10 @@
 		{
 			"type": "npm",
 			"script": "build",
-			"group": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			  },
 			"problemMatcher": ["$tsc"],
 			"label": "npm: build",
 			"detail": "npx tsc --build -verbose"
@@ -12,11 +15,8 @@
 		{
 			"type": "typescript",
 			"tsconfig": "tsconfig.json",
+			"group": "build",
 			"problemMatcher": ["$tsc"],
-			"group": {
-			  "kind": "build",
-			  "isDefault": true
-			}
 		  }
 	]
 }

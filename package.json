@@ -5,11 +5,10 @@
   "author": "luciotato <luciotato@gmail.com",
   "type": "module",
   "scripts": {
-    "build": "npx tsc --build",
+    "build": "node build.js",
     "test": "chrome chrome://extensions/",
     "start": "chrome chrome://extensions/"
   },
-  "license": "see LICENSE.md",
   "keywords": [
     "NEAR",
     "Narwallet"
