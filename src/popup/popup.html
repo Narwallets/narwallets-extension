@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Narwallet</title>
+    <link rel="stylesheet" href="../common.css">
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div class="app">
+        <div class="app-header">
+            <div class="app-header-contents">
+                <div class="app-header-logo-container">
+                    <img src="../icons/icon_48.png" class="app-header-logo">
+                </div>
+                <div class="app-header-account-menu-container">
+                    <div class="app-header-network-component-wrapper">
+                        <div id="select-network" class="network-component pointer" title="Active Network">
+                            <div class="network-indicator">
+                                <li id="curnet-name" class="green menu-icon-circle network-name">NEAR Testnet</li>
+                                <div class="down-arrow"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-contents">
+            <!-- New user, onboarding-->
+            <div id="welcome-new-user-page" class="page hidden">
+                <div class="contents-header">
+                    <h1>Welcome to Narwallet!</h1>
+                    <h2>With Narwallet you can easily manage all your NEAR accounts</h2>
+                </div>
+                <div class="contents-body">
+                    <h3>Let's start our journey</h3>
+                    <div class="select-action-button-box">
+                        <p>
+                            <b>Step one:</b>
+                            Create a password to protect this wallet
+                        </p>
+                        <button id="create-pass" class="btn-primary">Create Password</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Existing user, unlock-->
+            <div id="unlock-page" class="page hidden">
+                <div class="logo-128"></div>
+                <h1 class="unlock-page__title">Welcome Back!</h1>
+                <h3>Please enter your password to unlock this wallet</h3>
+                <div class="enter-pass">
+                    <div class="form-field-label">
+                        <label class="" data-shrink="true" for="create-password"
+                            id="create-password-label">Password</label>
+                        <div class="form-control">
+                            <input aria-invalid="false" autocomplete="password" id="passw" type="password" dir="auto"
+                                value="">
+                        </div>
+                    </div>
+                </div>
+                <button id="unlock" class="button btn-primary">Unlock</button>
+            </div>
+
+            <!-- Unlocked, Main Page -->
+            <div id="main-page" class="page hidden">
+                <div id="accounts-list">
+                </div>
+                <div class="contents-footer">
+                    <button id="add-account">Add Account</button>
+                </div>
+            </div>
+
+            <!-- Templates -->
+            <div id="account-item-template" class="hidden">
+                <div class="account-item">
+                    <div class="account type"></div>
+                    <div class="account name"></div>
+                    <div class="account balance"></div>
+                    <div class="account staked"></div>
+                    <div class="account available"></div>
+                </div>
+            </div>
+
+            <!-- add account, choice -->
+            <div id="import-or-create" class="page hidden">
+                <div class="contents-header">
+                    <h1>Do you have a NEAR account?</h1>
+                </div>
+                <div class="select-action-wrapper">
+                    <div class="select-action-button-box">
+                            <div class="text-big">Yes, I already have a NEAR account</div>
+                            <div class="text-small">Import your existing account</div>
+                            <button id="import" class="btn-primary small">Import account</button>
+                    </div>
+                    <div class="select-action-button-box">
+                            <div class="text-big">No, create a new account</div>
+                            <div class="text-small">Create a new NEAR account in this wallet</div>
+                            <button id="create" class="btn-primary small">Create Account</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- -->
+            <div id="err-div"></div>
+        </div> <!-- end app-contents -->
+    </div> <!-- end app-->
+    <!-- 
+    Networks Dropdown 
+    -->
+    <div id="networks-list" class="networks-list-box">
+        <div class="networks-list-content">
+            <div class="network-box-header">
+                <div class="title">Networks</div>
+                <hr>
+                <div class="messsage"></div>
+            </div>
+            <li data-code="mainnet" class="green menu-icon-circle">NEAR Mainnet
+            </li>
+            <li data-code="guildnet" class="cyan menu-icon-circle">Open Shards Alliance
+            </li>
+            <li data-code="testnet" class="yellow menu-icon-circle">NEAR Testnet
+            </li>
+            <li data-code="betanet" class="violet menu-icon-circle">NEAR Betanet
+            </li>
+            <li data-code="local" class="red menu-icon-circle">Local Network
+            </li>
+        </div>
+    </div>
+
+
+    <script src="../util/js-sha256.js"></script>
+    <script src="../tweetnacl/nacl-fast.js"></script>
+    <script src="../tweetnacl/nacl-util.js"></script>
+    <script src="../require.js"></script>
+    <script src="../global.ts"></script>
+    <script src="popup.ts"></script>
+</body>
+
+</html>

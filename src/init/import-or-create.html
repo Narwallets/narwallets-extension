@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=no">
+        <title>Narwallet</title>
+        <link rel="stylesheet" href="../common.css">
+        <link rel="stylesheet" href="import-or-create.css">
+    </head>
+    <body>
+        <div id="app-content">
+
+            <div class="main-container-wrapper">
+
+                <div class="contents-header">
+                    <h1>Do you have a NEAR account?</h1>
+                </div>
+                <div class="select-action-wrapper">
+                    <div class="select-action-button-box">
+                            <div class="text-big">Yes, I already have a NEAR account</div>
+                            <div class="text-small">Import your existing account using the 12 word seed phrase</div>
+                            <button id="import" class="btn-primary">Import account</button>
+                    </div>
+                    <div class="select-action-button-box">
+                            <div class="text-big">No, create a new account</div>
+                            <div class="text-small">This will create a new NEAR account in this wallet</div>
+                            <button id="create" class="btn-primary">Create Account</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="popover-content"></div>
+
+        <script src="../require.js"></script>
+        <script src="../global.ts"></script>
+        <script src="import-or-create.ts"></script>
+        
+    </body>
+</html>

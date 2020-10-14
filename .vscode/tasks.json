@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": ["$tsc"],
+			"label": "npm: build",
+			"detail": "npx tsc --build -verbose"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"problemMatcher": ["$tsc"],
+			"group": {
+			  "kind": "build",
+			  "isDefault": true
+			}
+		  }
+	]
+}
