@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension",
+  "name": "Narwallet-extension",
   "version": "1.0.0",
-  "description": "plus-typescript Chrome Extension Boilerplate",
+  "description": "Narwallet chrome/chromiun-extension wallet for NEAR",
   "author": "luciotato <luciotato@gmail.com",
   "type": "module",
   "scripts": {
@@ -15,7 +15,6 @@
   ],
   "devDependencies": {
     "@types/chrome": "0.0.124",
-    "@types/node": "^14.11.8",
     "plus-typescript": "^4.1.1-alpha",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"

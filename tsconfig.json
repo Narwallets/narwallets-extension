@@ -8,7 +8,7 @@
       "target": "es2020",
       "outDir": "dist",
       "sourceMap": false,
-
+      
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,

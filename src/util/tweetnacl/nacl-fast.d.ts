@@ -1,10 +1,24 @@
+//
+// LMT https://github.com/NarwalletGH/tweetnacl-js.git
+//
+// ---------------------------------------
+// MODIFIED TO WORK as a ES2020 JS MODULE
+// ---------------------------------------
+//
 // Type definitions for TweetNaCl.js
+//
+//
 
-export as namespace nacl;
+export function sign_keyPair_fromSecretKey(secretKey: Uint8Array): SignKeyPair;
+export function sign_keyPair_fromSeed(secretKey: Uint8Array): SignKeyPair;
 
-declare var nacl: nacl;
-export = nacl;
+export function secretbox(msg: Uint8Array, nonce: Uint8Array, key: Uint8Array): Uint8Array;
+export function secretbox_open(box: Uint8Array, nonce: Uint8Array, key: Uint8Array): Uint8Array | null;
+export const secretbox_nonceLength;
 
+export function randomBytes(n: number): Uint8Array;
+
+/*
 declare namespace nacl {
     export interface BoxKeyPair {
         publicKey: Uint8Array;
@@ -62,7 +76,7 @@ declare namespace nacl {
             verify(msg: Uint8Array, sig: Uint8Array, publicKey: Uint8Array): boolean;
         }
 
-        export interface keyPair {
+                export interface keyPair {
             (): SignKeyPair;
             fromSecretKey(secretKey: Uint8Array): SignKeyPair;
             fromSeed(secretKey: Uint8Array): SignKeyPair;
@@ -96,3 +110,4 @@ declare interface nacl {
     verify(x: Uint8Array, y: Uint8Array): boolean;
     setPRNG(fn: (x: Uint8Array, n: number) => void): void;
 }
+*/

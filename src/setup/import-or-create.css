@@ -76,18 +76,31 @@ button  {
     padding: 10px 20px;
     margin: 15px 20px;
     font-weight: 500;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.25rem;
+    font-size: 1.5em;
+    font-weight: 200;
+    /* line-height: 1.25rem; */
     border-radius: 6px;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
+    transition: border-color 0.4s ease, background-color 0.4s ease;
     flex: 0 0 auto;
     max-width: 150px;
-    max-height: 50px;
+    min-height: 52px;
+    min-width: 235px;
+    border: 2px solid #00800029;
+    font-stretch: expanded;
+    font-variant: all-small-caps;
+    letter-spacing: 3px;
+}
+
+button:hover {
+  border-color:#fa971e;
+  background-color:#e89700e6;
 }
 
 .btn-primary {
     color: #fff;
-    border: 2px solid #037dd6;
-    background-color: #037dd6;
+    background-color: #4e9e56;
+}
+
+button.small {
+    font-size: 1.2em;
 }

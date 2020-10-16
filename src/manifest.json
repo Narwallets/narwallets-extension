@@ -11,7 +11,7 @@
 
   "background": {
     "scripts": [
-      "background.ts"
+      "background+ts.js"
     ],
     "persistent": false
   },
@@ -22,7 +22,7 @@
         "<all_urls>"
       ],
       "js": [
-        "content_script.ts"
+        "contentScript+ts.js"
       ]
     }
   ],
