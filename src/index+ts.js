@@ -1,5 +1,10 @@
-import * as d from "../common+ts.js"
-import * as global from "../global+ts.js"
+import * as d from "./common+ts.js"
+import * as global from "./global+ts.js"
+import * as Pages from "./pages+ts.js"
+
+import {addListeners as CreateUser_addListeners} from "./page/create-pass+ts.js"
+import {addListeners as ImportOrCreate_addListeners} from "./page/import-or-create+ts.js"
+import {addListeners as Import_addListeners} from "./page/import+ts.js"
 
 //--- content sections at MAIN popup.html
 const WELCOME_NEW_USER_PAGE = "welcome-new-user-page"
@@ -11,9 +16,6 @@ const UNLOCK = "unlock"
 
 const MAIN_PAGE = "main-page"
 const ADD_ACCOUNT = "add-account"
-const ACCOUNTS_LIST = "accounts-list"
-const ACCOUNT_ITEM_TEMPLATE = "account-item-template"
-const ACCOUNT_ITEM = "account-item"
 const TYPE = "type"
 const NAME = "name"
 const BALANCE = "balance"
@@ -82,7 +84,7 @@ function selectNetworkClicked(ev /*:Event*/) {
 }
 
 function createPassClicked(ev /*:Event*/) {
-  window.open(chrome.runtime.getURL('setup/create-pass.html')); //navigate to create pass page
+  d.showPage(CREATE_PASS)
 }
 
 function unlockClicked(ev /*:Event*/) {
@@ -104,30 +106,7 @@ function unlockClicked(ev /*:Event*/) {
 }
 
 function addAccountClicked(ev /*:Event*/) {
-  //d.showPage(IMPORT_OR_CREATE)
-  window.open(chrome.runtime.getURL('setup/import-or-create.html')); //navigate to create pass page
-}
-
-function populateLI(containerId/*:string*/, templateId/*:string*/, dataArray/*:Record<string,any>[]*/) {
-  const listContainer = d.byId(containerId)
-  if (dataArray) {
-    for (let inx in dataArray) {
-      const dataItem = dataArray[inx]
-      const newLI = document.createElement("LI")  /*+as HTMLLIElement+*/
-      newLI.innerHTML = d.templateReplace(templateId, dataItem)
-      listContainer.appendChild(newLI)
-    }
-  }
-
-}
-
-function showMainPage() {
-  //build DOM accounts list
-  populateLI(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, global.SecureState.accounts)
-  d.showPage(MAIN_PAGE)
-  if (!global.SecureState.accounts || global.SecureState.accounts.length == 0) {
-    //window.open(chrome.runtime.getURL('/setup/import-or-create.html')); //open add-account-page
-  }
+  d.showPage(IMPORT_OR_CREATE)
 }
 
 
@@ -138,16 +117,15 @@ function onLoad() {
 
   //d.byId('buttonGetPosts').addEventListener(d.CLICK, clicked);
 
-  d.byId(SELECT_NETWORK).addEventListener(d.CLICK, selectNetworkClicked);
+  d.onClick(SELECT_NETWORK, selectNetworkClicked);
+  d.onClick(CREATE_PASS, createPassClicked);
+  d.onClick(UNLOCK, unlockClicked);
 
-  d.byId(CREATE_PASS).addEventListener(d.CLICK, createPassClicked);
+  d.onEnterKey(PASSW,unlockClicked)
 
-  d.byId(UNLOCK).addEventListener(d.CLICK, unlockClicked);
-  d.byId(PASSW).addEventListener("keyup", (event/*:KeyboardEvent*/) => { if (event.key === 'Enter' || event.keyCode === 13) unlockClicked(event) })
+  d.onClick(ADD_ACCOUNT,addAccountClicked);
 
-  d.byId(ADD_ACCOUNT).addEventListener(d.CLICK, addAccountClicked);
-
-  chrome.storage.sync.clear();
+  //chrome.storage.sync.clear();
 
   //restore State from chrome.storage.sync
   global.recoverState((err/*:string*/) => {
@@ -166,13 +144,13 @@ function onLoad() {
       if (global.State.unlockSHA) { 
         //auto-unlock is enabled
         //try unlocking
-        global.tryRecoverSecureStateSHA(global.State.unlockSHA,(ok/*:boolean*/)=>{
+        global.tryRecoverSecureStateSHA(global.State.unlockSHA, (ok/*:boolean*/) => {
           //auto-unlock succeeded
           if (ok) {
-            showMainPage(); 
+            Pages.showMain(); 
           }
           else {
-             d.showPage(UNLOCK_PAGE); //ask the user to unlok SecureState
+             d.showPage(UNLOCK_PAGE); //ask the user to unlock SecureState
           }
         });
       }
@@ -182,20 +160,12 @@ function onLoad() {
         
     }
   })
+
+  //--init other pages
+  CreateUser_addListeners();
+  ImportOrCreate_addListeners();
+  Import_addListeners();
+  
 }
 
 document.addEventListener('DOMContentLoaded', onLoad);
-
-
-  // button.addEventListener('click',  () => {
-  //   //alert('Button clicked!');
-  //   var port = chrome.extension.connect({
-  //     name: "Sample Communication"
-  //   });
-  //   port.postMessage("Hi BackGround");
-  //   port.onMessage.addListener(function(msg) {
-  //     console.log("popup.js: message recieved " + msg);
-  //   });
-  // })
-
-// });

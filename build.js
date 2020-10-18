@@ -40,13 +40,13 @@ function renameToJS (filename) {
 // ---------------------
 // ---START BUILD TASKS
 // ---------------------
-
+console.clear()
 // rename *+ts.js -> *+ts.ts so the plus-ts-compiler treat them as .ts files
 // if everything compiles, rename -back
 fromDir("./src", /\+ts\.js$/, renameToTS)
 
 //call insalled ts compiler
-const execResult = child_process.spawnSync("npx",["tsc","--build","-verbose"], { stdio: 'inherit' })
+const execResult = child_process.spawnSync("npx",["tsc","--build"], { stdio: 'inherit' })
 if (execResult.error) {
     console.log(execResult.error)
     process.exit(1)

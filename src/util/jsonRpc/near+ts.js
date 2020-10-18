@@ -25,7 +25,9 @@ export async function jsonRpcInternal(payload/*:Record<string,any>*/) /*:Promise
         headers: { 'Content-type': 'application/json; charset=utf-8' }
     }
 
-    const fetchResult= await fetch(jsonRpcUrl(), rpcOptions);
+    let rpcUrl = jsonRpcUrl()
+    const fetchResult= await fetch(rpcUrl, rpcOptions);
+    if (!fetchResult.ok) throw Error(rpcUrl+" "+fetchResult.statusText)
     const jsonResponse = await fetchResult.json()
     return jsonResponse
 

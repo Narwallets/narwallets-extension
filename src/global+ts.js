@@ -17,7 +17,6 @@ type NarwalletData= {
 //data that's encrypted before saving in the chrome.storage.sync
 type AccountInfo = {
   type: string;
-  name: string;
   stakingPool: string;
   lockingContract: string;
 }
@@ -26,7 +25,7 @@ type AccountInfo = {
 //data that's encrypted before saving in the chrome.storage.sync
 type NarwalletSecureData = {
   passHash?: string;
-  accounts: AccountInfo[];
+  accounts: Record<string,AccountInfo>;
 }
 +*/
 
@@ -37,7 +36,7 @@ export var State/*:NarwalletData*/ = {
 };
 
 export var SecureState/*:NarwalletSecureData*/ = {
-  accounts: []
+  accounts: {} 
 };
 
 export function saveState() {
@@ -88,7 +87,7 @@ function sha256PwdBase64(password/*:string*/)/*:string*/ {
 
 export function createSecureState(password/*:string*/) {
   SecureState.passHash = sha256PwdBase64(password);
-  SecureState.accounts = []
+  SecureState.accounts = {}
   saveSecureState();
 }
 

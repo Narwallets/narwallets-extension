@@ -8,6 +8,8 @@
 
 h1, h2 {
   text-align:center;
+  padding: 8px 0px;
+  margin: 0px 0px;
 }
 
 #err-div {
@@ -64,6 +66,7 @@ h1, h2 {
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
+  overflow: hidden;
 }
 
 .form-field-label {
