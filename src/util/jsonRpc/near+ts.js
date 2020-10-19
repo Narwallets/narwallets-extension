@@ -1,19 +1,7 @@
-import * as global from "../../global+ts.js"
+import * as global from "../../data/global+ts.js"
+import * as Network from "../../data/Network+ts.js"
 
 let id = 0
-
-export function jsonRpcUrl()/*:string*/ {
-
-    switch (global.State.network) {
-        case "mainnet": return "https://rpc.nearprotocol.com/";
-        case "testnet": return "https://rpc.testnet.near.org/";
-        default: {
-            const msg = "no rpc defined for " + global.State.network
-            alert(msg)
-            throw (msg);
-        }
-    }
-}
 
 export async function jsonRpcInternal(payload/*:Record<string,any>*/) /*:Promise<any>*/ {
 
@@ -25,7 +13,7 @@ export async function jsonRpcInternal(payload/*:Record<string,any>*/) /*:Promise
         headers: { 'Content-type': 'application/json; charset=utf-8' }
     }
 
-    let rpcUrl = jsonRpcUrl()
+    let rpcUrl = Network.currentInfo().rpc;
     const fetchResult= await fetch(rpcUrl, rpcOptions);
     if (!fetchResult.ok) throw Error(rpcUrl+" "+fetchResult.statusText)
     const jsonResponse = await fetchResult.json()

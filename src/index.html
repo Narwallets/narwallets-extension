@@ -4,22 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Narwallet</title>
+    <link rel="stylesheet" href="hamb.css">
     <link rel="stylesheet" href="common.css">
     <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
+    <div class="corner-logo logo-32">
+    </div>
+
     <div class="app">
         <div class="app-header">
             <div class="app-header-contents">
-                <div class="app-header-logo-container">
-                    <img src="icons/icon_48.png" class="app-header-logo">
-                </div>
                 <div class="app-header-account-menu-container">
                     <div class="app-header-network-component-wrapper">
                         <div id="select-network" class="network-component pointer" title="Active Network">
                             <div class="network-indicator">
-                                <li id="curnet-name" class="green menu-icon-circle network-name">NEAR Testnet</li>
+                                <li id="current-network-display-name" class="green menu-icon-circle network-name">NEAR Testnet</li>
                                 <div class="down-arrow"></div>
                             </div>
                         </div>
@@ -27,124 +28,115 @@
                 </div>
             </div>
         </div>
+
+        <div class="hamb">
+            <svg width=24 height=28>
+                <line id="top" x1=0 y1=2 x2=24 y2=2 />
+                <line id="middle" x1=0 y1=12 x2=24 y2=12 />
+                <line id="bottom" x1=0 y1=22 x2=24 y2=22 />
+            </svg>
+        </div>
+        <aside>
+        <div class="logo-128"></div>
+            <nav>
+                <hr>
+                <li id="lock">Lock</li><hr>
+                <li id="accounts">Accounts</li><hr>
+                <li id="add-account">Add Account</li><hr>
+                <li id="create-user">Create a new User</li><hr>
+                <li id="contact">Contact</li><hr>
+                <li id="about">About</li><hr>
+            </nav>
+        </aside>
+
         <div class="app-contents">
 
-            <!-- New user, onboarding-->
-            <div id="welcome-new-user-page" class="page hidden">
+            <!-- WELCOME New user, onboarding-->
+            <div id="welcome-new-user-page" class="page slide-hide">
                 <div class="contents-header">
                     <h1>Welcome to Narwallet!</h1>
                     <h2>The future is NEAR</h2>
                 </div>
                 <div class="contents-body">
-                    <h3>Let's start our journey</h3>
+                    <h2>Let's start our journey</h2>
                     <div class="select-action-button-box">
                         <p>
-                            <b>Step one:</b>
-                            Create a password to protect this wallet
+                            <b>Step one:</b><br> Create user and password to protect this wallet
                         </p>
-                        <button id="create-pass" class="btn-primary">Create Password</button>
+                        <button id="welcome-create-pass" class="btn-primary">Create User &amp; Password</button>
                     </div>
                 </div>
             </div>
 
             <!-- New User create pass-->
-            <div id="create-pass" class="page hidden">
+            <div id="create-user" class="page slide-hide">
                 <h1>Create User</h1>
                 <form class="create-pass-form">
                     <div class="form-field-label">
                         <label data-shrink="true" for="email">Your e-mail</label>
                         <div class="form-control">
-                            <input
-                                tabindex="0"
-                                aria-invalid="false"
-                                autocomplete="e-mail"
-                                dir="auto"
-                                id="email" />
+                            <input tabindex="0" aria-invalid="false" autocomplete="e-mail" dir="auto" id="email" />
                         </div>
                     </div>
                     <div class="form-field-label">
-                        <label
-                            class=""
-                            data-shrink="true"
-                            for="pass"
-                            id="create-password-label">New password (min 6 chars)</label>
+                        <label class="" data-shrink="true" for="pass" id="create-password-label">New password (min 6
+                            chars)</label>
                         <div class="form-control">
-                            <input
-                                aria-invalid="false"
-                                autocomplete="new-password"
-                                type="password"
-                                dir="auto"
+                            <input aria-invalid="false" autocomplete="new-password" type="password" dir="auto"
                                 id="pass" />
                         </div>
                     </div>
                     <div class="form-field-label">
-                        <label
-                            class="form-field-label"
-                            data-shrink="true"
-                            for="pass-confirm"
+                        <label class="form-field-label" data-shrink="true" for="pass-confirm"
                             id="confirm-password-label">Confirm password</label>
                         <div class="form-control">
-                            <input
-                                aria-invalid="false"
-                                autocomplete="confirm password"
-                                id="pass-confirm"
-                                type="password"
-                                dir="auto"
-                                />
+                            <input aria-invalid="false" autocomplete="confirm password" id="pass-confirm"
+                                type="password" dir="auto" />
                         </div>
                     </div>
                     <div class="checkbox-container">
-                        <input
-                        id="agree-check"
-                            type="checkbox"
-                            bind:checked
-                            aria-checked="false"
+                        <input id="agree-check" type="checkbox" bind:checked aria-checked="false"
                             aria-labelledby="checkbox-label" />
-                        <label for="checkbox"class="checkbox-label">
+                        <label for="checkbox" class="checkbox-label">
                             I have read and agree to the
-                            <a
-                                href="https://narwallet.io/terms.html"
-                                target="_blank"
-                                rel="noopener noreferrer">Terms of Use
+                            <a href="https://narwallet.io/terms.html" target="_blank" rel="noopener noreferrer">Terms of
+                                Use
                             </a>
                         </label>
                     </div>
                     <div class="center">
-                    <button
-                        class="btn-primary"
-                        id="create-user"
-                        >Create
-                     </button>
-                     </div>
+                        <button class="btn-primary" id="create-user">Create
+                        </button>
+                    </div>
                 </form>
-            
+
             </div>
 
             <!-- Add Account, Import or Create ? -->
 
-            <div id="import-or-create" class="page hidden">
+            <div id="import-or-create" class="page slide-hide">
 
                 <div class="contents-header">
                     <h1>Do you have a NEAR account?</h1>
                 </div>
                 <div class="select-action-wrapper">
                     <div class="select-action-button-box">
-                            <div class="text-big">Yes, I already have a NEAR account</div>
-                            <div class="text-small">Import your existing account</div>
-                            <button id="option-import" class="btn-primary">Import account</button>
+                        <div class="text-big">Yes, I already have a NEAR account</div>
+                        <div class="text-small">Import your existing account</div>
+                        <button id="option-import" class="btn-primary">Import account</button>
                     </div>
                     <div disabled="" class="select-action-button-box">
-                            <div class="text-big">No, create a new account</div>
-                            <div class="text-small">This will create a new NEAR account in this wallet</div>
-                            <button id="option-create" class="btn-primary">Create Account</button>
+                        <div class="text-big">No, create a new account</div>
+                        <div class="text-small">This will create a new NEAR account in this wallet</div>
+                        <button id="option-create" class="btn-primary">Create Account</button>
                     </div>
                 </div>
 
             </div>
-            
+
 
             <!-- Import Account -->
-            <div id="import-account" class="page hidden">
+            <div id="import-account" class="page slide-hide">
                 <h1>Import existing account</h1>
                 <form class="import-form">
                     <div class="form-field-label">
@@ -165,8 +157,7 @@
                     </div>
                     -->
                     <button id="search" class="button btn-primary" disabled="">
-                    Search Account in&nbsp;<span id="net-name"></span></button>
-                    <div id="err-div"></div>
+                        Search Account in&nbsp;<span id="net-name"></span></button>
                     <div class="account-info flex-labeled-container">
                         <div class="flex-labeled-row">
                             <label>Account Id</label>
@@ -187,16 +178,21 @@
 
 
             <!-- Existing user, unlock-->
-            <div id="unlock-page" class="page hidden">
+            <div id="unlock" class="page slide-hide">
                 <div class="logo-128"></div>
-                <h1 class="unlock-page__title">Welcome Back!</h1>
-                <h3>Please enter your password to unlock this wallet</h3>
+                <h1>Welcome Back!</h1>
+                <h3>Please enter user and password to unlock this wallet</h3>
                 <div class="enter-pass">
                     <div class="form-field-label">
-                        <label class="" data-shrink="true" for="create-password"
-                            id="create-password-label">Password</label>
+                        <label data-shrink="true" for="email">Your e-mail</label>
                         <div class="form-control">
-                            <input aria-invalid="false" autocomplete="password" id="passw" type="password" dir="auto"
+                            <input tabindex="0" aria-invalid="false" autocomplete="e-mail" dir="auto" id="unlock-email" />
+                        </div>
+                    </div>
+                    <div class="form-field-label">
+                        <label class="" data-shrink="true" for="unlock-pass">Password</label>
+                        <div class="form-control">
+                            <input aria-invalid="false" autocomplete="password" id="unlock-pass" type="password" dir="auto"
                                 value="">
                         </div>
                     </div>
@@ -205,26 +201,64 @@
             </div>
 
             <!-- Unlocked, Main Page -->
-            <div id="main-page" class="page hidden">
+            <div id="main-page" class="page slide-hide">
+                <h2>Wallet Accounts</h2>
                 <div id="accounts-list">
                 </div>
-                <div class="contents-footer">
-                    <button id="add-account">Add Account</button>
+                <div class="total-row">
+                    <div class="account-item-group">
+                        <div class="acc-value name total">Total</div>
+                        <div class="acc-value balance total"></div>
+                    </div>
                 </div>
+                <div class="contents-footer">
+                    <button id="add-account" class="small">Add Account</button>
+                </div>
+
             </div>
 
             <!-- Account Item Template -->
             <div id="account-item-template" class="hidden">
                 <div class="account-item">
-                    <div class="acc-value type">{type}</div>
-                    <div class="acc-value name">{key}</div>
-                    <div class="acc-value balance"></div>
-                    <div class="acc-value staked"></div>
-                    <div class="acc-value available"></div>
-                    <div class="acc-value lockingcontract">{lockingContract}</div>
-                    <div class="acc-value stakingpool">{stakingPool}</div>
+                    <div class="account-item-group">
+                        <div class="acc-value type">{type}</div>
+                        <div class="acc-value name">{key}</div>
+                        <div class="acc-value balance">{lastBalance}</div>
+                    </div>
+                    <div class="acount-item-group staked hidden">
+                        <div class="acc-value staked"></div>
+                        <div class="acc-value available"></div>
+                    </div>
+                    <div class="acount-item-group lockingcontract hidden">
+                        <div class="acc-value lockingcontract">{lockingContract}</div>
+                    </div>
+                    <div class="acount-item-group stakingpool hidden">
+                        <div class="acc-value stakingpool">{stakingPool}</div>
+                    </div>
                 </div>
-                <div class="three-dots" data-key="{key}"></div>
+            </div>
+
+            <!-- Unlocked, Single Account Selected -->
+            <div id="account-selected" class="page slide-hide">
+                <header class="back-link">Back to Accounts</header>
+                <div id="selected-account">
+                </div>
+                <div class="footer">
+                    <div class="button-group">
+                        <button id="send">Send</button>
+                        <button id="receive">Receive</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="stake">Stake</button>
+                        <button id="unstake">Unstake</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="swap">swap</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="remove">Remove Account</button>
+                    </div>
+                </div>
             </div>
 
 

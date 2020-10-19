@@ -47,6 +47,15 @@ h1, h2 {
     background-image:none;
 }
 
+.logo-32 {
+    width: 38px;
+    height: 36px;
+    background-image: url(../icons/icon_48.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
 .logo-48 {
     padding: 10px;
     float: left;
@@ -63,10 +72,21 @@ h1, h2 {
 }
 
 .page {
+  position: absolute;
+  top: 65px;
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
   overflow: hidden;
+  left:50%;
+  transition: left 0.3s ease-in-out;
+  width: 100%;
+}
+.page.show {
+  left:0px
+}
+.page.slide-hide {
+  left:-600px
 }
 
 .form-field-label {
@@ -142,4 +162,11 @@ h1, h2 {
   opacity: 1;
   transition: opacity 1s 1s ease-in-out;
   z-index: 999;
+}
+
+.corner-logo {
+  position:absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 95;
 }

@@ -1,5 +1,6 @@
 import * as d from "../common+ts.js"
-import * as global from "../global+ts.js"
+import * as global from "../data/global+ts.js"
+import * as Network from "../data/Network+ts.js"
 import * as near from "../util/jsonRpc/near+ts.js"
 import * as Pages from "../pages+ts.js"
 
@@ -64,7 +65,7 @@ function accountNameInput(ev /*:Event*/) {
   searchButton.disabled = (input.value=="")
   accountBalance.text=""
   accountBalanceLine.hide()
-  accountInfoName.text = input.value+"."+global.State.networkRootAccount;
+  accountInfoName.text = input.value + "." + Network.currentInfo().rootAccount;
   messageLine.hide()
 }
 
@@ -74,12 +75,17 @@ function importClicked(ev /*:Event*/) {
 
   const accName=accountInfoName.text; //d.byId(ACCOUNT_INFO_NAME).innerText;
 
-  if (global.SecureState.accounts[accName]) return d.showErr("The account is already in the wallet")
-  global.SecureState.accounts[accName] = 
+  const userDataForCurrentNetwork = global.SecureState.accounts[Network.current]||{}
+  if (userDataForCurrentNetwork[accName]) return d.showErr("The account is already in the wallet");
+
+  userDataForCurrentNetwork[accName] = 
     { type: "acc",
       stakingPool: "",
-      lockingContract: ""
+      lockingContract: "",
+      lastBalance:accountBalance.text
     }
+
+  global.SecureState.accounts[Network.current] = userDataForCurrentNetwork;
   global.saveSecureState()
   Pages.showMain()
 }
@@ -92,7 +98,7 @@ export function addListeners() {
   searchButton.onClick(searchClicked);
   importButton.onClick(importClicked);
 
-  d.byId(NET_NAME).innerText = global.State.network;
-  d.byId(NET_ROOT).innerText = "."+global.State.networkRootAccount;
+  d.byId(NET_NAME).innerText = Network.current;
+  d.byId(NET_ROOT).innerText = "." + Network.currentInfo().rootAccount;
 
 }

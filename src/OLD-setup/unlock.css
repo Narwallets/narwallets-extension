@@ -1,7 +1,7 @@
 *, *:before, *:after {
   box-sizing: border-box;
 }
-.unlock-page {
+.unlock.page {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -13,14 +13,14 @@
   color: #aeaeae; 
 }
 
-.unlock-page__title {
+h1.unlock.page {
     margin-top: 5px;
     font-size: 2rem;
     font-weight: 800;
     color: #4d4d4d;
 }
 
-.unlock-page__form {
+.unlock.page form {
     width: 100%;
     margin: 56px 0 8px;
 }

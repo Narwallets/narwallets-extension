@@ -14,7 +14,7 @@ function importAccountClicked(ev /*:Event*/) {
 export function addListeners() {
   
   
-  d.onClick("option-import", importAccountClicked);
-  d.onClick("option-create", createAccountClicked);
+  d.onClickId("option-import", importAccountClicked);
+  d.onClickId("option-create", createAccountClicked);
 
 }
