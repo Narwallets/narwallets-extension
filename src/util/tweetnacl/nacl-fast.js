@@ -1,3 +1,4 @@
+// @ts-nocheck
 //
 // LMT https://github.com/NarwalletGH/tweetnacl-js.git
 //

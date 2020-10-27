@@ -1,17 +1,41 @@
 {
-    "$schema": "https://json.schemastore.org/tsconfig",
-    "display": "Node 12+es2020",
-   
-    "compilerOptions": {
-      "lib": ["dom","es2020", "es2020.promise", "es2020.bigint", "es2020.string"],
-      "module": "es2020",
-      "target": "es2020",
-      "outDir": "dist",
-      "sourceMap": false,
-      
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": false
-    }
-  }
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node 12+es2020",
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "es2020",
+      "es2020.promise",
+      "es2020.bigint",
+      "es2020.string"
+    ],
+    "module": "es2020",
+    "target": "es2020",
+    "outDir": "dist",
+    "sourceMap": false,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": false,
+    "experimentalDecorators": true
+  },
+  "files": [
+    "src/background/background.js",
+    "src/contracts/LockupContract.js",
+    "src/data/Network.js",
+    "src/data/global.js",
+    "src/index.js",
+    "src/options/options.js",
+    "src/pages/account-selected.js",
+    "src/pages/create-pass.js",
+    "src/pages/import-or-create.js",
+    "src/pages/import.js",
+    "src/pages/main.js",
+    "src/util/conversions.js",
+    "src/util/document.js",
+    "src/util/email.js",
+    "src/util/near-accounts.js",
+    "src/util/tweetnacl/nacl-fast.js",
+    "src/util/tweetnacl/nacl-util.js"
+  ]
+}

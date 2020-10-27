@@ -1,33 +1,37 @@
-// @ts-nocheck
+//
+// LMT migrated to ES2020/ts module format
+//
 // Written in 2014-2016 by Dmitry Chestnykh and Devi Mandiri.
 // Public domain.
 
-export  function validateBase64(s) {
-    if (!(/^(?:[A-Za-z0-9+\/]{2}[A-Za-z0-9+\/]{2})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/.test(s))) {
-      throw new TypeError('invalid encoding');
-    }
-  }
-
-export function encodeUTF8 (arr) {
+export function encodeUTF8(arr: Uint8Array): string {
     var i, s = [];
     for (i = 0; i < arr.length; i++) s.push(String.fromCharCode(arr[i]));
     return decodeURIComponent(escape(s.join('')));
   };
 
-export function decodeUTF8(s) {
+export function decodeUTF8(s: string): Uint8Array {
     if (typeof s !== 'string') throw new TypeError('expected string');
     var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
     for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
     return b;
   };
 
-export function encodeBase64(arr) {
+
+export  function validateBase64(s:string) {
+    if (!(/^(?:[A-Za-z0-9+\/]{2}[A-Za-z0-9+\/]{2})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/.test(s))) {
+      throw new TypeError('invalid encoding');
+    }
+  }
+
+
+export function encodeBase64(arr: Uint8Array): string {
       var i, s = [], len = arr.length;
       for (i = 0; i < len; i++) s.push(String.fromCharCode(arr[i]));
       return btoa(s.join(''));
     };
 
-export function decodeBase64(s) {
+export function decodeBase64(s: string): Uint8Array {
       validateBase64(s);
       var i, d = atob(s), b = new Uint8Array(d.length);
       for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);

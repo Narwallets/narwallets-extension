@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
     <title>Narwallet</title>
-    <link rel="stylesheet" href="hamb.css">
-    <link rel="stylesheet" href="common.css">
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="css/hamb.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
@@ -20,7 +20,7 @@
                     <div class="app-header-network-component-wrapper">
                         <div id="select-network" class="network-component pointer" title="Active Network">
                             <div class="network-indicator">
-                                <li id="current-network-display-name" class="green menu-icon-circle network-name">NEAR Testnet</li>
+                                <li id="current-network-display-name" class="circle yellow">NEAR Testnet</li>
                                 <div class="down-arrow"></div>
                             </div>
                         </div>
@@ -37,15 +37,21 @@
             </svg>
         </div>
         <aside>
-        <div class="logo-128"></div>
+            <div class="logo-128"></div>
             <nav>
                 <hr>
-                <li id="lock">Lock</li><hr>
-                <li id="accounts">Accounts</li><hr>
-                <li id="add-account">Add Account</li><hr>
-                <li id="create-user">Create a new User</li><hr>
-                <li id="contact">Contact</li><hr>
-                <li id="about">About</li><hr>
+                <li id="lock">Lock</li>
+                <hr>
+                <li id="accounts">Accounts</li>
+                <hr>
+                <li id="add-account">Add Account</li>
+                <hr>
+                <li id="create-user">Create a new User</li>
+                <hr>
+                <li id="contact">Contact</li>
+                <hr>
+                <li id="about">About</li>
+                <hr>
             </nav>
         </aside>
 
@@ -167,6 +173,12 @@
                             <label>Balance</label>
                             <div id="account-balance" class="near-amount balance"></div>
                         </div>
+                        <div id="account-staked-line" class="flex-labeled-row small-labels hidden">
+                            <label>Staked</label><div id="account-staked" class="near-amount balance"></div>
+                            <label>Available</label><div id="account-available" class="near-amount balance"></div>
+                        </div>
+                        <div id="account-lockup-line" class="hidden flex-labeled-row">
+                        </div>
                         <div id="account-get-message-line" class="hidden flex-labeled-row">
                             <label>Msg</label>
                             <div id="account-get-message" class=""></div>
@@ -186,14 +198,15 @@
                     <div class="form-field-label">
                         <label data-shrink="true" for="email">Your e-mail</label>
                         <div class="form-control">
-                            <input tabindex="0" aria-invalid="false" autocomplete="e-mail" dir="auto" id="unlock-email" />
+                            <input tabindex="0" aria-invalid="false" autocomplete="e-mail" dir="auto"
+                                id="unlock-email" />
                         </div>
                     </div>
                     <div class="form-field-label">
                         <label class="" data-shrink="true" for="unlock-pass">Password</label>
                         <div class="form-control">
-                            <input aria-invalid="false" autocomplete="password" id="unlock-pass" type="password" dir="auto"
-                                value="">
+                            <input aria-invalid="false" autocomplete="password" id="unlock-pass" type="password"
+                                dir="auto" value="">
                         </div>
                     </div>
                 </div>
@@ -207,8 +220,8 @@
                 </div>
                 <div class="total-row">
                     <div class="account-item-group">
-                        <div class="acc-value name total">Total</div>
-                        <div class="acc-value balance total"></div>
+                        <div class="name total">Total</div>
+                        <div class="balance total"></div>
                     </div>
                 </div>
                 <div class="contents-footer">
@@ -221,43 +234,156 @@
             <div id="account-item-template" class="hidden">
                 <div class="account-item">
                     <div class="account-item-group">
-                        <div class="acc-value type">{type}</div>
-                        <div class="acc-value name">{key}</div>
-                        <div class="acc-value balance">{lastBalance}</div>
+                        <div class="type">{type}</div>
+                        <div class="name">{key}</div>
+                        <div class="balance">{lastBalance}</div>
                     </div>
-                    <div class="acount-item-group staked hidden">
-                        <div class="acc-value staked"></div>
-                        <div class="acc-value available"></div>
+                    <div class="account-item-group staked hidden">
+                        <div class="staked"></div>
+                        <div class="available"></div>
                     </div>
-                    <div class="acount-item-group lockingcontract hidden">
-                        <div class="acc-value lockingcontract">{lockingContract}</div>
+                    <div class="account-item-group lockup-contract hidden">
+                        <div class="lockup-contract">{lockupContract}</div>
                     </div>
-                    <div class="acount-item-group stakingpool hidden">
-                        <div class="acc-value stakingpool">{stakingPool}</div>
+                    <div class="account-item-group stakingpool hidden">
+                        <div class="stakingpool">{stakingPool}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Unlocked, Single Account Selected -->
+            <!-- Unlocked, Single Account Selected Page -->
             <div id="account-selected" class="page slide-hide">
                 <header class="back-link">Back to Accounts</header>
-                <div id="selected-account">
+                <div id="selected-account" class="selected-account-info">
                 </div>
+
+                <!-- Template -->
+                <div id="selected-account-template" class="hidden">
+                    <div class="account-item-group">
+                        <label>{typeFull}</label><br>
+                        <div class="access-status">{accessStatus}</div>
+                    </div>
+                    <div class="account-item-group">
+                        <div class="name">{name}</div>
+                    </div>
+                    <div id="owner-id-info-line" class="hidden account-item-group small-labels">
+                        <label>Owner</label>
+                        <div>{accountInfo.ownerId}</div>
+                    </div>
+                    <div id="staking-pool-info-line" class="hidden account-item-group small-labels">
+                        <label>Staking Pool</label>
+                        <div>{accountInfo.stakingPool} ({accountInfo.stakingPoolPct}%)</div>
+                        <label>Rewards</label>
+                        <div class="balance">{accountInfo.rewards}</div>
+                    </div>
+                    <div class="account-item-group">
+                        <label>Balance</label>
+                        <div class="total balance">{accountInfo.lastBalance}</div>
+                    </div>
+                    <div class="account-item-group staked small-labels">
+                        <label>Staked</label>
+                        <div class="balance">{accountInfo.staked}</div>
+                        <label>Available</label>
+                        <div class="balance">{available}</div>
+                    </div>
+                </div>
+
                 <div class="footer">
-                    <div class="button-group">
-                        <button id="send">Send</button>
-                        <button id="receive">Receive</button>
+                    <div id="account-selected-buttons" class="subpage">
+                        <div class="button-group top-line">
+                            <button id="send">Send</button>
+                            <button id="receive">Receive</button>
+                        </div>
+                        <div class="button-group">
+                            <button id="stake">Stake</button>
+                            <button id="unstake">Unstake</button>
+                        </div>
+                        <div class="button-group">
+                            <button id="refresh">refresh</button>
+                            <button id="swap">swap</button>
+                        </div>
+                        <div class="button-group">
+                            <button id="remove">Remove Account</button>
+                        </div>
                     </div>
-                    <div class="button-group">
-                        <button id="stake">Stake</button>
-                        <button id="unstake">Unstake</button>
+                    <div id="account-selected-send" class="subpage hidden">
+                        <div class="title">
+                            <h2>Send</h2>
+                        </div>
+                        <form class="send-form">
+                            <div class="form-field-label">
+                                <label for="send-to-account-name">
+                                    Send to Account Id
+                                </label>
+                                <div class="form-control">
+                                    <input aria-invalid="false" id="send-to-account-name" type="text" dir="auto" value="">
+                                </div>
+                                <label for="send-to-account-amount">
+                                    Amount in NEAR
+                                </label>
+                                <div class="form-control">
+                                    <input aria-invalid="false" id="send-to-account-amount" type="text" dir="auto" value="">
+                                </div>
+                            </div>
+                            <!--
+                            <div class="form-field-label">
+                                <label class="form-field-label" data-shrink="true" for="staking-pool" id="staking-pool-label">Confirm password</label>
+                                <div class="form-control">
+                                    <input aria-invalid="false" autocomplete="staking-pool" id="passw-confirm" type="password" dir="auto" value="">
+                                </div>
+                            </div>
+                            -->
+                        </form>
                     </div>
-                    <div class="button-group">
-                        <button id="swap">swap</button>
+
+                    <div id="account-selected-make-full-access" class="subpage hidden">
+                        <div class="title">
+                            <h2>Make Full Access</h2>
+                        </div>
+                        <div class="subtitle">
+                            <h3>Enter the seed phrase for this account</h3>
+                        </div>
+                        <form class="seed-phrase-form">
+                            <div class="form-field-label">
+                                <label for="seed-phrase">
+                                    Seed Phrase
+                                </label>
+                                <div class="form-control">
+                                    <input aria-invalid="false" placeholder="correct horse battery..." id="seed-phrase" type="text" dir="auto" value="">
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="button-group">
-                        <button id="remove">Remove Account</button>
+
+                    <div id="account-selected-make-read-only" class="subpage hidden">
+                        <div class="title">
+                            <h2>Make Read Only</h2>
+                        </div>
+                        <div class="subtitle">
+                            <h3>WARNING you won't be able to access this account again without the seed phrase. Please make sure you have the seed phrase secured</h3>
+                        </div>
+                        <form class="make-read-only-form">
+                            <div class="form-field-label">
+                                <label for="account-name-confirm">
+                                    Type the account name to confirm
+                                </label>
+                                <div class="form-control">
+                                    <input aria-invalid="false" placeholder="" id="account-name-confirm" type="text" dir="auto" value="">
+                                </div>
+                            </div>
+                        </form>
                     </div>
+
+
+                    <div class="button-group top-line">
+                        <button id="account-selected-action-confirm" class="button btn-primary hidden">
+                            OK
+                        </button>
+                        <button id="account-selected-action-cancel" class="button btn-cancel hidden">
+                            Cancel
+                        </button>
+                    </div>
+
                 </div>
             </div>
 
@@ -267,7 +393,9 @@
     <!-- -->
     <div id="err-div"></div>
     <!-- -->
-    <div id="wait"></div>
+    <div id="wait">
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>    
+    </div>
     <!-- 
     Networks Dropdown 
     -->
@@ -278,20 +406,19 @@
                 <hr>
                 <div class="messsage"></div>
             </div>
-            <li data-code="mainnet" class="green menu-icon-circle">NEAR Mainnet
-            </li>
-            <li data-code="guildnet" class="cyan menu-icon-circle">Open Shards Alliance
-            </li>
-            <li data-code="testnet" class="yellow menu-icon-circle">NEAR Testnet
-            </li>
-            <li data-code="betanet" class="violet menu-icon-circle">NEAR Betanet
-            </li>
-            <li data-code="local" class="red menu-icon-circle">Local Network
-            </li>
+            <div id="network-items">
+            </div>
         </div>
     </div>
 
-    <script type="module" src="index+ts.js"></script>
+    <!-- Network Item Template -->
+    <div id="network-item-template" class="hidden">
+        <li data-code="{name}" class="circle {color}">{displayName}</li>
+    </div>
+
+    <script src="bundled-libs.js"></script>
+    <script type="module" src="index.js"></script>
+
 </body>
 
 </html>

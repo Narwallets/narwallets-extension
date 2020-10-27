@@ -11,18 +11,27 @@
 
   "background": {
     "scripts": [
-      "background/background.js"
+      "background+ts.js"
     ],
     "persistent": false
   },
 
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentScript+ts.js"
+      ]
+    }
+  ],
+ 
   "permissions": [
     "activeTab",
     "tabs",
     "declarativeContent",
-    "storage",
-    "notifications", 
-    "alarms"
+    "storage"
   ],
 
   "options_ui": {

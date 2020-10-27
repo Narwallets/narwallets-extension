@@ -1,4 +1,5 @@
 import { createRequire } from 'module';
+import ts from 'plus-typescript';
 const require = createRequire(import.meta.url);
 const fs = require("fs")
 const path= require("path")
@@ -24,38 +25,84 @@ function fromDir (startPath, filter, callback) {
     };
 };
 
-function renameToTS (filename) {
-    fs.renameSync(filename,filename.slice(0,-3)+".ts")
-    // var buf = fs.readFileSync(filename)
-    // const replaced = buf.toString().replace(/(import .* from\s+['"])(?!.*\.js['"])(\..*?)(?=['"])/g, '$1$2.js')
-    // if (replaced !== buf.toString()) {
-    //     fs.writeFileSync(filename, replaced)
-    //     console.log("fixed imports at " + filename)
-    // }
+function copyFolderSync(from, to) {
+    try {
+      fs.mkdirSync(to);
+    } catch(e) {}
+  
+    fs.readdirSync(from).forEach((element) => {
+      const stat = fs.lstatSync(path.join(from, element));
+      if (stat.isFile()) {
+        fs.copyFileSync(path.join(from, element), path.join(to, element));
+      } else if (stat.isSymbolicLink()) {
+        fs.symlinkSync(fs.readlinkSync(path.join(from, element)), path.join(to, element));
+      } else if (stat.isDirectory()) {
+        copyFolderSync(path.join(from, element), path.join(to, element));
+      }
+    });
+  }
+
+//-- execute tsc on a specific dir
+function tsc(runPath/*:string*/, extraArgs/*:string[]*/){
+    console.log(process.cwd())
+    const args=["tsc","-build","-verbose",...extraArgs||[]]
+    const execResult = child_process.spawnSync("npx",args, { stdio: 'inherit', cwd:runPath})
+    if (execResult.error) {
+        console.log(execResult.error)
+        process.exit(1)
+    }
+    if (execResult.status != 0) {
+        process.exit(execResult.status)
+    }
 }
-function renameToJS (filename) {
-    fs.renameSync(filename,filename.slice(0,-3)+".js")
-}
+
 
 // ---------------------
 // ---START BUILD TASKS
 // ---------------------
 console.clear()
-// rename *+ts.js -> *+ts.ts so the plus-ts-compiler treat them as .ts files
-// if everything compiles, rename -back
-fromDir("./src", /\+ts\.js$/, renameToTS)
+console.log("build",Date.now())
+//-----------------------------------------
+//-- compile api-ts
+tsc("./src/api") //,["--module","esnext"])
 
-//call insalled ts compiler
-const execResult = child_process.spawnSync("npx",["tsc","--build"], { stdio: 'inherit' })
-if (execResult.error) {
-    console.log(execResult.error)
+// read tsconfig.json
+var buf = fs.readFileSync("tsconfig.json")
+try{
+var tsconfig = JSON.parse(buf)
+}
+catch(ex){
+    console.error("ERR parsing tsconfig.json")
+    console.error(ex)
+    const keyPart="JSON at position "
+    let n = ex.message.indexOf(keyPart)
+    if (n!=-1) {
+        const i = n+keyPart.length
+        const pos = Number(ex.message.slice(i,i+5))
+        if (pos){
+            console.error("INFO: position",pos-20,"to",pos+20)
+            console.error("...",buf.slice(pos-20,pos+20).toString(),"...")
+        }
+    }
     process.exit(1)
 }
-if (execResult.status != 0) {
-    process.exit(execResult.status)
+//console.log(JSON.stringify(tsconfig))
+
+// get all files .js under /src except /src/api & bundled-libs.js
+let files=[]
+fromDir("./src", /\.js$/, (filename)=>{
+    if (!filename.endsWith("bundled-libs.js") && filename.indexOf("/api/")==-1) {
+      files.push(filename)
+    }
+  })
+
+const asString = JSON.stringify(files)
+if (JSON.stringify(tsconfig.files)!==asString){
+    tsconfig.files = files;
+    fs.writeFileSync("tsconfig.json",JSON.stringify(tsconfig,null,2))
+    console.log("tsconfig.json updated")
 }
 
-//if everything ok - rename back
-// rename *+ts.ts -> *+ts.js so the browser treat them as .js files
-fromDir("./src", /\+ts\.ts$/, renameToJS)
-
+//call installed tsc compiler: npx tsc
+tsc(".")
+console.log("INFO: plus-tsc build completed")
