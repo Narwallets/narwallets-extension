@@ -193,6 +193,7 @@ export function showSuccess(msg/*:string*/) {
 // requires div id="err-div" and class .show
 export function showErr(msg/*:string*/) {
   showMsg(msg, "error");
+  console.error(msg)
 }
 
 //---------------------

@@ -31,13 +31,14 @@ export async function searchAccount(accName/*:string*/) /*:Promise<SearchAccount
             let foundLockupContract = new LockupContract(accName);
             if (await foundLockupContract.tryRetrieveInfo()) {
                 //found the balances -- return as if it was a standard account
+                const prevInfo=global.SecureState.accounts[Network.current][accName]
                 result.accountInfo = {
                     type: "lock.c",
                     lastBalance: foundLockupContract.totalBalance,
                     staked : foundLockupContract.staked,
                     stakingPool: foundLockupContract.stakingPool,
                     rewards: foundLockupContract.rewards,
-                    ownerId: foundLockupContract.ownerId,
+                    ownerId: prevInfo.ownerId,
                     stakingPoolPct: foundLockupContract.stakingPoolPct
                 }
                 return result;

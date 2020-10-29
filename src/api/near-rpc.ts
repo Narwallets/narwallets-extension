@@ -13,6 +13,26 @@ declare var BN: typeof BNClass
 //-- NEAR PROTOCOL RPC CALLS
 //---------------------------
 
+export function formatJSONErr(obj:any):any{
+
+    let text=JSON.stringify(obj)
+    text = text.replace(/{/g," ")
+    text = text.replace(/}/g," ")
+    text = text.replace(/"/g,"")
+
+    //try some enhancements
+    const KEY="panicked at '"
+    const kl = KEY.length
+    let n= text.indexOf(KEY)
+    if (n>0 && n<text.length-kl-5) {
+        const i = text.indexOf("'",n+kl)
+        const cutted = text.slice(n+kl, i)
+        if (cutted.trim().length>5) text=cutted
+    }
+
+    return text
+  }
+  
 let recentBlockHash: Uint8Array;
 export function getRecentBlockHash(): Uint8Array {
     return recentBlockHash
@@ -25,8 +45,15 @@ export function bufferToHex(buffer: any) {
         .join("");
 }
 //--helper fn
-export function decodeStringFromResult(result: Uint8Array): string {
-    return naclUtil.encodeUTF8(result).slice(1, -1)
+export function decodeJsonFromResult(result: Uint8Array): string {
+    let text=naclUtil.encodeUTF8(result)
+    if (text=="null") return "" //I strongly prefer "" as alias to null (ORACLE style)
+    try {
+        return JSON.parse(text);
+    }
+    catch(ex){
+        throw Error("ERR at JSON.parse: "+text)
+    }
 }
 
 /**
@@ -113,7 +140,7 @@ result: {
 */
 
 export function queryAccount(accountId: string): Promise<StateResult> {
-    return jsonRpcQuery("account/" + accountId, {}) as Promise<StateResult>
+    return jsonRpcQuery("account/" + accountId) as Promise<StateResult>
 };
 
 export function access_key(accountId: string, publicKey: string): Promise<any> {
@@ -125,10 +152,20 @@ export function viewRaw(contractId:string, method:string, params?:any) :Promise<
     if (params) encodedParams=bs58.encode(Buffer.from(JSON.stringify(params)));
     return jsonRpcQuery("call/" + contractId + "/" + method, encodedParams);
 }
-export async function viewString(contractId:string, method:string, params?:any) :Promise<string> {
+export async function view(contractId:string, method:string, params?:any) :Promise<any> {
     const data = await viewRaw(contractId, method, params);
-    return decodeStringFromResult(data.result)
+    return decodeJsonFromResult(data.result)
 }
+
+export function getValidators(): Promise<any> {
+    return jsonRpc('validators',[null]) as Promise<any>
+};
+
+export async function getStakingPoolFee(stakingPool:string): Promise<number> {
+    const rewardFeeFraction = await view(stakingPool, "get_reward_fee_fraction");
+    return rewardFeeFraction.numerator * 100 / rewardFeeFraction.denominator;
+};
+
 
 export function broadcast_tx_commit_signed(signedTransaction: TX.SignedTransaction): Promise<any> {
     const borshEcoded = signedTransaction.encode();
@@ -179,7 +216,15 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], sender: 
         })
     });
 
-    return broadcast_tx_commit_signed(signedTransaction)
+    const result = await broadcast_tx_commit_signed(signedTransaction)
+
+    if (result.status && result.status.Failure){
+        console.error(JSON.stringify(result))
+        console.error(result)
+        throw Error(formatJSONErr(result.status.Failure))
+    }
+  
+    return result
 }
 
 
@@ -192,5 +237,3 @@ export function send(sender: string, receiver: string, amountNear: number, priva
     return broadcast_tx_commit_actions(actions, sender, receiver, privateKey)
 
 }
-
-

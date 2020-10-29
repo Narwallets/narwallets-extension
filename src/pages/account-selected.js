@@ -9,9 +9,10 @@ import * as near from "../api/near-rpc.js"
 import * as seedPhraseUtil from "../api/utils/seed-phrase.js"
 import { PublicKey } from "../api/utils/key-pair.js"
 import { setRpcUrl } from "../api/utils/json-rpc.js"
+import { LockupContract } from "../contracts/LockupContract.js"
 
 /*+
-import type { AnyElement } from "../util/document.js"
+import type { AnyElement, ClickHandler } from "../util/document.js"
 +*/
 
 const THIS_PAGE = "account-selected";
@@ -20,7 +21,7 @@ let selectedAccountData/*:ExtendedAccountData*/
 
 let accountInfoName /*:d.El*/;
 let accountBalance /*:d.El*/;
-let sendButton /*:d.El*/;
+
 let removeButton /*:d.El*/;
 let refreshButton /*:d.El*/;
 
@@ -33,6 +34,7 @@ export function show(accName/*:string*/) {
 }
 
 // page init
+let okCancelRow/*:d.El*/
 let confirmBtn/*:d.El*/
 let cancelBtn/*:d.El*/
 
@@ -40,20 +42,23 @@ function initPage() {
 
     //accountAmount.onInput(amountInput);
 
-    sendButton = new d.El("button#send");
     removeButton = new d.El("button#remove");
     refreshButton = new d.El("button#refresh");
 
+    okCancelRow = new d.El(".footer .ok-cancel")
     confirmBtn = new d.El("#account-selected-action-confirm")
     cancelBtn = new d.El("#account-selected-action-cancel")
-
 
     seedTextElem = new d.El("#seed-phrase")
 
     const backLink = new d.El("#account-selected.page .back-link");
     backLink.onClick(Pages.showMain);
 
-    sendButton.onClick(sendClicked);
+    d.onClickId("send", () => fullAccessSubPage("account-selected-send", performSend));
+    d.onClickId("stake", () => fullAccessSubPage("account-selected-stake", performLockupContractStake));
+    d.onClickId("unstake", () => fullAccessSubPage("account-selected-unstake", performUnstake));
+    d.onClickId("list-pools", listPoolsClicked);
+
     removeButton.onClick(removeClicked);
     refreshButton.onClick(refreshClicked);
 
@@ -85,8 +90,8 @@ class ExtendedAccountData {
         }
         this.typeFull = typeFullTranslation[this.accountInfo.type]
         this.accessStatus = this.accountInfo.privateKey ? "Full Access" : "Read Only"
-        if (this.accountInfo.type=="lock.c" && !this.accountInfo.privateKey){
-            if (this.accountInfo.ownerId && getAccountRecord(this.accountInfo.ownerId)){
+        if (this.accountInfo.type == "lock.c" && !this.accountInfo.privateKey) {
+            if (this.accountInfo.ownerId && getAccountRecord(this.accountInfo.ownerId)) {
                 this.accessStatus = "Owned"
             }
         }
@@ -108,12 +113,12 @@ function showAccountData(accName/*:string*/) {
     accountInfoName = new d.El(".selected-account-info .name");
     accountBalance = new d.El(".selected-account-info .total.balance");
 
-    if (selectedAccountData.accountInfo.ownerId){
-        const oiLine=new d.El(".selected-account-info #owner-id-info-line");
+    if (selectedAccountData.accountInfo.ownerId) {
+        const oiLine = new d.El(".selected-account-info #owner-id-info-line");
         oiLine.show()
     }
-    if (selectedAccountData.accountInfo.stakingPool){
-        const spLine=new d.El(".selected-account-info #staking-pool-info-line");
+    if (selectedAccountData.accountInfo.stakingPool) {
+        const spLine = new d.El(".selected-account-info #staking-pool-info-line");
         spLine.show()
     }
 
@@ -132,54 +137,127 @@ type StateResult={
 }
 +*/
 
+
+function listPoolsClicked() {
+    chrome.storage.local.set({ selectedNetwork: Network.current })
+    chrome.windows.create({
+        url: chrome.runtime.getURL("outside/list-pools.html")
+    });
+}
+
+
 let confirmFunction/*:d.ClickHandler*/ = function () { }
 
 function showOKCancel(OKHandler/*:d.ClickHandler*/) {
     confirmFunction = OKHandler
-    confirmBtn.show()
-    cancelBtn.show()
+    okCancelRow.show()
     enableOKCancel()
 }
 function disableOKCancel() {
-    confirmBtn.disabled=true
-    cancelBtn.disabled=true
+    confirmBtn.disabled = true
+    cancelBtn.disabled = true
 }
 function enableOKCancel() {
-    confirmBtn.disabled=false
-    cancelBtn.disabled=false
+    confirmBtn.disabled = false
+    cancelBtn.disabled = false
 }
 
-function checkAccountIsFullAccess() {
+function checkNormalAccountIsFullAccess() {
     if (selectedAccountData.accountInfo.privateKey) return true;
     throw Error("Account access is Read-Only. You can't perform this action")
 }
 
-function sendClicked(ev /*:Event*/) {
+function checkAccountAccess() {
+    if (selectedAccountData.accountInfo.type == "lock.c") {
+        if (!selectedAccountData.accountInfo.ownerId) throw Error("Owner is unknown. Try importing owner account");
+        const ownerInfo = getAccountRecord(selectedAccountData.accountInfo.ownerId)
+        if (!ownerInfo) throw Error("The owner account is not in this wallet")
+        if (!ownerInfo.privateKey) throw Error("You need full access on the owner account: " + selectedAccountData.accountInfo.ownerId + " to operate this lockup account")
+        //new d.El(".footer .title").hide() //no hay  espacio
+    }
+    else {//normal account
+        checkNormalAccountIsFullAccess()
+        //new d.El(".footer .title").show() //hay espacio
+    }
+}
+
+function fullAccessSubPage(subPageId/*:string*/, OKHandler/*:ClickHandler*/) {
     try {
         d.hideErr()
-        checkAccountIsFullAccess()
-        d.showSubPage("account-selected-send")
-        showOKCancel(performSend)
+        checkAccountAccess()
+        d.showSubPage(subPageId)
+        showOKCancel(OKHandler)
     }
     catch (ex) {
         d.showErr(ex.message)
     }
+
 }
 
+async function performLockupContractStake() {
+    try {
+
+        const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+        if (!near.isValidAccountID(newStakingPool)) throw Error("Staking pool Account Id is invalid");
+
+        const lc = new LockupContract(selectedAccountData.name)
+
+        const info = selectedAccountData.accountInfo
+        if (!info.ownerId) throw Error("unknown ownerId");
+
+        const owner=getAccountRecord(info.ownerId)
+        if (!owner.privateKey) throw Error("you need full access on "+owner.privateKey);
+        
+        const amountToStake = info.lastBalance - info.staked - 5
+        if (amountToStake<5) throw Error("Not enough available balance to stake. Balance-Staked="+c.toStringDec(info.lastBalance - info.staked));
+        //c.toNum(d.inputById("stake-amount").value);
+        //if (!near.isValidAmount(amountToStake)) throw Error("Amount should be a positive integer");
+
+        disableOKCancel();
+        d.showWait()
+        await lc.stakeWith(info.ownerId, 
+                    newStakingPool, 
+                    amountToStake, 
+                    owner.privateKey)
+
+        info.stakingPool = newStakingPool
+        info.staked = amountToStake
+        global.saveSecureState()
+        showAccountData(selectedAccountData.name)
+
+        d.showSuccess("Success")
+        showButtons()
+
+    }
+    catch (ex) {
+        d.showErr(ex.message)
+    }
+    finally {
+        d.hideWait()
+        enableOKCancel();
+    }
+
+}
+
+function performUnstake() {
+}
+
+
+
 function internalReflectTransfer(sender /*:string*/, receiver /*:string*/, amountNear /*:number*/) {
-    let updated=false
+    let updated = false
     //the sender should be the selected account
-    if(sender==selectedAccountData.name){
-        selectedAccountData.accountInfo.lastBalance-=amountNear
-        selectedAccountData.available-=amountNear
+    if (sender == selectedAccountData.name) {
+        selectedAccountData.accountInfo.lastBalance -= amountNear
+        selectedAccountData.available -= amountNear
         showAccountData(sender)
-        updated=true;
+        updated = true;
     }
     //check if receiver is also in this wallet
     const receiverData = getAccountRecord(receiver)
     if (receiverData) { //receiver is also in the wallet
-        receiverData.lastBalance-=amountNear
-        updated=true;
+        receiverData.lastBalance += amountNear
+        updated = true;
     }
     if (updated) global.saveSecureState();
 }
@@ -198,14 +276,14 @@ async function performSend() {
 
         await near.send(selectedAccountData.name, toAccName, amountToSend, selectedAccountData.accountInfo.privateKey)
 
-        amountElem.value=""
+        amountElem.value = ""
         showButtons()
-        
+
         //TODO transaction history per network
         //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
         //global.state.transactions[Network.current].push(transactionInfo)
 
-        d.showSuccess("Success: "+selectedAccountData.name+" transferred "+c.toStringDec(amountToSend)+"\u{24c3} to "+toAccName)
+        d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName)
 
         internalReflectTransfer(selectedAccountData.name, toAccName, amountToSend)
 
@@ -214,7 +292,7 @@ async function performSend() {
         d.showErr(ex.message)
     }
     finally {
-        //d.hideWait()
+        d.hideWait()
         enableOKCancel()
     }
 
@@ -302,12 +380,12 @@ function confirmClicked(ev/*:Event*/) {
 
 function showButtons() {
     d.showSubPage("account-selected-buttons")
-    confirmBtn.hide()
-    cancelBtn.hide()
+    okCancelRow.hide()
 }
 
 function cancelClicked() {
     showButtons()
+    okCancelRow.hide()
 }
 
 

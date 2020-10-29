@@ -26,6 +26,7 @@
     "src/data/global.js",
     "src/index.js",
     "src/options/options.js",
+    "src/outside/list-pools.js",
     "src/pages/account-selected.js",
     "src/pages/create-pass.js",
     "src/pages/import-or-create.js",

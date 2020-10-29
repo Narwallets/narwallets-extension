@@ -8,7 +8,7 @@
  * @param {string} yoctos 
  */
 export function ytonNoComma(yoctos/*:string*/)/*:string*/ {
-    return ytonFull(yoctos).slice(0, -20) // truncate to 4 decimals 
+    return ytonFull(yoctos).slice(0, -22) // truncate to 2 decimals 
 }
 
 /**
@@ -69,7 +69,7 @@ export function addCommas(str/*:string*/) {
     let n = str.indexOf(".") - 4
     while (n >= 0) {
         str = str.slice(0, n + 1) + "," + str.slice(n + 1)
-        n = n - 4
+        n = n - 3
     }
     return str;
 }

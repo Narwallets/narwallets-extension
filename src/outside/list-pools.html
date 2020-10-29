@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Narwallets.com</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="list-pools.css">
+</head>
+
+<body>
+<header>
+    <h1>Staking Pools List - <span id="net-name"></span></h1>
+</header>
+<div class="content">
+    <ul id="list" class="list">
+        <li id="item-template" class="hidden">
+            <div class="name">{name}</div>
+            <div class="stake balance">Stake: {stake}</div>
+            <div class="block production">Block Production: {uptime}%</div>
+            <div class="slashed">Slashed? {slashed}</div>
+            <div class="fee-line">
+                <span class="fee">Fee: <span id="{name}">?</span>%</span>
+            </div>
+            <button class="select small hidden">Copy to clip</button>
+        </li>
+        <hr>
+    </ul>
+</div>
+<footer>
+    <!-- -->
+    <div id="err-div"></div>
+    <!-- -->
+<div id="wait">
+    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>    
+</div>
+</footer>
+
+<script src="../bundled-libs.js"></script>
+<script type="module" src="list-pools.js"></script>
+
+</body>
+</html>

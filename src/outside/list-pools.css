@@ -1,0 +1,89 @@
+html {
+  height: 100%;
+}
+html body {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+html body .content {
+  width: 100%;
+  overflow-y: auto;
+}
+header {
+    background-color: #c4e1fe42;
+    min-height: 50px;
+    width: 100%;
+}
+footer {
+    min-height: 2px;
+    width: 100%;
+}
+
+.list {
+    margin-left: 30%;
+    width: 400px;
+}
+
+li {
+    list-style: none;
+    /* display: block; */
+    width: 100%;
+    padding: 20px 10px;
+    /* margin-bottom: 10px; */
+    border-bottom: 2px solid #80808066;
+}
+
+li:hover {
+    background-color:#80808033;
+
+}
+
+.name{
+    font-size: 1.5em;
+}
+
+.name{
+    font-size: 1.5em;
+}
+
+li div{
+    font-size: 1.2em;
+    text-align: right;
+    /* max-width: 40%; */
+    border-radius: 8px;
+}
+
+li div.name{
+    font-size: 1.5em;
+    text-align: left;
+}
+li span.fee{
+    display: inline-block;
+    font-size: 1em;
+    text-align: right;
+    border-radius: 8px;
+    min-width: 100px;
+    max-width: 100px;
+    padding: 2px 10px;
+    margin: 5px 2px;
+    border: solid 1px #0000005e;
+}
+.yellow {
+    background-color: #ffff0042;    
+}
+.red{
+    background-color: #ff000042;
+}
+.green{
+    background-color: greenyellow;
+}
+
+button.small {
+  max-height: 20px !important;
+  /* padding: 1px 10px 2px 10px; */
+  line-height: 0.5em;
+  min-height: 28px;
+  letter-spacing: 2px;
+}

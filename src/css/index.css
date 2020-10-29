@@ -1,9 +1,5 @@
 body {
-    margin: 0;
-    font-size: 11pt;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     overflow: hidden;
-    /* overscroll-behavior: none; */
 }
 
 .app {
@@ -242,35 +238,6 @@ h3 {
     font-weight: 200;
 }
 
-button {
-    padding: 7px 20px 12px 20px;
-    margin: 15px 20px;
-    font-weight: 500;
-    font-size: 1.5em;
-    font-weight: 200;
-    /* line-height: 1.25rem; */
-    border-radius: 6px;
-    transition: border-color 0.4s ease, background-color 0.4s ease;
-    flex: 1 1;
-    max-width: 150px;
-    min-height: 52px;
-    min-width: 235px;
-    border: 2px solid #00800029;
-    font-stretch: expanded;
-    font-variant: all-small-caps;
-    letter-spacing: 3px;
-}
-
-button:hover:not(:disabled) {
-    border-color: #fa971e;
-    background-color: #e89700e6;
-}
-
-button:disabled {
-    color: #999;
-    background-color: whitesmoke;
-    border-color: #dfdfdf;
-}
 
 
 #import-account button {
@@ -286,16 +253,6 @@ button:disabled {
 .btn-cancel {
     color: #fff;
     background-color: #b45a5a;
-}
-
-button.small {
-    font-size: 1.2em;
-    min-width: 160px;
-    min-height: 40px;
-    padding: 0px;
-    padding-bottom: 5px;
-    line-height: 16px;
-    vertical-align: text-bottom;
 }
 
 .select-action-button-box {
@@ -474,7 +431,7 @@ input[type=checkbox] {
 
 .account-item .name , .total-row .name {
     display: flex;
-    flex: 1 1 100%;
+    flex: 1 1 50%;
     padding: 0px 7px;
     margin: 1px 7px;
     min-height: 30px;
@@ -492,7 +449,7 @@ input[type=checkbox] {
     display: flex;
     flex: 0 0 20%;
     padding: 0px 6px;
-    align-self: center;
+    align-self: end;
     min-height: 30px;
     max-height: 30px;
     text-align: right;
@@ -547,39 +504,40 @@ input[type=checkbox] {
     color: white
 }
 
-#account-selected .footer {
+.account-selected .footer {
     flex-flow: column;
     align-items: center;
     display: flex;
     width: 100%;
 }
 
-#account-selected .button-group {
+.account-selected .button-group {
     flex-flow: row nowrap;
     justify-content: space-around;
     display: flex;
-    max-width: 400px;
+    min-width: 230px;
+    max-width: 250px;
     padding: 3px 0px;
     border-bottom: solid 1px lightgray;
 }
 
 .button-group.top-line {
     border-top: solid 1px lightgray;
-    margin-top: 5px
+    margin-top: 5px;
+    /* max-width: 80%; */
 }
 
-#account-selected .footer button {
-    font-size: 1.2em;
-    flex: 1 1 50%;
-    min-width: 150px;
-    min-height: 40px;
-    max-height: 40px;
-    padding: 0px 10px;
-    line-height: 14px;
+.account-selected .footer button  {
+    font-size: 1.3em;
+    flex: 1 1 30%;
+    min-height: 35px;
+    /* max-height: 40px; */
+    padding: 6px 10px 10px 12px;
+    line-height: 0.8em;
     margin: 4px;
 }
 
-#account-selected header {
+.account-selected header {
     width: 100%;
     height: 40px;
     margin-left: 40px;
@@ -614,7 +572,7 @@ input[type=checkbox] {
     /* align-items: center; */
     width: 100%;
     padding: 2px 6px;
-    line-height: 1.6em;
+    line-height: 1.3em;
     /* justify-content: flex-start; */
     /* align-items: baseline; */
 }
@@ -626,7 +584,7 @@ input[type=checkbox] {
     border-radius: 4px;
     background-color: #e1e1e1;
     color: black;
-    font-size: 1.3em;
+    font-size: 1.2em;
     font-weight: 300;
     padding: 0px 4px;
     line-height: 1.6em;
@@ -651,19 +609,7 @@ input[type=checkbox] {
     font-weight: 300;
 }
 
-.selected-account-info div div {
-
-    flex: 1 1 auto;
-    margin: 4px;
-    border-radius: 4px;
-    background-color: #cee8ff;
-    color: black;
-    font-size: 1.3em;
-    font-weight: 300;
-    padding: 2px 4px;
-    word-break: break-all;
-
-}
+.selected-account-info div div {flex: 1 1 auto;margin: 4px;border-radius: 4px;background-color: #cee8ff;color: black;font-size: 1.2em;font-weight: 300;padding: 2px 4px;word-break: break-all;}
 
 .access-status{
     flex: 1 1 0%!important;
@@ -674,10 +620,6 @@ input[type=checkbox] {
     border-color: #fa971e;
     background-color: #e89700e6;
     transition: border-color 0.4s ease, background-color 0.4s ease;  
-}
-
-.balance:after {
-    content: "\24c3"
 }
 
 account-item-group.staked div div{
@@ -696,7 +638,10 @@ account-item-group.staked div div{
     justify-content: space-around;
     display: flex;
     /* max-width: 400px; */
-    padding: 3px 0px;
+    padding: 0px 0px;
+    font-size: 0.6em;
+    margin: 0px;
+    font-weight: 900;
 }
   
 .footer h2 {
@@ -725,3 +670,4 @@ account-item-group.staked div div{
     background: linear-gradient(to left, rgba(240,240,240,0), #a55555);
     margin-left: 4vh;
   } 
+

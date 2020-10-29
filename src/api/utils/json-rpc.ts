@@ -21,11 +21,19 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
 
         if (!fetchResult.ok) throw new Error(rpcUrl + " " + fetchResult.status + " " + fetchResult.statusText)
 
-        if (response.error) {
-            const errorMessage = `[${response.error.code}] ${response.error.message}: ${response.error.data}`;
+        let error=response.error
+        if (!error && response.result && response.result.error) {
+            error={
+                message:response.result.error,
+                code:"",
+                data:""
+            }
+        }
+        if (error) {
+            const errorMessage = `[${error.code}] ${error.message}: ${error.data}`;
             // NOTE: All this hackery is happening because structured errors not implemented
             // TODO: Fix when https://github.com/nearprotocol/nearcore/issues/1839 gets resolved
-            if (response.error.data === 'Timeout' || errorMessage.includes('Timeout error')) {
+            if (error.data === 'Timeout' || errorMessage.includes('Timeout error')) {
                 const err = new Error('jsonRpc has timed out')
                 err.name = 'TimeoutError'
                 throw err;
@@ -62,7 +70,7 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
  * @param method jsonRpc method to call
  * @param jsonRpcParams string[] with parameters
  */
-export function jsonRpc(method: string, jsonRpcParams: string[]): Promise<any> {
+export function jsonRpc(method: string, jsonRpcParams: any[]): Promise<any> {
     const payload = {
         method: method,
         params: jsonRpcParams,
@@ -78,6 +86,7 @@ export function jsonRpc(method: string, jsonRpcParams: string[]): Promise<any> {
  * @param {any} params : { amount:"2020202202212"}
  */
 export async function jsonRpcQuery(queryWhat: string, params?: any): Promise<any> {
+    if (typeof params=="object" && params.isEmpty) params=undefined
     let queryParams = [queryWhat, params || ""] //params for the fn call - something - the jsonrpc call fail if there's a single item in the array
     return await jsonRpc("query", queryParams);
 }
