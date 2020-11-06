@@ -1,6 +1,6 @@
 node_modules
 dist
-**/api/**/*.js
-**/api/**/*.js.map
+- commented  to make it easier to beta-test **/api/**/*.js
+- commented  to make it easier to beta-test **/api/**/*.js.map
 z-attic-gitignore
 
