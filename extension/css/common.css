@@ -296,8 +296,6 @@ button {
   padding: 5px 10px 7px 10px;
   line-height: 1em;
   margin: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
-  font-weight: 250 !important;
 }
 
 button:hover:not(:disabled) {
