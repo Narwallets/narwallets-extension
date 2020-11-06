@@ -3,10 +3,15 @@
 ## Beta Test Installation (v0.1)
 
 * clone this repository on your machine and:
-* open chrome
-* enable Extensions Developer Mode
-* load unpacked extension from /Narwallets-extension/src
+  * open chrome
+  * enable Extensions Developer Mode
+  * load unpacked extension from [dir-where-you-cloned]/Narwallets-extension/src
 
+
+## Road Map to v0.2
+* Trello Board at https://trello.com/b/SRbigp2g/narwalletscom-extension-wallet-website
+* Integration with DApp - modeled as 
+* Manage Create account (currently redirecting to NEAR Web Wallet)
 
 
 ## Dev Tools (v0.1)
