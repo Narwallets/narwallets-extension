@@ -64,7 +64,7 @@ console.clear()
 console.log("build",Date.now())
 //-----------------------------------------
 //-- compile api-ts
-tsc("./src/api") //,["--module","esnext"])
+tsc("./extension/api") //,["--module","esnext"])
 
 // read tsconfig.json
 var buf = fs.readFileSync("tsconfig.json")
@@ -88,9 +88,9 @@ catch(ex){
 }
 //console.log(JSON.stringify(tsconfig))
 
-// get all files .js under /src except /src/api & bundled-libs.js
+// get all files .js under /extension except /extension/api & bundled-libs.js
 let files=[]
-fromDir("./src", /\.js$/, (filename)=>{
+fromDir("./extension", /\.js$/, (filename)=>{
     if (!filename.endsWith("bundled-libs.js") && filename.indexOf("/api/")==-1) {
       files.push(filename)
     }

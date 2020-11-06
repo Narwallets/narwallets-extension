@@ -53,7 +53,7 @@ export function yton(yoctos) {
 }
 export function isValidAccountID(accountId) {
     const MIN_ACCOUNT_ID_LEN = 2;
-    const MAX_ACCOUNT_ID_LEN = 64;
+    const MAX_ACCOUNT_ID_LEN = 64; //implicit accounts have 64 hex chars
     if (accountId.length < MIN_ACCOUNT_ID_LEN ||
         accountId.length > MAX_ACCOUNT_ID_LEN) {
         return false;

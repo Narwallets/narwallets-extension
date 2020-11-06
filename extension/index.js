@@ -175,6 +175,12 @@ function asideIsUnlocked() {
 }
 
 function securityOptions() {
+
+  //close moreless because options can change behavior
+  const buttonsMore = new d.All(".buttons-more")
+  buttonsMore.addClass("hidden")
+  d.qs("#moreless").innerText = "More..."
+
   d.showPage("security-options")
   d.inputById("auto-unlock-seconds").value = global.getAutoUnlockSeconds().toString()
   d.inputById("advanced-mode").checked = global.SecureState.advancedMode ? true : false;

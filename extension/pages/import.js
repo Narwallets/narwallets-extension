@@ -203,7 +203,7 @@ async function searchClicked(ev /*:Event*/) {
   const input = d.inputById("search-account-name")
   let accName = input.value.trim().toLowerCase()
   const root = Network.currentInfo().rootAccount
-  if (accName && !accName.endsWith(root)) accName=accName+ "." +root
+  if (accName && accName.length<60 && !accName.endsWith(root)) accName=accName+ "." +root
 
   if (!accName) {
     d.showErr("Enter the account to search for")

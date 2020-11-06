@@ -416,6 +416,16 @@ export class All {
       }
     })
   }
+  addClass(className/*:string*/) {
+    this.elems.forEach((item/*:HTMLElement*/) => {
+        item.classList.add(className)
+    })
+  }
+  removeClass(className/*:string*/) {
+    this.elems.forEach((item/*:HTMLElement*/) => {
+        item.classList.remove(className)
+    })
+  }
 
   addEventListener(event/*:string*/, handler/*:ClickHandler*/) {
     for (const item of this.elems /*+as unknown as HTMLElement[]+*/) {
