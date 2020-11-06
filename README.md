@@ -10,7 +10,7 @@
 
 ## Road Map to v0.2
 * Trello Board at https://trello.com/b/SRbigp2g/narwalletscom-extension-wallet-website
-* Integration with DApp - modeled as 
+* Integration with DApp - modeled after docs.ethers.io/v5 ? other? new approach?
 * Manage Create account (currently redirecting to NEAR Web Wallet)
 
 
