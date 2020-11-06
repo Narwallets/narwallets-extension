@@ -296,6 +296,7 @@ button {
   padding: 5px 10px 7px 10px;
   line-height: 1em;
   margin: 8px;
+  font-familyArial Narrow, Arial: ;
 }
 
 button:hover:not(:disabled) {
