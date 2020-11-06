@@ -11,8 +11,8 @@ const IMPORT_OR_CREATE = "import-or-create"
 
 function agreeCheckboxClicked(ev /*:Event*/) {
   //enable create button when terms accepted
-  const chkBox = ev.target /*+as HTMLInputElement+*/
-  d.inputById(CREATE_USER).disabled = !chkBox.checked;
+  //const chkBox = ev.target /*+as HTMLInputElement+*/
+  //d.inputById(CREATE_USER).disabled = !chkBox.checked;
 }
 
 function createClicked(ev /*:Event*/) {
@@ -28,8 +28,8 @@ function createClicked(ev /*:Event*/) {
   if (!isValidEmail(email)) {
     err = "Invalid email";
   }
-  else if (!password || password.length < 6) {
-    err = "password must be at least 6 characters long"
+  else if (!password || password.length < 8) {
+    err = "password must be at least 8 characters long"
   }
   else if (!confirm || confirm != password) {
     err = "passwords don't match"
@@ -37,17 +37,14 @@ function createClicked(ev /*:Event*/) {
   else if (!agree.checked) {
     err = "Please agree to the Terms of Use"
   }
-
+  else if (global.State.usersList.includes(email)){
+    err ="User already exists"
+  }
   if (err) {
     d.showErr(err);
     return;
   }
 
-  if (global.State.usersList.includes(email)){
-    d.showErr("User already exists")
-    d.showPage("unlock");  
-    return;
-  }
 
   //Create SecureState store hashedPass
   global.State.currentUser=email;

@@ -46,8 +46,8 @@
                 <hr>
                 <li id="add-account">Add Account</li>
                 <hr>
-                <li id="change-password">Change your password</li>
-                <hr>
+                <!--<li id="change-password">Change your password</li>
+                <hr>-->
                 <li id="create-user">Create a new User</li>
                 <hr>
                 <li id="options">Options</li>
@@ -83,23 +83,21 @@
                     <div class="form-field-label">
                         <label data-shrink="true" for="email">Your e-mail</label>
                         <div class="form-control">
-                            <input tabindex="0" aria-invalid="false" autocomplete="e-mail" dir="auto" id="email" />
+                            <input type="text" tabindex="0" autocomplete="e-mail" id="email" />
                         </div>
                     </div>
                     <div class="form-field-label">
-                        <label class="" data-shrink="true" for="pass" id="create-password-label">New password (min 6
+                        <label class="" data-shrink="true" for="pass" id="create-password-label">New password (min 8
                             chars)</label>
                         <div class="form-control">
-                            <input aria-invalid="false" autocomplete="new-password" type="password" dir="auto"
-                                id="pass" />
+                            <input type="password" autocomplete="new-password" type="password" id="pass" >
                         </div>
                     </div>
                     <div class="form-field-label">
                         <label class="form-field-label" data-shrink="true" for="pass-confirm"
                             id="confirm-password-label">Confirm password</label>
                         <div class="form-control">
-                            <input aria-invalid="false" autocomplete="confirm password" id="pass-confirm"
-                                type="password" dir="auto" />
+                            <input type="password" autocomplete="confirm password" id="pass-confirm">
                         </div>
                     </div>
                     <div class="checkbox-container">
@@ -211,17 +209,15 @@
                 <h3>Please enter user and password to unlock this wallet</h3>
                 <div class="enter-pass">
                     <div class="form-field-label">
-                        <label data-shrink="true" for="email">Your e-mail</label>
+                        <label for="email">Your e-mail</label>
                         <div class="form-control">
-                            <input tabindex="0" aria-invalid="false" autocomplete="e-mail" dir="auto"
-                                id="unlock-email" />
+                            <input type="text" tabindex="0" autocomplete="e-mail" id="unlock-email">
                         </div>
                     </div>
                     <div class="form-field-label">
-                        <label class="" data-shrink="true" for="unlock-pass">Password</label>
+                        <label for="unlock-pass">Password</label>
                         <div class="form-control">
-                            <input aria-invalid="false" autocomplete="password" id="unlock-pass" type="password"
-                                dir="auto" value="">
+                            <input autocomplete="password" id="unlock-pass" type="password">
                         </div>
                     </div>
                 </div>
@@ -259,12 +255,11 @@
                         <label for="auto-unlock-seconds" style="
                                 text-align: right;
                                 padding-right: 10px;
-                                flex: 0 1 25%;">Auto-Unlock (seconds): </label>
+                                flex: 0 1 25%;">Auto-Lock (seconds): </label>
                         <input id="auto-unlock-seconds" type="number">
                         <div class="flex-padding" style="flex: 1 0 auto;"></div>
                     </div>
-                    <div class="explanation">The wallet will auto-unlock if you close and re-open the popup extension
-                        within that period.</div>
+                    <div class="explanation">The wallet will auto-lock after x seconds of you closing the popup extension</div>
                     <div class="flex-row">
                         <button id="save-settings" class="small">Save Settings</button>
                         <button id="cancel-security-settings" class="small btn-cancel">Cancel</button>

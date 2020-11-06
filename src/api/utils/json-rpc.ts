@@ -1,6 +1,6 @@
 import * as naclUtil from "../tweetnacl/util.js";
 
-let rpcUrl: string = "https://rpc.testnet.near.org/"
+let rpcUrl: string = "https://rpc.mainnet.near.org/"
 
 export function setRpcUrl(newUrl: string) {
     rpcUrl = newUrl;

@@ -180,10 +180,11 @@ export function tryRecoverSecureStateSHA(user/*:string*/, hashedPassBase64/*:str
       if (!user) throw new Error("user is null")
       chrome.storage.sync.get(user, (obj) => {
         try {
-          if (!obj[State.currentUser]) throw Error(INVALID_USER_OR_PASS)
-          const decrypted = decryptIntoJson(hashedPassBase64, obj[State.currentUser]);
+          if (!obj[user]) throw Error(INVALID_USER_OR_PASS)
+          const decrypted = decryptIntoJson(hashedPassBase64, obj[user]);
           SecureState = decrypted
           State.currentUser = user;
+          saveState()
           Network.setCurrent(SecureState.initialNetworkName);
           unlocked = true;
           resolve()

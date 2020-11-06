@@ -1,4 +1,4 @@
-let rpcUrl = "https://rpc.testnet.near.org/";
+let rpcUrl = "https://rpc.mainnet.near.org/";
 export function setRpcUrl(newUrl) {
     rpcUrl = newUrl;
 }

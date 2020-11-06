@@ -9,6 +9,8 @@ import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js"
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js"
 import { addListeners as Import_addListeners } from "./pages/import.js"
 
+import { show as AccountSelectedPage_show } from "./pages/account-selected.js"
+
 /*+
 import * as bip39 from "./bundled-types/bip39-light"
 import type { NetworkInfo} from "./data/Network.js"
@@ -179,6 +181,7 @@ function securityOptions() {
   d.onClickId("save-settings", saveSecurityOptions)
   d.onClickId("cancel-security-settings", Pages.showMain)
 }
+
 function saveSecurityOptions(ev/*:Event*/) {
   try {
     ev.preventDefault()
@@ -209,7 +212,7 @@ function asideOptions() {
 }
 
 function asideCreateUser() {
-  global.saveOnUnload.unlockSHA = "";
+  global.lock()
   hambClicked();
   d.showPage(WELCOME_NEW_USER_PAGE)
 }
@@ -256,7 +259,7 @@ async function onLoad() {
   d.qs("aside #accounts").onClick(asideAccounts);
   d.qs("aside #create-user").onClick(asideCreateUser);
   d.qs("aside #add-account").onClick(asideAddAccount);
-  d.qs("aside #change-password").onClick(asideChangePassword);
+  //d.qs("aside #change-password").onClick(asideChangePassword);
   d.qs("aside #options").onClick(asideOptions);
   //new d.El(".aside #contact).asideContact);
   //new d.El(".aside #about).asideAbout);
@@ -293,6 +296,17 @@ async function onLoad() {
       chrome.storage.local.get("uk", (obj) => {
         //console.log("chrome.storage.local.get(uk", obj)
         tryAutoUnlock(obj.uk)
+          .then((result) => {
+            if (result) {
+              chrome.storage.local.get({ reposition: "", account: "" }, (obj) => {
+                if (obj.account) {
+                  chrome.storage.local.remove("reposition")
+                  chrome.storage.local.remove("account")
+                  AccountSelectedPage_show(obj.account, obj.reposition)
+                }
+              });
+            }
+          });
       });
     }
 
@@ -310,7 +324,7 @@ async function onLoad() {
   }
 }
 
-async function tryAutoUnlock(unlockSHA/*:string*/) {
+async function tryAutoUnlock(unlockSHA/*:string*/) /*:Promise<boolean>*/ {
   if (unlockSHA) {
     //auto-unlock is enabled
     //try unlocking
@@ -320,14 +334,15 @@ async function tryAutoUnlock(unlockSHA/*:string*/) {
       global.saveOnUnload.unlockSHA = unlockSHA;
       try { Network.setCurrent(global.SecureState.initialNetworkName) } catch { }; //initial networkName for this user
       Pages.showMain(); //show acc list
-      return;
+      return true;
     }
     catch (ex) {
       //invalid pass-SHA or other error
       d.showErr(ex.message);
-      chrome.storage.local.get
+      return false;
     }
   }
+  return false;
 }
 
 
@@ -370,10 +385,10 @@ async function tryAutoUnlock(unlockSHA/*:string*/) {
 document.addEventListener('DOMContentLoaded', onLoad);
 
 //calling a background fn seems to be the only way to execut something on popupUnload
-var background = chrome.extension.getBackgroundPage();
 addEventListener("unload", function (event) {
+  console.log("unload")
   //@ts-ignore
-  background.popupUnloading(global.saveOnUnload.unlockSHA, global.getAutoUnlockSeconds()*1000); //SET AUTO-UNLOCK for 1h
+  chrome.extension.getBackgroundPage().popupUnloading(global.saveOnUnload.unlockSHA, global.getAutoUnlockSeconds() * 1000); //SET AUTO-LOCK after x seconds
 }, true);
 
 // chrome.runtime.getBackgroundPage((background)=>{
@@ -392,7 +407,7 @@ addEventListener("unload", function (event) {
 
 function openTermsOfUseOnNewWindow() {
   chrome.windows.create({
-    url: 'https://narwallet.io/terms.html'
+    url: 'https://narwallets.com/terms.html'
   });
   return false
 }

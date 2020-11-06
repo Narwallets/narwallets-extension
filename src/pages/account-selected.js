@@ -29,10 +29,18 @@ let refreshButton /*:d.El*/;
 
 let seedTextElem /*:d.El*/;
 
-export function show(accName/*:string*/) {
+export function show(accName/*:string*/, reposition/*+?:string+*/) {
     initPage();
     showAccountData(accName);
     d.showPage(THIS_PAGE)
+    if(reposition){
+        switch(reposition){
+            case "stake": {
+                stakeClicked()
+                break;
+            }
+        }
+    }
 }
 
 // page init
@@ -145,6 +153,7 @@ type StateResult={
 
 function listPoolsClicked() {
     chrome.storage.local.set({ selectedNetwork: Network.current })
+    chrome.storage.local.set({ reposition: "stake", account:selectedAccountData.name })
     chrome.windows.create({
         url: chrome.runtime.getURL("outside/list-pools.html"),
         state: "maximized"
@@ -741,18 +750,17 @@ type PoolInfo = {
 }
 +*/
 //---------------------------------------------
-export async function searchThePools(exAccData/*:ExtendedAccountData*/) {
+export async function searchThePools(exAccData/*:ExtendedAccountData*/) /*:Promise<boolean>*/{
 
     const doingDiv = d.showMsg("Searching Pools...", "info", -1)
     d.showWait()
+    let lastAmountFound = 0
     try {
 
         let checked/*:Record<string,boolean>*/ = {}
-        let lastAmountFound = 0
 
         const validators = await near.getValidators()
         const allOfThem = validators.current_validators.concat(validators.next_validators, validators.prev_epoch_kickout, validators.current_proposals)
-
 
         for (let pool of allOfThem) {
             if (!checked[pool.account_id]) {
@@ -779,15 +787,11 @@ export async function searchThePools(exAccData/*:ExtendedAccountData*/) {
                             exAccData.accountInfo.unStaked = near.yton(poolAccInfo.unstaked_balance)
                             exAccData.inThePool = exAccData.accountInfo.staked + exAccData.accountInfo.unStaked
                             exAccData.accountInfo.stakingPoolPct = await near.getStakingPoolFee(pool.account_id)
-                            global.saveSecureState()
                             lastAmountFound = amount
                         }
                     }
                 }
             }
-        }
-        if (lastAmountFound > 0) {
-            refreshSelectedAccount()
         }
     }
     catch (ex) {
@@ -796,12 +800,17 @@ export async function searchThePools(exAccData/*:ExtendedAccountData*/) {
     finally {
         doingDiv.remove()
         d.hideWait()
+        return (lastAmountFound > 0)
     }
 
 }
 
 async function searchPoolsButtonClicked() {
-    searchThePools(selectedAccountData)
+    const found = searchThePools(selectedAccountData)
+    if (found){
+        refreshSelectedAccount()
+        global.saveSecureState()
+    }
 }
 
 //---------------------------------------

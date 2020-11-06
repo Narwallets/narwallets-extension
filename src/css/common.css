@@ -141,7 +141,7 @@ h3.warning {
     /* padding-top: 10px; */
 }
 
-input[type="text"] {
+input[type="text"],input[type="password"] {
     padding: 0px 20px;
     font-size: 1em;
     border: 2px solid #BBC0C5;
@@ -151,6 +151,16 @@ input[type="text"] {
     color: #363636;
     text-align: center;
 }
+input[type="number"] {
+    padding: 0px 20px;
+    font-size: 1em;
+    border: 2px solid #BBC0C5;
+    border-radius: 6px;
+    height: 2.4em;
+    color: #363636;
+    text-align: center;
+}
+
 
 .with-inside-button{
   padding-right: 136px !important;

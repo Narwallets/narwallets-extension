@@ -19,7 +19,7 @@ chrome.runtime.onSuspend.addListener(function () {
 //----- expire auto-unlock
 const UNLOCK_EXPIRED = "unlock-expired"
 function popupUnloading(unlockSHA/*:string*/, expireMs/*:number*/){
-  //console.log("BACK: popupUnloading", expireMs);
+  console.log("BACK: popupUnloading", expireMs);
   if (expireMs<=0){
       chrome.storage.local.remove("uk") //clear unlock sha
   }

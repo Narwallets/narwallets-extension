@@ -130,7 +130,7 @@ async function searchTheAccountName(accName/*:string*/) {
     if (d.qs("#yes-search-the-pools").el.checked){
       await searchThePools(mainExtData)
       displayAccountInfoAt("searched-account-info","search-info-account-template",mainExtData)
-      //Note: the lockupContract knows how much it has staked, no need to search at this point to get total balance
+      //Note: the lockupContract knows how much it has staked, no need to search the pools to get total balance
     }
 
   }
