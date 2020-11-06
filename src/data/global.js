@@ -2,9 +2,11 @@ import * as nacl from "../util/tweetnacl/nacl-fast.js"
 import * as naclUtil from "../util/tweetnacl/nacl-util.js";
 import * as sha256 from "../api/sha256.js"
 import * as Network from "./Network.js";
+import { recoverFromSyncStorage } from "./util.js";
 import { showErr, IUOP as INVALID_USER_OR_PASS } from "../util/document.js";
+import { Account } from "../data/Account.js"; //required for SecureState declaration
 
-const DATA_VERSION="0.1"
+const DATA_VERSION = "0.1"
 
 
 /*+
@@ -13,63 +15,58 @@ import type {NetworkInfo} from "./Network.js";
 //---- GLOBAL STATE ----
 /*+
 //data that's not encrypted
-type NarwalletData= {
+type StateStruc= {
   dataVersion: string;
   usersList: string[];
   currentUser:string;
 }
-
-//user NEAR accounts info type
-export type AccountInfo = {
-  type: string;
-  lastBalance: number;
-  staked: number;
-  stakingPool?: string;
-  rewards?: number;
-  stakingPoolPct?: number;
-  privateKey?: string;
-  ownerId?:string; //ownerId if this is a lockup-contract {type:"lock.c"}
-}
-
-type NetworkNameType=string;
-type AccountIdType=string;
-
-//data that's encrypted before saving in the chrome.storage.sync
-// for each-user
-type NarwalletSecureData = {
-  dataVersion: string;
-  hashedPass?: string;
-  initialNetworkName: string;
-  accounts: Record<NetworkNameType,Record<AccountIdType,AccountInfo>>; 
-}
 +*/
-// SecureState.accounts => { network { accountId { ...info
 
-export const EmptyState/*:NarwalletData*/ = {
+
+export const EmptyState/*:StateStruc*/ = {
   dataVersion: DATA_VERSION,
   usersList: [],
   currentUser: "",
 };
 
-export var State = EmptyState;
+export var State = Object.assign({},EmptyState);
 
-export const MemState = {
-    unlockSHA: ""
+export const saveOnUnload = {
+  unlockSHA: "" //while the extension is open. When the ext gets closed, this is saved if auto-unlock is enabled
 }
+
+/*+
+type NetworkNameType=string;
+type AccountIdType=string;
+
+//data that's stored *encrypted* in chrome.storage.sync
+// for each-user
+type NarwalletSecureData = {
+  dataVersion: string;
+  hashedPass?: string;
+  initialNetworkName: string;
+  autoUnlockSeconds: number;
+  advancedMode: boolean;
+  accounts: Record<NetworkNameType,Record<AccountIdType,Account>>; 
+}
++*/
+// SecureState.accounts => { network { accountId { ...info
 
 const EmptySecureState/*:NarwalletSecureData*/ = {
   dataVersion: DATA_VERSION,
   hashedPass: undefined,
   initialNetworkName: Network.defaultName,
+  autoUnlockSeconds: 15,
+  advancedMode: false,
   accounts: {}
 };
 
-export var SecureState/*:NarwalletSecureData*/ = EmptySecureState;
+export var SecureState/*:NarwalletSecureData*/ = Object.assign({},EmptySecureState);
 export var unlocked = false;
 
 
-export function clearState(){
-  State = Object.assign({},EmptyState);
+export function clearState() {
+  State = Object.assign({}, EmptyState);
   unlocked = false;
 }
 
@@ -84,41 +81,20 @@ export function saveState() {
 type callbackERR = (err:string) => void;
 +*/
 
-export function recoverState()/*:Promise<void>*/ {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.storage.sync.get("S", (keys) => {
-        State = (keys.S || {}) /*+as NarwalletData+*/;
-        if (Object.keys(State).length==0) Object.assign(State,EmptyState);
-        return resolve()
-      })
-      // const stringState = localStorage.getItem("S")
-      // if (stringState) {
-      //   try {
-      //     State = JSON.parse(stringState);
-      //   }
-      //   catch {
-      //     alert("CRITICAL. Invalid state. State reset");
-      //   }
-      //   finally { }
-      // }
-    }
-    catch (err) {
-      console.error("CRITICAL. Can't recover state", err.message);
-      reject()
-    }
-    finally { }
-  });
+
+export async function recoverState()/*:Promise<void>*/ {
+  State = await recoverFromSyncStorage("State","S", EmptyState)
 }
 
 function sha256PwdBase64(password/*:string*/)/*:string*/ {
   return naclUtil.encodeBase64(sha256.hash(naclUtil.decodeUTF8(password)));
 }
 
-export function lock(){
-  unlocked =false;
-  MemState.unlockSHA="";
+export function lock() {
+  unlocked = false;
+  saveOnUnload.unlockSHA = "";
   SecureState = EmptySecureState;
+  chrome.storage.local.remove('uk') //clear auto-unlock
 }
 
 
@@ -126,7 +102,7 @@ export function createSecureState(password/*:string*/) {
   SecureState.hashedPass = sha256PwdBase64(password);
   SecureState.accounts = {}
   saveSecureState();
-  unlocked=true;
+  unlocked = true;
 }
 
 export function saveSecureState() {
@@ -148,17 +124,23 @@ export function saveSecureState() {
   const base64FullMessage = naclUtil.encodeBase64(fullMessage);
 
   //localStorage.setItem("SS", base64FullMessage)
-  const dataToStore/*:any*/={}
-  dataToStore[State.currentUser] = base64FullMessage;
-  chrome.storage.sync.set(dataToStore, () => {
+  const keyIsCurrentUser/*:any*/ = {}
+  keyIsCurrentUser[State.currentUser] = base64FullMessage;
+  chrome.storage.sync.set(keyIsCurrentUser, () => {
     if (chrome.runtime.lastError) showErr(chrome.runtime.lastError.message /*+as string+*/);
   })
 
 }
 
 
-export function setAutoUnlock(password/*:string*/) {
-  MemState.unlockSHA = sha256PwdBase64(password); //auto-unlock key
+export function setAutoUnlock(user/*:string*/, password/*:string*/) {
+  //remember user
+  if (State.currentUser != user) {
+    State.currentUser = user;
+    saveState(); //remember last user
+  }
+  saveOnUnload.unlockSHA = sha256PwdBase64(password); //auto-save on popup-unload (with expiry time)
+  chrome.storage.local.set({uk:saveOnUnload.unlockSHA}) //to facilitate Ctrl-R development
   //console.log("MemState.unlockSHA",MemState.unlockSHA)
 }
 
@@ -166,7 +148,7 @@ export function setAutoUnlock(password/*:string*/) {
 function decryptIntoJson(hashedPassBase64/*:string*/, encryptedMsg/*:string*/)/*:NarwalletSecureData*/ {
 
   if (!encryptedMsg) throw new Error("encryptedState is empty");
-  
+
   const keyPair = nacl.sign_keyPair_fromSeed(naclUtil.decodeBase64(hashedPassBase64));
   const keyUint8Array = keyPair.publicKey;
 
@@ -179,14 +161,14 @@ function decryptIntoJson(hashedPassBase64/*:string*/, encryptedMsg/*:string*/)/*
 
   const decrypted = nacl.secretbox_open(message, nonce, keyUint8Array);
 
-  if (decrypted==null||!decrypted) throw Error(INVALID_USER_OR_PASS);
+  if (decrypted == null || !decrypted) throw Error(INVALID_USER_OR_PASS);
 
   const base64DecryptedMessage = naclUtil.encodeUTF8(decrypted /*+as Uint8Array+*/);
   return JSON.parse(base64DecryptedMessage);
- }
+}
 
 //recover with PASSWORD
-export function tryRecoverSecureState(user/*:string*/,password/*:string*/) /*:Promise<void>*/ {
+export function tryRecoverSecureState(user/*:string*/, password/*:string*/) /*:Promise<void>*/ {
   return tryRecoverSecureStateSHA(user, sha256PwdBase64(password))
 }
 
@@ -194,32 +176,62 @@ export function tryRecoverSecureState(user/*:string*/,password/*:string*/) /*:Pr
 export function tryRecoverSecureStateSHA(user/*:string*/, hashedPassBase64/*:string*/) /*:Promise<void>*/ {
   //const encryptedState = localStorage.getItem("SS")
   return new Promise((resolve, reject) => {
-      try {
-        if (!user) throw new Error("user is null")
-        chrome.storage.sync.get(user, (obj) => {
-          try {
-            if (!obj[State.currentUser]) throw Error(INVALID_USER_OR_PASS)
-            const decrypted=decryptIntoJson(hashedPassBase64, obj[State.currentUser]);
-            SecureState = decrypted
-            State.currentUser=user;
-            Network.setCurrent(SecureState.initialNetworkName);
-            unlocked=true;
-            resolve()
-          }
-          catch(ex){
-            SecureState = EmptySecureState;
-            unlocked=false;
-            reject(ex);
-          }
-        })
-      } catch (ex) {
-        SecureState = EmptySecureState;
-        unlocked=false;
-        reject(ex);
-      }
+    try {
+      if (!user) throw new Error("user is null")
+      chrome.storage.sync.get(user, (obj) => {
+        try {
+          if (!obj[State.currentUser]) throw Error(INVALID_USER_OR_PASS)
+          const decrypted = decryptIntoJson(hashedPassBase64, obj[State.currentUser]);
+          SecureState = decrypted
+          State.currentUser = user;
+          Network.setCurrent(SecureState.initialNetworkName);
+          unlocked = true;
+          resolve()
+        }
+        catch (ex) {
+          SecureState = EmptySecureState;
+          unlocked = false;
+          reject(ex);
+        }
+      })
+    } catch (ex) {
+      SecureState = EmptySecureState;
+      unlocked = false;
+      reject(ex);
+    }
   });
 }
 
+//------------------
+export function saveAccount(accName/*:string*/, accountInfo/*:Account*/) {
+
+  if (!accName || !accountInfo) {
+      console.error("saveFoundAccount called but no data")
+      return;
+  }
+
+  let accountsForCurrentNetwork = SecureState.accounts[Network.current]
+  if (accountsForCurrentNetwork == undefined) { //no accounts yet
+      accountsForCurrentNetwork = {} //create empty object
+      SecureState.accounts[Network.current] = accountsForCurrentNetwork
+  }
+
+  accountsForCurrentNetwork[accName] = accountInfo
+
+  saveSecureState()
+}
+
+export function getNetworkAccountsCount(){
+  const accounts = SecureState.accounts[Network.current]
+  if (!accounts) return 0;
+  return Object.keys(accounts).length
+}
+
+export function getAutoUnlockSeconds(){
+  let aul = SecureState.autoUnlockSeconds
+  if (aul == undefined) aul = 15;
+  return aul;
+}
 
 //--background page
 /*+

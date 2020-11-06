@@ -16,6 +16,28 @@ chrome.runtime.onSuspend.addListener(function () {
 });
 
 
+//----- expire auto-unlock
+const UNLOCK_EXPIRED = "unlock-expired"
+function popupUnloading(unlockSHA/*:string*/, expireMs/*:number*/){
+  //console.log("BACK: popupUnloading", expireMs);
+  if (expireMs<=0){
+      chrome.storage.local.remove("uk") //clear unlock sha
+  }
+  else {
+    chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + expireMs })
+    chrome.storage.local.set({ uk: unlockSHA })
+  }
+}
+
+chrome.alarms.onAlarm.addListener(
+  function (alarm/*:any*/) {
+    //console.log("chrome.alarms.onAlarm fired ", alarm);
+    if (alarm.name == UNLOCK_EXPIRED) {
+      chrome.storage.local.remove("uk") //clear unlock sha
+    }
+  }
+);
+  
 // chrome.extension.onConnect.addListener(function(port) {
 //   console.log("Connected .....");
 //   port.onMessage.addListener(function(msg) {
@@ -61,18 +83,3 @@ chrome.runtime.onSuspend.addListener(function () {
 //   });
 
 
-//----- expire auto-unlock
-const UNLOCK_EXPIRED = "unlock-expired"
-function popupUnloading(unlockSHA/*:string*/, expireMs/*:number*/){
-  //console.log("BACK: popupUnloading", expireMs);
-  chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + (expireMs || 5000) })
-  chrome.storage.local.set({ uk: unlockSHA })
-}
-chrome.alarms.onAlarm.addListener(
-  function (alarm/*:any*/) {
-    //console.log("chrome.alarms.onAlarm fired ", alarm);
-    if (alarm.name == UNLOCK_EXPIRED) {
-      chrome.storage.local.set({ uk: "" }) //clear unlock sha
-    }
-  });
-  

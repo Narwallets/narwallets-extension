@@ -4,148 +4,72 @@ import * as d from "./document.js"
 import * as Network from "../data/Network.js"
 import * as near from "../api/near-rpc.js";
 import { LockupContract } from "../contracts/LockupContract.js"
+import { Account } from "../data/Account.js"
 
-/*+
-export type SearchAccountResult = {
-    accName      : string;
-    accountInfo  : global.AccountInfo|undefined;
-    foundLockupContract: LockupContract|undefined;
-    error:string;
+function checkNotLockup(accName/*:string*/) {
+    if (accName.endsWith(LockupContract.getLockupSuffix())) {
+        throw Error("You must import the owner's account to get the Lockup contract account")
+    }
 }
-+*/
 
-export async function searchAccount(accName/*:string*/) /*:Promise<SearchAccountResult>*/ {
+export async function asyncRefreshAccountInfo(accName/*:string*/, info/*:Account*/) {
 
-    let result/*:SearchAccountResult*/ = {
-        accName: accName,
-        accountInfo: undefined,
-        foundLockupContract: undefined,
-        error: ""
+    if (accName.endsWith(LockupContract.getLockupSuffix())) {
+        //es un lockup
+        if (!info.ownerId) return;
+        const lockup = await getLockupContract(info)
+        if (!lockup) return;
     }
 
-    try {
-        if (accName.endsWith(LockupContract.getLockupSuffix())) {
-            //-------------------------
-            //-- It's a lockup contract, just refresh balances
-            //-------------------------
-            let foundLockupContract = new LockupContract(accName);
-            if (await foundLockupContract.tryRetrieveInfo()) {
-                //found the balances -- return as if it was a standard account
-                const prevInfo=global.SecureState.accounts[Network.current][accName]
-                result.accountInfo = {
-                    type: "lock.c",
-                    lastBalance: foundLockupContract.totalBalance,
-                    staked : foundLockupContract.staked,
-                    stakingPool: foundLockupContract.stakingPool,
-                    rewards: foundLockupContract.rewards,
-                    ownerId: prevInfo.ownerId,
-                    stakingPoolPct: foundLockupContract.stakingPoolPct
-                }
-                return result;
-            }
-            else {
-                result.error = "Error retrieving Lockup C. Data";
-                return result;
-            }
-
+    else {
+        //normal
+        let stateResultYoctos;
+        try {
+            stateResultYoctos = await near.queryAccount(accName)
         }
-        else { //normal account
-
-            let stateResultYoctos;
-            try {
-                stateResultYoctos = await near.queryAccount(accName)
-            }
-            catch (ex) {
-                const reason = ex.message.replace("while viewing", "")
-                result.error = reason;
-                return result;
-            }
-
-            result.accountInfo = {
-                type: "acc",
-                lastBalance: c.ytoNN(stateResultYoctos.amount),
-                staked : c.ytoNN(stateResultYoctos.locked),
-            }
-        
-
-            //Try search lockup contract
-            result.foundLockupContract = new LockupContract(accName);
-            if (await result.foundLockupContract.tryRetrieveInfo()) {
-                //found the lockup contract
-            }
-            else {
-                result.foundLockupContract = undefined;
-            }
-
-            return result;
+        catch (ex) {
+            const reason = ex.message.replace("while viewing", "")
+            throw Error(reason)
         }
-    }
-    catch(ex) {
-        result.error= ex.message;
-        return result;
-    }
-    finally {
+
+        info.lastBalance = c.yton(stateResultYoctos.amount)
+        if (info.stakingPool){
+            const previnThePool = info.staked+info.unStaked;
+            const stakingInfo = await near.getStakingPoolAccInfo(accName,info.stakingPool)
+            info.staked = near.yton(stakingInfo.staked_balance)
+            info.unStaked = near.yton(stakingInfo.unstaked_balance)
+            info.rewards = previnThePool>0? info.staked + info.unStaked - previnThePool : 0;
+            info.stakingPoolPct = await near.getStakingPoolFee(info.stakingPool)
+        }
+        else {
+            info.staked = 0
+            info.unStaked = 0
+        }
     }
 
 }
 
+export async function searchAccount(accName/*:string*/) /*:Promise<Account>*/ {
 
-//------------------
-export function saveFoundAccounts(result/*:SearchAccountResult*/) {
+    checkNotLockup(accName)
 
-    if (result.error || !result.accName || !result.accountInfo) {
-        console.error("saveFoundAccounts called but no data")
-        return;
-    }
+    let result = new Account();
+    await asyncRefreshAccountInfo(accName,result)
 
-    const userDataForCurrentNetwork = global.SecureState.accounts[Network.current] || {}
-    //commented: if exists in the wallet, refresh it
-    //if (userDataForCurrentNetwork[accName]) return d.showErr("The account is already in the wallet");
-
-    const data = userDataForCurrentNetwork[result.accName] || {}
-
-    if (data.isEmpty){ //new account
-        d.showSuccess("Account found!")
-    }
-
-    Object.assign(data, {
-        type: result.accountInfo.type,
-        lastBalance: result.accountInfo.lastBalance,
-        staked: result.accountInfo.staked,
-        ownerId: result.accountInfo.ownerId,
-        stakingPool: result.accountInfo.stakingPool,
-        rewards: result.accountInfo.rewards,
-        stakingPoolPct: result.accountInfo.stakingPoolPct,
-    });
-
-    userDataForCurrentNetwork[result.accName] = data //if it was new, add it
-    global.saveSecureState()
-
-    //also add foundLockupContract
-    if (result.foundLockupContract) {
-        //commented: if it is in the wallet, refresh
-        //if (!userDataForCurrentNetwork[foundLockupContract.contractAccount]) return d.showErr("The account is already in the wallet");
-
-        const lcData = userDataForCurrentNetwork[result.foundLockupContract.contractAccount] || {}
-
-        if (lcData.isEmpty){ //new Lockup Contract account
-            d.showSuccess("Associated Lockup Contract account found!")
-        }
-
-        Object.assign(lcData, {
-            type: "lock.c",
-            staked: result.foundLockupContract.staked,
-            lastBalance: result.foundLockupContract.totalBalance,
-            ownerId: result.foundLockupContract.ownerId,
-            stakingPool: result.foundLockupContract.stakingPool,
-            rewards: result.foundLockupContract.rewards,
-            stakingPoolPct: result.foundLockupContract.stakingPoolPct,
-        });
-
-        
-        userDataForCurrentNetwork[result.foundLockupContract.contractAccount] = lcData //if it was new, add it
-        global.saveSecureState()
-
-    }
-
+    return result;
 }
+
+export async function getLockupContract(accInfo/*:Account*/)/*:Promise<LockupContract|undefined>*/ {
+    //Try search lockup contract
+    const result = new LockupContract(accInfo);
+    if (await result.tryRetrieveInfo()) {
+        //found the lockup contract
+        return result
+    }
+    else {
+        return undefined;
+    }
+}
+
+
+

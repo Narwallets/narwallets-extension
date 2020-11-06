@@ -1,9 +1,14 @@
 import * as d from "../util/document.js"
+import * as Network from "../data/Network.js"
+
 
 const IMPORT_ACCOUNT ="import-account"
 
 function createAccountClicked(ev /*:Event*/) {
-  //d.showPage(CREATE_ACCOUNT)
+    chrome.windows.create({
+        url: Network.currentInfo().NearWebWalletUrl,
+        state: "maximized"
+    });
 }
 
 function importAccountClicked(ev /*:Event*/) {

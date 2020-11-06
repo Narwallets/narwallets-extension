@@ -9,7 +9,9 @@ html body {
 }
 html body .content {
   width: 100%;
-  overflow-y: auto;
+  height: 100%;
+  overflow-x: auto;
+  position: relative;
 }
 header {
     background-color: #c4e1fe42;
@@ -22,21 +24,31 @@ footer {
 }
 
 .list {
-    margin-left: 30%;
-    width: 400px;
+    position: absolute;
+    top: 10px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    left:  10px;
+    bottom:  10px;
+    right: 10px;
 }
 
 li {
     list-style: none;
-    /* display: block; */
-    width: 100%;
+    display: table;
+    min-width: 300px;
+    max-width: 300px;
     padding: 20px 10px;
-    /* margin-bottom: 10px; */
-    border-bottom: 2px solid #80808066;
+    margin: 7px;
+    /*border-bottom: 2px solid #80808066;*/
+    border-radius: 6px;
+    border: 2px solid aliceblue;
+    flex: 0 0 300px;
 }
 
 li:hover {
-    background-color:#80808033;
+    background-color:#b0b56933;
 
 }
 
@@ -51,13 +63,13 @@ li:hover {
 li div{
     font-size: 1.2em;
     text-align: right;
-    /* max-width: 40%; */
     border-radius: 8px;
 }
 
 li div.name{
     font-size: 1.5em;
     text-align: left;
+    overflow-wrap: anywhere;
 }
 li span.fee{
     display: inline-block;

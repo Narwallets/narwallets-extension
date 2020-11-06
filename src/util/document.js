@@ -21,7 +21,7 @@ export const WAIT = "wait"
 
 export const IUOP = "Invalid user or password"
 
-let numberFormatFunction = function(num/*:number*/,key/*:string*/){
+let numberFormatFunction = function (num/*:number*/, key/*:string*/) {
   if (key.endsWith("Pct")) return num.toString();
   return c.toStringDec(num);
 }
@@ -60,6 +60,7 @@ export function byId(id/*:string*/)/*:HTMLElement*/ {
   }
 }
 
+
 export function onClickId(id/*:string*/, clickHandler/*:(ev:Event)=>void*/) {
   try {
     let elems = document.querySelectorAll("button#" + id);
@@ -97,18 +98,8 @@ export type AnyElement = HTMLElement & HTMLInputElement & HTMLButtonElement;
  * @param id 
  */
 export function inputById(id/*:string*/)/*:HTMLInputElement*/ {
-  try {
-    const result = document.getElementById(id)
-    if (!result) {
-      console.error("element with id='" + id + "' NOT FOUND")
-      return undefined /*+as unknown as HTMLInputElement+*/;
-    }
-    return document.getElementById(id) /*+as HTMLInputElement+*/
-  }
-  catch (ex) {
-    console.error(ex.message + " element with id='" + id + "' NOT FOUND")
-    return undefined /*+as unknown as HTMLInputElement+*/;
-  }
+  const elemClass = qs("input#"+id)
+  return elemClass.el /*+as HTMLInputElement+*/
 }
 
 /**
@@ -169,20 +160,27 @@ export function hideErr() {
 
 var errorId = 0
 
-export function showMsg(msg/*:string*/, extraClass/*:string*/) {
+// returns created err-div item
+// showMs=-1 => indefinite
+export function showMsg(msg/*:string*/, extraClass/*:string*/, showMs/*+?:number+*/) /*:HTMLElement*/{
+  if (!showMs) showMs=6000; //default show for 6 seconds
   const errDiv = byId(ERR_DIV)
-  if (!errDiv) {
-    console.error("MISSING err-div ON THIS PAGE")
-    alert(msg);
-    return;
-  }
   const newDiv = document.createElement("DIV")  /*+as HTMLElement+*/
   newDiv.innerText = msg;
   if (extraClass) newDiv.classList.add(extraClass)
-  errDiv.appendChild(newDiv);
-  setTimeout(() => { newDiv.classList.add("show") }, 30);
-  setTimeout(() => { newDiv.classList.remove("show") }, 5000);
-  setTimeout(() => { newDiv.remove() }, 5300);
+  if (!errDiv) {
+    console.error("MISSING err-div ON THIS PAGE")
+    alert(msg);
+  }
+  else {
+    errDiv.appendChild(newDiv);
+    setTimeout(() => { newDiv.classList.add("show") }, 30);
+    setTimeout(() => { newDiv.classList.remove("show") }, showMs);
+  }
+  if (showMs>0){
+    setTimeout(() => { newDiv.remove() }, showMs+300);
+  }
+  return newDiv;
 }
 
 export function showSuccess(msg/*:string*/) {
@@ -198,7 +196,7 @@ export function showErr(msg/*:string*/) {
 
 //---------------------
 // inline HTML templates
-export function internal_templateReplace(template/*:string*/, prefix/*:string*/, obj/*:any*/) /*:string*/ {
+export function templateReplace(template/*:string*/, obj/*:any*/, prefix/*:string*/="") /*:string*/ {
   var result = template;
   for (const key in obj) {
     let value = obj[key];
@@ -207,10 +205,10 @@ export function internal_templateReplace(template/*:string*/, prefix/*:string*/,
       text = "";
     }
     else if (typeof value === "number") {
-      text = numberFormatFunction(value,key)
+      text = numberFormatFunction(value, key)
     }
     else if (typeof value === "object") {
-      result = internal_templateReplace(result, key + ".", value) //recurse
+      result = templateReplace(result, value, key + ".") //recurse
       continue;
     }
     else {
@@ -221,11 +219,6 @@ export function internal_templateReplace(template/*:string*/, prefix/*:string*/,
     }
   }
   return result;
-}
-
-export function templateReplace(templateId/*:string*/, obj/*:any*/) {
-  var result = byId(templateId).innerHTML;
-  return internal_templateReplace(result, "", obj)
 }
 
 let hideTO/*:any*/;
@@ -253,11 +246,23 @@ export function clearContainer(containerId/*:string*/) {
   listContainer.innerHTML = "";
 }
 
-export function appendTemplateLI(containerId/*:string*/, templateId/*:string*/, data/*:Record<string,any>*/) {
-  const newLI = document.createElement("LI")  /*+as HTMLLIElement+*/
-  newLI.innerHTML = templateReplace(templateId, data)
+export function appendTemplate(elType/*:string*/, containerId/*:string*/, templateId/*:string*/, data/*:Record<string,any>*/) {
+  const newLI = document.createElement(elType)  /*+as HTMLLIElement+*/
+  const templateElem=byId(templateId)
+  //-- if data-id has value, set it
+  if (templateElem.dataset.id) newLI.id=templateReplace(templateElem.dataset.id,data) //data-id => id={x}
+  //-- copy classes from template (except "hidden")
+  //@ts-ignore
+  newLI.classList.add(...templateElem.classList) //add all classes
+  newLI.classList.remove("hidden") //remove hidden
+  //---
+  newLI.innerHTML = templateReplace(templateElem.innerHTML, data)
   const listContainer = byId(containerId)
   listContainer.appendChild(newLI)
+}
+
+export function appendTemplateLI(containerId/*:string*/, templateId/*:string*/, data/*:Record<string,any>*/) {
+  appendTemplate("LI",containerId,templateId,data)
 }
 export function populateSingleLI(containerId/*:string*/, templateId/*:string*/, multiDataObj/*:Record<string,any>*/, key/*:string*/) {
   const dataItem = {
@@ -305,11 +310,17 @@ export function getClosestChildText(parentSelector/*:string*/, target/*:EventTar
 
 }
 
+//a safe query selector, throws if there's more than one
+export function qs(selector/*:string*/) {
+  return new El(selector)
+}
+
 export class El {
 
   el/*:AnyElement*/ = undefined /*+as unknown as AnyElement+*/;
 
   constructor(selector/*:string*/) {
+    if (selector=="") return;
     try {
       let elems = document.querySelectorAll(selector);
       if (elems.length > 1) throw new Error("more than one!");
@@ -320,6 +331,22 @@ export class El {
     catch (ex) {
       console.error("ERR: querySelectorAll('" + selector + "') " + ex.message);
       return;
+    }
+  }
+
+  sub(selector/*:string*/)/*:El*/{
+    try {
+      let elems = this.el.querySelectorAll(selector);
+      if (elems.length > 1) throw new Error("more than one!");
+      let elem = elems[0];
+      if (!elem) throw new Error("NOT FOUND");
+      const newEl = new El("")
+      newEl.el = elem /*+as unknown as AnyElement+*/;
+      return newEl;
+    }
+    catch (ex) {
+      console.error("ERR: sub-querySelectorAll('" + selector + "') " + ex.message);
+      return this;
     }
   }
 
@@ -353,4 +380,48 @@ export class El {
 
   onClick(clickHandler/*:ClickHandler*/) { this.el.addEventListener(CLICK, clickHandler); }
   onInput(inputHandler/*:ClickHandler*/) { this.el.addEventListener(INPUT, inputHandler); }
+}
+
+
+//---------------
+//a safe query selector, throws if there's none
+export function all(selector/*:string*/) {
+  return new All(selector)
+}
+//---------------
+export class All {
+
+  elems/*:NodeListOf<HTMLElement>;*/
+
+  constructor(selector/*:string*/) {
+    this.elems = document.querySelectorAll(selector);
+    try {
+      if (this.elems.length == 0) throw new Error("not found!");
+    }
+    catch (ex) {
+      console.error("ERR: querySelectorAll('" + selector + "') " + ex.message);
+    }
+  }
+
+  hide() { this.elems.forEach((item/*:HTMLElement*/) => { item.classList.add("hidden") }) }
+  show() { this.elems.forEach((item/*:HTMLElement*/) => { item.classList.remove("hidden") }) }
+
+  toggleClass(className/*:string*/) {
+    this.elems.forEach((item/*:HTMLElement*/) => {
+      if (item.classList.contains(className)) {
+        item.classList.remove(className)
+      }
+      else {
+        item.classList.add(className)
+      }
+    })
+  }
+
+  addEventListener(event/*:string*/, handler/*:ClickHandler*/) {
+    for (const item of this.elems /*+as unknown as HTMLElement[]+*/) {
+      item.addEventListener(event, handler)
+    }
+  }
+  onClick(clickHandler/*:ClickHandler*/) { this.addEventListener(CLICK, clickHandler) }
+  onInput(inputHandler/*:ClickHandler*/) { this.addEventListener(INPUT, inputHandler) }
 }

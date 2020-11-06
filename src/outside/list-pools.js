@@ -27,14 +27,15 @@ function clicked(name/*:string*/) {
   console.log(name);
   navigator.clipboard.writeText(name);
   d.showSuccess("Copied to clipboard: " + name)
-  setTimeout(window.close,600);
-  }
+  setTimeout(window.close, 600);
+}
 
 // ---------------------
 // DOM Loaded - START
 // ---------------------
 async function onLoad() {
 
+  d.showWait()
   try {
 
     const data = await near.getValidators()
@@ -46,7 +47,7 @@ async function onLoad() {
       list.push({
         name: item.account_id,
         slashed: item.is_slashed ? "yes" : "no",
-        stake: c.yton(item.stake),
+        stake: c.ytonString(item.stake),
         stakeY: item.stake.padStart(50, "0"),
         uptime: Math.round(item.num_produced_blocks / item.num_expected_blocks * 100)
       })
@@ -61,25 +62,34 @@ async function onLoad() {
     for (let item of data.current_validators) {
       near.getStakingPoolFee(item.account_id) //async get fees
         .then((fee) => {
+          //debug
+          if (item.account_id.indexOf("node0")!=-1){
+            console.log(fee)
+          }
           const elem = d.byId(item.account_id)
-          elem.innerText = fee.toString();
-          const parent = elem.parentElement;
-          if (parent) {
-            if (fee > 50) parent.classList.add("red")
-            if (fee > 15) parent.classList.add("yellow")
-            if (fee <= 8 && fee >= 0.5) parent.classList.add("green")
-            const LI=parent.closest("LI");
-            if (LI) {
-              const button/*+:HTMLElement|null+*/ = LI.querySelector("button")
-              if (button) {
-                button.addEventListener("click", () => { clicked(item.account_id) })
-                button.classList.remove("hidden");
-              }
+          if (fee >= 50) elem.classList.add("hidden") //bye bye 
+
+          const feeSpan = d.byId(item.account_id + "-fee")
+          feeSpan.innerText = fee.toString();
+          const feeBox = feeSpan.parentElement;
+          if (feeBox) {
+            if (fee >= 30) feeBox.classList.add("red")
+            if (fee >= 5) feeBox.classList.add("yellow")
+            if (fee <= 5 && fee >= 0.5) feeBox.classList.add("green")
+          }
+          if (fee > 0 && fee < 50) {
+            const button/*+:HTMLElement|null+*/ = elem.querySelector("button")
+            if (button) {
+              button.addEventListener("click", () => { clicked(item.account_id) })
+              button.classList.remove("hidden");
             }
           }
         })
         .catch((ex) => {
           console.error(ex)
+          //no contract on account_id
+          const elem = d.byId(item.account_id)
+          elem.classList.add("hidden") //bye bye 
         })
     }
 
@@ -87,15 +97,18 @@ async function onLoad() {
   catch (ex) {
     d.showErr(ex.message)
   }
+  finally {
+    d.hideWait()
+  }
 }
 
-async function init(){
-  try{
-  chrome.storage.local.get("selectedNetwork",(data)=>{
-    Network.setCurrent(data.selectedNetwork);
-    onLoad();
-  })
-  }catch(ex){
+async function init() {
+  try {
+    chrome.storage.local.get("selectedNetwork", (data) => {
+      Network.setCurrent(data.selectedNetwork);
+      onLoad();
+    })
+  } catch (ex) {
     d.showErr(ex.message);
   }
 }

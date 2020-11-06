@@ -22,8 +22,11 @@
   "files": [
     "src/background/background.js",
     "src/contracts/LockupContract.js",
+    "src/data/Account.js",
     "src/data/Network.js",
     "src/data/global.js",
+    "src/data/options.js",
+    "src/data/util.js",
     "src/index.js",
     "src/options/options.js",
     "src/outside/list-pools.js",

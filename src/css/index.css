@@ -23,6 +23,7 @@ body {
     padding-bottom: 10px;
     flex-direction: row;
     align-content: center;
+    max-height: 52px;
 }
 
 .app-header-contents {
@@ -185,7 +186,7 @@ li {
 }
 .subtitle {
     text-align: center;
-    margin-top: 2px;
+    max-width: 354px;
 }
 
 .btn {
@@ -199,12 +200,15 @@ li {
 
 .app-contents {
     display: block;
-    flex: 0 0 auto;
+    position: relative;
+    /* flex: 0 0 auto; */
     /* padding: 20px 40px; */
-    flex-direction: column;
-    align-content: center;
-    overflow: hidden;
+    /* flex-direction: column; */
+    /* align-content: center; */
+    overflow-x: hidden;
     width: 450px;
+    min-height: 548px;
+    overflow-y: auto;
 }
 
 h1 {
@@ -212,10 +216,23 @@ h1 {
     font-weight: 250;
 }
 
+#welcome-new-user-page h1{
+    margin: 24px;
+    font-size: 3.8em;
+}
+
+#welcome-new-user-page .contents-body{
+    display: flex;
+    height: 100%
+    flex-flow: column nowrap;
+    height: 500px;
+    justify-content: center;
+}
+
 h2 {
     text-align: center;
     color: #1d1d1d;
-    font-size: 1.8em;
+    font-size: 2.1em;
     font-weight: 250;
 }
 
@@ -255,6 +272,7 @@ h3 {
     background-color: #b45a5a;
 }
 
+
 .select-action-button-box {
     border: 1px solid #d8d8d8;
     border-radius: 10px;
@@ -271,33 +289,18 @@ h3 {
     padding: 0px 22px;
 }
 
-.checkbox-container {
-    padding: 24px 0px;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-}
-
-input[type=checkbox] {
-    min-width: 20px;
-    min-height: 20px;
-    flex: 0 0 ;
-    margin: 0px;
-}
-
-.checkbox-label {
-    padding-left: 8px;
-}
 
 /* IMPORT ACCOUNT */
-.account-info {
+#account-search-results {
     font-size: 1.4em;
     border: 2px solid #9292be;
     border-radius: 7px;
-    padding: 10px;
-    margin: 20px 0px;
-    min-width: 70%;
+    /* padding: 8px; */
+    /* margin: 20px 0px; */
+    max-width: 400px;
+    min-width: 400px;
+    padding: 5px;
+    margin: 5px;
 }
 
 
@@ -306,8 +309,7 @@ input[type=checkbox] {
     flex-flow: column wrap;
     justify-content: flex-start;
     align-items: baseline;
-    font-size: 1.2em;
-    max-width: 97%;
+    /* font-size: 1.2em; */
 }
 
 .flex-labeled-row {
@@ -323,49 +325,49 @@ input[type=checkbox] {
 }
 
 
-.flex-labeled-row>label {
+.flex-labeled-row .name {
     /*label*/
-    flex: 0 1 28%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 1 1 70%;
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    word-break: break-all;
     border-radius: 4px;
-    background-color: #989898;
-    color: white;
+    background-color: #cee8ff;
+    color: #2e2b2b;
     font-size: 1em;
     font-weight: 300;
-    max-height: 30px;
-    padding: 0px 7px;
+    /* max-height: 30px; */
+    padding: 4px 7px;
     margin: 2px;
-    align-self: center;
-    min-height: 30px;
-    text-align: center;
+    /* min-height: 30px; */
+    text-align: left;
     vertical-align: middle;
-    line-height: 30px;
+    line-height: 1.2em;
+    align-items: center;
+    display: flex;
 }
 
-.flex-labeled-row>div {
+.flex-labeled-row .balance {
     /*value*/
-    flex: 1 1 50%;
+    flex: 0 0 auto;
     border-radius: 4px;
     background-color: #c5eac7;
     font-weight: 300;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 334px;
-
     padding: 0px 7px;
     margin: 2px;
     align-self: center;
     min-height: 30px;
-
     text-align: right;
     vertical-align: middle;
     line-height: 30px;
-
 }
 
 .flex-labeled-row>div.account-name {
     background-color: #d5efff;
+    text-align: center;
 }
 
 
@@ -374,16 +376,6 @@ input[type=checkbox] {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: baseline;
-    /* margin-right: -123px; */
-    /* min-width: 87%; */
-    width: 100%;
-}
-
-#accounts-list>li {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: flex-end;
-    /* align-items: stretch; */
     width: 100%;
 }
 
@@ -392,18 +384,18 @@ input[type=checkbox] {
 }
 
 .account-item, .total-row {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-items: baseline;
-    font-size: 1.3em;
+    /* display: flex; */
+    /* flex-flow: column nowrap; */
+    /* justify-content: flex-start; */
+    /* align-items: baseline; */
+    font-size: 1.2em;
     /*border: 2px solid #9292be;*/
-    border-bottom: 1px solid #8080805e;
+    border-bottom: 1px solid #80808021;
     /*border-radius: 7px;*/
-    padding: 10px;
+    padding: 4px 7px;
     margin: 0px 0px;
     min-width: 86%;
-    flex: 1 0;
+    /* flex: 1 0; */
     width: 100%;
 }
 
@@ -411,57 +403,77 @@ input[type=checkbox] {
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    align-items: center;
+    /* margin-bottom: 0px; */
+}
+
+.account-item-group * {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    padding: 5px 6px;
+    border-radius: 8px;
+    font-weight: 300;
+    margin-right: 4px;
+    min-height: 36px;
+    text-overflow: ellipsis!important;
+    overflow: hidden!important;
+}
+.account-item-group > label {
+    justify-content: space-around;
 }
 
 .account-item-group.staked label{
-    display: flex;
+    /* display: flex; */
     flex: 1 1 10%;
 }
 
-
-.account-item:hover {
+.account-item:not(.unselectable):hover {
     background-color: #7c907d6e;
     cursor: pointer;
 }
 
 .account-item .type {
-    flex: 0 0 10%;
+    overflow: hidden;
+    word-break: keep-all;
+    text-overflow: ellipsis;
+    max-height: 30px;
+    /* display: block; */
+    white-space: nowrap;
 }
 
 .account-item .name , .total-row .name {
-    display: flex;
-    flex: 1 1 50%;
-    padding: 0px 7px;
-    margin: 1px 7px;
-    min-height: 30px;
-    max-height: 30px;
+    /* display: flex; */
+    flex: 1 1 30%;
+    /* padding: 0px 7px; */
+    /* margin: 1px 7px; */
+    /* min-height: 30px; */
+    /* max-height: 30px; */
     text-align: left;
-    vertical-align: middle;
-    line-height: 30px;
+    /* vertical-align: middle; */
+    /* line-height: 30px; */
     background-color: #cee8ff;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
     /* max-width: 260px; */
 }
 
-.account-item div, .total-row div {
-    display: flex;
-    flex: 0 0 20%;
-    padding: 0px 6px;
-    align-self: end;
-    min-height: 30px;
-    max-height: 30px;
-    text-align: right;
-    vertical-align: middle;
-    line-height: 30px;
-    border-radius: 8px;
-    font-weight: 300;
-}
 
 .account-item .type {
     background-color: #e1e1e1;
 }
+
+.invisible{
+    visibility: hidden;
+}
+.account-item > * {
+    /*drag only on the LI*/
+    pointer-events: none;
+}
+/*
+.unselectable{
+    user-select: none;
+}
+*/
 
 .name.total {
     display: inline-block;
@@ -539,11 +551,11 @@ input[type=checkbox] {
 
 .account-selected header {
     width: 100%;
-    height: 40px;
+    height: 32px;
     margin-left: 40px;
     font-weight: 200;
     border-bottom: 1px solid #eaeaea;
-    padding-top: 10px;
+    padding-top: 3px;
     padding-left: 10px;
 }
 
@@ -575,41 +587,92 @@ input[type=checkbox] {
     line-height: 1.3em;
     /* justify-content: flex-start; */
     /* align-items: baseline; */
+    margin-top: 3px;
 }
 
 .selected-account-info label {
     display: flex;
     flex: 1 1 15%;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis!important;
     border-radius: 4px;
     background-color: #e1e1e1;
     color: black;
     font-size: 1.2em;
     font-weight: 300;
-    padding: 0px 4px;
-    line-height: 1.6em;
-    margin: 3px 4px;
     white-space: nowrap;
+    min-height: 30px;
+    align-items: center;
+    padding-left: 4px;
 }
 
 .balance {
-    padding-left: 5px;
+    /* padding-left: 5px; */
     letter-spacing: 0.04em;
     background-color: #c4f0cf !important;
     word-break: normal !important;
-    flex: 1 1 auto;
-    flex: 0 0 20%;
-    padding: 0px 6px;
-    align-self: center;
-    min-height: inherit;
-    max-height: inherit;
-    text-align: right;
-    line-height: inherit;
-    border-radius: 8px;
-    font-weight: 300;
+    text-align: right!important;
+    justify-content: flex-end!important;
+    /* flex: 1 1 auto; */
+    /* flex-flow: row nowrap; */
+    /* flex: 0 0 20%; */
+    /* padding: 0px 6px; */
+    /* align-self: center; */
+    /* min-height: inherit; */
+    /* max-height: inherit; */
+    /* text-align: right; */
+    /* line-height: inherit; */
+    /* border-radius: 8px; */
+    /* font-weight: 300; */
 }
 
-.selected-account-info div div {flex: 1 1 auto;margin: 4px;border-radius: 4px;background-color: #cee8ff;color: black;font-size: 1.2em;font-weight: 300;padding: 2px 4px;word-break: break-all;}
+.selected-account-info div div {
+    background-color: #cee8ff;
+    color: black;
+    flex: 1 1 auto;
+/*    
+    /* margin: 4px; */
+    border-radius: 4px;
+    font-size: 1.2em;
+    font-weight: 300;
+    word-break: break-all;
+    line-height: 1.1em;
+}
+
+
+.single-account-item-group {
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    /* justify-content: space-between; */
+    align-items: center;
+    margin-bottom: 3px;
+}
+
+.single-account-item-group * {
+    display: flex;
+    justify-content: center;
+    flex-flow: row nowrap;
+    align-items: center;
+    padding: 5px 6px;
+    border-radius: 8px;
+    font-weight: 300;
+    margin-right: 4px;
+    min-height: 30px!important;
+    text-overflow: ellipsis!important;
+    overflow: hidden!important;
+    white-space: break-spaces!important;
+    line-height: 1em;
+}
+
+.account-item-group.small-labels div{
+    /* word-break: keep-all; */
+    white-space: nowrap;
+    overflow: hidden;
+    /* max-height: 26px; */
+    /* flex-wrap: nowrap; */
+    /* text-overflow: ellipsis; */
+    /* display: inline; */
+}
 
 .access-status{
     flex: 1 1 0%!important;
@@ -622,14 +685,24 @@ input[type=checkbox] {
     transition: border-color 0.4s ease, background-color 0.4s ease;  
 }
 
-account-item-group.staked div div{
+/*account-item-group.staked div div{
     font-size: 0.84em !important;
 }
+*/
 
 .small-labels {
     font-size: 0.75em !important;
     line-height: 1.7em;
-    /* max-height: 38px */
+    /* max-height: 30px; */
+}
+
+.small-labels label {
+    text-align: center;
+    min-height: 24px;
+}
+.small-labels div {
+    min-height: 30px;
+    max-height: 30px;
 }
 
   
@@ -652,6 +725,7 @@ account-item-group.staked div div{
     justify-content: center;
     align-items: center;
     flex: 1 0 90%;
+    font-size: 2em;
 }
 .footer h2::before, .footer h2::after {
     content: '';
@@ -671,3 +745,81 @@ account-item-group.staked div div{
     margin-left: 4vh;
   } 
 
+.important-label {
+    font-size: 1.1em;
+    padding-left: 16px;
+    padding-bottom: 4px;
+    padding-top: 8px;
+    color: black;
+    word-break: break-all;
+    /* padding: 10px; */
+}
+
+button.big{
+    padding: 8px 10px 12px 11px!important;
+    margin-top: 19px!important;
+    margin-bottom: 20px!important;
+    min-width: 250px;
+    min-height: 50px;
+    display: block;
+    /* align-items: center; */
+    border: 2px solid #ffff0030;
+    font-size: 1.6em;
+    /* font-weight: 600!important; */
+}
+
+button.ultrabig{
+    /* padding: 8px 10px 12px 11px!important; */
+    margin-top: 19px!important;
+    margin-bottom: 20px!important;
+    min-width: 250px;
+    min-height: 50px;
+    display: block;
+    /* align-items: center; */
+    border: 2px solid #ffff001f;
+    font-size: 2em;
+    font-weight: 600!important;
+}
+
+.send-form input {
+    font-size: 1.3em;
+}
+
+.options-list{
+    padding: 40px 16px;
+    height: 478px;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-around;
+}
+.options-list div {
+    display: flex !important;
+    flex-flow: row wrap;
+    padding: 2px 24px;
+}
+.options-list div input[type="checkbox"]{
+    /* position: relative; */
+    /* top: -8px; */
+    flex: auto;
+    /* flex: 1 1 auto; */
+    max-height: 18px;
+}
+.options-list div label{
+    flex: 1 1;
+    /* max-width: 150px; */
+    /* text-align: right; */
+}
+
+.options-list div.explanation{
+    padding: 0px 40px 2px 70px;
+    margin-top: 4px;
+    margin-bottom: 22px;
+    line-height: 1.4em;
+}
+.options-list div input[type="number"]{
+    max-width: 5em;
+    text-align: center;
+    padding: 5px;
+    border-color: lightgray;
+    top: 3px;
+}

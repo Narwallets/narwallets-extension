@@ -4,28 +4,22 @@
 //----------------------------------
 
 /**
- * returns string with a decimal point and 4 decimal places
+ * returns string representing NEAR with thsnds separators, and 2 decimal places
  * @param {string} yoctos 
  */
-export function ytonNoComma(yoctos/*:string*/)/*:string*/ {
-    return ytonFull(yoctos).slice(0, -22) // truncate to 2 decimals 
-}
-
-/**
- * returns string representing NEAR with thsnds separators, and 4 decimal places
- * @param {string} yoctos 
- */
-export function yton(yoctos/*:string*/)/*:string*/ {
-    return addCommas(ytonNoComma(yoctos)) 
+export function ytonString(yoctos/*:string*/)/*:string*/ {
+    const just2dec = ytonFull(yoctos).slice(0, -22)
+    return addCommas(just2dec) 
 }
 
 /**
  * returns Near number with 4 decimal digits
  * @param {string} yoctos amount in yoctos
  */
-export function ytoNN(yoctos/*:string*/)/*:number*/ {
+export function yton(yoctos/*:string*/)/*:number*/ {
     try {
-        return Number(ytonNoComma(yoctos)) // truncated to 4 decimals 
+        const just4dec = ytonFull(yoctos).slice(0, -20)
+        return Number(just4dec) // truncated to 4 decimals 
     }
     catch (ex) {
         console.error("ERR: ytoNN(", yoctos, ")", ex)
@@ -34,16 +28,16 @@ export function ytoNN(yoctos/*:string*/)/*:number*/ {
 }
 
 /**
- * converts a number to a string with commas and 4 decimal places
+ * Formats a number in NEAR to a string with commas and 2 decimal places
  * @param {number} n 
  */
 export function toStringDec(n/*:number*/) {
-    const text1e4N = Math.round(n * 10000).toString().padStart(5, "0");
-    const withDecPoint =text1e4N.slice(0, -4) + "." + text1e4N.slice(-4,-2); //only 2 decimal places shown
+    const text1e4N = Math.round(n * 100).toString().padStart(3, "0");
+    const withDecPoint =text1e4N.slice(0, -2) + "." + text1e4N.slice(-2); 
     return addCommas(withDecPoint);
 }
 /**
- * converts a string with and commas and 4 decimal places into a number
+ * converts a string with and commas and decimal places into a number
  * @param {string} str
  */
 export function toNum(str/*:string*/)/*:number*/ {
