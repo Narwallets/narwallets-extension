@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-size: 11pt;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif!important;
     font-weight: 300;
     /* overscroll-behavior: none; */
     overflow:hidden;
@@ -296,6 +296,8 @@ button {
   padding: 5px 10px 7px 10px;
   line-height: 1em;
   margin: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+  font-weight: 250 !important;
 }
 
 button:hover:not(:disabled) {
@@ -317,7 +319,7 @@ button.medium {
   /* max-height: 40px !important; */
   /* padding-top: 3px!important; */
   letter-spacing: 2.4px;
-  min-width: 197px;
+  min-width: 205px;
   border: 2px solid #b9bc5c7a;
   margin: 5px !important;
 }
