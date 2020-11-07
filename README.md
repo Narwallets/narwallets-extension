@@ -23,6 +23,7 @@
 * Provide a similar experience as Metamask/other eth extension-wallets to ease the onboard ethereum users into the NEAR ecosystem.
 * You can have multiple wallets by providing different user/passwords. 
 * Each wallet can have multiple accounts. You can see the sum of all accounts in the wallet
+* Accounts are first added to a wallet in safe-by-default read-only mode. 
 * All private data is stored encrypted on chrome local storage
 * Lockup contract accounts are auto-discovered and treated as another account in the group
 * Advanced mode allows you to take control and liquidate lockup contract accounts
