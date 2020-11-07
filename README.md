@@ -30,7 +30,7 @@
 
 * We're using base libs as a bundle (The ideal solution would be to have typescript versions of each lib and compile to ES2020 modules) 
 
-We need to reduce the bundle's size.
+We need to reduce the bundle's size. Bundle is at https://github.com/Narwallets/bundled-crypto-libs.git
 
 Bundle includes:
 
