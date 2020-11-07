@@ -29,6 +29,7 @@
 
 ![multiple accounts and total](docs/images/multiple-accounts-and-total.png)
 
+
 ## Road Map to v0.2
 * Integration with DApp - modeled after docs.ethers.io/v5 ? other? new approach?
 * Manage Create account (currently redirecting to NEAR Web Wallet)
