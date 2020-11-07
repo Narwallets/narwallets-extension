@@ -19,12 +19,12 @@
 * Narwallets has only one option regading account recovery: Write-down the seed phrase. NEAR Web Wallet has other user-friendly recovery options (email & phone recovery).
 * Narwallets, aiming at simplicity, has no 2FA support.
 * The good:
-* It's an extension-wallet: With v0.2 you'll be able to interact with a DApp without leaving the DApp site
-* Onboard ethereum users into the NEAR ecosystem, providing a similar experience as Metamask/other eth extension-wallets 
+* It's an extension-wallet: With v0.2 you'll be able to interact with DApps without leaving the DApp site
+* Provide a similar experience as Metamask/other eth extension-wallets to ease the onboard ethereum users into the NEAR ecosystem.
 * You can have multiple wallets by providing different user/passwords. 
 * Each wallet can have multiple accounts. You can see the sum of all accounts in the wallet
-* All private data is stored encrypted on chrome local storage.
-* Lockup contract accounts are auto-discovered and treated as another account
+* All private data is stored encrypted on chrome local storage
+* Lockup contract accounts are auto-discovered and treated as another account in the group
 * Advanced mode allows you to take control and liquidate lockup contract accounts
 
 ![multiple accounts and total](docs/images/multiple-accounts-and-total.png)
