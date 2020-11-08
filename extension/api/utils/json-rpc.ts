@@ -6,6 +6,15 @@ export function setRpcUrl(newUrl: string) {
     rpcUrl = newUrl;
 }
 
+const fetchHeaders:Record<string,string>={ 'Content-type': 'application/json; charset=utf-8' }
+export function addHeader(name: string, value:string) {
+    fetchHeaders[name]=value
+}
+export function getHeaders() {
+    return fetchHeaders;
+}
+
+
 function ytonFull(str:string):string {
     let result = (str + "").padStart(25, "0")
     result = result.slice(0, -24) + "." + result.slice(-24)

@@ -12,6 +12,7 @@ import { PublicKey } from "../api/utils/key-pair.js"
 import { setRpcUrl } from "../api/utils/json-rpc.js"
 import { LockupContract } from "../contracts/LockupContract.js"
 import { Account, ExtendedAccountData } from "../data/Account.js"
+import { localStorageSet } from "../data/util.js"
 
 /*+
 import type { AnyElement, ClickHandler } from "../util/document.js"
@@ -152,8 +153,7 @@ type StateResult={
 
 
 function listPoolsClicked() {
-    chrome.storage.local.set({ selectedNetwork: Network.current })
-    chrome.storage.local.set({ reposition: "stake", account:selectedAccountData.name })
+    localStorageSet({selectedNetwork:Network.current,reposition:"stake",account:selectedAccountData.name})
     chrome.windows.create({
         url: chrome.runtime.getURL("outside/list-pools.html"),
         state: "maximized"
@@ -732,6 +732,7 @@ async function performSend() {
 
 
 function exploreButtonClicked() {
+    localStorageSet({reposition:"account", account:selectedAccountData.name})
     chrome.windows.create({
         url: Network.currentInfo().explorerUrl + "accounts/" + selectedAccountData.name,
         state: "maximized"

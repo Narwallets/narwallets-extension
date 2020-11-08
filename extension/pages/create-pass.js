@@ -45,6 +45,7 @@ function createClicked(ev /*:Event*/) {
     return;
   }
 
+  global.lock() //log out current user
 
   //Create SecureState store hashedPass
   global.State.currentUser=email;

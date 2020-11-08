@@ -2,6 +2,13 @@ let rpcUrl = "https://rpc.mainnet.near.org/";
 export function setRpcUrl(newUrl) {
     rpcUrl = newUrl;
 }
+const fetchHeaders = { 'Content-type': 'application/json; charset=utf-8' };
+export function addHeader(name, value) {
+    fetchHeaders[name] = value;
+}
+export function getHeaders() {
+    return fetchHeaders;
+}
 function ytonFull(str) {
     let result = (str + "").padStart(25, "0");
     result = result.slice(0, -24) + "." + result.slice(-24);

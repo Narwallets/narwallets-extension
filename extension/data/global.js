@@ -2,7 +2,7 @@ import * as nacl from "../util/tweetnacl/nacl-fast.js"
 import * as naclUtil from "../util/tweetnacl/nacl-util.js";
 import * as sha256 from "../api/sha256.js"
 import * as Network from "./Network.js";
-import { recoverFromSyncStorage } from "./util.js";
+import { localStorageRemove, recoverFromLocalStorage, localStorageSave, localStorageSet, localStorageGet } from "./util.js";
 import { showErr, IUOP as INVALID_USER_OR_PASS } from "../util/document.js";
 import { Account } from "../data/Account.js"; //required for SecureState declaration
 
@@ -29,7 +29,7 @@ export const EmptyState/*:StateStruc*/ = {
   currentUser: "",
 };
 
-export var State = Object.assign({},EmptyState);
+export var State = Object.assign({}, EmptyState);
 
 export const saveOnUnload = {
   unlockSHA: "" //while the extension is open. When the ext gets closed, this is saved if auto-unlock is enabled
@@ -39,7 +39,7 @@ export const saveOnUnload = {
 type NetworkNameType=string;
 type AccountIdType=string;
 
-//data that's stored *encrypted* in chrome.storage.sync
+//data that's stored *encrypted* in local storage
 // for each-user
 type NarwalletSecureData = {
   dataVersion: string;
@@ -61,7 +61,7 @@ const EmptySecureState/*:NarwalletSecureData*/ = {
   accounts: {}
 };
 
-export var SecureState/*:NarwalletSecureData*/ = Object.assign({},EmptySecureState);
+export var SecureState/*:NarwalletSecureData*/ = Object.assign({}, EmptySecureState);
 export var unlocked = false;
 
 
@@ -71,10 +71,7 @@ export function clearState() {
 }
 
 export function saveState() {
-  chrome.storage.sync.set({ "S": State }, () => {
-    if (chrome.runtime.lastError) showErr(chrome.runtime.lastError.message /*+as string+*/);
-  })
-  //localStorage.setItem("S", JSON.stringify(State))
+  localStorageSave("State", "S", State)
 }
 
 /*+
@@ -83,7 +80,7 @@ type callbackERR = (err:string) => void;
 
 
 export async function recoverState()/*:Promise<void>*/ {
-  State = await recoverFromSyncStorage("State","S", EmptyState)
+  State = await recoverFromLocalStorage("State", "S", EmptyState)
 }
 
 function sha256PwdBase64(password/*:string*/)/*:string*/ {
@@ -94,7 +91,7 @@ export function lock() {
   unlocked = false;
   saveOnUnload.unlockSHA = "";
   SecureState = EmptySecureState;
-  chrome.storage.local.remove('uk') //clear auto-unlock
+  localStorageRemove('uk') //clear auto-unlock
 }
 
 
@@ -124,24 +121,21 @@ export function saveSecureState() {
   const base64FullMessage = naclUtil.encodeBase64(fullMessage);
 
   //localStorage.setItem("SS", base64FullMessage)
-  const keyIsCurrentUser/*:any*/ = {}
-  keyIsCurrentUser[State.currentUser] = base64FullMessage;
-  chrome.storage.sync.set(keyIsCurrentUser, () => {
-    if (chrome.runtime.lastError) showErr(chrome.runtime.lastError.message /*+as string+*/);
-  })
+  localStorageSave("Secure State", State.currentUser, base64FullMessage)
 
 }
 
 
-export function setAutoUnlock(user/*:string*/, password/*:string*/) {
-  //remember user
+export function setAutoUnlock(user/*:string*/, hashedPassBase64/*:string*/) {
+
   if (State.currentUser != user) {
-    State.currentUser = user;
-    saveState(); //remember last user
+    //remember last user
+    try { State.currentUser = user; saveState(); } catch { }
   }
-  saveOnUnload.unlockSHA = sha256PwdBase64(password); //auto-save on popup-unload (with expiry time)
-  chrome.storage.local.set({uk:saveOnUnload.unlockSHA}) //to facilitate Ctrl-R development
-  //console.log("MemState.unlockSHA",MemState.unlockSHA)
+
+  saveOnUnload.unlockSHA = hashedPassBase64; //auto-save on popup-unload (with expiry time)
+  const expireMs = SecureState.autoUnlockSeconds * 1000
+  localStorageSet({uk: hashedPassBase64, exp: Date.now() + expireMs})
 }
 
 
@@ -167,54 +161,36 @@ function decryptIntoJson(hashedPassBase64/*:string*/, encryptedMsg/*:string*/)/*
   return JSON.parse(base64DecryptedMessage);
 }
 
-//recover with PASSWORD
-export function tryRecoverSecureState(user/*:string*/, password/*:string*/) /*:Promise<void>*/ {
-  return tryRecoverSecureStateSHA(user, sha256PwdBase64(password))
+//recover with PASSWORD or throws
+export async function unlockSecureState(email/*:string*/, password/*:string*/) /*:Promise<void>*/ {
+  return unlockSecureStateSHA(email, sha256PwdBase64(password))
 }
 
-//recover with PASSWORD_HASH
-export function tryRecoverSecureStateSHA(user/*:string*/, hashedPassBase64/*:string*/) /*:Promise<void>*/ {
+//recover with PASSWORD_HASH or throws
+export async function unlockSecureStateSHA(email/*:string*/, hashedPassBase64/*:string*/) /*:Promise<void>*/ {
   //const encryptedState = localStorage.getItem("SS")
-  return new Promise((resolve, reject) => {
-    try {
-      if (!user) throw new Error("user is null")
-      chrome.storage.sync.get(user, (obj) => {
-        try {
-          if (!obj[user]) throw Error(INVALID_USER_OR_PASS)
-          const decrypted = decryptIntoJson(hashedPassBase64, obj[user]);
-          SecureState = decrypted
-          State.currentUser = user;
-          saveState()
-          Network.setCurrent(SecureState.initialNetworkName);
-          unlocked = true;
-          resolve()
-        }
-        catch (ex) {
-          SecureState = EmptySecureState;
-          unlocked = false;
-          reject(ex);
-        }
-      })
-    } catch (ex) {
-      SecureState = EmptySecureState;
-      unlocked = false;
-      reject(ex);
-    }
-  });
+  if (!email) throw new Error("email is null")
+  const encryptedState = await localStorageGet(email)
+  if (!encryptedState) throw Error(INVALID_USER_OR_PASS)
+  const decrypted = decryptIntoJson(hashedPassBase64, encryptedState);
+  SecureState = decrypted
+  unlocked = true;
+  try { setAutoUnlock(email, hashedPassBase64); } catch { } //auto-unlock & set current user
+  try { Network.setCurrent(SecureState.initialNetworkName) } catch { };
 }
 
 //------------------
 export function saveAccount(accName/*:string*/, accountInfo/*:Account*/) {
 
   if (!accName || !accountInfo) {
-      console.error("saveFoundAccount called but no data")
-      return;
+    console.error("saveFoundAccount called but no data")
+    return;
   }
 
   let accountsForCurrentNetwork = SecureState.accounts[Network.current]
   if (accountsForCurrentNetwork == undefined) { //no accounts yet
-      accountsForCurrentNetwork = {} //create empty object
-      SecureState.accounts[Network.current] = accountsForCurrentNetwork
+    accountsForCurrentNetwork = {} //create empty object
+    SecureState.accounts[Network.current] = accountsForCurrentNetwork
   }
 
   accountsForCurrentNetwork[accName] = accountInfo
@@ -222,13 +198,13 @@ export function saveAccount(accName/*:string*/, accountInfo/*:Account*/) {
   saveSecureState()
 }
 
-export function getNetworkAccountsCount(){
+export function getNetworkAccountsCount() {
   const accounts = SecureState.accounts[Network.current]
   if (!accounts) return 0;
   return Object.keys(accounts).length
 }
 
-export function getAutoUnlockSeconds(){
+export function getAutoUnlockSeconds() {
   let aul = SecureState.autoUnlockSeconds
   if (aul == undefined) aul = 15;
   return aul;

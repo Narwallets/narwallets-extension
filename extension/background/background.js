@@ -21,11 +21,11 @@ const UNLOCK_EXPIRED = "unlock-expired"
 function popupUnloading(unlockSHA/*:string*/, expireMs/*:number*/){
   console.log("BACK: popupUnloading", expireMs);
   if (expireMs<=0){
-      chrome.storage.local.remove("uk") //clear unlock sha
+      chrome.storage.local.remove(["uk","exp"]) //clear unlock sha
   }
   else {
     chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + expireMs })
-    chrome.storage.local.set({ uk: unlockSHA })
+    chrome.storage.local.set({ uk: unlockSHA, exp:Date.now() + expireMs })
   }
 }
 
@@ -33,7 +33,7 @@ chrome.alarms.onAlarm.addListener(
   function (alarm/*:any*/) {
     //console.log("chrome.alarms.onAlarm fired ", alarm);
     if (alarm.name == UNLOCK_EXPIRED) {
-      chrome.storage.local.remove("uk") //clear unlock sha
+      chrome.storage.local.remove(["uk","exp"]) //clear unlock sha
     }
   }
 );

@@ -10,6 +10,7 @@ import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-c
 import { addListeners as Import_addListeners } from "./pages/import.js"
 
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js"
+import { localStorageGet, localStorageGetAndRemove, localStorageRemove, localStorageSet } from "./data/util.js"
 
 /*+
 import * as bip39 from "./bundled-types/bip39-light"
@@ -112,11 +113,11 @@ function selectNetworkClicked(ev /*:Event*/) {
   });
 }
 
-function welcomeCreatePassClicked(ev /*:Event*/) {
+function welcomeCreatePassClicked() {
   d.showPage(CREATE_USER)
 }
 
-function unlockClicked(ev /*:Event*/) {
+async function unlockClicked(ev /*:Event*/) {
 
   const emailEl = d.inputById("unlock-email")
   const passEl = d.inputById("unlock-pass")
@@ -135,15 +136,19 @@ function unlockClicked(ev /*:Event*/) {
   const password = passEl.value;
   passEl.value = ""
 
-  global.tryRecoverSecureState(email, password)
-    .then(() => {
-      global.setAutoUnlock(email, password); //auto-unlock
-      Pages.showMain()
-      if (global.getNetworkAccountsCount() == 0) d.showPage(IMPORT_OR_CREATE); //auto-add account after unlock
-    })
-    .catch((ex) => {
-      d.showErr(ex.message);
-    })
+  try {
+    await global.unlockSecureState(email, password)
+    Pages.showMain()
+    if (global.getNetworkAccountsCount() == 0) {
+      d.showPage(IMPORT_OR_CREATE); //auto-add account after unlock
+    }
+    else {
+      tryReposition(); //try reposition
+    }
+  }
+  catch (ex) {
+    d.showErr(ex.message);
+  }
 
 }
 
@@ -217,8 +222,7 @@ function asideOptions() {
   // });
 }
 
-function asideCreateUser() {
-  global.lock()
+function asideCreateUserClicked() {
   hambClicked();
   d.showPage(WELCOME_NEW_USER_PAGE)
 }
@@ -236,6 +240,21 @@ function asideChangePassword() {
 
 function addAccountClicked() {
   d.showPage(IMPORT_OR_CREATE)
+}
+
+async function tryReposition() {
+  const reposition = await localStorageGetAndRemove("reposition")
+  switch (reposition) {
+    case "create-user": { //was creating user but maybe jumped to terms-of-use
+      welcomeCreatePassClicked()
+      d.inputById("email").value = await localStorageGetAndRemove("email")
+      break;
+    }
+    case "account": case "stake":  {
+      const account = await localStorageGetAndRemove("account")
+      if (account) AccountSelectedPage_show(account, reposition)
+    }
+  }
 }
 
 // ---------------------
@@ -263,7 +282,7 @@ async function onLoad() {
   //aside
   d.qs("aside #lock").onClick(asideLock);
   d.qs("aside #accounts").onClick(asideAccounts);
-  d.qs("aside #create-user").onClick(asideCreateUser);
+  d.qs("aside #create-user").onClick(asideCreateUserClicked);
   d.qs("aside #add-account").onClick(asideAddAccount);
   //d.qs("aside #change-password").onClick(asideChangePassword);
   d.qs("aside #options").onClick(asideOptions);
@@ -281,7 +300,7 @@ async function onLoad() {
   ImportOrCreate_addListeners();
   Import_addListeners();
 
-  //restore State from chrome.storage.sync
+  //restore State from chrome.storage.local
   try {
 
     await recoverOptions();
@@ -294,32 +313,25 @@ async function onLoad() {
     if (global.State.usersList.length == 0) {
       //no users => welcome new User
       d.showPage(WELCOME_NEW_USER_PAGE)
+      tryReposition();
       return; //***
     }
 
-    if (global.State.currentUser) { //last-user
-      //try to get auto-unlock key
-      chrome.storage.local.get("uk", (obj) => {
-        //console.log("chrome.storage.local.get(uk", obj)
-        tryAutoUnlock(obj.uk)
-          .then((result) => {
-            if (result) {
-              chrome.storage.local.get({ reposition: "", account: "" }, (obj) => {
-                if (obj.account) {
-                  chrome.storage.local.remove("reposition")
-                  chrome.storage.local.remove("account")
-                  AccountSelectedPage_show(obj.account, obj.reposition)
-                }
-              });
-            }
-          });
-      });
-    }
-
     d.showPage(UNLOCK); //DEFAULT: ask the user to unlock SecureState
-    //showPage clears all input fields
-    //if we have a last user
+    //showPage clears all input fields, set ddefault value after show-page
     d.inputById("unlock-email").value = global.State.currentUser;
+
+    if (global.State.currentUser) { //we have a "last-user"
+      //try to get auto-unlock key
+      const uk = await localStorageGetAndRemove("uk")
+      const exp = await localStorageGetAndRemove("exp")
+      if (exp && Date.now() < exp && uk) { //maybe we can auto-unlock
+        if (await tryAutoUnlock(uk)) { //if we succeed
+          tryReposition(); //try reposition
+        }
+      }
+
+    }
 
   }
   catch (ex) {
@@ -335,7 +347,7 @@ async function tryAutoUnlock(unlockSHA/*:string*/) /*:Promise<boolean>*/ {
     //auto-unlock is enabled
     //try unlocking
     try {
-      await global.tryRecoverSecureStateSHA(global.State.currentUser, unlockSHA);
+      await global.unlockSecureStateSHA(global.State.currentUser, unlockSHA);
       //if unlock succeeded
       global.saveOnUnload.unlockSHA = unlockSHA;
       try { Network.setCurrent(global.SecureState.initialNetworkName) } catch { }; //initial networkName for this user
@@ -392,9 +404,12 @@ document.addEventListener('DOMContentLoaded', onLoad);
 
 //calling a background fn seems to be the only way to execut something on popupUnload
 addEventListener("unload", function (event) {
-  console.log("unload")
-  //@ts-ignore
-  chrome.extension.getBackgroundPage().popupUnloading(global.saveOnUnload.unlockSHA, global.getAutoUnlockSeconds() * 1000); //SET AUTO-LOCK after x seconds
+  const autoUnlockSeconds = global.getAutoUnlockSeconds()
+  if (autoUnlockSeconds>0) {
+    const backgroundPage = chrome.extension.getBackgroundPage()
+    //@ts-ignore
+    backgroundPage.popupUnloading(global.saveOnUnload.unlockSHA, autoUnlockSeconds * 1000); //SET AUTO-LOCK after x ms
+  }
 }, true);
 
 // chrome.runtime.getBackgroundPage((background)=>{
@@ -412,6 +427,7 @@ addEventListener("unload", function (event) {
 //console.log(bip39.mnemonicToSeed("correct horse battery staple"))
 
 function openTermsOfUseOnNewWindow() {
+  localStorageSet({reposition:"create-user", email:d.inputById("email").value})
   chrome.windows.create({
     url: 'https://narwallets.com/terms.html'
   });

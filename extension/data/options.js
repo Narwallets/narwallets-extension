@@ -1,4 +1,4 @@
-import { recoverFromSyncStorage,saveToSyncStorage } from "./util.js";
+import { recoverFromLocalStorage,localStorageSave } from "./util.js";
 
 /*+
 //data that's not encrypted
@@ -19,9 +19,9 @@ export const EmptyOptions/*:OptionsStruc*/ = {
 export var options = Object.assign({},EmptyOptions);
 
 export async function recoverOptions(){
-    options = await recoverFromSyncStorage("options","opt",EmptyOptions)
+    options = await recoverFromLocalStorage("options","opt",EmptyOptions)
 }
 
 export function saveOptions(){
-    saveToSyncStorage("options","opt",options)
+    localStorageSave("options","opt",options)
 }

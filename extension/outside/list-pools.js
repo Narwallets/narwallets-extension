@@ -5,6 +5,7 @@ import * as Pages from "../pages/main.js"
 import * as Network from "../data/Network.js"
 import * as near from "../api/near-rpc.js"
 import * as rpc from "../api/utils/json-rpc.js"
+import { localStorageGet, localStorageGetAndRemove } from "../data/util.js"
 
 
 /*+
@@ -31,9 +32,7 @@ function clicked(name/*:string*/) {
 }
 
 // ---------------------
-// DOM Loaded - START
-// ---------------------
-async function onLoad() {
+async function displaySatakingPools() {
 
   d.showWait()
   try {
@@ -63,7 +62,7 @@ async function onLoad() {
       near.getStakingPoolFee(item.account_id) //async get fees
         .then((fee) => {
           //debug
-          if (item.account_id.indexOf("node0")!=-1){
+          if (item.account_id.indexOf("node0") != -1) {
             console.log(fee)
           }
           const elem = d.byId(item.account_id)
@@ -102,13 +101,17 @@ async function onLoad() {
   }
 }
 
+// ---------------------
+// DOM Loaded - START
+// ---------------------
 async function init() {
   try {
-    chrome.storage.local.get("selectedNetwork", (data) => {
-      Network.setCurrent(data.selectedNetwork);
-      onLoad();
-    })
-  } catch (ex) {
+    rpc.addHeader("mode","no-cors")
+    const selectedNetwork = await localStorageGetAndRemove("selectedNetwork")
+    if (selectedNetwork) Network.setCurrent(selectedNetwork);
+    displaySatakingPools();
+  } 
+  catch (ex) {
     d.showErr(ex.message);
   }
 }
