@@ -77,7 +77,7 @@ function initPage() {
     d.onClickId("moreless", moreLessClicked);
     d.onClickId("add-note", addNoteClicked);
 
-    d.onClickId("access", accessStatusClicked);
+    d.onClickId("access", changeAccessClicked);
     d.onClickId("explore", exploreButtonClicked);
     d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("show-public-key", showPublicKeyClicked);
@@ -226,7 +226,7 @@ function showGotoOwner() {
 }
 function showOKToGrantAccess() {
     d.showSubPage('account-selected-ok-to-grant-access')
-    showOKCancel(accessStatusClicked)
+    showOKCancel(changeAccessClicked)
 }
 
 function receiveClicked() {
@@ -835,10 +835,13 @@ function accessLabelClicked() {
     if (selectedAccountData.accountInfo.type == "lock.c") {
         showGotoOwner()
     }
+    else {
+        changeAccessClicked()
+    }
 }
 
 //---------------------------------------
-function accessStatusClicked() {
+function changeAccessClicked() {
     d.hideErr()
     seedTextElem.value = ""
 
@@ -1020,21 +1023,22 @@ async function makeFullAccessOKClicked() {
     d.showWait()
     try {
         let { seedPhrase, secretKey, publicKey } = seedPhraseUtil.parseSeedPhrase(words)
-        let keyFound = await near.access_key(selectedAccountData.name, publicKey)
-        if (keyFound.error) {
-            let err = keyFound.error
+        try {
+            let keyFound = await near.access_key(selectedAccountData.name, publicKey)
+        }
+        catch(ex){
+            let err=ex.message
+            //better explanation
             if (err.indexOf("does not exists") != 0) err = "Seed phrase was incorrect or is not the seed phrase for this account key"
-            d.showErr(err)
+            throw new Error(err)
         }
-        else {
-            //if key found correctly
-            selectedAccountData.accountInfo.privateKey = secretKey
-            seedTextElem.value = ""
-            global.saveSecureState()
-            d.showMsg("Seed Phrase is correct. Access granted", "success")
-            showAccountData(selectedAccountData.name)
-            showButtons()
-        }
+        //if key found correctly
+        selectedAccountData.accountInfo.privateKey = secretKey
+        seedTextElem.value = ""
+        global.saveSecureState()
+        d.showMsg("Seed Phrase is correct. Access granted", "success")
+        showAccountData(selectedAccountData.name)
+        showButtons()
     }
     catch (ex) {
         d.showErr(ex.message)
@@ -1076,7 +1080,7 @@ function removeAccountClicked(ev /*:Event*/) {
 
         if (selectedAccountData.accountInfo.privateKey){
             //has full access - remove access first
-            accessStatusClicked()
+            changeAccessClicked()
             return;
         }
 
