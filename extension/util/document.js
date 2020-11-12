@@ -187,6 +187,10 @@ export function showSuccess(msg/*:string*/) {
   showMsg(msg, "success")
 }
 
+export function showWarn(msg/*:string*/) {
+  showMsg(msg, "warning")
+}
+
 // shows a message on ERR_DIV for 5 seconds
 // requires div id="err-div" and class .show
 export function showErr(msg/*:string*/) {

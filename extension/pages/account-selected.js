@@ -212,8 +212,10 @@ function fullAccessSubPage(subPageId/*:string*/, OKHandler/*:ClickHandler*/) {
 }
 
 function GotoOwnerOkHandler() {
-    if (selectedAccountData.accountInfo.ownerId) {
-        show(selectedAccountData.accountInfo.ownerId);
+    const owner=selectedAccountData.accountInfo.ownerId
+    if (owner) {
+        show(owner);
+        d.showWarn("Attention: You're now at " + owner)
     }
 }
 
