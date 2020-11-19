@@ -22,10 +22,21 @@ export function yton(yoctos/*:string*/)/*:number*/ {
         return Number(just4dec) // truncated to 4 decimals 
     }
     catch (ex) {
-        console.error("ERR: ytoNN(", yoctos, ")", ex)
+        console.error("ERR: yton(", yoctos, ")", ex)
         return NaN;
     }
 }
+
+/**
+ * convert nears expressed as a js-number with MAX 4 decimals into a yoctos-string
+ * @param n amount in near MAX 4 DECIMALS
+ */
+export function ntoy(n: number) {
+    let by1e4 = Math.round(n * 1e4).toString() // near * 1e4 - round
+    let yoctosText = by1e4 + "0".repeat(20) //  mul by 1e20 => yoctos = near * 1e(4+20)
+    return yoctosText
+}
+
 
 /**
  * Formats a number in NEAR to a string with commas and 2 decimal places

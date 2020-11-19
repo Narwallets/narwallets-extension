@@ -415,7 +415,7 @@ async function performStake() {
             poolAccInfo = await near.getStakingPoolAccInfo(selectedAccountData.name, newStakingPool)
         }
 
-        if (poolAccInfo.unstaked_balance != "0" ) { //deposited but unstaked, stake
+        if (c.yton(poolAccInfo.unstaked_balance) >= 10 ) { //at least 10 deposited but unstaked, stake that
             //just re-stake (maybe the user asked unstaking but now regrets it)
             const amountToStakeY=fixUserAmountInY(amountToStake,poolAccInfo.unstaked_balance)
             if (amountToStakeY==poolAccInfo.unstaked_balance){
@@ -433,6 +433,8 @@ async function performStake() {
                 near.ONE_TGAS.muln(125),
                 amountToStake
             )
+            //update staked to avoid incorrect "rewards" calculations on refresh
+            selectedAccountData.accountInfo.staked += amountToStake
         }
 
         global.saveSecureState()
