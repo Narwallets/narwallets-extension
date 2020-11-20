@@ -1,3 +1,9 @@
+/*@font-face {
+    font-family: 'Arimo';
+    src: url('Arimo-VariableFont_wght.ttf') format('truetype'); 
+  }  
+*/
+
 body {
     overflow: hidden;
 }
