@@ -67,6 +67,11 @@ background-color: #ecffff;
 border-width: 2px;
 color: #3b3b3b;
 }
+#err-div>div.warning {
+  background-color: #eef1bb;
+  border-width: 2px;
+  color: #3b3b3b;
+}
 
 
 .logo-128 {

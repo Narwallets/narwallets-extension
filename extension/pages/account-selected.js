@@ -77,7 +77,7 @@ function initPage() {
     d.onClickId("moreless", moreLessClicked);
     d.onClickId("add-note", addNoteClicked);
 
-    d.onClickId("access", accessStatusClicked);
+    d.onClickId("access", changeAccessClicked);
     d.onClickId("explore", exploreButtonClicked);
     d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("show-public-key", showPublicKeyClicked);
@@ -212,8 +212,10 @@ function fullAccessSubPage(subPageId/*:string*/, OKHandler/*:ClickHandler*/) {
 }
 
 function GotoOwnerOkHandler() {
-    if (selectedAccountData.accountInfo.ownerId) {
-        show(selectedAccountData.accountInfo.ownerId);
+    const owner=selectedAccountData.accountInfo.ownerId
+    if (owner) {
+        show(owner);
+        d.showWarn("Attention: You're now at " + owner)
     }
 }
 
@@ -226,7 +228,7 @@ function showGotoOwner() {
 }
 function showOKToGrantAccess() {
     d.showSubPage('account-selected-ok-to-grant-access')
-    showOKCancel(accessStatusClicked)
+    showOKCancel(changeAccessClicked)
 }
 
 function receiveClicked() {
@@ -413,7 +415,7 @@ async function performStake() {
             poolAccInfo = await near.getStakingPoolAccInfo(selectedAccountData.name, newStakingPool)
         }
 
-        if (poolAccInfo.unstaked_balance != "0" ) { //deposited but unstaked, stake
+        if (c.yton(poolAccInfo.unstaked_balance) >= 10 ) { //at least 10 deposited but unstaked, stake that
             //just re-stake (maybe the user asked unstaking but now regrets it)
             const amountToStakeY=fixUserAmountInY(amountToStake,poolAccInfo.unstaked_balance)
             if (amountToStakeY==poolAccInfo.unstaked_balance){
@@ -431,6 +433,8 @@ async function performStake() {
                 near.ONE_TGAS.muln(125),
                 amountToStake
             )
+            //update staked to avoid incorrect "rewards" calculations on refresh
+            selectedAccountData.accountInfo.staked += amountToStake
         }
 
         global.saveSecureState()
@@ -835,10 +839,13 @@ function accessLabelClicked() {
     if (selectedAccountData.accountInfo.type == "lock.c") {
         showGotoOwner()
     }
+    else {
+        changeAccessClicked()
+    }
 }
 
 //---------------------------------------
-function accessStatusClicked() {
+function changeAccessClicked() {
     d.hideErr()
     seedTextElem.value = ""
 
@@ -1020,21 +1027,22 @@ async function makeFullAccessOKClicked() {
     d.showWait()
     try {
         let { seedPhrase, secretKey, publicKey } = seedPhraseUtil.parseSeedPhrase(words)
-        let keyFound = await near.access_key(selectedAccountData.name, publicKey)
-        if (keyFound.error) {
-            let err = keyFound.error
+        try {
+            let keyFound = await near.access_key(selectedAccountData.name, publicKey)
+        }
+        catch(ex){
+            let err=ex.message
+            //better explanation
             if (err.indexOf("does not exists") != 0) err = "Seed phrase was incorrect or is not the seed phrase for this account key"
-            d.showErr(err)
+            throw new Error(err)
         }
-        else {
-            //if key found correctly
-            selectedAccountData.accountInfo.privateKey = secretKey
-            seedTextElem.value = ""
-            global.saveSecureState()
-            d.showMsg("Seed Phrase is correct. Access granted", "success")
-            showAccountData(selectedAccountData.name)
-            showButtons()
-        }
+        //if key found correctly
+        selectedAccountData.accountInfo.privateKey = secretKey
+        seedTextElem.value = ""
+        global.saveSecureState()
+        d.showMsg("Seed Phrase is correct. Access granted", "success")
+        showAccountData(selectedAccountData.name)
+        showButtons()
     }
     catch (ex) {
         d.showErr(ex.message)
@@ -1076,7 +1084,7 @@ function removeAccountClicked(ev /*:Event*/) {
 
         if (selectedAccountData.accountInfo.privateKey){
             //has full access - remove access first
-            accessStatusClicked()
+            changeAccessClicked()
             return;
         }
 

@@ -26,7 +26,6 @@
     "plus-typescript": "^4.2.0"
   },
   "dependencies": {
-    "@types/create-hmac": "^1.1.0",
-    "save-dev": "0.0.1-security"
+    "@types/create-hmac": "^1.1.0"
   }
 }

@@ -36,8 +36,8 @@ export function decodeJsonFromResult(result) {
  * @param n amount in near MAX 4 DECIMALS
  */
 export function ntoy(n) {
-    let millionsText = Math.round(n * 1e4).toString(); // near * 1e4 - round
-    let yoctosText = millionsText + "0".repeat(20); //  mul by 1e20 => yoctos = near * 1e(4+20)
+    let by1e4 = Math.round(n * 1e4).toString(); // near * 1e4 - round
+    let yoctosText = by1e4 + "0".repeat(20); //  mul by 1e20 => yoctos = near * 1e(4+20)
     return yoctosText;
 }
 /**

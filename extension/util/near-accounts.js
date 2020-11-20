@@ -15,14 +15,14 @@ function checkNotLockup(accName/*:string*/) {
 export async function asyncRefreshAccountInfo(accName/*:string*/, info/*:Account*/) {
 
     if (accName.endsWith(LockupContract.getLockupSuffix())) {
-        //es un lockup
+        //lockup contract
         if (!info.ownerId) return;
         const lockup = await getLockupContract(info)
         if (!lockup) return;
     }
 
     else {
-        //normal
+        //normal account
         let stateResultYoctos;
         try {
             stateResultYoctos = await near.queryAccount(accName)
@@ -39,6 +39,7 @@ export async function asyncRefreshAccountInfo(accName/*:string*/, info/*:Account
             info.staked = near.yton(stakingInfo.staked_balance)
             info.unStaked = near.yton(stakingInfo.unstaked_balance)
             info.rewards = previnThePool>0? info.staked + info.unStaked - previnThePool : 0;
+            if (info.rewards<0) info.rewards=0;
             info.stakingPoolPct = await near.getStakingPoolFee(info.stakingPool)
         }
         else {
