@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-size: 11pt;
-  font-family: "Segoe UI",Arimo,Roboto, Oxygen-Sans, Cantarell, Ubuntu, "Helvetica Neue", -apple-system,  BlinkMacSystemFont,sans-serif!important;
+  font-family: Ubuntu,"Segoe UI", Roboto, Arimo, Oxygen-Sans, Cantarell, Ubuntu, "Helvetica Neue", -apple-system,  BlinkMacSystemFont,sans-serif!important;
   font-weight: 300;
   /* overscroll-behavior: none; */
   overflow:hidden;
