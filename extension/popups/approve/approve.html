@@ -11,23 +11,23 @@
 <body>
 <header>
     <h1><span id="net-name"></span> Approve Transaction</h1>
+</header>
+<article>
     <h2 id="web-page"></h2>
     <h3>is asking to execute on</h3>
     <h2 id="receiver"></h2>
-</header>
-<article>
     <ul id="list" class="list">
-        <li id="item-template" class="hidden" data-id="{name}">
-            <div class="action">{action}</div>
-            <div class="attached-near">{attachedNear}</div>
-        </li>
     </ul>
-    <!-- OK CANCEL buttons common to all subpages -->
+    <li id="item-template" class="hidden" data-id="{name}">
+        <div class="action">{action}</div>
+        <div class="attached-near">{attachedNear}</div>
+    </li>
+<!-- OK CANCEL buttons common to all subpages -->
     <div class="button-group ok-cancel">
-        <button id="account-selected-action-confirm" class="button btn-primary">
+        <button id="approve-ok" class="button btn-primary">
             OK
         </button>
-        <button id="account-selected-action-cancel" class="button btn-cancel">
+        <button id="approve-cancel" class="button btn-cancel">
             Cancel
         </button>
     </div>

@@ -6,55 +6,86 @@ import * as nearAccounts from "../util/near-accounts.js"
 
 import * as near from "../api/near-rpc.js"
 import { setRpcUrl } from "../api/utils/json-rpc.js"
-import { localStorageSet } from "../data/util.js"
+import { localStorageSet, localStorageGet } from "../data/util.js"
+import  * as TX from "../api/transaction.js"
+
+/*+
+import type { FunctionCall } from "../api/batch-transaction.js"
++*/
 
 /*HAY QUE HACER QUE BACKGROUND JS HAGA TODO LO RELACIONADO CON COMUNICARSE CON near
 Y debe saber CUAL ES LA RED SELECCIONADA, ETC, ETC
 -POPUP DEBE USAR BACKGROUND (askBackground) PARA TODO
 */
 
-//---------------------------------------------------
-//listen to msgs from content_script->via port
-//---------------------------------------------------
-let contentScriptPort/*:chrome.runtime.Port|undefined*/ = undefined;
-chrome.runtime.onConnect.addListener(function (port) {
-  console.log("contentScriptPort onConnect .....");
-  contentScriptPort = port;
-  //on-message
-  port.onMessage.addListener(messageFromWebPage)
-  //on-disconnect (page unloaded?)
-  port.onDisconnect.addListener(function (port) {
-    _webPageAcceptedConnection = false;
-    contentScriptPort = undefined;
-  });
-})
+//----------------------------------------
+//-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
+//-- msg path is popup->here->action->sendResponse(err,data)
+//-- msg path is tab->cs->here->action
+//----------------------------------------
+//https://developer.chrome.com/extensions/background_pages
+chrome.runtime.onMessage.addListener(runtimeMessageHandler)
+
+function runtimeMessageHandler(msg/*:any*/, sender/*:chrome.runtime.MessageSender*/, sendResponse/*:Function*/) {
+
+  //check if it comes from the web-page or from this extension 
+  const url = sender.url? sender.url:"";
+  const fromPage = !url.startsWith("chrome-extension://"+chrome.runtime.id+"/");
+
+  //console.log("runtimeMessage received ",sender, url)
+  console.log("runtimeMessage received " + (fromPage ? "FROM PAGE " : "from popup ") + JSON.stringify(msg));
+  if (msg.dest != "ext") {
+    sendResponse({ err: "msg.dest must be 'ext'" })
+  }
+  else if (fromPage) {
+    // from a tab/contents-script
+    msg.url=url; //add source
+    msg.tabId=(sender.tab?sender.tab.id:-1); //add tab.id
+    processMessageFromWebPage(msg)
+  }
+  else {
+    //from internal pages like popup
+    getActionPromise(msg)
+      .then((data) => { sendResponse({ data: data }) })
+      .catch((ex) => { sendResponse({ err: ex.message }) })
+     //sendResponse will be called async .- always return true
+     //returning void cancels all pending callbacks
+  }
+  return true; //a prev callback could be pending.- always return true
+}
 
 //---------------------------------------------------
-//process msgs from web-page->content-script->port
+//process msgs from web-page->content-script->here
 //---------------------------------------------------
-async function messageFromWebPage(msg/*:any*/) {
+function processMessageFromWebPage(msg/*:any*/) {
 
-  if (msg.dest != "ext") return;
-
-  console.log("ext message received from web-page", msg);
+  console.log("processMessageFromWebPage", msg);
 
   switch (msg.code) {
 
     case "connected":
-      connectedWebPageInfo = msg;
-      _webPageAcceptedConnection = (!msg.err);
+      if (!msg.tabId) {
+        console.error("msg.tabId is ",msg.tabId)
+        return;
+      }
+      if (!_connectedTabs[msg.tabId]) _connectedTabs[msg.tabId]={};
+      _connectedTabs[msg.tabId].aceptedConnection = (!msg.err)
+      _connectedTabs[msg.tabId].connectedResponse = msg
       break;
 
     case "view":
       //view-call request
-      let resultErrData = { dest: "page", code: "request-resolved", requestId: msg.requestId, err: undefined, data: undefined }
-      try {
-        resultErrData.data = await near.view(msg.contract, msg.method, msg.args);
-      }
-      catch (ex) {
-        resultErrData.err = ex.message;
-      }
-      if (contentScriptPort) { contentScriptPort.postMessage(resultErrData) }
+      //when resolved, send msg to content-script->page
+      let resolvedMsg = {dest:"page", code:"request-resolved", tabId:msg.tabId, requestId:msg.requestId, err:undefined, data:undefined}
+      near.view(msg.contract, msg.method, msg.args)
+        .then(data=>{
+          resolvedMsg.data=data;  //if resolved ok, send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId,resolvedMsg);
+          }) 
+        .catch(ex=>{
+          resolvedMsg.err=ex.message;  //if error ok, also send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId,resolvedMsg);
+          }) 
       break;
 
     case "apply":
@@ -79,39 +110,18 @@ async function messageFromWebPage(msg/*:any*/) {
       break;
 
     default:
-      console.error("unk msg.code")
+      console.error("unk msg.code",msg)
   }
 
 }
 
-
-//----------------------------------------
-//-- LISTEN to "chrome.runtime.message" from own POPUPs or content script
-//-- msg path is popup->here->action->sendResponse(err,data)
-//----------------------------------------
-chrome.runtime.onMessage.addListener(runtimeMessageHandler)
-function runtimeMessageHandler(msg/*:any*/, sender/*:chrome.runtime.MessageSender*/, sendResponse/*:Function*/) {
-  const fromPage = sender.tab != undefined && sender.tab != null;
-  console.log("runtimeMessage received " + (fromPage ? "FROM PAGE " : "from popup ") + JSON.stringify(msg));
-  if (fromPage) {
-    console.error("ONLY runtime.messages from own popups accepted")
-    return;
-  }
-  if (msg.dest != "ext") {
-    sendResponse({ err: "msg.dest must be 'ext'" })
-    return;
-  }
-  getActionPromise(msg)
-    .then((data) => { sendResponse({ data: data }) })
-    .catch((ex) => { sendResponse({ err: ex.message }) })
-  return true;//meaning sendResponse will be called async 
-}
-//create a promise to resolev action requested by popup
+//create a promise to resolve the action requested by the popup
 function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
 
   if (msg.code == "set-network") {
     try {
       Network.setCurrent(msg.network);
+      localStorageSet({backgroundNetwork:msg.network})
       return Promise.resolve();
     }
     catch (ex) {
@@ -119,29 +129,44 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
     }
   }
   else if (msg.code == "connect") {
-    connectedWebPageInfo = msg;
     return connectToWebPage(msg.accountId, msg.network);
   }
   else if (msg.code == "disconnect") {
-    disconnectFromWebPage()
-    return Promise.resolve();
+    return disconnectFromWebPage()
   }
   else if (msg.code == "isConnected") {
-    return Promise.resolve(_webPageAcceptedConnection);
+    return isConnected();
   }
   else if (msg.code == "view") {
     //view-call request
     return near.view(msg.contract, msg.method, msg.args);
   }
   else if (msg.code == "apply") {
-    //apply transaction request
-    //from Popup
+    //apply transaction request from popup
     //tx.apply request
-    if (msg.contract && msg.method && msg.accountId) {
-      const accInfo = global.SecureState.accounts[Network.current][msg.accountId]
-      if (!accInfo.privateKey) return Promise.reject(Error(`account ${msg.accountId} is read-only`))
-      return near.call_method(msg.contract, msg.method, msg.args, msg.accountId, accInfo.privateKey, near.ONE_TGAS.muln(msg.Tgas || 25))
+    //when resolved, send msg to content-script->page
+    const connectedAccountId=_connectedTabs[msg.tabId].connectedAccountId||"...";
+    const accInfo = global.SecureState.accounts[Network.current][connectedAccountId]
+    if (!accInfo) return Promise.reject(Error(`account ${connectedAccountId} NOT FOUND on wallet`))
+    if (!accInfo.privateKey) return Promise.reject(Error(`account ${connectedAccountId} is read-only`))
+    //convert wallet-api actions to near.TX.Action
+    const actions/*:TX.Action[]*/=[]
+    for (let item of msg.tx.items) {
+      //convert action
+      switch (item.action) {
+        case "call":
+            const f=item /*+as FunctionCall+*/;
+            actions.push(TX.functionCall(f.method,f.args,near.ONE_TGAS.muln(f.Tgas),near.ONE_NEAR.muln(f.attachedNear)))
+          break;
+        case "transfer":
+          actions.push(TX.transfer(near.ONE_NEAR.muln(item.attachedNear)))
+          break;
+        default:
+          return Promise.reject(Error("batchTx UNKNOWN item.action="+item.action))
+      }
     }
+    //restuns the Promise required to complete this action
+    return near.broadcast_tx_commit_actions(actions, connectedAccountId, msg.tx.receiver, accInfo.privateKey)
   }
   return Promise.reject(Error(`invalid msg.code ${JSON.stringify(msg)}`))
 }
@@ -243,126 +268,257 @@ chrome.alarms.onAlarm.addListener(
 
 
 /**
- * Tries to connect to web page.
+ * Tries to connect to web page. (CPS style)
  * There are several steps involved
  * 1. inject proxy-content-script
  * 2. wait for injected-proxy to open the contenScriptPort
  * 3. send "connect" 
  * 4. check response from the page
  */
+/*+
+type CPSDATA=
+  {accountId:string,network:string, activeTabId:number,
+        url:string|undefined, ctinfo:ConnectedTabInfo,
+        resolve:Function, reject:Function
+  }
++*/
 function connectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<any>*/ {
+  console.log("connectToWebPage start")
+
   return new Promise((resolve, reject) => {
-    if (_webPageAcceptedConnection) return reject(Error("already connected"))
-    _webPageAcceptedConnection = false;
-    if (contentScriptPort) {
-      //contentScript already injected - WARN: DO NO inject another because its NOT REPLACED, just added in a new VM
-      //if you keep calling chrome.tabs.executeScript you end up with 4 or 5 running contentScripts
-      //Send to the page connection info
-      contentScriptPort.postMessage({ dest: "page", code: "connect", data: { accountId: accountId, network: network } })
-      setTimeout(() => {
-        if (_webPageAcceptedConnection) { //page connected and responded with connection info
-          return resolve();
-        }
-        else {
-          return reject(Error(connectedWebPageInfo.err || "Web page not responding / Not a Narwallets compatible NEAR web app (2)"))
-        }
-      }, 250);
-    }
-    else {
-      //execute contentScript on activeTab
-      //contentScript opens a port for receiving messages from bakcground.js and redirecting to the page
-      //it also listens to page messages and sends them thru the port
-      //basically contentScript.js acts as a proxy to pass messages from ext<->activeTab
-      chrome.tabs.executeScript({ file: 'background/contentScript.js' },
-        function () {
-          if (chrome.runtime.lastError) {
-            console.error(JSON.stringify(chrome.runtime.lastError))
-            return reject(chrome.runtime.lastError)
+
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+
+      const activeTabId = tabs[0].id||-1;
+      if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId]={};
+
+      const cpsData/*:CPSDATA*/={
+        accountId: accountId,
+        network: network,
+        activeTabId: activeTabId,
+        url: tabs[0].url,
+        ctinfo: _connectedTabs[activeTabId],
+        resolve:resolve,
+        reject:reject
+      }
+      console.log("activeTabId",cpsData)
+      cpsData.ctinfo = _connectedTabs[cpsData.activeTabId]
+      cpsData.ctinfo.aceptedConnection=false; //we're connecting another
+      cpsData.ctinfo.connectedResponse={};
+
+      //check if it responds
+      try {
+        chrome.tabs.sendMessage(cpsData.activeTabId,{code: "ping"},function(response){
+          if (!response) {
+            //not responding, set injected status
+            cpsData.ctinfo.injected=false;
+            console.error(chrome.runtime.lastError);
           }
-          else {
-            if (!contentScriptPort) { //contentScript didn't open port back
-              return reject(Error("Web page not responding / Not a Narwallets compatible NEAR web app (1)"))
-            }
-            //Send connection info to the page
-            contentScriptPort.postMessage({ dest: "page", code: "connect", data: { accountId: accountId, network: network } })
-            setTimeout(() => {
-              if (_webPageAcceptedConnection) { //page connected and responded with connection info
-                return resolve();
-              }
-              else {
-                return reject(Error(connectedWebPageInfo.err || "Web page not responding / Not a Narwallets compatible NEAR web app (2)"))
-              }
-            }, 250);
+          else{
+            //responded set injected status
+            cpsData.ctinfo.injected=true;
           }
-      })
-    }
+          //CPS
+          return continueCWP_2(cpsData)
+        })
+      }
+      catch(ex){
+        //err trying to talk to the page, set injected status
+        cpsData.ctinfo.injected=false;
+        console.error(ex);
+        //CPS
+        return continueCWP_2(cpsData)
+      }
+    })
   })
 }
 
-function OLDconnectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<any>*/ {
-  return new Promise((resolve, reject) => {
-    _webPageAcceptedConnection = false;
-    //execute contentScript on activeTab
-    //contentScript opens a port for receiving messages from bakcground.js and redirecting to the page
-    //it also listens to page messages and sends them thru the port
-    //basically contentScript.js acts as a proxy to pass messages from ext<->activeTab
-    chrome.tabs.executeScript({ file: 'background/contentScript.js' },
+///inject if necessary
+function continueCWP_2(cpsData/*:CPSDATA*/){
+  if (cpsData.ctinfo.injected) {
+    //if responded, it was injected, continue
+    return continueCWP_3(cpsData);
+  }
+  //not injected yet. Inject/execute contentScript on activeTab
+  //contentScript replies with a chrome.runtime.sendmessage 
+  //it also listens to page messages and relays via chrome.runtime.sendmessage 
+  //basically contentScript.js acts as a proxy to pass messages from ext<->tab
+  console.log("injecting")
+  try{
+    chrome.tabs.executeScript({file: 'background/contentScript.js' },
       function () {
         if (chrome.runtime.lastError) {
           console.error(JSON.stringify(chrome.runtime.lastError))
-          return reject(chrome.runtime.lastError)
+          return cpsData.reject(chrome.runtime.lastError)
         }
         else {
-          if (!contentScriptPort) { //contentScript didn't open port back
-            return reject(Error("Web page not responding / Not a Narwallets compatible NEAR web app (1)"))
-          }
-          //Send to the page connection info
-          contentScriptPort.postMessage({ dest: "page", code: "connect", data: { accountId: accountId, network: network } })
-          setTimeout(() => {
-            if (_webPageAcceptedConnection) { //page connected and responded with connection info
-              return resolve();
-            }
-            else {
-              return reject(Error(connectedWebPageInfo.err || "Web page not responding / Not a Narwallets compatible NEAR web app (2)"))
-            }
-          }, 250);
+          //injected ok
+          cpsData.ctinfo.injected=true
+          //CPS
+          return continueCWP_3(cpsData);
         }
       })
+  }
+  catch(ex){
+    return cpsData.reject(ex)
+  }
+}
+
+///send connect order
+function continueCWP_3(cpsData/*:CPSDATA*/){
+  console.log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url)
+  //send connect order via content script. a response will be received later
+  chrome.tabs.sendMessage(cpsData.activeTabId,{ dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network}})
+  //wait 250 for response
+  setTimeout(() => {
+    if (cpsData.ctinfo.aceptedConnection) { //page responded with connection info
+      cpsData.ctinfo.connectedAccountId = cpsData.accountId //register connected acount
+      return cpsData.resolve();
+    }
+    else {
+      let errMsg=cpsData.url + " not responding / Not a Narwallets compatible NEAR web page"
+      if (cpsData.ctinfo.connectedResponse) errMsg= cpsData.ctinfo.connectedResponse.err+" "+errMsg;
+      return cpsData.reject(Error(errMsg))
+    }
+  }, 250);
+}
+
+
+function OLDconnectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<any>*/ {
+  console.log("connectToWebPage start")
+
+  return new Promise((resolve, reject) => {
+
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+
+      const activeTabId=tabs[0].id||-1
+      console.log("activeTabId",activeTabId)
+      if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId]={};
+      if (_connectedTabs[activeTabId].aceptedConnection){
+        //already connected, verify 
+        try {
+          chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
+            if (!response) {
+              _connectedTabs[activeTabId].injected=false;
+              _connectedTabs[activeTabId].aceptedConnection=false;
+              const errMsg="Try again. "+(chrome.runtime.lastError?chrome.runtime.lastError.message:"")
+              return reject(Error(errMsg))
+            }
+            else{
+              console.log("return reject(Error(already connected))")
+              return reject(Error("already connected"))
+            }
+          })
+          return;//verification is async
+        }
+        catch(ex){
+          return reject(ex)
+        }
+      }
+      if (!_connectedTabs[activeTabId].injected){
+        //not injected yet inject/execute contentScript on activeTab
+        //contentScript replies with a chrome.runtime.sendmessage 
+        //it also listens to page messages and relays via chrome.runtime.sendmessage 
+        //basically contentScript.js acts as a proxy to pass messages from ext<->tab
+        console.log("injecting")
+        chrome.tabs.executeScript({file: 'background/contentScript.js' },
+          function () {
+            if (chrome.runtime.lastError) {
+              console.error(JSON.stringify(chrome.runtime.lastError))
+              return reject(chrome.runtime.lastError)
+            }
+            else {
+              _connectedTabs[activeTabId].injected=true
+              console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
+              //send via content script. a response will be received later
+              chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
+              //wait 250 for response
+              setTimeout(() => {
+                if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
+                  _connectedTabs[activeTabId].connectedAccountId //register connected acount
+                  return resolve();
+                }
+                else {
+                  let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
+                  if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
+                  return reject(Error(errMsg))
+                }
+              }, 250);
+            }
+        })
+      }
+      else {
+        //it was injected already
+        //verify
+        chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
+          if (!response) {
+            _connectedTabs[activeTabId].injected=false;
+            return reject(chrome.runtime.lastError||Error("page not responding. Try again"))
+          }
+          else {
+            //send via content script. a response will be received later
+            console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
+            chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
+            //wait 250 for response
+            setTimeout(() => {
+              if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
+                return resolve();
+              }
+              else {
+                let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
+                if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
+                return reject(Error(errMsg))
+              }
+            }, 250);
+          }
+        })
+      }
+    })
   })
 }
 
 
-
-let _webPageAcceptedConnection/*:boolean*/ = false;
-let connectedWebPageInfo/*:any*/;
-
 /*+
-type RequestResult ={
-  err?:string;
-  data?:any;
+type ConnectedTabInfo = {
+    injected?:boolean;
+    aceptedConnection?:boolean;
+    connectedAccountId?:string;
+    connectedResponse?:any;
 }
 +*/
 
-function disconnectFromWebPage() {
-  _webPageAcceptedConnection = false;
-  if (!contentScriptPort) return;
-  contentScriptPort.postMessage({ dest: "page", code: "disconnect" })
-  contentScriptPort.disconnect();
-  contentScriptPort = undefined;
-  return;
+let _connectedTabs/*:Record<number,ConnectedTabInfo>*/={};
+
+function disconnectFromWebPage()/*:Promise<any>*/ {
+  return new Promise((resolve,reject)=>{
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      const activeTabId=tabs[0].id||-1
+      if (_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection){
+        _connectedTabs[activeTabId].aceptedConnection=false;
+        chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "disconnect" })
+        return resolve();
+      }
+      else {
+        return reject(Error("active web page is not connected"));
+      }
+    })
+  })
 }
 
-function isConnected() { return _webPageAcceptedConnection }
+function isConnected()/*:Promise<boolean>*/ { 
+  return new Promise((resolve,reject)=>{
+    chrome.tabs.query({active: true, currentWindow: true}, 
+      function(tabs) {
+        const activeTabId=tabs[0].id||-1
+        return resolve(_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection)
+      })
+    })
+}
 
-console.log("background.js loaded")
-//https://developer.chrome.com/extensions/background_pages
-// chrome.runtime.onMessage.addListener(function(message, callback) {
-//   if (message.data == “setAlarm”) {
-//     chrome.alarms.create({delayInMinutes: 5})
-//   } else if (message.data == “runLogic”) {
-//     chrome.tabs.executeScript({file: 'logic.js'});
-//   } else if (message.data == “changeColor”) {
-//     chrome.tabs.executeScript(
-//         {code: 'document.body.style.backgroundColor="orange"'});
-//   };
-// });
+async function onLoad(){
+  console.log("background.js onLoad")
+  const nw = await localStorageGet("backgroundNetwork");
+  if (nw) Network.setCurrent(nw);
+}
+
+document.addEventListener('DOMContentLoaded', onLoad);

@@ -18,6 +18,7 @@
     "http://*/*",
     "https://*/*",
     "activeTab",
+    "tabs",
     "storage",
     "notifications", 
     "alarms"

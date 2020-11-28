@@ -234,6 +234,7 @@ export function clearContainer(containerId/*:string*/) {
 export function appendTemplate(elType/*:string*/, containerId/*:string*/, templateId/*:string*/, data/*:Record<string,any>*/) {
   const newLI = document.createElement(elType)  /*+as HTMLLIElement+*/
   const templateElem=byId(templateId)
+  if (!templateElem) console.error("appendTemplate, template id='"+templateId+"' NOT FOUND")
   //-- if data-id has value, set it
   if (templateElem.dataset.id) newLI.id=templateReplace(templateElem.dataset.id,data) //data-id => id={x}
   //-- copy classes from template (except "hidden")
