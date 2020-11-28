@@ -11,6 +11,7 @@ import { addListeners as Import_addListeners } from "./pages/import.js"
 
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js"
 import { localStorageGet, localStorageGetAndRemove, localStorageRemove, localStorageSet } from "./data/util.js"
+import { askBackground } from "./api/askBackground.js"
 
 /*+
 import * as bip39 from "./bundled-types/bip39-light"
@@ -64,7 +65,7 @@ function onNetworkChanged(info/*:NetworkInfo*/) {
   currentNetworkDisplayName.el.className = "circle " + info.color //set indicator color
 }
 
-function networkItemClicked(e /*:Event*/) {
+async function networkItemClicked(e /*:Event*/) {
   try {
     //console.log(e.target.getAttribute("data-code"))
     if (!e.target) return;
@@ -75,6 +76,10 @@ function networkItemClicked(e /*:Event*/) {
 
     //update indicator visual state & global state
     Network.setCurrent(networkName);
+    global.SecureState.initialNetworkName = networkName;
+    global.saveSecureState();
+    //also inform background page
+    await askBackground({code:"set-network",network:networkName})
 
     //close dropdown
     closeDropDown(NETWORKS_LIST) //close 
@@ -83,9 +88,6 @@ function networkItemClicked(e /*:Event*/) {
       d.showPage(UNLOCK);
       return;
     }
-
-    global.SecureState.initialNetworkName = networkName;
-    global.saveSecureState();
 
     Pages.showMain(); //refresh accounts list
 
@@ -238,10 +240,6 @@ function asideChangePassword() {
   }
 }
 
-function addAccountClicked() {
-  d.showPage(IMPORT_OR_CREATE)
-}
-
 async function tryReposition() {
   const reposition = await localStorageGetAndRemove("reposition")
   switch (reposition) {
@@ -252,7 +250,9 @@ async function tryReposition() {
     }
     case "account": case "stake":  {
       const account = await localStorageGetAndRemove("account")
-      if (account) AccountSelectedPage_show(account, reposition)
+      if (account) {
+        AccountSelectedPage_show(account, reposition)
+      }
     }
   }
 }
@@ -276,8 +276,6 @@ async function onLoad() {
   d.onClickId(UNLOCK, unlockClicked);
 
   d.onEnterKey("unlock-pass", unlockClicked)
-
-  d.onClickId(ADD_ACCOUNT, addAccountClicked);
 
   //aside
   d.qs("aside #lock").onClick(asideLock);
@@ -350,7 +348,12 @@ async function tryAutoUnlock(unlockSHA/*:string*/) /*:Promise<boolean>*/ {
       await global.unlockSecureStateSHA(global.State.currentUser, unlockSHA);
       //if unlock succeeded
       global.saveOnUnload.unlockSHA = unlockSHA;
-      try { Network.setCurrent(global.SecureState.initialNetworkName) } catch { }; //initial networkName for this user
+      try { 
+        Network.setCurrent(global.SecureState.initialNetworkName) 
+        //also inform background page
+        await askBackground({code:"set-network",network:global.SecureState.initialNetworkName})
+      } catch { }; //initial networkName for this user
+
       Pages.showMain(); //show acc list
       return true;
     }

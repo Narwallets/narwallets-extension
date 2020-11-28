@@ -10,16 +10,14 @@
   },
 
   "background": {
-    "scripts": [
-      "background/background.js"
-    ],
+    "page": "background/background.html",
     "persistent": false
   },
 
   "permissions": [
+    "http://*/*",
+    "https://*/*",
     "activeTab",
-    "tabs",
-    "declarativeContent",
     "storage",
     "notifications", 
     "alarms"

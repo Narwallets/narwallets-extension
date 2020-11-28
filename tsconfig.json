@@ -21,6 +21,7 @@
   },
   "files": [
     "extension/background/background.js",
+    "extension/background/contentScript.js",
     "extension/contracts/LockupContract.js",
     "extension/data/Account.js",
     "extension/data/Network.js",
@@ -35,6 +36,8 @@
     "extension/pages/import-or-create.js",
     "extension/pages/import.js",
     "extension/pages/main.js",
+    "extension/popups/approve/approve.js",
+    "extension/popups/approve/approve2.js",
     "extension/util/conversions.js",
     "extension/util/document.js",
     "extension/util/email.js",

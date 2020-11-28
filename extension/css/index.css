@@ -404,6 +404,9 @@ h3 {
     /* flex: 1 0; */
     width: 100%;
 }
+.total-row{
+    margin-bottom: 5px;
+}
 
 .account-item-group {
     display: flex;
@@ -522,30 +525,30 @@ h3 {
     color: white
 }
 
-.account-selected .footer {
+.footer-buttons {
     flex-flow: column;
     align-items: center;
     display: flex;
     width: 100%;
 }
 
-.account-selected .button-group {
+.button-group {
     flex-flow: row nowrap;
     justify-content: space-around;
     display: flex;
     min-width: 230px;
     max-width: 250px;
     padding: 3px 0px;
-    border-bottom: solid 1px lightgray;
+    border-top: solid 1px lightgray;
 }
 
-.button-group.top-line {
-    border-top: solid 1px lightgray;
-    margin-top: 5px;
+.button-group.no-top-line {
+    border-top: 0px;
+    margin-top: 0px;
     /* max-width: 80%; */
 }
 
-.account-selected .footer button  {
+button  {
     font-size: 1.3em;
     flex: 1 1 30%;
     min-height: 35px;
@@ -553,6 +556,11 @@ h3 {
     padding: 6px 10px 10px 12px;
     line-height: 0.8em;
     margin: 4px;
+}
+
+.two-col-button  {
+    max-height: 35px;
+    min-width: 242px;
 }
 
 .account-selected header {

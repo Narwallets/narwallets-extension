@@ -13,6 +13,7 @@ import { setRpcUrl } from "../api/utils/json-rpc.js"
 import { LockupContract } from "../contracts/LockupContract.js"
 import { Account, ExtendedAccountData } from "../data/Account.js"
 import { localStorageSet } from "../data/util.js"
+import { askBackground } from "../api/askBackground.js"
 
 /*+
 import type { AnyElement, ClickHandler } from "../util/document.js"
@@ -42,6 +43,7 @@ export function show(accName/*:string*/, reposition/*+?:string+*/) {
             }
         }
     }
+    localStorageSet({reposition:"account", account:accName})
 }
 
 // page init
@@ -56,7 +58,7 @@ function initPage() {
     removeButton = new d.El("button#remove");
     refreshButton = new d.El("button#refresh");
 
-    okCancelRow = new d.El(".footer .ok-cancel")
+    okCancelRow = new d.El("#account-selected .ok-cancel")
     confirmBtn = new d.El("#account-selected-action-confirm")
     cancelBtn = new d.El("#account-selected-action-cancel")
 
@@ -70,6 +72,9 @@ function initPage() {
     d.onClickId("unstake", unstakeClicked);
     d.onClickId("list-pools", listPoolsClicked);
     d.onClickId("receive", receiveClicked);
+    d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+    d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
+    
 
     showButtons(); //2nd or third entry - always show the buttons
 
@@ -238,7 +243,32 @@ function receiveClicked() {
     showGotoOwner() //if this is a lock.c shows the "goto owner" page
 }
 
-
+//--------------------------------
+async function connectToWebAppClicked()/*: Promise<any>*/{
+    d.showWait()
+    try{
+        await askBackground({code:"connect",accountId:selectedAccountData.name, network:Network.current})
+        d.showSuccess("connected")
+        window.close()
+    }
+    catch(ex){
+        d.showErr(ex.message);
+    }
+    finally{
+        d.hideWait();
+    }
+}
+//--------------------------------
+async function disconnectFromPageClicked() {
+    try{
+        await askBackground({code:"disconnect"})
+        d.showSuccess("disconnected")
+    }
+    catch(ex){
+        d.showErr(ex.message);
+    }
+  }
+  
 //--------------------------------
 function checkOwnerAccessThrows(action/*:string*/) {
     //check if we have owner's key

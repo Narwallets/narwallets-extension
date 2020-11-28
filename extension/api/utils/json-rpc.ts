@@ -138,7 +138,7 @@ export function jsonRpc(method: string, jsonRpcParams: any[]): Promise<any> {
  * @param {any} params : { amount:"2020202202212"}
  */
 export async function jsonRpcQuery(queryWhat: string, params?: any): Promise<any> {
-    if (typeof params=="object" && params.isEmpty) params=undefined
+    if (typeof params=="object" && Object.keys(params).length==0) { params=undefined}
     let queryParams = [queryWhat, params || ""] //params for the fn call - something - the jsonrpc call fail if there's a single item in the array
     return await jsonRpc("query", queryParams);
 }

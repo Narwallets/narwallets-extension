@@ -5,7 +5,7 @@ export async function localStorageGet(code/*:string*/)/*:Promise<any>*/ {
   return new Promise((resolve, reject) => {
     try {
       chrome.storage.local.get(code, (obj) => {
-        console.log("localStorageGet",code,obj)
+        //console.log("localStorageGet",code,obj)
         return resolve(obj[code])
       })
     }
@@ -24,7 +24,7 @@ export async function localStorageGetAndRemove(code/*:string*/) /*:Promise<any>*
 }
 // set for simpler items
 export function localStorageSet(payload/*:any*/) {
-  console.log("localStorageSet",payload)
+  //console.log("localStorageSet",payload)
   chrome.storage.local.set(payload, () => {
     if (chrome.runtime.lastError) console.error("ERR chrome.storage.local.set(...) " + chrome.runtime.lastError.message /*+as string+*/);
   })

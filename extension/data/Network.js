@@ -10,6 +10,7 @@ export type NetworkInfo = {
   }
 +*/
 
+import { askBackground } from "../api/askBackground.js";
 import { setRpcUrl } from "../api/utils/json-rpc.js";
 
 export const List/*:NetworkInfo[]*/ = [

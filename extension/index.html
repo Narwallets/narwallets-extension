@@ -235,8 +235,13 @@
                         <div class="balance total"></div>
                     </div>
                 </div>
-                <div class="contents-footer">
-                    <button id="add-account" class="small">Add Account</button>
+                <div class="footer-buttons">
+                    <div class="button-group no-top-line">
+                        <button id="add-account" class="small">Add Account</button>
+                    </div>
+                    <div class="button-group" id="disconnect-line">
+                        <button id="disconnect-from-web-page" class="small">Disconnect from web page</button>
+                    </div>
                 </div>
             </div>
 
@@ -332,9 +337,13 @@
                     </div>
                 </div>
 
-                <div class="footer">
+                <div class="footer-buttons">
                     <div id="account-selected-buttons" class="subpage">
-                        <div class="button-group top-line">
+                        <div class="button-group">
+                            <button id="acc-connect-to-page" class="small">Connect to Web Page</button>
+                            <button id="acc-disconnect-from-page" class="small">Disconnect Web Page</button>
+                        </div>
+                        <div class="button-group">
                             <button id="send">Send</button>
                             <button id="receive">Receive</button>
                         </div>
@@ -606,7 +615,7 @@
                     </div>
 
                     <!-- OK CANCEL buttons common to all subpages -->
-                    <div class="button-group top-line ok-cancel hidden">
+                    <div class="button-group ok-cancel hidden">
                         <button id="account-selected-action-confirm" class="button btn-primary">
                             OK
                         </button>

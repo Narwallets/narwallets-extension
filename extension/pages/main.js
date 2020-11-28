@@ -5,6 +5,9 @@ import * as Network from "../data/Network.js"
 import { Account, ExtendedAccountData } from "../data/Account.js"
 import { show as AccountSelectedPage_show } from "./account-selected.js"
 
+import { localStorageSet } from "../data/util.js"
+import { askBackground } from "../api/askBackground.js"
+
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER = "welcome-new-user-page"
 export const CREATE_PASS = "create-pass"
@@ -87,8 +90,29 @@ function sortByOrder(a/*:ExtendedAccountData*/, b/*:ExtendedAccountData*/) {
   return -1;
 }
 
+function addAccountClicked() {
+  d.showPage(IMPORT_OR_CREATE)
+}
+
+async function disconnectFromWepPageClicked() {
+  const button = d.qs("#disconnect-from-web-page")
+  button.enabled = false;
+  try{
+      await askBackground({code:"disconnect"})
+      d.showSuccess("disconnected")
+      setTimeout(function(){
+        d.qs("#disconnect-line").hide()
+        button.enabled = true
+      },1000)
+  }
+  catch(ex){
+      d.showErr(ex.message);
+      button.enabled = true;
+  }
+}
+
 //--------------------------
-export function showMain() {
+export async function showMain() {
 
   d.hideErr()
 
@@ -144,8 +168,15 @@ export function showMain() {
   totalEl.innerText = c.toStringDec(total);
   d.qs("#main-page .total-row").el.addEventListener("dragover", total_dragOver)
 
+  d.onClickId(ADD_ACCOUNT, addAccountClicked);
+
+  const disconnectButton = d.qs("#disconnect-from-web-page")
+  disconnectButton.onClick(disconnectFromWepPageClicked);
+
   d.showPage(MAIN)
 
+  const isConnected = true;// await sendBackground({code:"isConnected"})
+  d.qs("#disconnect-line").showIf(isConnected);
 }
 
 //---------------------------------------------------

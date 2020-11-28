@@ -5,6 +5,7 @@ import * as Network from "./Network.js";
 import { localStorageRemove, recoverFromLocalStorage, localStorageSave, localStorageSet, localStorageGet } from "./util.js";
 import { showErr, IUOP as INVALID_USER_OR_PASS } from "../util/document.js";
 import { Account } from "../data/Account.js"; //required for SecureState declaration
+import { askBackground } from "../api/askBackground.js";
 
 const DATA_VERSION = "0.1"
 
@@ -176,7 +177,11 @@ export async function unlockSecureStateSHA(email/*:string*/, hashedPassBase64/*:
   SecureState = decrypted
   unlocked = true;
   try { setAutoUnlock(email, hashedPassBase64); } catch { } //auto-unlock & set current user
-  try { Network.setCurrent(SecureState.initialNetworkName) } catch { };
+  try { 
+    Network.setCurrent(SecureState.initialNetworkName) 
+    //also inform background page
+    await askBackground({code:"set-network",network:SecureState.initialNetworkName})
+  } catch { };
 }
 
 //------------------

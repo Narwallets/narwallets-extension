@@ -27,25 +27,6 @@ let numberFormatFunction = function (num/*:number*/, key/*:string*/) {
 }
 //export function setNumberFormatFunction
 
-//----js simple independent utility FUNCTIONS  -------
-// add property get Object.isEmpty --> returns true if the object is {}
-Object.defineProperty(Object.prototype, 'isEmpty', {
-  get() {
-    for (var p in this) {
-      if (this.hasOwnProperty(p)) { return false }
-    }
-    return true;
-  }
-})
-/*+
-declare global {
-  interface Object {
-    isEmpty:boolean;
-  }
-}
-+*/
-
-
 //----DOM COMMON simple independent utility FUNCTIONS  -------
 /**
  * wrapper around document.getElementById -> HTMLElement
@@ -356,6 +337,7 @@ export class El {
 
   hide() { this.el.classList.add("hidden") }
   show() { this.el.classList.remove("hidden") }
+  showIf(truefalse/*:boolean*/) { if (truefalse) this.show(); else this.hide(); }
   get hidden() { return this.el.classList.contains("hidden") }
   set hidden(value) { if (value) this.hide(); else this.show() }
 
