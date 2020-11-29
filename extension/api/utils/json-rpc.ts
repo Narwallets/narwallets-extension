@@ -97,7 +97,7 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
         return response.result;
     }
     catch (ex) {
-        throw new Error("Network Err: " + ex.message)
+        throw new Error(rpcUrl+": " + ex.message)
     }
 }
     // if (!response.ok) {

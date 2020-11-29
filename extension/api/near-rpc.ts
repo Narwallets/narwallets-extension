@@ -1,5 +1,6 @@
 import { jsonRpc, jsonRpcQuery, formatJSONErr } from "./utils/json-rpc.js"
 import * as naclUtil from "./tweetnacl/util.js"
+import {isValidAccountID} from "./utils/valid.js";
 import { PublicKey, KeyPairEd25519 } from "./utils/key-pair.js"
 import { serialize, base_decode } from "./utils/serialize.js"
 import * as TX from "./transaction.js"
@@ -58,50 +59,6 @@ export function yton(yoctos: string) {
     return Number(nearsText)
 }
 
-export function isValidAccountID(accountId: string): boolean {
-    const MIN_ACCOUNT_ID_LEN = 2;
-    const MAX_ACCOUNT_ID_LEN = 64; //implicit accounts have 64 hex chars
-    if (
-        accountId.length < MIN_ACCOUNT_ID_LEN ||
-        accountId.length > MAX_ACCOUNT_ID_LEN
-    ) {
-        return false;
-    }
-
-    // The valid account ID regex is /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/
-
-    // We can safely assume that last char was a separator.
-    var last_char_is_separator = true;
-
-    for (let n = 0; n < accountId.length; n++) {
-        let c = accountId.charAt(n);
-        let current_char_is_separator = c == "-" || c == "_" || c == ".";
-        if (
-            !current_char_is_separator &&
-            !((c >= "a" && c <= "z") || (c >= "0" && c <= "9"))
-        )
-            return false; //only 0..9 a..z and separators are valid chars
-        if (current_char_is_separator && last_char_is_separator) {
-            return false; //do not allow 2 separs together
-        }
-        last_char_is_separator = current_char_is_separator;
-    }
-    // The account can't end as separator.
-    return !last_char_is_separator;
-}
-
-
-export function isValidAmount(amount: number): boolean {
-    if (isNaN(amount)) return false;
-    if (amount < 0) return false;
-    return true
-}
-
-//-------------------------------
-export function getPublicKey(privateKey: string): string {
-    const keyPair = KeyPairEd25519.fromString(privateKey);
-    return keyPair.getPublicKey().toString();
-}
 
 //-------------------------
 //-- Query Account State
@@ -163,23 +120,6 @@ export function getValidators(): Promise<any> {
     return jsonRpc('validators', [null]) as Promise<any>
 };
 
-export type StakingPoolAccountInfoResult = {
-    account_id: string; // '90027aec7944e8e70cf1f86fa255ac18866bb043.lockup.guildnet',
-    unstaked_balance: string; //'1166437895078907168093622181',
-    staked_balance: string; //'0',
-    can_withdraw: boolean; //true
-}
-
-// always return StakingPoolAccountInfoResult. A empty one if the pool can't find the account. See: core-contracts/staking-pool
-export async function getStakingPoolAccInfo(accountName: string, stakingPool: string): Promise<StakingPoolAccountInfoResult> {
-    return view(stakingPool, "get_account", { account_id: accountName }) as Promise<StakingPoolAccountInfoResult>
-}
-
-export async function getStakingPoolFee(stakingPool: string): Promise<number> {
-    const rewardFeeFraction = await view(stakingPool, "get_reward_fee_fraction");
-    return rewardFeeFraction.numerator * 100 / rewardFeeFraction.denominator;
-};
-
 
 //-------------------------------
 export function broadcast_tx_commit_signed(signedTransaction: TX.SignedTransaction): Promise<any> {
@@ -189,13 +129,13 @@ export function broadcast_tx_commit_signed(signedTransaction: TX.SignedTransacti
 };
 
 //-------------------------------
-export async function broadcast_tx_commit_actions(actions: TX.Action[], sender: string, receiver: string, privateKey: string): Promise<any> {
+export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId: string, receiver: string, privateKey: string): Promise<any> {
 
     const keyPair = KeyPairEd25519.fromString(privateKey);
     const publicKey = keyPair.getPublicKey();
 
-    const accessKey = await access_key(sender, publicKey.toString());
-    if (accessKey.permission !== 'FullAccess') throw Error(`The key is not full access for account '${sender}'`)
+    const accessKey = await access_key(signerId, publicKey.toString());
+    if (accessKey.permission !== 'FullAccess') throw Error(`The key is not full access for account '${signerId}'`)
 
     // converts a recent block hash into an array of bytes 
     // this hash was retrieved earlier when creating the accessKey (Line 26)
@@ -207,7 +147,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], sender: 
     const nonce = ++accessKey.nonce;
 
     const transaction = TX.createTransaction(
-        sender,
+        signerId,
         publicKey,
         receiver,
         nonce,

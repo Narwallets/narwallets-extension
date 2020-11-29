@@ -1,19 +1,19 @@
 import * as c from "../util/conversions.js"
 import * as d from "../util/document.js"
-import * as global from "../data/global.js"
-import { options } from "../data/options.js"
-import * as Network from "../data/Network.js"
-import * as nearAccounts from "../util/near-accounts.js"
+
+import * as nearAccounts from "../util/search-accounts.js"
 import * as Pages from "../pages/main.js"
 
-import * as near from "../api/near-rpc.js"
+import * as StakingPool from "../api/staking-pool.js"
+import {isValidAccountID, isValidAmount} from "../api/utils/valid.js";
 import * as seedPhraseUtil from "../api/utils/seed-phrase.js"
-import { PublicKey } from "../api/utils/key-pair.js"
+import { PublicKey, KeyPairEd25519 } from "../api/utils/key-pair.js"
 import { setRpcUrl } from "../api/utils/json-rpc.js"
 import { LockupContract } from "../contracts/LockupContract.js"
-import { Account, ExtendedAccountData } from "../data/Account.js"
+import { Account, ExtendedAccountData } from "../api/account.js"
 import { localStorageSet } from "../data/util.js"
-import { askBackground } from "../api/askBackground.js"
+import { askBackground, askBackgroundApplyTxAction, askBackgroundApplyBatchTx, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts } from "../api/askBackground.js"
+import { BatchTransaction, DeleteAccountToBeneficiary } from "../api/batch-transaction.js"
 
 /*+
 import type { AnyElement, ClickHandler } from "../util/document.js"
@@ -102,21 +102,22 @@ function showingMore() {
     if (buttonsMore.elems.length == 0) return false;
     return !buttonsMore.elems[0].classList.contains("hidden")
 }
-function moreLessClicked() {
-    const selector = global.SecureState.advancedMode ? ".buttons-more" : ".buttons-more:not(.advanced)"
+async function moreLessClicked() {
+    const options = await askBackgroundGetOptions()
+    const selector = options.advancedMode ? ".buttons-more" : ".buttons-more:not(.advanced)"
     const buttonsMore = new d.All(selector)
     buttonsMore.toggleClass("hidden")
     d.qs("#moreless").innerText = (showingMore() ? "Less..." : "More...")
 }
 
 
-function getAccountRecord(accName/*:string*/)/*:Account*/ {
-    return global.SecureState.accounts[Network.current][accName];
+function getAccountRecord(accName/*:string*/)/*:Promise<Account>*/ {
+    return askBackground({code:"get-account",accountId:accName}) /*as Promise<Account>*/
 }
 
-function showAccountData(accName/*:string*/) {
+async function showAccountData(accName/*:string*/) {
 
-    const accInfo = getAccountRecord(accName)
+    const accInfo = await getAccountRecord(accName)
     if (!accInfo) throw new Error("Account is not in this wallet: " + accName)
 
     selectedAccountData = new ExtendedAccountData(accName, accInfo)
@@ -158,7 +159,7 @@ type StateResult={
 
 
 function listPoolsClicked() {
-    localStorageSet({selectedNetwork:Network.current,reposition:"stake",account:selectedAccountData.name})
+    localStorageSet({reposition:"stake",account:selectedAccountData.name})
     chrome.windows.create({
         url: chrome.runtime.getURL("outside/list-pools.html"),
         state: "maximized"
@@ -189,10 +190,10 @@ function checkNormalAccountIsFullAccess() {
     throw Error("Account access is Read-Only")
 }
 
-function checkAccountAccess() {
+async function checkAccountAccess() {
     if (selectedAccountData.accountInfo.type == "lock.c") {
         if (!selectedAccountData.accountInfo.ownerId) throw Error("Owner is unknown. Try importing owner account");
-        const ownerInfo = getAccountRecord(selectedAccountData.accountInfo.ownerId)
+        const ownerInfo = await getAccountRecord(selectedAccountData.accountInfo.ownerId)
         if (!ownerInfo) throw Error("The owner account is not in this wallet")
         if (!ownerInfo.privateKey) throw Error("You need full access on the owner account: " + selectedAccountData.accountInfo.ownerId + " to operate this lockup account")
         //new d.El(".footer .title").hide() //no hay  espacio
@@ -219,7 +220,7 @@ function fullAccessSubPage(subPageId/*:string*/, OKHandler/*:ClickHandler*/) {
 function GotoOwnerOkHandler() {
     const owner=selectedAccountData.accountInfo.ownerId
     if (owner) {
-        show(owner);
+        show(owner,undefined);
         d.showWarn("Attention: You're now at " + owner)
     }
 }
@@ -247,7 +248,7 @@ function receiveClicked() {
 async function connectToWebAppClicked()/*: Promise<any>*/{
     d.showWait()
     try{
-        await askBackground({code:"connect",accountId:selectedAccountData.name, network:Network.current})
+        await askBackground({code:"connect",accountId:selectedAccountData.name})
         d.showSuccess("connected")
         window.close()
     }
@@ -270,11 +271,11 @@ async function disconnectFromPageClicked() {
   }
   
 //--------------------------------
-function checkOwnerAccessThrows(action/*:string*/) {
+async function checkOwnerAccessThrows(action/*:string*/) {
     //check if we have owner's key
     const info = selectedAccountData.accountInfo
     if (info.ownerId) {
-        const owner = getAccountRecord(info.ownerId)
+        const owner = await getAccountRecord(info.ownerId)
         if (!owner || !owner.privateKey) {
             showGotoOwner()
             throw Error("You need full access on " + info.ownerId +
@@ -284,13 +285,13 @@ function checkOwnerAccessThrows(action/*:string*/) {
 }
 
 //----------------------
-function sendClicked() {
+async function sendClicked() {
     try {
         let maxAmountToSend = selectedAccountData.available
         let performer = performSend //default send
         //if it's a lock.c and we didn't add a priv key yet, use contract method "trasnfer" (performLockupContractSend)
         if (selectedAccountData.accountInfo.type == "lock.c" && !selectedAccountData.accountInfo.privateKey) {
-            checkOwnerAccessThrows("send")
+            await checkOwnerAccessThrows("send")
             performer = performLockupContractSend
         }
 
@@ -317,17 +318,18 @@ async function performLockupContractSend() {
         const info = selectedAccountData.accountInfo
         if (!info.ownerId) throw Error("unknown ownerId");
 
-        const owner = getAccountRecord(info.ownerId)
+        const owner = await getAccountRecord(info.ownerId)
         if (!owner.privateKey) throw Error("you need full access on " + info.ownerId);
 
         const toAccName = d.inputById("send-to-account-name").value.trim();
-        if (!near.isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
+        if (!isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
 
         //const amountToStake = info.lastBalance - info.staked - 36
         const amountToSend = c.toNum(d.inputById("send-to-account-amount").value);
-        if (!near.isValidAmount(amountToSend)) throw Error("Amount should be a positive integer");
+        if (!isValidAmount(amountToSend)) throw Error("Amount should be a positive integer");
 
         const lc = new LockupContract(info)
+        await lc.computeContractAccount()
         await lc.transfer(info.ownerId,
             amountToSend,
             toAccName,
@@ -351,7 +353,7 @@ async function performLockupContractSend() {
 
 
 //----------------------
-function stakeClicked() {
+async function stakeClicked() {
     try {
         const info = selectedAccountData.accountInfo
         const stakeAmountBox = d.inputById("stake-amount")
@@ -366,7 +368,7 @@ function stakeClicked() {
         }
 
         if (info.type == "lock.c") {
-            checkOwnerAccessThrows("stake")
+            await checkOwnerAccessThrows("stake")
             performer = performLockupContractStake
             stakeAmountBox.disabled = true
             stakeAmountBox.classList.add("bg-lightblue")
@@ -386,8 +388,10 @@ function stakeClicked() {
     } catch (ex) {
         d.showErr(ex.message)
     }
+}
 
-
+function saveSelectedAccount()/*:Promise<any>*/{
+    return askBackground({code:"set-account", accountId:selectedAccountData.name, accInfo:selectedAccountData.accountInfo})
 }
 
 //----------------------
@@ -398,17 +402,17 @@ async function performStake() {
     try {
 
         const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
-        if (!near.isValidAccountID(newStakingPool)) throw Error("Staking pool Account Id is invalid");
+        if (!isValidAccountID(newStakingPool)) throw Error("Staking pool Account Id is invalid");
 
         if (!selectedAccountData.accountInfo.privateKey) throw Error("you need full access on " + selectedAccountData.name);
 
         //const amountToStake = info.lastBalance - info.staked - 36
         const amountToStake = c.toNum(d.inputById("stake-amount").value);
-        if (!near.isValidAmount(amountToStake)) throw Error("Amount should be a positive integer");
+        if (!isValidAmount(amountToStake)) throw Error("Amount should be a positive integer");
         if (amountToStake < 5) throw Error("Stake at least 5 Near");
 
         //refresh status
-        refreshSelectedAccount()
+        await refreshSelectedAccount()
 
         let actualSP = selectedAccountData.accountInfo.stakingPool
 
@@ -422,7 +426,7 @@ async function performStake() {
         if (actualSP) { //there's a selected SP
 
             //ask the actual SP how much is staked
-            poolAccInfo = await near.getStakingPoolAccInfo(selectedAccountData.name, actualSP)
+            poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP)
 
             if (actualSP != newStakingPool) { //requesting a change of SP
 
@@ -442,34 +446,36 @@ async function performStake() {
         if (!actualSP) {
             //select the new staking pool
             selectedAccountData.accountInfo.stakingPool = newStakingPool
-            poolAccInfo = await near.getStakingPoolAccInfo(selectedAccountData.name, newStakingPool)
+            poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, newStakingPool)
         }
 
         if (c.yton(poolAccInfo.unstaked_balance) >= 10 ) { //at least 10 deposited but unstaked, stake that
             //just re-stake (maybe the user asked unstaking but now regrets it)
             const amountToStakeY=fixUserAmountInY(amountToStake,poolAccInfo.unstaked_balance)
             if (amountToStakeY==poolAccInfo.unstaked_balance){
-                await near.call_method(newStakingPool, "stake_all", {}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
+                await askBackgroundCallMethod(newStakingPool, "stake_all", {}, selectedAccountData.name, 125)
             }
             else {
-                await near.call_method(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
+                await askBackgroundCallMethod(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, 125)
+                //await near.call_method(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
             }
         }
         else { //no unstaked funds
             //deposit and stake
-            await near.call_method(newStakingPool, "deposit_and_stake", {},
-                selectedAccountData.name,
-                selectedAccountData.accountInfo.privateKey,
-                near.ONE_TGAS.muln(125),
-                amountToStake
-            )
+            await askBackgroundCallMethod(newStakingPool, "deposit_and_stake", {}, selectedAccountData.name, 125, amountToStake)
+            // await near.call_method(newStakingPool, "deposit_and_stake", {},
+            //     selectedAccountData.name,
+            //     selectedAccountData.accountInfo.privateKey,
+            //     near.ONE_TGAS.muln(125),
+            //     amountToStake
+            // )
             //update staked to avoid incorrect "rewards" calculations on refresh
             selectedAccountData.accountInfo.staked += amountToStake
         }
 
-        global.saveSecureState()
+        await saveSelectedAccount()
         //refresh status
-        refreshSelectedAccount()
+        await refreshSelectedAccount()
 
         d.showSuccess("Success")
         showButtons()
@@ -492,28 +498,30 @@ async function performLockupContractStake() {
         d.showWait()
 
         const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
-        if (!near.isValidAccountID(newStakingPool)) throw Error("Staking pool Account Id is invalid");
+        if (!isValidAccountID(newStakingPool)) throw Error("Staking pool Account Id is invalid");
 
         const info = selectedAccountData.accountInfo
         if (!info.ownerId) throw Error("unknown ownerId");
 
-        const owner = getAccountRecord(info.ownerId)
+        const owner = await getAccountRecord(info.ownerId)
         if (!owner.privateKey) throw Error("you need full access on " + info.ownerId);
 
         //const amountToStake = info.lastBalance - info.staked - 36
         const amountToStake = c.toNum(d.inputById("stake-amount").value);
-        if (!near.isValidAmount(amountToStake)) throw Error("Amount should be a positive integer");
+        if (!isValidAmount(amountToStake)) throw Error("Amount should be a positive integer");
         if (amountToStake < 5) throw Error("Stake at least 5 NEAR");
 
         const lc = new LockupContract(info)
+        await lc.computeContractAccount()
         await lc.stakeWith(info.ownerId,
             newStakingPool,
             amountToStake,
             owner.privateKey)
 
-        global.saveSecureState()
+        //store updated lc state
+        await askBackground({code:"set-account", accountId:lc.contractAccount, accInfo:lc.accountInfo})
         //refresh status
-        refreshSelectedAccount()
+        await refreshSelectedAccount()
 
         d.showSuccess("Success")
         showButtons()
@@ -542,7 +550,7 @@ async function unstakeClicked() {
         if (info.type == "lock.c") {
             //lockup - allways full amount
             d.qs("#unstake-ALL-label").show()
-            checkOwnerAccessThrows("unstake")
+            await checkOwnerAccessThrows("unstake")
             performer = performLockupContractUnstake
             amountBox.disabled = true
             amountBox.classList.add("bg-lightblue")
@@ -598,7 +606,7 @@ function fixUserAmountInY(amount/*:number*/, yoctosMax/*:string*/) /*:string*/ {
 
     let yoctosResult = yoctosMax //default => all 
     if (amount + 1 < c.yton(yoctosResult)) {
-        yoctosResult = near.ntoy(amount) //only if it's less of what's available, we take the input amount
+        yoctosResult = c.ntoy(amount) //only if it's less of what's available, we take the input amount
     }
     else if (amount > 1+c.yton(yoctosMax)) { //only if it's +1 above max
         throw Error("Max amount is " + c.toStringDec(c.yton(yoctosMax)))
@@ -617,7 +625,7 @@ async function performUnstake() {
         const modeUnstake = !modeWithraw
 
         const amount = c.toNum(d.inputById("unstake-amount").value);
-        if (!near.isValidAmount(amount)) throw Error("Amount is not valid");
+        if (!isValidAmount(amount)) throw Error("Amount is not valid");
 
         if (!selectedAccountData.accountInfo.privateKey) throw Error("you need full access on " + selectedAccountData.name);
 
@@ -625,7 +633,7 @@ async function performUnstake() {
         if (!actualSP) throw Error("No staking pool selected in this account");
 
         //check if it's staked or just in the pool but unstaked
-        const poolAccInfo = await near.getStakingPoolAccInfo(selectedAccountData.name, actualSP)
+        const poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP)
 
         if (modeWithraw) {
 
@@ -636,10 +644,10 @@ async function performUnstake() {
             //ok we've unstaked funds we can withdraw 
             let yoctosToWithdraw = fixUserAmountInY(amount, poolAccInfo.unstaked_balance) // round user amount
             if (yoctosToWithdraw==poolAccInfo.unstaked_balance){
-                await near.call_method(actualSP, "withdraw_all", { }, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
+                await askBackgroundCallMethod(actualSP, "withdraw_all", {}, selectedAccountData.name, 125)
             }
             else {
-                await near.call_method(actualSP, "withdraw", { amount: yoctosToWithdraw }, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
+                await askBackgroundCallMethod(actualSP, "withdraw", {amount:yoctosToWithdraw}, selectedAccountData.name, 125)
             }
             d.showSuccess(c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool")
             //----------------
@@ -652,17 +660,16 @@ async function performUnstake() {
 
             let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance) // round user amount
             if (yoctosToUnstake==poolAccInfo.staked_balance){
-                await near.call_method(actualSP, "unstake_all", {}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
+                await askBackgroundCallMethod(actualSP, "unstake_all", {}, selectedAccountData.name, 125)
             }
             else {
-                await near.call_method(actualSP, "unstake", { amount: yoctosToUnstake }, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
+                await askBackgroundCallMethod(actualSP, "unstake", {amount:yoctosToUnstake}, selectedAccountData.name, 125)
             }
             d.showSuccess("Unstake requested, you must wait (36-48hs) for withdrawal")
     }
 
     //refresh status
-    refreshSelectedAccount()
-    global.saveSecureState()
+    await refreshSelectedAccount()
 
     showButtons()
 
@@ -685,16 +692,17 @@ async function performLockupContractUnstake() {
         const info = selectedAccountData.accountInfo
         if (!info.ownerId) throw Error("unknown ownerId");
 
-        const owner = getAccountRecord(info.ownerId)
+        const owner = await getAccountRecord(info.ownerId)
         if (!owner.privateKey) throw Error("you need full access on " + info.ownerId);
 
         const lc = new LockupContract(info)
+        await lc.computeContractAccount()
 
         const message = await lc.unstakeAndWithdrawAll(info.ownerId, owner.privateKey)
         d.showSuccess(message)
 
         //refresh status
-        refreshSelectedAccount()
+        await refreshSelectedAccount()
 
         showButtons()
 
@@ -710,22 +718,21 @@ async function performLockupContractUnstake() {
 }
 
 
-function internalReflectTransfer(sender /*:string*/, receiver /*:string*/, amountNear /*:number*/) {
+async function internalReflectTransfer(sender /*:string*/, receiver /*:string*/, amountNear /*:number*/) {
     let updated = false
     //the sender should be the selected account
     if (sender == selectedAccountData.name) {
         selectedAccountData.accountInfo.lastBalance -= amountNear
         selectedAccountData.available -= amountNear
         showAccountData(sender)
-        updated = true;
+        saveSelectedAccount();
     }
     //check if receiver is also in this wallet
-    const receiverAccInfo = getAccountRecord(receiver)
+    const receiverAccInfo = await getAccountRecord(receiver)
     if (receiverAccInfo) { //receiver is also in the wallet
         receiverAccInfo.lastBalance += amountNear
-        updated = true;
+        return askBackground({code:"set-account", accountId:receiver, accInfo:receiverAccInfo})
     }
-    if (updated) global.saveSecureState();
 }
 
 async function performSend() {
@@ -734,13 +741,13 @@ async function performSend() {
         const toAccName = new d.El("#send-to-account-name").value
         const amountElem = new d.El("#send-to-account-amount")
         const amountToSend = c.toNum(amountElem.value)
-        if (!near.isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
-        if (!near.isValidAmount(amountToSend)) throw Error("Amount should be a positive integer");
+        if (!isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
+        if (!isValidAmount(amountToSend)) throw Error("Amount should be a positive integer");
 
         disableOKCancel()
         d.showWait()
 
-        await near.send(selectedAccountData.name, toAccName, amountToSend, selectedAccountData.accountInfo.privateKey)
+        await askBackgroundTransferNear(selectedAccountData.name, toAccName, amountToSend)
 
         amountElem.value = ""
         showButtons()
@@ -765,10 +772,11 @@ async function performSend() {
 }
 
 
-function exploreButtonClicked() {
+async function exploreButtonClicked() {
     localStorageSet({reposition:"account", account:selectedAccountData.name})
+    const netInfo = await askBackgroundGetNetworkInfo()
     chrome.windows.create({
-        url: Network.currentInfo().explorerUrl + "accounts/" + selectedAccountData.name,
+        url: netInfo.explorerUrl + "accounts/" + selectedAccountData.name,
         state: "maximized"
     });
 }
@@ -794,7 +802,7 @@ export async function searchThePools(exAccData/*:ExtendedAccountData*/) /*:Promi
 
         let checked/*:Record<string,boolean>*/ = {}
 
-        const validators = await near.getValidators()
+        const validators = await askBackgroundGetValidators()
         const allOfThem = validators.current_validators.concat(validators.next_validators, validators.prev_epoch_kickout, validators.current_proposals)
 
         for (let pool of allOfThem) {
@@ -803,9 +811,12 @@ export async function searchThePools(exAccData/*:ExtendedAccountData*/) /*:Promi
                 let isStakingPool = true
                 let poolAccInfo;
                 try {
-                    poolAccInfo = await near.getStakingPoolAccInfo(exAccData.name, pool.account_id)
+                    poolAccInfo = await StakingPool.getAccInfo(exAccData.name, pool.account_id)
                 } catch (ex) {
-                    if (ex.message.indexOf("cannot find contract code for account") != -1) {
+                    if (
+                    ex.message.indexOf("cannot find contract code for account") != -1
+                    || ex.message.indexOf("FunctionCallError(MethodResolveError(MethodNotFound))")!=-1
+                    ){
                         //validator is not a staking pool - ignore
                         isStakingPool = false
                     }
@@ -818,10 +829,10 @@ export async function searchThePools(exAccData/*:ExtendedAccountData*/) /*:Promi
                         d.showSuccess(`Found! ${c.toStringDec(amount)} on ${pool.account_id}`)
                         if (amount > lastAmountFound) { //save only one
                             exAccData.accountInfo.stakingPool = pool.account_id;
-                            exAccData.accountInfo.staked = near.yton(poolAccInfo.staked_balance)
-                            exAccData.accountInfo.unStaked = near.yton(poolAccInfo.unstaked_balance)
+                            exAccData.accountInfo.staked = c.yton(poolAccInfo.staked_balance)
+                            exAccData.accountInfo.unStaked = c.yton(poolAccInfo.unstaked_balance)
                             exAccData.inThePool = exAccData.accountInfo.staked + exAccData.accountInfo.unStaked
-                            exAccData.accountInfo.stakingPoolPct = await near.getStakingPoolFee(pool.account_id)
+                            exAccData.accountInfo.stakingPoolPct = await StakingPool.getFee(pool.account_id)
                             lastAmountFound = amount
                         }
                     }
@@ -843,9 +854,14 @@ export async function searchThePools(exAccData/*:ExtendedAccountData*/) /*:Promi
 async function searchPoolsButtonClicked() {
     const found = searchThePools(selectedAccountData)
     if (found){
-        refreshSelectedAccount()
-        global.saveSecureState()
+        await refreshSelectedAccount()
     }
+}
+
+//-------------------------------
+function getPublicKey(privateKey/*:string*/) /*:string*/ {
+    const keyPair = KeyPairEd25519.fromString(privateKey);
+    return keyPair.getPublicKey().toString();
 }
 
 //---------------------------------------
@@ -859,7 +875,7 @@ function showPublicKeyClicked() {
     }
     else { //normal acc priv key
         d.showSubPage("account-selected-show-public-key")
-        d.byId("account-selected-public-key").innerText = near.getPublicKey(selectedAccountData.accountInfo.privateKey)
+        d.byId("account-selected-public-key").innerText = getPublicKey(selectedAccountData.accountInfo.privateKey)
         showOKCancel(showButtons)
     }
 }
@@ -910,10 +926,10 @@ function addNoteClicked() {
     d.showSubPage("account-selected-add-note")
     showOKCancel(addNoteOKClicked)
 }
-function addNoteOKClicked() {
+async function addNoteOKClicked() {
     d.hideErr()
     selectedAccountData.accountInfo.note = d.inputById("add-note").value.trim()
-    global.saveSecureState()
+    await saveSelectedAccount()
     showAccountData(selectedAccountData.name)
     showButtons()
 }
@@ -958,7 +974,7 @@ async function AccountDeleteOKClicked() {
         const beneficiary = d.inputById("send-balance-to-account-name").value
         if (!beneficiary) throw Error("Enter the beneficiary account")
 
-        const result = await near.delete_account(toDeleteAccName, privateKey, beneficiary)
+        const result = await askBackgroundApplyTxAction(toDeleteAccName,new DeleteAccountToBeneficiary(beneficiary), selectedAccountData.name)
 
         d.showSuccess("Account Deleted")
 
@@ -983,12 +999,12 @@ async function AddPublicKeyToLockupOKClicked() {
         //if (!newPubKey) throw Error("Enter the public key to add")
         const owner = selectedAccountData.accountInfo.ownerId;
         if (!owner) throw Error("Lockup account owner unknown")
-        const ownerAcc = getAccountRecord(owner)
+        const ownerAcc = await getAccountRecord(owner)
         const privateKey = ownerAcc.privateKey;
         if (!privateKey) throw Error("Owner Account is Read-Only")
 
         try {
-            const pingTransfer = await near.call_method(selectedAccountData.name, "check_transfers_vote", {}, owner, privateKey, near.ONE_TGAS.muln(75))
+            const pingTransfer = await askBackgroundCallMethod(selectedAccountData.name, "check_transfers_vote", {}, owner, 75)
         } catch (ex) {
             if (ex.message.indexOf("Transfers are already enabled") != -1) {
                 //ok, Transfers are enabled 
@@ -996,26 +1012,26 @@ async function AddPublicKeyToLockupOKClicked() {
             else throw ex;
         }
 
-        const newPubKey = near.getPublicKey(privateKey)
-        const result = await near.call_method(selectedAccountData.name, "add_full_access_key", { new_public_key: newPubKey }, owner, privateKey, near.ONE_TGAS.muln(50))
+        const newPubKey = getPublicKey(privateKey)
+        const result = await askBackgroundCallMethod(selectedAccountData.name, "add_full_access_key", {new_public_key:newPubKey}, owner, 50)
 
         d.showSuccess("Public Key added")
 
         //check if that's a known-key 
-        for (let accName in global.SecureState.accounts[Network.current]) {
+        const allNetworkAccounts = await askBackgroundAllNetworkAccounts()
+        for (let accName in allNetworkAccounts) {
             if (accName != selectedAccountData.name) {
-                const accInfo = getAccountRecord(accName)
+                const accInfo = allNetworkAccounts[accName]
                 if (accInfo.privateKey) {
-                    const thePubKey = near.getPublicKey(accInfo.privateKey)
+                    const thePubKey = getPublicKey(accInfo.privateKey)
                     if (thePubKey == newPubKey) {
                         selectedAccountData.accountInfo.privateKey = accInfo.privateKey
-                        global.saveSecureState()
+                        saveSelectedAccount()
                         d.showSuccess("Full access added from " + accName)
                     }
                 }
             }
         }
-        global.saveSecureState()
         showButtons()
     }
     catch (ex) {
@@ -1034,7 +1050,7 @@ function makeReadOnlyOKClicked() {
     }
     else {
         selectedAccountData.accountInfo.privateKey = undefined
-        global.saveSecureState()
+        saveSelectedAccount()
         selectedAccountData.accessStatus = "Read Only"
         d.showMsg("Account access removed", "success")
         showAccountData(selectedAccountData.name)
@@ -1058,7 +1074,7 @@ async function makeFullAccessOKClicked() {
     try {
         let { seedPhrase, secretKey, publicKey } = seedPhraseUtil.parseSeedPhrase(words)
         try {
-            let keyFound = await near.access_key(selectedAccountData.name, publicKey)
+            let keyFound = await askBackgroundGetAccessKey(selectedAccountData.name, publicKey)
         }
         catch(ex){
             let err=ex.message
@@ -1069,7 +1085,7 @@ async function makeFullAccessOKClicked() {
         //if key found correctly
         selectedAccountData.accountInfo.privateKey = secretKey
         seedTextElem.value = ""
-        global.saveSecureState()
+        await saveSelectedAccount()
         d.showMsg("Seed Phrase is correct. Access granted", "success")
         showAccountData(selectedAccountData.name)
         showButtons()
@@ -1108,9 +1124,8 @@ function cancelClicked() {
 }
 
 
-function removeAccountClicked(ev /*:Event*/) {
+async function removeAccountClicked(ev /*:Event*/) {
     try{
-        ev.preventDefault();
 
         if (selectedAccountData.accountInfo.privateKey){
             //has full access - remove access first
@@ -1119,9 +1134,7 @@ function removeAccountClicked(ev /*:Event*/) {
         }
 
         //remove
-        delete global.SecureState.accounts[Network.current][selectedAccountData.name];
-        //persist
-        global.saveSecureState()
+        await askBackground({code:"delete-account", accountId:selectedAccountData.name})
         //return to main page
         Pages.showMain()
     }
@@ -1132,7 +1145,7 @@ function removeAccountClicked(ev /*:Event*/) {
 
 async function refreshSelectedAccount() {
     await nearAccounts.asyncRefreshAccountInfo(selectedAccountData.name, selectedAccountData.accountInfo)
-    global.saveAccount(selectedAccountData.name, selectedAccountData.accountInfo);
+    await saveSelectedAccount()
     showAccountData(selectedAccountData.name);
 }
 

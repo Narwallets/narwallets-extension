@@ -1,11 +1,9 @@
 import * as d from "../util/document.js"
 import * as c from "../util/conversions.js"
-import * as global from "../data/global.js"
-import * as Pages from "../pages/main.js"
-import * as Network from "../data/Network.js"
-import * as near from "../api/near-rpc.js"
+import * as StakingPool from "../api/staking-pool.js"
+
 import * as rpc from "../api/utils/json-rpc.js"
-import { localStorageGet, localStorageGetAndRemove } from "../data/util.js"
+import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../api/askBackground.js"
 
 
 /*+
@@ -37,9 +35,10 @@ async function displaySatakingPools() {
   d.showWait()
   try {
 
-    const data = await near.getValidators()
+    const data = await askBackgroundGetValidators()
 
-    d.byId("net-name").innerText = Network.currentInfo().displayName;
+    const networkInfo = await askBackgroundGetNetworkInfo()
+    d.byId("net-name").innerText = networkInfo.displayName;
 
     const list/*:PoolInfo[]*/ = []
     for (let item of data.current_validators) {
@@ -59,7 +58,7 @@ async function displaySatakingPools() {
 
     //query fees
     for (let item of data.current_validators) {
-      near.getStakingPoolFee(item.account_id) //async get fees
+      StakingPool.getFee(item.account_id) //async get fees
         .then((fee) => {
           //debug
           if (item.account_id.indexOf("node0") != -1) {
@@ -107,8 +106,6 @@ async function displaySatakingPools() {
 async function init() {
   try {
     rpc.addHeader("mode","no-cors")
-    const selectedNetwork = await localStorageGetAndRemove("selectedNetwork")
-    if (selectedNetwork) Network.setCurrent(selectedNetwork);
     displaySatakingPools();
   } 
   catch (ex) {

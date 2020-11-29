@@ -1,9 +1,10 @@
 //----------------------
 //-- BatchTransaction --
 //----------------------
-// this classes exists to facilitate the creation of a BatchTransaction
+// this classes exists to facilitate the creation of a BatchTransactions
 // a BatchTransaction is a series of actions *to be executed on a fixed receiver*
 // by having this classes we can make typescript help with type-checking and code suggestions
+//
 export class BatchTransaction {
     constructor(receiver) {
         this.receiver = receiver;
@@ -30,6 +31,11 @@ export class FunctionCall extends BatchAction {
 export class Transfer extends BatchAction {
     constructor(attachedNear) {
         super("transfer", attachedNear);
+    }
+}
+export class DeleteAccountToBeneficiary extends BatchAction {
+    constructor(beneficiaryAccountId) {
+        super("delete");
     }
 }
 //# sourceMappingURL=batch-transaction.js.map

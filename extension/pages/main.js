@@ -1,12 +1,11 @@
 import * as d from "../util/document.js"
 import * as c from "../util/conversions.js"
-import * as global from "../data/global.js"
-import * as Network from "../data/Network.js"
-import { Account, ExtendedAccountData } from "../data/Account.js"
+
+import { Account, ExtendedAccountData } from "../api/account.js"
 import { show as AccountSelectedPage_show } from "./account-selected.js"
 
 import { localStorageSet } from "../data/util.js"
-import { askBackground } from "../api/askBackground.js"
+import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetState } from "../api/askBackground.js"
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER = "welcome-new-user-page"
@@ -66,7 +65,7 @@ function accountItem_drop(ev/*:Event*/) {
   ev.preventDefault();
   //console.log("drop")
 }
-function accountItem_dragend(ev/*:Event*/) {
+async function accountItem_dragend(ev/*:Event*/) {
   //console.log("dragEnd")
   ev.preventDefault()
   d.all("li.account-item")
@@ -76,12 +75,15 @@ function accountItem_dragend(ev/*:Event*/) {
   const accountLis = d.all("li.account-item")
   accountLis.toggleClass("unselectable")
   let n = 1;
-  accountLis.elems.forEach((li) => {
-    const accInfo = global.SecureState.accounts[Network.current][li.id]
+  const networkAccounts = await askBackgroundAllNetworkAccounts()
+  accountLis.elems.forEach(async (li) => {
+    const accInfo = networkAccounts[li.id]
     //console.log(n,accInfo.type,li.id)
-    if (accInfo) accInfo.order = n++;
+    if (accInfo && accInfo.order!=n) {
+      accInfo.order = n++;
+      await askBackground({code:"set-account", accountId:li.id, accinfo:accInfo})
+    }
   })
-  global.saveSecureState();
 }
 
 //--------------------------
@@ -117,11 +119,15 @@ export async function showMain() {
   d.hideErr()
 
   //logged and with no accounts? add one
-  if (global.unlocked && global.getNetworkAccountsCount()==0) {
-    d.showPage(IMPORT_OR_CREATE)
-    return;
+  const state = await askBackgroundGetState()
+  if (state.unlocked){
+    const countAccounts = await askBackground({code:"getNetworkAccountsCount"})
+    if (countAccounts==0) {
+      d.showPage(IMPORT_OR_CREATE)
+      return;
+    }
   }
-  if (!global.unlocked) {
+  if (!state.unlocked) {
     d.showPage(UNLOCK)
     return;
   }
@@ -129,7 +135,7 @@ export async function showMain() {
   d.clearContainer(ACCOUNTS_LIST);
 
   //get accounts, sort by accountInfo.order and show as LI
-  const accountsRecord = global.SecureState.accounts[Network.current]
+  const accountsRecord = await askBackgroundAllNetworkAccounts()
   const list/*:ExtendedAccountData[]*/ = []
   for (let key in accountsRecord) {
     list.push(new ExtendedAccountData(key, accountsRecord[key]))
@@ -188,7 +194,7 @@ export function accountItemClicked(ev/*:Event*/) {
     if (li) {
       const accName = li.id // d.getClosestChildText(".account-item", ev.target, ".name");
       if (!accName) return;
-      AccountSelectedPage_show(accName);
+      AccountSelectedPage_show(accName,undefined);
     }
   }
 }

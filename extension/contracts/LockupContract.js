@@ -1,20 +1,23 @@
 import * as c from "../util/conversions.js"
 import * as d from "../util/document.js"
-import * as Network from "../data/Network.js"
+
 import * as sha256 from "../api/sha256.js"
 import * as naclUtil from "../util/tweetnacl/nacl-util.js";
 import * as near from "../api/near-rpc.js";
+import * as StakingPool from "../api/staking-pool.js";
 import * as TX from "../api/transaction.js";
-import { Account } from "../data/Account.js"
+import { Account } from "../api/account.js"
+import {isValidAccountID} from "../api/utils/valid.js";
+import { askBackgroundGetNetworkInfo } from "../api/askBackground.js";
 
 /*+
 import { BN } from "../bundled-types/BN.js";
-import type {StakingPoolAccountInfoResult} from "../api/near-rpc.js";
+import type {StakingPoolAccountInfoResult} from "../api/staking-pool.js";
 +*/
 
 export class LockupContract {
 
-  contractAccount/*:string*/
+  contractAccount/*:string*/=""
   accountInfo/*:Account*/
   liquidBalance/*:number*/ = 0
   locked/*:number*/ = 0
@@ -22,32 +25,35 @@ export class LockupContract {
   BASE_GAS/*:BN*/;
   BN_ZERO/*:BN*/;
 
-  static getLockupSuffix() {
-    const rootAccount = Network.currentInfo().rootAccount
+  constructor(info/*:Account*/) {
+    this.BASE_GAS = new BN("25" + "0".repeat(12));
+    this.BN_ZERO = new BN("0");
+    this.accountInfo = info
+    this.accountInfo.type = "lock.c"
+  }
+
+  static hexContractAccount(accountId /*:string*/) {
+    const b = sha256.hash(naclUtil.decodeUTF8(accountId)).buffer
+    const hex = near.bufferToHex(b)
+    return `${hex.slice(0, 40)}`;
+  }
+
+  static async getLockupSuffix() {
+    const networkInfo = await askBackgroundGetNetworkInfo()
+    const rootAccount = networkInfo.rootAccount
     //HACK to test lockup contracts in testnet - until core devs provide a way to
     //create xxx.lockup.testnet accounts- we use .lockupy.testnet, that we created
     const lockupSuffix = (rootAccount == "testnet" ? "lockupy" : "lockup")
     return "." + lockupSuffix + "." + rootAccount;
   }
 
-  constructor(info/*:Account*/) {
-    if (!info.ownerId) throw Error("missing info.ownerId")
-
-    const suffix = LockupContract.getLockupSuffix()
-    if (info.ownerId.endsWith(suffix)) throw Error("use the owner account Id to init a lockup contract instance")
-
-    this.BASE_GAS = new BN("25" + "0".repeat(12));
-    this.BN_ZERO = new BN("0");
-    const contractComputedName = LockupContract.computeContractAccount(info.ownerId)
-    this.contractAccount = contractComputedName + suffix;
-    this.accountInfo = info
-    this.accountInfo.type = "lock.c"
-  }
-
-  static computeContractAccount(accountId /*:string*/) {
-    const b = sha256.hash(naclUtil.decodeUTF8(accountId)).buffer
-    const hex = near.bufferToHex(b)
-    return `${hex.slice(0, 40)}`;
+  async computeContractAccount(){
+    const owner=this.accountInfo.ownerId
+    if (!owner) throw Error("missing accountInfo.ownerId")
+    const suffix = await LockupContract.getLockupSuffix()
+    if (owner.endsWith(suffix)) throw Error("use the owner account Id to init a lockup contract instance")
+    const hexName = LockupContract.hexContractAccount(owner)
+    this.contractAccount = hexName + suffix;
   }
 
   async getAmount(method/*:string*/) /*:Promise<number>*/ {
@@ -80,7 +86,7 @@ export class LockupContract {
         this.accountInfo.unStaked = c.yton(poolAcc.unstaked_balance)
         const inThePool = this.accountInfo.staked+this.accountInfo.unStaked
         this.accountInfo.rewards = this.accountInfo.staked + this.accountInfo.unStaked - contractKnownPoolDeposited
-        this.accountInfo.stakingPoolPct = await near.getStakingPoolFee(this.accountInfo.stakingPool)
+        this.accountInfo.stakingPoolPct = await StakingPool.getFee(this.accountInfo.stakingPool)
       }
 
       return true
@@ -169,7 +175,7 @@ export class LockupContract {
   async transfer(sender /*:string*/, amountNear /*:number*/, receiverId /*:string*/, privateKey /*:string*/) /*: Promise<any>*/ {
 
     if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount")
-    if (!near.isValidAccountID(receiverId)) throw Error("invalid receiver account Id")
+    if (!isValidAccountID(receiverId)) throw Error("invalid receiver account Id")
 
     //try to transfer
     await this.call_method("transfer",{amount:near.ntoy(amountNear),receiver_id:receiverId}, this.BASE_GAS.muln(2), sender, privateKey)
@@ -179,7 +185,7 @@ export class LockupContract {
   //-------------------------------------------
   async getStakingPoolAccInfo()/*Promise<StakingPoolAccountInfoResult>*/ {
     if (!this.accountInfo.stakingPool) throw Error("no staking pool informed")
-    return near.getStakingPoolAccInfo(this.contractAccount, this.accountInfo.stakingPool)
+    return StakingPool.getAccInfo(this.contractAccount, this.accountInfo.stakingPool)
   }
 
   //---------------------------------------------------

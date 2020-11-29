@@ -1,9 +1,5 @@
 import * as d from "../util/document.js"
 import {options, recoverOptions, saveOptions} from "../data/options.js"
-import * as c from "../util/conversions.js"
-import * as global from "../data/global.js"
-
-
 
 function SaveClicked(ev/*:Event*/){
     ev.preventDefault()

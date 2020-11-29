@@ -783,7 +783,7 @@ button.big{
 }
 
 button.ultrabig{
-    /* padding: 8px 10px 12px 11px!important; */
+    padding: 8px 0px 13px 14px!important;
     margin-top: 19px!important;
     margin-bottom: 20px!important;
     min-width: 250px;
@@ -792,7 +792,8 @@ button.ultrabig{
     /* align-items: center; */
     border: 2px solid #ffff001f;
     font-size: 2em;
-    font-weight: 600!important;
+    font-weight: 500!important;
+    letter-spacing: 13px;
 }
 
 .send-form input {

@@ -82,7 +82,7 @@ export async function jsonRpcInternal(payload) {
         return response.result;
     }
     catch (ex) {
-        throw new Error("Network Err: " + ex.message);
+        throw new Error(rpcUrl + ": " + ex.message);
     }
 }
 // if (!response.ok) {

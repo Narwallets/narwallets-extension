@@ -201,18 +201,4 @@ export function createSignedTransaction(transaction, keyPair) {
     let result = createHashAndSignedTransaction(transaction, keyPair);
     return result.signedTransaction;
 }
-/*export async function signTransaction(transaction: Transaction, signer: Signer, accountId?: string, networkId?: string): Promise<[Uint8Array, SignedTransaction]>;
-export async function signTransaction(receiverId: string, nonce: number, actions: Action[], blockHash: Uint8Array, signer: Signer, accountId?: string, networkId?: string): Promise<[Uint8Array, SignedTransaction]>;
-export async function signTransaction(...args): Promise<[Uint8Array, SignedTransaction]> {
-    if (args[0].constructor === Transaction) {
-        const [ transaction, signer, accountId, networkId ] = args;
-        return signTransactionObject(transaction, signer, accountId, networkId);
-    } else {
-        const [ receiverId, nonce, actions, blockHash, signer, accountId, networkId ] = args;
-        const publicKey = await signer.getPublicKey(accountId, networkId);
-        const transaction = createTransaction(accountId, publicKey, receiverId, nonce, actions, blockHash);
-        return signTransactionObject(transaction, signer, accountId, networkId);
-    }
-}
-*/
 //# sourceMappingURL=transaction.js.map

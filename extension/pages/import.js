@@ -1,17 +1,17 @@
 import * as d from "../util/document.js"
 import * as c from "../util/conversions.js"
-import * as global from "../data/global.js"
-import * as Network from "../data/Network.js"
-import * as near from "../util/near-accounts.js"
-import {isValidAccountID} from "../api/near-rpc.js"
+
+import * as searchAccounts from "../util/search-accounts.js"
+import {isValidAccountID} from "../api/utils/valid.js"
 import * as Pages from "../pages/main.js"
 
-import { Account, ExtendedAccountData } from "../data/Account.js"
+import { Account, ExtendedAccountData } from "../api/account.js"
 import { LockupContract } from "../contracts/LockupContract.js"
 import {searchThePools} from "./account-selected.js"
+import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../api/askBackground.js"
 
 /*+
-import type { NetworkInfo} from "../data/Network.js"
+import type { NetworkInfo} from "../api/network.js"
 +*/
 
 const NET_NAME = "net-name"
@@ -101,7 +101,7 @@ async function searchTheAccountName(accName/*:string*/) {
     // accountBalance.innerText = ""
     // accountBalanceLine.hide()
 
-    const mainAccInfo = await near.searchAccount(accName)
+    const mainAccInfo = await searchAccounts.searchAccount(accName)
 
     //accountBalance.innerText = c.toStringDec(acInfo.lastBalance);
     //accountBalanceLine.show()
@@ -119,7 +119,7 @@ async function searchTheAccountName(accName/*:string*/) {
     let lockupExtData;
     const accInfo = new Account()
     accInfo.ownerId = accName
-    const lockupContract = await near.getLockupContract(accInfo)
+    const lockupContract = await searchAccounts.getLockupContract(accInfo)
     if (lockupContract){
       lastSearchResult.lockupContract = lockupContract
       lockupExtData= new ExtendedAccountData(lockupContract.contractAccount, lockupContract.accountInfo)
@@ -146,9 +146,9 @@ async function searchTheAccountName(accName/*:string*/) {
   }
 }
 
-function importIfNew(accType/*:string*/, accName/*:string*/,accountInfo/*:Account*/, order/*:number*/){
+async function importIfNew(accType/*:string*/, accName/*:string*/,accountInfo/*:Account*/, order/*:number*/){
 
-  const networkAccounts = global.SecureState.accounts[Network.current]
+  const networkAccounts = await askBackgroundAllNetworkAccounts();
 
   if (networkAccounts && networkAccounts[accName]){
     d.showErr(`${accType} ${accName} is already in the wallet`)
@@ -158,29 +158,32 @@ function importIfNew(accType/*:string*/, accName/*:string*/,accountInfo/*:Accoun
     d.showSuccess("Account added: "+accName)//new account
     accountInfo.order = order
     console.log("added ",order,accName)
-    global.saveAccount(accName, accountInfo);
+    await askBackground({code:"set-account",accountId:accName, accInfo:accountInfo})
     return 1;
     }
 }
 
-function importClicked(ev /*:Event*/) {
+async function importClicked(ev /*:Event*/) {
 
   ev.preventDefault();
   if (!lastSearchResult.mainAccount || !lastSearchResult.mainAccountName) return;
 
-  const networkAccounts = global.SecureState.accounts[Network.current]
+  const networkAccounts = await askBackgroundAllNetworkAccounts()
   let accountOrder = networkAccounts? Object.keys(networkAccounts).length+1: 0
 
   let importedCount=0;
   
-  importedCount+=importIfNew("Account", 
-    lastSearchResult.mainAccountName,
-    lastSearchResult.mainAccount, accountOrder)
+  const importedMain = await importIfNew("Account", 
+      lastSearchResult.mainAccountName,
+      lastSearchResult.mainAccount, accountOrder)
+
+  importedCount+=importedMain;
 
   if (lastSearchResult.lockupContract) {
-    importedCount+=importIfNew("Lockup Contract",
-      lastSearchResult.lockupContract.contractAccount,
-      lastSearchResult.lockupContract.accountInfo, accountOrder+1)
+    const importedLc = await importIfNew("Lockup Contract",
+        lastSearchResult.lockupContract.contractAccount,
+        lastSearchResult.lockupContract.accountInfo, accountOrder+1)
+    importedCount+=importedLc;
   }
 
   if (importedCount==0){
@@ -202,7 +205,8 @@ async function searchClicked(ev /*:Event*/) {
   // let accName = accountInfoName.innerText; //d.byId(ACCOUNT_INFO_NAME).innerText;
   const input = d.inputById("search-account-name")
   let accName = input.value.trim().toLowerCase()
-  const root = Network.currentInfo().rootAccount
+  const netInfo = await askBackgroundGetNetworkInfo()
+  const root = netInfo.rootAccount
   if (accName && accName.length<60 && !accName.endsWith(root)) accName=accName+ "." +root
 
   if (!accName) {
@@ -215,7 +219,6 @@ async function searchClicked(ev /*:Event*/) {
     searchTheAccountName(accName);
   }
 }
-
 
 // function accountNameInput(ev /*:Event*/) {
 //   //enable create button when terms accepted
@@ -234,9 +237,10 @@ async function searchClicked(ev /*:Event*/) {
 //   messageLine.hide()
 // }
 
-function onNetworkChanged(data/*:NetworkInfo*/) {
-  d.byId(NET_NAME).innerText = Network.current; //serach button
-  d.byId(NET_ROOT).innerText = "." + Network.currentInfo().rootAccount; //account name label
+async function onNetworkChanged(info/*:NetworkInfo*/) {
+  //update indicator visual state
+  d.byId(NET_NAME).innerText = info.name; //serach button
+  d.byId(NET_ROOT).innerText = "." + info.rootAccount; //account name label
 }
 
 function createAccountClicked(ev /*:Event*/) {
@@ -244,7 +248,7 @@ function createAccountClicked(ev /*:Event*/) {
 }
 
 // on document load
-export function addListeners() {
+export async function addListeners() {
 
   d.onClickId("option-import", importExistingAccount);
   d.onClickId("option-create", createAccountClicked);
@@ -254,8 +258,13 @@ export function addListeners() {
   searchButton.onClick(searchClicked);
   importButton.onClick(importClicked);
 
-
-  onNetworkChanged(Network.currentInfo());
-  Network.changeListeners["import-page"] = onNetworkChanged
+  onNetworkChanged(await askBackgroundGetNetworkInfo());
 
 }
+
+//listen to extension messages
+chrome.runtime.onMessage.addListener(function(msg){
+  if (msg.code="network-changed") {
+    onNetworkChanged(msg.network)
+  }
+})

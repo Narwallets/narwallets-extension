@@ -23,8 +23,6 @@
     "extension/background/background.js",
     "extension/background/contentScript.js",
     "extension/contracts/LockupContract.js",
-    "extension/data/Account.js",
-    "extension/data/Network.js",
     "extension/data/global.js",
     "extension/data/options.js",
     "extension/data/util.js",
@@ -37,11 +35,9 @@
     "extension/pages/import.js",
     "extension/pages/main.js",
     "extension/popups/approve/approve.js",
-    "extension/popups/approve/approve2.js",
     "extension/util/conversions.js",
     "extension/util/document.js",
-    "extension/util/email.js",
-    "extension/util/near-accounts.js",
+    "extension/util/search-accounts.js",
     "extension/util/tweetnacl/nacl-fast.js",
     "extension/util/tweetnacl/nacl-util.js"
   ]

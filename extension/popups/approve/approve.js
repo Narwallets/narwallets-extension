@@ -10,7 +10,6 @@ console.log("approve.js chrome.runtime.onMessage.addListener")
 chrome.runtime.onMessage.addListener(
   function (msg) {
     if (msg.dest != "approve") return;
-    d.byId("web-page").innerText = JSON.stringify(msg)
     displayTx(msg)
   }
 )
@@ -61,6 +60,7 @@ type TxInfo = {
 type TxMsg = {
       url: string;
       network: string|undefined;
+      signerId:string;
       tx:BatchTransaction;
 }
 type ResolvedMsg={
@@ -80,11 +80,12 @@ var resolvedMsg/*:any*/;
 function displayTx(msg/*:TxMsg*/) {
 
   initialMsg = msg;
-  resolvedMsg = { dest: "page", code: "request-resolved", tabId: initialMsg.tabId, requestId: initialMsg.requestId }
+  resolvedMsg = { dest: "page", code: "request-resolved", tabId:initialMsg.tabId, requestId:initialMsg.requestId }
 
   try {
 
     d.byId("net-name").innerText = msg.network || ""
+    d.byId("signer-id").innerText = msg.signerId || ""
     d.byId("web-page").innerText = msg.url
     d.byId("receiver").innerText = msg.tx.receiver
 

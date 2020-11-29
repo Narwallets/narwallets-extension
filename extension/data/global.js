@@ -1,33 +1,25 @@
 import * as nacl from "../util/tweetnacl/nacl-fast.js"
 import * as naclUtil from "../util/tweetnacl/nacl-util.js";
 import * as sha256 from "../api/sha256.js"
-import * as Network from "./Network.js";
+import * as Network from "../api/network.js";
 import { localStorageRemove, recoverFromLocalStorage, localStorageSave, localStorageSet, localStorageGet } from "./util.js";
 import { showErr, IUOP as INVALID_USER_OR_PASS } from "../util/document.js";
-import { Account } from "../data/Account.js"; //required for SecureState declaration
+import { Account } from "../api/account.js"; //required for SecureState declaration
 import { askBackground } from "../api/askBackground.js";
 
 const DATA_VERSION = "0.1"
 
-
 /*+
-import type {NetworkInfo} from "./Network.js";
-
-//---- GLOBAL STATE ----
-/*+
-//data that's not encrypted
-type StateStruc= {
-  dataVersion: string;
-  usersList: string[];
-  currentUser:string;
-}
+import type {NetworkInfo} from "../api/network.js";
+import type {StateStruct} from "../api/state-type.js";
 +*/
+//---- GLOBAL STATE ----
 
-
-export const EmptyState/*:StateStruc*/ = {
+export const EmptyState/*:StateStruct*/ = {
   dataVersion: DATA_VERSION,
   usersList: [],
   currentUser: "",
+  unlocked:false,
 };
 
 export var State = Object.assign({}, EmptyState);
@@ -57,18 +49,15 @@ const EmptySecureState/*:NarwalletSecureData*/ = {
   dataVersion: DATA_VERSION,
   hashedPass: undefined,
   initialNetworkName: Network.defaultName,
-  autoUnlockSeconds: 15,
+  autoUnlockSeconds: 30,
   advancedMode: false,
   accounts: {}
 };
 
 export var SecureState/*:NarwalletSecureData*/ = Object.assign({}, EmptySecureState);
-export var unlocked = false;
-
 
 export function clearState() {
   State = Object.assign({}, EmptyState);
-  unlocked = false;
 }
 
 export function saveState() {
@@ -82,6 +71,7 @@ type callbackERR = (err:string) => void;
 
 export async function recoverState()/*:Promise<void>*/ {
   State = await recoverFromLocalStorage("State", "S", EmptyState)
+  State.unlocked=false;
 }
 
 function sha256PwdBase64(password/*:string*/)/*:string*/ {
@@ -89,22 +79,22 @@ function sha256PwdBase64(password/*:string*/)/*:string*/ {
 }
 
 export function lock() {
-  unlocked = false;
-  saveOnUnload.unlockSHA = "";
+  State.unlocked = false;
   SecureState = EmptySecureState;
+  saveOnUnload.unlockSHA = "";
   localStorageRemove('uk') //clear auto-unlock
 }
-
 
 export function createSecureState(password/*:string*/) {
   SecureState.hashedPass = sha256PwdBase64(password);
   SecureState.accounts = {}
   saveSecureState();
-  unlocked = true;
+  State.unlocked = true;
 }
 
 export function saveSecureState() {
 
+  if (!State.unlocked) throw new Error("state is locked")
   if (!State.currentUser) throw new Error("No curent User")
   if (!SecureState.hashedPass) { throw new Error("Invalid SecureState, no hashedPass") }
 
@@ -125,7 +115,6 @@ export function saveSecureState() {
   localStorageSave("Secure State", State.currentUser, base64FullMessage)
 
 }
-
 
 export function setAutoUnlock(user/*:string*/, hashedPassBase64/*:string*/) {
 
@@ -175,13 +164,9 @@ export async function unlockSecureStateSHA(email/*:string*/, hashedPassBase64/*:
   if (!encryptedState) throw Error(INVALID_USER_OR_PASS)
   const decrypted = decryptIntoJson(hashedPassBase64, encryptedState);
   SecureState = decrypted
-  unlocked = true;
+  State.unlocked = true;
   try { setAutoUnlock(email, hashedPassBase64); } catch { } //auto-unlock & set current user
-  try { 
-    Network.setCurrent(SecureState.initialNetworkName) 
-    //also inform background page
-    await askBackground({code:"set-network",network:SecureState.initialNetworkName})
-  } catch { };
+  try { Network.setCurrent(SecureState.initialNetworkName) } catch { };
 }
 
 //------------------
@@ -211,7 +196,7 @@ export function getNetworkAccountsCount() {
 
 export function getAutoUnlockSeconds() {
   let aul = SecureState.autoUnlockSeconds
-  if (aul == undefined) aul = 15;
+  if (aul == undefined) aul = 30;
   return aul;
 }
 

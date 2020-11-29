@@ -1,9 +1,6 @@
 import * as d from "./util/document.js"
-import * as global from "./data/global.js"
-import { recoverOptions } from "./data/options.js"
 import * as Pages from "./pages/main.js"
-import * as Network from "./data/Network.js"
-import { isValidEmail } from "./util/email.js"
+import {NetworkList} from "./api/network.js"
 
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js"
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js"
@@ -11,11 +8,13 @@ import { addListeners as Import_addListeners } from "./pages/import.js"
 
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js"
 import { localStorageGet, localStorageGetAndRemove, localStorageRemove, localStorageSet } from "./data/util.js"
-import { askBackground } from "./api/askBackground.js"
+import { askBackground, askBackgroundGetNetworkInfo, askBackgroundGetState, askBackgroundSetNetwork } from "./api/askBackground.js"
+import { functionCall } from "./api/transaction.js"
+import { isValidEmail } from "./api/utils/valid.js"
 
 /*+
 import * as bip39 from "./bundled-types/bip39-light"
-import type { NetworkInfo} from "./data/Network.js"
+import type { NetworkInfo} from "./api/network.js"
 +*/
 
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
@@ -74,16 +73,13 @@ async function networkItemClicked(e /*:Event*/) {
     const networkName = e.target.getAttribute(DATA_CODE)
     if (!networkName) return;
 
-    //update indicator visual state & global state
-    Network.setCurrent(networkName);
-    global.SecureState.initialNetworkName = networkName;
-    global.saveSecureState();
-    //also inform background page
-    await askBackground({code:"set-network",network:networkName})
+    //update indicator visual state & global state (background)
+    await askBackgroundSetNetwork(networkName)
 
     //close dropdown
     closeDropDown(NETWORKS_LIST) //close 
 
+    const global = await askBackgroundGetState()
     if (!global.unlocked) {
       d.showPage(UNLOCK);
       return;
@@ -130,18 +126,14 @@ async function unlockClicked(ev /*:Event*/) {
     return;
   }
 
-  //if (!global.State.usersList.includes( email)){
-  //  d.showErr("User already exists");
-  //  return;
-  //}
-
   const password = passEl.value;
   passEl.value = ""
 
   try {
-    await global.unlockSecureState(email, password)
-    Pages.showMain()
-    if (global.getNetworkAccountsCount() == 0) {
+    await askBackground({code:"unlockSecureState",email:email, password:password})
+    await Pages.showMain()
+    const numAccounts=await askBackground({code:"getNetworkAccountsCount"})
+    if (numAccounts == 0) {
       d.showPage(IMPORT_OR_CREATE); //auto-add account after unlock
     }
     else {
@@ -159,11 +151,12 @@ function hambClicked() {
   aside.toggleClass("open")
 }
 
-function asideLock() {
-  global.lock()
+async function asideLock() {
+  await askBackground({code:"lock"})
   hambClicked();
   d.showPage(UNLOCK)
-  d.inputById("unlock-email").value = global.State.currentUser;
+  const state=await askBackgroundGetState()
+  d.inputById("unlock-email").value = state.currentUser;
 
 }
 function asideAccounts() {
@@ -171,9 +164,10 @@ function asideAccounts() {
   Pages.showMain();
 }
 
-function asideIsUnlocked() {
+async function asideIsUnlocked() {
   hambClicked();
-  if (!global.unlocked) {
+  const state=await askBackgroundGetState()
+  if (!state.unlocked) {
     d.showPage(UNLOCK)
     d.showErr("You need to unlock the wallet first")
     return false;
@@ -181,7 +175,7 @@ function asideIsUnlocked() {
   return true;
 }
 
-function securityOptions() {
+async function securityOptions() {
 
   //close moreless because options can change behavior
   const buttonsMore = new d.All(".buttons-more")
@@ -189,24 +183,23 @@ function securityOptions() {
   d.qs("#moreless").innerText = "More..."
 
   d.showPage("security-options")
-  d.inputById("auto-unlock-seconds").value = global.getAutoUnlockSeconds().toString()
-  d.inputById("advanced-mode").checked = global.SecureState.advancedMode ? true : false;
+  const data=await askBackground({code:"get-options"})
+  d.inputById("auto-unlock-seconds").value = data.getAutoUnlockSeconds().toString()
+  d.inputById("advanced-mode").checked = data.advancedMode? true : false;
   d.onClickId("save-settings", saveSecurityOptions)
   d.onClickId("cancel-security-settings", Pages.showMain)
 }
 
-function saveSecurityOptions(ev/*:Event*/) {
+async function saveSecurityOptions(ev/*:Event*/) {
   try {
     ev.preventDefault()
 
     const checkElem = document.getElementById("advanced-mode") /*+as HTMLInputElement+*/
-    global.SecureState.advancedMode = checkElem.checked
-
     const aulSecs = Number(d.inputById("auto-unlock-seconds").value)
     if (isNaN(aulSecs)) throw Error("Invalid auto unlock seconds")
-    global.SecureState.autoUnlockSeconds = aulSecs
 
-    global.saveSecureState()
+    await askBackground({code:"set-options",autoUnlockSeconds:aulSecs, advancedMode:checkElem.checked})
+
     Pages.showMain()
     d.showSuccess("Options saved")
   }
@@ -219,9 +212,6 @@ function asideOptions() {
   if (asideIsUnlocked()) {
     securityOptions()
   }
-  // chrome.windows.create({
-  //     url: chrome.runtime.getURL("options/options.html")
-  // });
 }
 
 function asideCreateUserClicked() {
@@ -287,11 +277,7 @@ async function onLoad() {
   //new d.El(".aside #contact).asideContact);
   //new d.El(".aside #about).asideAbout);
 
-  d.populateUL("network-items", "network-item-template", Network.List)
-
-  onNetworkChanged(Network.currentInfo());
-  Network.changeListeners["index-page"] = onNetworkChanged;
-
+  d.populateUL("network-items", "network-item-template", NetworkList)
 
   //--init other pages
   CreateUser_addListeners();
@@ -300,36 +286,39 @@ async function onLoad() {
 
   //restore State from chrome.storage.local
   try {
+    //show current network
+    const networkInfo = await askBackgroundGetNetworkInfo()
+    onNetworkChanged(networkInfo); //set indicator with current network
 
-    await recoverOptions();
-    await global.recoverState();
-    //console.log(global.State)
+    const state = await askBackgroundGetState()
 
-    if (!global.State.dataVersion) {
-      global.clearState();
-    }
-    if (global.State.usersList.length == 0) {
+    if (state.usersList.length == 0) {
       //no users => welcome new User
       d.showPage(WELCOME_NEW_USER_PAGE)
       tryReposition();
       return; //***
     }
 
+    if (state.unlocked){
+      await Pages.showMain()
+      tryReposition();
+      return;
+    }
+
+
     d.showPage(UNLOCK); //DEFAULT: ask the user to unlock SecureState
     //showPage clears all input fields, set ddefault value after show-page
-    d.inputById("unlock-email").value = global.State.currentUser;
+    d.inputById("unlock-email").value = state.currentUser;
 
-    if (global.State.currentUser) { //we have a "last-user"
-      //try to get auto-unlock key
-      const uk = await localStorageGetAndRemove("uk")
-      const exp = await localStorageGetAndRemove("exp")
-      if (exp && Date.now() < exp && uk) { //maybe we can auto-unlock
-        if (await tryAutoUnlock(uk)) { //if we succeed
-          tryReposition(); //try reposition
-        }
-      }
-
-    }
+    // if (state.currentUser) { //we have a "last-user"
+    //   //try to get auto-unlock key
+    //   const uk = await localStorageGetAndRemove("uk")
+    //   const exp = await localStorageGetAndRemove("exp")
+    //   if (exp && Date.now() < exp && uk) { //maybe we can auto-unlock
+    //     if (await tryAutoUnlock(uk)) { //if we succeed
+    //       tryReposition(); //try reposition
+    //     }
+    //   }
 
   }
   catch (ex) {
@@ -340,92 +329,53 @@ async function onLoad() {
   }
 }
 
-async function tryAutoUnlock(unlockSHA/*:string*/) /*:Promise<boolean>*/ {
-  if (unlockSHA) {
-    //auto-unlock is enabled
-    //try unlocking
-    try {
-      await global.unlockSecureStateSHA(global.State.currentUser, unlockSHA);
-      //if unlock succeeded
-      global.saveOnUnload.unlockSHA = unlockSHA;
-      try { 
-        Network.setCurrent(global.SecureState.initialNetworkName) 
-        //also inform background page
-        await askBackground({code:"set-network",network:global.SecureState.initialNetworkName})
-      } catch { }; //initial networkName for this user
+// async function tryAutoUnlock(unlockSHA/*:string*/) /*:Promise<boolean>*/ {
+//   if (unlockSHA) {
+//     //auto-unlock is enabled
+//     //try unlocking
+//     try {
+//       await global.unlockSecureStateSHA(global.State.currentUser, unlockSHA);
+//       //if unlock succeeded
+//       global.saveOnUnload.unlockSHA = unlockSHA;
+//       try { 
+//         Network.setCurrent(global.SecureState.initialNetworkName) 
+//         //also inform background page
+//         await askBackgroundSetNetwork(global.SecureState.initialNetworkName)
+//       } catch { }; //initial networkName for this user
 
-      Pages.showMain(); //show acc list
-      return true;
-    }
-    catch (ex) {
-      //invalid pass-SHA or other error
-      d.showErr(ex.message);
-      return false;
-    }
-  }
-  return false;
-}
-
-
-// //-- OJO deben hacerse FUERA de un async
-// //window.addEventListener("unload", onUnload);
-// window.addEventListener("unload", ()=>{
-//     chrome.runtime.getBackgroundPage((background)=>{
-//     try{
-//       //@ts-ignore      
-//       background.console.log("fore: about call hold",global.MemState.unlockSHA, AUTO_LOCK_SECONDS*1000);
-//       //@ts-ignore      
-//       background.hold(global.MemState.unlockSHA, AUTO_LOCK_SECONDS*1000);
+//       Pages.showMain(); //show acc list
+//       return true;
 //     }
-//     catch(ex){console.error(ex)};
-//     });
-//   console.log("onUnload executed");
-// });
-
-// function onUnload(event/*:Event*/){
-//   chrome.runtime.getBackgroundPage((background)=>{
-//     try{
-//       //@ts-ignore      
-//       background.console.log("fore: about call hold",global.MemState.unlockSHA, AUTO_LOCK_SECONDS*1000);
-//       //@ts-ignore      
-//       background.hold(global.MemState.unlockSHA, AUTO_LOCK_SECONDS*1000);
+//     catch (ex) {
+//       //invalid pass-SHA or other error
+//       d.showErr(ex.message);
+//       return false;
 //     }
-//     catch(ex){console.error(ex)};
-//     });
-//   console.log("onUnload executed");
+//   }
+//   return false;
 // }
 
-// window.addEventListener("unload",()=>{
-//   chrome.runtime.sendMessage({kind:"popup-unload"})
-// })
-
-// chrome.runtime.onSuspend.addListener(()=>{
-//   chrome.runtime.sendMessage({kind:"popup-unload"})
-// })
 
 document.addEventListener('DOMContentLoaded', onLoad);
 
-//calling a background fn seems to be the only way to execut something on popupUnload
+//inform background.js we're unloading (starts auto-lock timer)
 addEventListener("unload", function (event) {
-  const autoUnlockSeconds = global.getAutoUnlockSeconds()
-  if (autoUnlockSeconds>0) {
-    const backgroundPage = chrome.extension.getBackgroundPage()
-    //@ts-ignore
-    backgroundPage.popupUnloading(global.saveOnUnload.unlockSHA, autoUnlockSeconds * 1000); //SET AUTO-LOCK after x ms
-  }
-}, true);
-
-// chrome.runtime.getBackgroundPage((background)=>{
-//   try{
-//     //@ts-ignore      
-//     background.console.log("FROM INDEX")
-//     //@ts-ignore      
-//     //background.msg("popup-opened");
-//     //background.hold("ALGO", AUTO_LOCK_SECONDS*1000);
+  chrome.runtime.sendMessage({dest:"ext",code:"popupUnloading"})
+  })
+//   const autoUnlockSeconds = global.getAutoUnlockSeconds()
+//   if (autoUnlockSeconds>0) {
+//     const backgroundPage = chrome.extension.getBackgroundPage()
+//     //@ts-ignore
+//     backgroundPage.popupUnloading(global.saveOnUnload.unlockSHA, autoUnlockSeconds * 1000); //SET AUTO-LOCK after x ms
 //   }
-//   catch(ex){console.error(ex)};
-//   });
+// }, true);
 
+//listen to extension messages
+chrome.runtime.onMessage.addListener(function(msg){
+  if (msg.code="network-changed") {
+    onNetworkChanged(msg.network)
+  }
+})
 
 //console.log(bip39.mnemonicToSeed("correct horse battery staple"))
 

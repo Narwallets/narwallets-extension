@@ -1,19 +1,19 @@
 //user NEAR accounts info type
 export class Account {
-    order/*:number*/ =0
-    type /*:"acc"|"lock.c"*/ = "acc"
-    note /*:string*/=""
-    lastBalance /*:number*/ =0 // native balance from rpc:query/account & near state
-    stakingPool /*+?:string+*/ 
-    staked /*:number*/ = 0 // in the pool & staked
-    unStaked/*:number*/ = 0 // in the pool & unstaked (maybe can withdraw)
-    rewards /*:number*/ = 0 //Stakingpool rewards (initial staking - (staked+unstaked))
-    stakingPoolPct /*+?:number+*/
-    privateKey /*+?:string+*/
-    ownerId /*+?:string+*/ //ownerId if this is a lockup-contract {type:"lock.c"}
-    lockedOther/*:number*/ = 0 //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
+    order:number =0
+    type: "acc"|"lock.c" = "acc"
+    note: string=""
+    lastBalance: number =0 // native balance from rpc:query/account & near state
+    stakingPool?:string
+    staked:  number = 0 // in the pool & staked
+    unStaked:number = 0 // in the pool & unstaked (maybe can withdraw)
+    rewards: number = 0 //Stakingpool rewards (initial staking - (staked+unstaked))
+    stakingPoolPct?:number
+    privateKey?:string
+    ownerId?:string //ownerId if this is a lockup-contract {type:"lock.c"}
+    lockedOther:number = 0 //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
 
-    get totalInThePool()/*:number*/ {
+    get totalInThePool():number {
         return this.staked + this.unStaked;
     }
     
@@ -21,20 +21,20 @@ export class Account {
   
   export class ExtendedAccountData {
 
-    type /*:string*/ //small-type + note
-    name /*:string*/
-    accessStatus /*:string*/
-    typeFull /*:string*/ //full-type + note
-    accountInfo /*:Account*/
-    total /*:number*/ //lastBalance+inThePool
-    unlockedOther /*:number*/
-    available /*:number*/
-    inThePool /*:number*/
+    type:string //small-type + note
+    name:string
+    accessStatus:string
+    typeFull:string //full-type + note
+    accountInfo:Account
+    total:number //lastBalance+inThePool
+    unlockedOther:number
+    available:number
+    inThePool:number
 
-    constructor(name/*:string*/, accountInfo/*:Account*/) {
+    constructor(name:string, accountInfo:Account) {
         this.name = name;
         this.accountInfo = accountInfo;
-        const typeFullTranslation/*:Record<string,string>*/ = {
+        const typeFullTranslation:Record<string,string> = {
             acc: "Account",
             "lock.c": "Lockup Contract"
         }

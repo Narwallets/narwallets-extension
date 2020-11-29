@@ -1,4 +1,5 @@
-/*+
+import { setRpcUrl } from "./utils/json-rpc.js";
+
 export type NetworkInfo = {
     name: string;
     rootAccount: string;
@@ -8,12 +9,9 @@ export type NetworkInfo = {
     explorerUrl: string;
     NearWebWalletUrl: string;
   }
-+*/
 
-import { askBackground } from "../api/askBackground.js";
-import { setRpcUrl } from "../api/utils/json-rpc.js";
 
-export const List/*:NetworkInfo[]*/ = [
+export const NetworkList:NetworkInfo[] = [
 
   { name: "mainnet", rootAccount: "near", displayName: "NEAR Mainnet", color: "green", 
       rpc: "https://rpc.mainnet.near.org/", explorerUrl: "https://explorer.near.org/", NearWebWalletUrl:"https://wallet.near.org/",
@@ -39,25 +37,21 @@ export const List/*:NetworkInfo[]*/ = [
 export const defaultName = "mainnet"; //default network
 export let current = defaultName;
 
-export let changeListeners/*:Record<string,(info:NetworkInfo)=>void>*/ = {};
-
-export function setCurrent(name/*:string*/)/*:void*/ {
-  const info = getInfo(name); //get & check
-  current = name
+export function setCurrent(networkName:string):void {
+  const info = getInfo(networkName); //get & check
+  if (networkName==current) { //no change
+    return;
+  }
+  current = networkName
   setRpcUrl(info.rpc)
-  for (const key in changeListeners) {
-    try {
-      changeListeners[key](info); //call all listeners
-    } catch (ex) {
-      console.error(ex);
-    }
-  };
+  //broadcast change
+  chrome.runtime.sendMessage({code:"network-changed",network:current})
 };
 
-export function getInfo(name/*:string*/) /*:NetworkInfo*/ {
-  for (let i = 0; i < List.length; i++) if (List[i].name == name) return List[i];
+export function getInfo(name:string) :NetworkInfo {
+  for (let i = 0; i < NetworkList.length; i++) if (NetworkList[i].name == name) return NetworkList[i];
   throw new Error("invalid network name: " + name);
 }
 
-export function currentInfo() /*:NetworkInfo*/ { return getInfo(current) };
+export function currentInfo():NetworkInfo { return getInfo(current) };
 

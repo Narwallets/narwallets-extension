@@ -1,16 +1,20 @@
 import * as c from "../util/conversions.js"
 import * as global from "../data/global.js"
-import { options } from "../data/options.js"
-import * as Network from "../data/Network.js"
-import * as nearAccounts from "../util/near-accounts.js"
+import { recoverOptions, options } from "../data/options.js"
+
+import * as Network from "../api/network.js"
+import * as nearAccounts from "../util/search-accounts.js"
 
 import * as near from "../api/near-rpc.js"
 import { setRpcUrl } from "../api/utils/json-rpc.js"
 import { localStorageSet, localStorageGet } from "../data/util.js"
-import  * as TX from "../api/transaction.js"
+import * as TX from "../api/transaction.js"
+
+import { isValidEmail } from "../api/utils/valid.js"
 
 /*+
 import type { FunctionCall } from "../api/batch-transaction.js"
+import type {ResolvedMessage} from "../api/state-type.js"
 +*/
 
 /*HAY QUE HACER QUE BACKGROUND JS HAGA TODO LO RELACIONADO CON COMUNICARSE CON near
@@ -29,8 +33,8 @@ chrome.runtime.onMessage.addListener(runtimeMessageHandler)
 function runtimeMessageHandler(msg/*:any*/, sender/*:chrome.runtime.MessageSender*/, sendResponse/*:Function*/) {
 
   //check if it comes from the web-page or from this extension 
-  const url = sender.url? sender.url:"";
-  const fromPage = !url.startsWith("chrome-extension://"+chrome.runtime.id+"/");
+  const url = sender.url ? sender.url : "";
+  const fromPage = !url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
 
   //console.log("runtimeMessage received ",sender, url)
   console.log("runtimeMessage received " + (fromPage ? "FROM PAGE " : "from popup ") + JSON.stringify(msg));
@@ -39,19 +43,185 @@ function runtimeMessageHandler(msg/*:any*/, sender/*:chrome.runtime.MessageSende
   }
   else if (fromPage) {
     // from a tab/contents-script
-    msg.url=url; //add source
-    msg.tabId=(sender.tab?sender.tab.id:-1); //add tab.id
+    msg.url = url; //add source
+    msg.tabId = (sender.tab ? sender.tab.id : -1); //add tab.id
     processMessageFromWebPage(msg)
   }
   else {
     //from internal pages like popup
+
+    //simple messages
+    if (msg.code == "popupUnloading") {
+      const autoUnlockSeconds = global.getAutoUnlockSeconds()
+      chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + autoUnlockSeconds * 1000 })
+      return;
+    }
+    else if (msg.code == "network-changed") {
+      try {
+        Network.setCurrent(msg.network)
+        localStorageSet({ backgroundNetwork: Network.current })
+      }
+      catch (ex) {
+        console.error(ex)
+      }
+      return;
+    }
+    //other codes resolved by promises
     getActionPromise(msg)
       .then((data) => { sendResponse({ data: data }) })
       .catch((ex) => { sendResponse({ err: ex.message }) })
-     //sendResponse will be called async .- always return true
-     //returning void cancels all pending callbacks
+    //sendResponse will be called async .- always return true
+    //returning void cancels all pending callbacks
   }
   return true; //a prev callback could be pending.- always return true
+}
+
+//create a promise to resolve the action requested by the popup
+function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
+
+  try {
+
+    if (msg.code == "set-network") {
+      Network.setCurrent(msg.network)
+      return Promise.resolve();
+    }
+    else if (msg.code == "get-network-info") {
+      return Promise.resolve(Network.currentInfo());
+    }
+
+    else if (msg.code == "get-state") {
+      return Promise.resolve(global.State);
+    }
+    else if (msg.code == "lock") {
+      global.lock()
+      return Promise.resolve()
+    }
+    else if (msg.code == "unlockSecureState") {
+      return global.unlockSecureState(msg.email, msg.password)
+    }
+
+    else if (msg.code == "create-user") {
+
+      if (!isValidEmail(msg.email)) {
+        throw Error("Invalid email");
+      }
+      else if (global.State.usersList.includes(msg.email)) {
+        throw Error("User already exists")
+      }
+      else if (!msg.password || msg.password.length < 8) {
+        throw Error("password must be at least 8 characters long")
+      }
+      global.lock() //log out current user
+
+      global.State.currentUser = msg.email;
+      global.createSecureState(msg.password);
+      //save new user in usersList
+      global.State.usersList.push(msg.email);
+      global.saveState()
+      return Promise.resolve()
+    }
+
+    else if (msg.code == "set-options") {
+      global.SecureState.advancedMode = msg.advancedMode;
+      global.SecureState.autoUnlockSeconds = msg.autoUnlockSeconds;
+      global.saveSecureState()
+      return Promise.resolve()
+    }
+    else if (msg.code == "get-options") {
+      return Promise.resolve({
+        advancedMode: global.SecureState.advancedMode,
+        autoUnlockSeconds: global.SecureState.autoUnlockSeconds,
+      })
+    }
+
+    else if (msg.code == "get-account") {
+      if (!global.SecureState.accounts[Network.current]) return Promise.resolve(undefined);
+      return Promise.resolve(global.SecureState.accounts[Network.current][msg.accountId])
+    }
+    else if (msg.code == "set-account") {
+      if (!global.SecureState.accounts[Network.current]) global.SecureState.accounts[Network.current] = {}
+      global.SecureState.accounts[Network.current][msg.accountId] = msg.accInfo;
+      global.saveSecureState()
+      return Promise.resolve()
+    }
+    else if (msg.code == "delete-account") {
+      delete global.SecureState.accounts[Network.current][msg.accountId];
+      //persist
+      global.saveSecureState()
+      return Promise.resolve()
+    }
+
+    else if (msg.code == "getNetworkAccountsCount") {
+      return Promise.resolve(global.getNetworkAccountsCount())
+    }
+    else if (msg.code == "all-network-accounts") {
+      const result = global.SecureState.accounts[Network.current]
+      return Promise.resolve(result || {})
+    }
+
+    else if (msg.code == "connect") {
+      if (!msg.network) msg.network = Network.current;
+      return connectToWebPage(msg.accountId, msg.network);
+    }
+    else if (msg.code == "disconnect") {
+      return disconnectFromWebPage()
+    }
+    else if (msg.code == "isConnected") {
+      return isConnected();
+    }
+
+    else if (msg.code == "view") {
+      //view-call request
+      return near.view(msg.contract, msg.method, msg.args);
+    }
+
+    else if (msg.code == "get-validators") {
+      //view-call request
+      return near.getValidators();
+    }
+    else if (msg.code == "access-key") {
+      //check acess-key exists and get nonce
+      return near.access_key(msg.accountId, msg.publicKey);
+    }
+    else if (msg.code == "query-near-account") {
+      //check acess-key exists and get nonce
+      return near.queryAccount(msg.accountId);
+    }
+
+
+    else if (msg.code == "apply") {
+      //apply transaction request from popup
+      //tx.apply request
+      //when resolved, send msg to content-script->page
+      const signerId = msg.signerId || "...";
+      const accInfo = global.SecureState.accounts[Network.current][signerId]
+      if (!accInfo) throw Error(`account ${signerId} NOT FOUND on wallet`)
+      if (!accInfo.privateKey) throw Error(`account ${signerId} is read-only`)
+      //convert wallet-api actions to near.TX.Action
+      const actions/*:TX.Action[]*/ = []
+      for (let item of msg.tx.items) {
+        //convert action
+        switch (item.action) {
+          case "call":
+            const f = item /*+as FunctionCall+*/;
+            actions.push(TX.functionCall(f.method, f.args, near.ONE_TGAS.muln(f.Tgas), near.ONE_NEAR.muln(f.attachedNear)))
+            break;
+          case "transfer":
+            actions.push(TX.transfer(near.ONE_NEAR.muln(item.attachedNear)))
+            break;
+          default:
+            throw Error("batchTx UNKNOWN item.action=" + item.action)
+        }
+      }
+      //restuns the Promise required to complete this action
+      return near.broadcast_tx_commit_actions(actions, signerId, msg.tx.receiver, accInfo.privateKey)
+    }
+    //default
+    throw Error(`invalid msg.code ${JSON.stringify(msg)}`)
+  }
+  catch (ex) {
+    return Promise.reject(ex)
+  }
 }
 
 //---------------------------------------------------
@@ -61,114 +231,78 @@ function processMessageFromWebPage(msg/*:any*/) {
 
   console.log("processMessageFromWebPage", msg);
 
+  if (!msg.tabId) {
+    console.error("msg.tabId is ", msg.tabId)
+    return;
+  }
+  if (!_connectedTabs[msg.tabId]) _connectedTabs[msg.tabId] = {};
+  const ctinfo = _connectedTabs[msg.tabId];
+
+  //when resolved, send msg to content-script->page
+  let resolvedMsg /*:ResolvedMessage*/ = { dest: "page", code: "request-resolved", tabId: msg.tabId, requestId: msg.requestId }
+
   switch (msg.code) {
 
     case "connected":
-      if (!msg.tabId) {
-        console.error("msg.tabId is ",msg.tabId)
-        return;
-      }
-      if (!_connectedTabs[msg.tabId]) _connectedTabs[msg.tabId]={};
-      _connectedTabs[msg.tabId].aceptedConnection = (!msg.err)
-      _connectedTabs[msg.tabId].connectedResponse = msg
+      ctinfo.aceptedConnection = (!msg.err)
+      ctinfo.connectedResponse = msg
       break;
 
     case "view":
       //view-call request
-      //when resolved, send msg to content-script->page
-      let resolvedMsg = {dest:"page", code:"request-resolved", tabId:msg.tabId, requestId:msg.requestId, err:undefined, data:undefined}
       near.view(msg.contract, msg.method, msg.args)
-        .then(data=>{
-          resolvedMsg.data=data;  //if resolved ok, send msg to content-script->tab
-          chrome.tabs.sendMessage(resolvedMsg.tabId,resolvedMsg);
-          }) 
-        .catch(ex=>{
-          resolvedMsg.err=ex.message;  //if error ok, also send msg to content-script->tab
-          chrome.tabs.sendMessage(resolvedMsg.tabId,resolvedMsg);
-          }) 
-      break;
-
-    case "apply":
-      //load popup window for the user to approve
-      const width=600
-      const height=600
-      chrome.windows.create({ 
-        url: 'popups/approve/approve.html',
-        type: 'popup',
-        left: screen.width / 2 - width / 2,
-        top: screen.height / 2 - height / 2,
-        width: width,
-        height: height,
-        focused:true 
-        },function(popupWindow){
-            if (popupWindow) {
-              popupWindow.alwaysOnTop = true;
-              msg.dest="approve"
-              setTimeout(()=>{chrome.runtime.sendMessage(msg)}, 100)
-            }
+        .then(data => {
+          resolvedMsg.data = data;  //if resolved ok, send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+        })
+        .catch(ex => {
+          resolvedMsg.err = ex.message;  //if error ok, also send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
         })
       break;
 
-    default:
-      console.error("unk msg.code",msg)
-  }
+    case "apply":
+      try {
+        if (!ctinfo.connectedAccountId) {
+          throw Error("connectedAccountId is null")  //if error also send msg to content-script->tab
+        }
 
-}
+        //creify account exists and is full-access
+        const signerId = ctinfo.connectedAccountId
+        const accInfo = global.SecureState.accounts[Network.current][signerId]
+        if (!accInfo) throw Error(`account ${signerId} NOT FOUND on wallet`)
+        if (!accInfo.privateKey) throw Error(`account ${signerId} is read-only`)
 
-//create a promise to resolve the action requested by the popup
-function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
-
-  if (msg.code == "set-network") {
-    try {
-      Network.setCurrent(msg.network);
-      localStorageSet({backgroundNetwork:msg.network})
-      return Promise.resolve();
-    }
-    catch (ex) {
-      return Promise.reject(ex)
-    }
-  }
-  else if (msg.code == "connect") {
-    return connectToWebPage(msg.accountId, msg.network);
-  }
-  else if (msg.code == "disconnect") {
-    return disconnectFromWebPage()
-  }
-  else if (msg.code == "isConnected") {
-    return isConnected();
-  }
-  else if (msg.code == "view") {
-    //view-call request
-    return near.view(msg.contract, msg.method, msg.args);
-  }
-  else if (msg.code == "apply") {
-    //apply transaction request from popup
-    //tx.apply request
-    //when resolved, send msg to content-script->page
-    const connectedAccountId=_connectedTabs[msg.tabId].connectedAccountId||"...";
-    const accInfo = global.SecureState.accounts[Network.current][connectedAccountId]
-    if (!accInfo) return Promise.reject(Error(`account ${connectedAccountId} NOT FOUND on wallet`))
-    if (!accInfo.privateKey) return Promise.reject(Error(`account ${connectedAccountId} is read-only`))
-    //convert wallet-api actions to near.TX.Action
-    const actions/*:TX.Action[]*/=[]
-    for (let item of msg.tx.items) {
-      //convert action
-      switch (item.action) {
-        case "call":
-            const f=item /*+as FunctionCall+*/;
-            actions.push(TX.functionCall(f.method,f.args,near.ONE_TGAS.muln(f.Tgas),near.ONE_NEAR.muln(f.attachedNear)))
-          break;
-        case "transfer":
-          actions.push(TX.transfer(near.ONE_NEAR.muln(item.attachedNear)))
-          break;
-        default:
-          return Promise.reject(Error("batchTx UNKNOWN item.action="+item.action))
+        //load popup window for the user to approve
+        const width = 600
+        const height = 600
+        chrome.windows.create({
+          url: 'popups/approve/approve.html',
+          type: 'popup',
+          left: screen.width / 2 - width / 2,
+          top: screen.height / 2 - height / 2,
+          width: width,
+          height: height,
+          focused: true
+        }, function (popupWindow) {
+          if (popupWindow) {
+            popupWindow.alwaysOnTop = true;
+            msg.dest = "approve" //send msg to the approval popup
+            msg.signerId = ctinfo.connectedAccountId;
+            setTimeout(() => { chrome.runtime.sendMessage(msg) }, 100)
+          }
+        })
       }
-    }
-    //restuns the Promise required to complete this action
-    return near.broadcast_tx_commit_actions(actions, connectedAccountId, msg.tx.receiver, accInfo.privateKey)
+      catch (ex) {
+        resolvedMsg.err = ex.message;  //if error, also send msg to content-script->tab
+        chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+      }
+      break;
+
+    default:
+      console.error("unk msg.code", msg)
   }
-  return Promise.reject(Error(`invalid msg.code ${JSON.stringify(msg)}`))
+
 }
 
 //------------------------
@@ -189,6 +323,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 //on extension suspended
 //------------------------
 chrome.runtime.onSuspend.addListener(function () {
+  global.lock()
   console.log("onSuspend.");
   chrome.browserAction.setBadgeText({ text: "" });
 });
@@ -198,16 +333,16 @@ chrome.runtime.onSuspend.addListener(function () {
 //----- expire auto-unlock
 //------------------------
 const UNLOCK_EXPIRED = "unlock-expired"
-function popupUnloading(unlockSHA/*:string*/, expireMs/*:number*/) {
-  console.log("BACK: popupUnloading", expireMs);
-  if (expireMs <= 0) {
-    chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
-  }
-  else {
-    chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + expireMs })
-    chrome.storage.local.set({ uk: unlockSHA, exp: Date.now() + expireMs })
-  }
-}
+// function popupUnloading(unlockSHA/*:string*/, expireMs/*:number*/) {
+//   console.log("BACK: popupUnloading", expireMs);
+//   if (expireMs <= 0) {
+//     chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
+//   }
+//   else {
+//     chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + expireMs })
+//     chrome.storage.local.set({ uk: unlockSHA, exp: Date.now() + expireMs })
+//   }
+// }
 
 //------------------------
 //expire alarm
@@ -216,55 +351,11 @@ chrome.alarms.onAlarm.addListener(
   function (alarm/*:any*/) {
     //console.log("chrome.alarms.onAlarm fired ", alarm);
     if (alarm.name == UNLOCK_EXPIRED) {
-      chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
+      global.lock()
+      //chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
     }
   }
 );
-
-// function backgroundFunction(msg /*:string*/) {
-//   console.log("backgound funtion executed, meg:" + msg);
-//   return "I'm backman";
-// }
-
-// function hold(key /*:string*/) {
-//   //(console.log("hold:", key);
-//   chrome.storage.local.set({ uk: key })
-// }
-
-// function getHoldKey(callback/*:any*/) {
-//   chrome.storage.local.get("uk", (obj) => {
-//     callback(obj.uk)
-//   });
-// }
-
-//-------------------------------------------
-// listen to runtime messages from the popup 
-//-------------------------------------------
-// chrome.runtime.onMessage.addListener(
-//   function(message, callback) {
-//     if (message == "runContentScript"){
-//       //execute contentScript on activeTab
-//       //contentScript opens a port for receivin messages from bakcground.js and redirecting to the page
-//       //it also listens to page messages and sends them thru the port
-//       //basically acts as a proxy to pass messages from background<->activeTab
-//       chrome.tabs.executeScript({file: 'background/contentScript.js'},function(){
-//         if (chrome.runtime.lastError) console.error(JSON.stringify(chrome.runtime.lastError))
-//       })
-//       // chrome.tabs.executeScript({code: 'console.log("test")'},function(){
-//       //   if (chrome.runtime.lastError) console.error(JSON.stringify(chrome.runtime.lastError))
-//       // })
-//     }
-//     else if (message.dest=="page"){ 
-//       if (connectedPort) {
-//         connectedPort.postMessage(message);
-//       }
-//       else{
-//         console.error("can't send message. port Not connected")
-//         console.error(message)
-//       }
-//     }
-
-//   });
 
 
 /**
@@ -287,44 +378,44 @@ function connectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<a
 
   return new Promise((resolve, reject) => {
 
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 
-      const activeTabId = tabs[0].id||-1;
-      if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId]={};
+      const activeTabId = tabs[0].id || -1;
+      if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId] = {};
 
-      const cpsData/*:CPSDATA*/={
+      const cpsData/*:CPSDATA*/ = {
         accountId: accountId,
         network: network,
         activeTabId: activeTabId,
         url: tabs[0].url,
         ctinfo: _connectedTabs[activeTabId],
-        resolve:resolve,
-        reject:reject
+        resolve: resolve,
+        reject: reject
       }
-      console.log("activeTabId",cpsData)
+      console.log("activeTabId", cpsData)
       cpsData.ctinfo = _connectedTabs[cpsData.activeTabId]
-      cpsData.ctinfo.aceptedConnection=false; //we're connecting another
-      cpsData.ctinfo.connectedResponse={};
+      cpsData.ctinfo.aceptedConnection = false; //we're connecting another
+      cpsData.ctinfo.connectedResponse = {};
 
       //check if it responds
       try {
-        chrome.tabs.sendMessage(cpsData.activeTabId,{code: "ping"},function(response){
+        chrome.tabs.sendMessage(cpsData.activeTabId, { code: "ping" }, function (response) {
           if (!response) {
             //not responding, set injected status
-            cpsData.ctinfo.injected=false;
+            cpsData.ctinfo.injected = false;
             console.error(chrome.runtime.lastError);
           }
-          else{
+          else {
             //responded set injected status
-            cpsData.ctinfo.injected=true;
+            cpsData.ctinfo.injected = true;
           }
           //CPS
           return continueCWP_2(cpsData)
         })
       }
-      catch(ex){
+      catch (ex) {
         //err trying to talk to the page, set injected status
-        cpsData.ctinfo.injected=false;
+        cpsData.ctinfo.injected = false;
         console.error(ex);
         //CPS
         return continueCWP_2(cpsData)
@@ -334,7 +425,7 @@ function connectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<a
 }
 
 ///inject if necessary
-function continueCWP_2(cpsData/*:CPSDATA*/){
+function continueCWP_2(cpsData/*:CPSDATA*/) {
   if (cpsData.ctinfo.injected) {
     //if responded, it was injected, continue
     return continueCWP_3(cpsData);
@@ -344,8 +435,8 @@ function continueCWP_2(cpsData/*:CPSDATA*/){
   //it also listens to page messages and relays via chrome.runtime.sendmessage 
   //basically contentScript.js acts as a proxy to pass messages from ext<->tab
   console.log("injecting")
-  try{
-    chrome.tabs.executeScript({file: 'background/contentScript.js' },
+  try {
+    chrome.tabs.executeScript({ file: 'background/contentScript.js' },
       function () {
         if (chrome.runtime.lastError) {
           console.error(JSON.stringify(chrome.runtime.lastError))
@@ -353,22 +444,22 @@ function continueCWP_2(cpsData/*:CPSDATA*/){
         }
         else {
           //injected ok
-          cpsData.ctinfo.injected=true
+          cpsData.ctinfo.injected = true
           //CPS
           return continueCWP_3(cpsData);
         }
       })
   }
-  catch(ex){
+  catch (ex) {
     return cpsData.reject(ex)
   }
 }
 
 ///send connect order
-function continueCWP_3(cpsData/*:CPSDATA*/){
+function continueCWP_3(cpsData/*:CPSDATA*/) {
   console.log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url)
   //send connect order via content script. a response will be received later
-  chrome.tabs.sendMessage(cpsData.activeTabId,{ dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network}})
+  chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network } })
   //wait 250 for response
   setTimeout(() => {
     if (cpsData.ctinfo.aceptedConnection) { //page responded with connection info
@@ -376,106 +467,106 @@ function continueCWP_3(cpsData/*:CPSDATA*/){
       return cpsData.resolve();
     }
     else {
-      let errMsg=cpsData.url + " not responding / Not a Narwallets compatible NEAR web page"
-      if (cpsData.ctinfo.connectedResponse) errMsg= cpsData.ctinfo.connectedResponse.err+" "+errMsg;
+      let errMsg = cpsData.url + " not responding / Not a Narwallets compatible NEAR web page"
+      if (cpsData.ctinfo.connectedResponse) errMsg = cpsData.ctinfo.connectedResponse.err + " " + errMsg;
       return cpsData.reject(Error(errMsg))
     }
   }, 250);
 }
 
 
-function OLDconnectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<any>*/ {
-  console.log("connectToWebPage start")
+// function OLDconnectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<any>*/ {
+//   console.log("connectToWebPage start")
 
-  return new Promise((resolve, reject) => {
+//   return new Promise((resolve, reject) => {
 
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
-      const activeTabId=tabs[0].id||-1
-      console.log("activeTabId",activeTabId)
-      if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId]={};
-      if (_connectedTabs[activeTabId].aceptedConnection){
-        //already connected, verify 
-        try {
-          chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
-            if (!response) {
-              _connectedTabs[activeTabId].injected=false;
-              _connectedTabs[activeTabId].aceptedConnection=false;
-              const errMsg="Try again. "+(chrome.runtime.lastError?chrome.runtime.lastError.message:"")
-              return reject(Error(errMsg))
-            }
-            else{
-              console.log("return reject(Error(already connected))")
-              return reject(Error("already connected"))
-            }
-          })
-          return;//verification is async
-        }
-        catch(ex){
-          return reject(ex)
-        }
-      }
-      if (!_connectedTabs[activeTabId].injected){
-        //not injected yet inject/execute contentScript on activeTab
-        //contentScript replies with a chrome.runtime.sendmessage 
-        //it also listens to page messages and relays via chrome.runtime.sendmessage 
-        //basically contentScript.js acts as a proxy to pass messages from ext<->tab
-        console.log("injecting")
-        chrome.tabs.executeScript({file: 'background/contentScript.js' },
-          function () {
-            if (chrome.runtime.lastError) {
-              console.error(JSON.stringify(chrome.runtime.lastError))
-              return reject(chrome.runtime.lastError)
-            }
-            else {
-              _connectedTabs[activeTabId].injected=true
-              console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
-              //send via content script. a response will be received later
-              chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
-              //wait 250 for response
-              setTimeout(() => {
-                if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
-                  _connectedTabs[activeTabId].connectedAccountId //register connected acount
-                  return resolve();
-                }
-                else {
-                  let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
-                  if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
-                  return reject(Error(errMsg))
-                }
-              }, 250);
-            }
-        })
-      }
-      else {
-        //it was injected already
-        //verify
-        chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
-          if (!response) {
-            _connectedTabs[activeTabId].injected=false;
-            return reject(chrome.runtime.lastError||Error("page not responding. Try again"))
-          }
-          else {
-            //send via content script. a response will be received later
-            console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
-            chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
-            //wait 250 for response
-            setTimeout(() => {
-              if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
-                return resolve();
-              }
-              else {
-                let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
-                if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
-                return reject(Error(errMsg))
-              }
-            }, 250);
-          }
-        })
-      }
-    })
-  })
-}
+//       const activeTabId=tabs[0].id||-1
+//       console.log("activeTabId",activeTabId)
+//       if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId]={};
+//       if (_connectedTabs[activeTabId].aceptedConnection){
+//         //already connected, verify 
+//         try {
+//           chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
+//             if (!response) {
+//               _connectedTabs[activeTabId].injected=false;
+//               _connectedTabs[activeTabId].aceptedConnection=false;
+//               const errMsg="Try again. "+(chrome.runtime.lastError?chrome.runtime.lastError.message:"")
+//               return reject(Error(errMsg))
+//             }
+//             else{
+//               console.log("return reject(Error(already connected))")
+//               return reject(Error("already connected"))
+//             }
+//           })
+//           return;//verification is async
+//         }
+//         catch(ex){
+//           return reject(ex)
+//         }
+//       }
+//       if (!_connectedTabs[activeTabId].injected){
+//         //not injected yet inject/execute contentScript on activeTab
+//         //contentScript replies with a chrome.runtime.sendmessage 
+//         //it also listens to page messages and relays via chrome.runtime.sendmessage 
+//         //basically contentScript.js acts as a proxy to pass messages from ext<->tab
+//         console.log("injecting")
+//         chrome.tabs.executeScript({file: 'background/contentScript.js' },
+//           function () {
+//             if (chrome.runtime.lastError) {
+//               console.error(JSON.stringify(chrome.runtime.lastError))
+//               return reject(chrome.runtime.lastError)
+//             }
+//             else {
+//               _connectedTabs[activeTabId].injected=true
+//               console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
+//               //send via content script. a response will be received later
+//               chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
+//               //wait 250 for response
+//               setTimeout(() => {
+//                 if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
+//                   _connectedTabs[activeTabId].connectedAccountId //register connected acount
+//                   return resolve();
+//                 }
+//                 else {
+//                   let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
+//                   if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
+//                   return reject(Error(errMsg))
+//                 }
+//               }, 250);
+//             }
+//         })
+//       }
+//       else {
+//         //it was injected already
+//         //verify
+//         chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
+//           if (!response) {
+//             _connectedTabs[activeTabId].injected=false;
+//             return reject(chrome.runtime.lastError||Error("page not responding. Try again"))
+//           }
+//           else {
+//             //send via content script. a response will be received later
+//             console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
+//             chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
+//             //wait 250 for response
+//             setTimeout(() => {
+//               if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
+//                 return resolve();
+//               }
+//               else {
+//                 let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
+//                 if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
+//                 return reject(Error(errMsg))
+//               }
+//             }, 250);
+//           }
+//         })
+//       }
+//     })
+//   })
+// }
 
 
 /*+
@@ -487,15 +578,15 @@ type ConnectedTabInfo = {
 }
 +*/
 
-let _connectedTabs/*:Record<number,ConnectedTabInfo>*/={};
+let _connectedTabs/*:Record<number,ConnectedTabInfo>*/ = {};
 
 function disconnectFromWebPage()/*:Promise<any>*/ {
-  return new Promise((resolve,reject)=>{
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      const activeTabId=tabs[0].id||-1
-      if (_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection){
-        _connectedTabs[activeTabId].aceptedConnection=false;
-        chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "disconnect" })
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      const activeTabId = tabs[0].id || -1
+      if (_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection) {
+        _connectedTabs[activeTabId].aceptedConnection = false;
+        chrome.tabs.sendMessage(activeTabId, { dest: "page", code: "disconnect" })
         return resolve();
       }
       else {
@@ -505,18 +596,24 @@ function disconnectFromWebPage()/*:Promise<any>*/ {
   })
 }
 
-function isConnected()/*:Promise<boolean>*/ { 
-  return new Promise((resolve,reject)=>{
-    chrome.tabs.query({active: true, currentWindow: true}, 
-      function(tabs) {
-        const activeTabId=tabs[0].id||-1
+function isConnected()/*:Promise<boolean>*/ {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true },
+      function (tabs) {
+        const activeTabId = tabs[0].id || -1
         return resolve(_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection)
       })
-    })
+  })
 }
 
-async function onLoad(){
-  console.log("background.js onLoad")
+async function onLoad() {
+  console.log("background.js onLoad", new Date())
+  await recoverOptions()
+  await global.recoverState()
+  //console.log(global.State)
+  if (!global.State.dataVersion) {
+    global.clearState();
+  }
   const nw = await localStorageGet("backgroundNetwork");
   if (nw) Network.setCurrent(nw);
 }

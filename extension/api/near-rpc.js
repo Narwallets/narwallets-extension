@@ -1,5 +1,6 @@
 import { jsonRpc, jsonRpcQuery, formatJSONErr } from "./utils/json-rpc.js";
 import * as naclUtil from "./tweetnacl/util.js";
+import { isValidAccountID } from "./utils/valid.js";
 import { KeyPairEd25519 } from "./utils/key-pair.js";
 import { serialize, base_decode } from "./utils/serialize.js";
 import * as TX from "./transaction.js";
@@ -51,42 +52,6 @@ export function yton(yoctos) {
     let nearsText = padded.slice(0, -24) + "." + padded.slice(-24, -20); //add decimal point. Equivalent to near=yoctos/1e24 and truncate to 4 dec places
     return Number(nearsText);
 }
-export function isValidAccountID(accountId) {
-    const MIN_ACCOUNT_ID_LEN = 2;
-    const MAX_ACCOUNT_ID_LEN = 64; //implicit accounts have 64 hex chars
-    if (accountId.length < MIN_ACCOUNT_ID_LEN ||
-        accountId.length > MAX_ACCOUNT_ID_LEN) {
-        return false;
-    }
-    // The valid account ID regex is /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/
-    // We can safely assume that last char was a separator.
-    var last_char_is_separator = true;
-    for (let n = 0; n < accountId.length; n++) {
-        let c = accountId.charAt(n);
-        let current_char_is_separator = c == "-" || c == "_" || c == ".";
-        if (!current_char_is_separator &&
-            !((c >= "a" && c <= "z") || (c >= "0" && c <= "9")))
-            return false; //only 0..9 a..z and separators are valid chars
-        if (current_char_is_separator && last_char_is_separator) {
-            return false; //do not allow 2 separs together
-        }
-        last_char_is_separator = current_char_is_separator;
-    }
-    // The account can't end as separator.
-    return !last_char_is_separator;
-}
-export function isValidAmount(amount) {
-    if (isNaN(amount))
-        return false;
-    if (amount < 0)
-        return false;
-    return true;
-}
-//-------------------------------
-export function getPublicKey(privateKey) {
-    const keyPair = KeyPairEd25519.fromString(privateKey);
-    return keyPair.getPublicKey().toString();
-}
 /*
 near.state example result
 result: {
@@ -133,15 +98,6 @@ export function getValidators() {
     return jsonRpc('validators', [null]);
 }
 ;
-// always return StakingPoolAccountInfoResult. A empty one if the pool can't find the account. See: core-contracts/staking-pool
-export async function getStakingPoolAccInfo(accountName, stakingPool) {
-    return view(stakingPool, "get_account", { account_id: accountName });
-}
-export async function getStakingPoolFee(stakingPool) {
-    const rewardFeeFraction = await view(stakingPool, "get_reward_fee_fraction");
-    return rewardFeeFraction.numerator * 100 / rewardFeeFraction.denominator;
-}
-;
 //-------------------------------
 export function broadcast_tx_commit_signed(signedTransaction) {
     const borshEcoded = signedTransaction.encode();
@@ -150,12 +106,12 @@ export function broadcast_tx_commit_signed(signedTransaction) {
 }
 ;
 //-------------------------------
-export async function broadcast_tx_commit_actions(actions, sender, receiver, privateKey) {
+export async function broadcast_tx_commit_actions(actions, signerId, receiver, privateKey) {
     const keyPair = KeyPairEd25519.fromString(privateKey);
     const publicKey = keyPair.getPublicKey();
-    const accessKey = await access_key(sender, publicKey.toString());
+    const accessKey = await access_key(signerId, publicKey.toString());
     if (accessKey.permission !== 'FullAccess')
-        throw Error(`The key is not full access for account '${sender}'`);
+        throw Error(`The key is not full access for account '${signerId}'`);
     // converts a recent block hash into an array of bytes 
     // this hash was retrieved earlier when creating the accessKey (Line 26)
     // this is required to prove the tx was recently constructed (within 24hrs)
@@ -163,7 +119,7 @@ export async function broadcast_tx_commit_actions(actions, sender, receiver, pri
     // each transaction requires a unique number or nonce
     // this is created by taking the current nonce and incrementing it
     const nonce = ++accessKey.nonce;
-    const transaction = TX.createTransaction(sender, publicKey, receiver, nonce, actions, recentBlockHash);
+    const transaction = TX.createTransaction(signerId, publicKey, receiver, nonce, actions, recentBlockHash);
     const serializedTx = serialize(TX.SCHEMA, transaction);
     const serializedTxHash = new Uint8Array(sha256.hash(serializedTx));
     const signature = keyPair.sign(serializedTxHash);
