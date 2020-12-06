@@ -45,7 +45,7 @@ export function setCurrent(networkName:string):void {
   current = networkName
   setRpcUrl(info.rpc)
   //broadcast change
-  chrome.runtime.sendMessage({code:"network-changed",network:current})
+  chrome.runtime.sendMessage({ code: "network-changed", network:current, networkInfo:info });
 };
 
 export function getInfo(name:string) :NetworkInfo {

@@ -34,6 +34,7 @@
     "extension/pages/import-or-create.js",
     "extension/pages/import.js",
     "extension/pages/main.js",
+    "extension/pages/unlock.js",
     "extension/popups/approve/approve.js",
     "extension/util/conversions.js",
     "extension/util/document.js",

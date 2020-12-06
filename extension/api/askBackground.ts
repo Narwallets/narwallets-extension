@@ -7,8 +7,8 @@ import { BatchAction, BatchTransaction, FunctionCall, Transfer} from "./batch-tr
 export function askBackground(requestPayload:any):Promise<any>{
     requestPayload.dest="ext";
     return new Promise((resolve,reject)=>{
-        console.log("sendMessage",requestPayload)
-        const timeout=setTimeout(()=>{return reject(Error("timeout"));},10000);
+        console.log("sendMessage",JSON.stringify(requestPayload))
+        const timeout=setTimeout(()=>{return reject(Error("timeout"));},30000);
         chrome.runtime.sendMessage(requestPayload,function(response){
             clearTimeout(timeout);
             if (!response){
@@ -22,6 +22,9 @@ export function askBackground(requestPayload:any):Promise<any>{
     })
 }
 
+export function askBackgroundIsLocked():Promise<boolean>{
+    return askBackground({code:"is-locked"}) as Promise<boolean>
+}
 export function askBackgroundGetState():Promise<StateStruct>{
     return askBackground({code:"get-state"}) as Promise<StateStruct>
 }

@@ -1,4 +1,6 @@
-//--- DOCUMENT UTILITIES ---
+//---------------------
+//--- DOM UTILITIES ---
+//---------------------
 import * as c from "./conversions.js"
 
 /*+
@@ -19,29 +21,24 @@ export const HIDDEN = "hidden"
 export const ERR_DIV = "err-div"
 export const WAIT = "wait"
 
-export const IUOP = "Invalid user or password"
-
-let numberFormatFunction = function (num/*:number*/, key/*:string*/) {
-  if (key.endsWith("Pct")) return num.toString();
-  return c.toStringDec(num);
-}
-//export function setNumberFormatFunction
 
 //----DOM COMMON simple independent utility FUNCTIONS  -------
 /**
  * wrapper around document.getElementById -> HTMLElement
- * @param id 
+ * @param id
  */
 export function byId(id/*:string*/)/*:HTMLElement*/ {
   try {
     return document.getElementById(id) /*+as HTMLElement+*/
   }
   catch {
-    return new HTMLElement();
+    console.error(`document.getElementById(${id}) NOT FOUND`)
+    return new HTMLElement()
   }
 }
-
-
+//---
+//-- seach button elements with the id and add click listener
+//---
 export function onClickId(id/*:string*/, clickHandler/*:(ev:Event)=>void*/) {
   try {
     let elems = document.querySelectorAll("button#" + id);
@@ -56,10 +53,14 @@ export function onClickId(id/*:string*/, clickHandler/*:(ev:Event)=>void*/) {
     elem.addEventListener(CLICK, clickHandler);
   }
   catch (ex) {
-    console.error("ERR: onClick('" + id + "') " + ex.message);
+    console.error("ERR: onClickId('" + id + "') " + ex.message);
   }
 }
-
+/**
+ * add an event when Enter is pressed in an input-box
+ * @param textId
+ * @param clickHandler
+ */
 export function onEnterKey(textId/*:string*/, clickHandler/*:(ev:Event)=>void*/) {
   byId(textId).addEventListener("keyup", (event/*:KeyboardEvent*/) => { if (event.key === 'Enter') clickHandler(event) })
 }
@@ -76,38 +77,74 @@ export type AnyElement = HTMLElement & HTMLInputElement & HTMLButtonElement;
 
 /**
  * wrapper around document.getElementById -> anyElement
- * @param id 
+ * @param id
  */
 export function inputById(id/*:string*/)/*:HTMLInputElement*/ {
-  const elemClass = qs("input#"+id)
+  const elemClass = qs("input#" + id)
   return elemClass.el /*+as HTMLInputElement+*/
 }
 
 /**
-* showPage(id)
-* removes class=hidden from an element
-* @param id 
+ * get a Number from a text element, by selector
+ * @param selector
+ */
+export function getNumber(selector/*:string*/) {
+  const amountElem = new El(selector);
+  return c.toNum(amountElem.value);
+}
+//-------------------------------------------------------
+/**
+* showByClass(id)
+* removes class=hidden from a DIV with id=id & class=className
+* @param id
 */
 export function showByClass(id/*:string*/, className/*:string*/) {
   const toShow = document.querySelectorAll("." + className + "#" + id)[0];
-  // comentado - hides useful info -hideErr(); //cleanup
-  //hide all others
-  document.querySelectorAll("." + className).forEach((el) => {
-    if (el !== toShow) {
-      el.classList.add("slide-hide");
-      el.classList.remove("show");
-    }
-  })
   if (!toShow) {
     console.error("." + className + "#" + id, "NOT FOUND")
     return;
   }
-  toShow.querySelectorAll("input").forEach((item) => item.value = "") //clear all input fields
-  toShow.classList.remove(HIDDEN); //show requested
-  toShow.classList.remove("slide-hide"); //show requested
-  toShow.classList.add("show"); //animate
-}
+  //clear all input fields
+  toShow.querySelectorAll("input").forEach((item) => item.value = "") 
 
+  const allPages=document.querySelectorAll("." + className)
+  allPages.forEach((el) => {
+    el.classList.remove(HIDDEN);
+  })
+  //the setTimeout is needed because  HIDDEN=>display:none, and setting display:none BREAKS ANIMATIONS
+  setTimeout(() => {
+      //animated hide all 
+    allPages.forEach((el) => {
+      el.classList.remove("show");
+      el.classList.add("slide-hide");
+      el.setAttribute("disabled","")
+    })
+    //show requested
+    toShow.classList.remove("slide-hide"); //show requested
+    toShow.classList.add("show"); //animate
+    toShow.removeAttribute("disabled")
+  }
+  ,100)
+
+  //after animation, hide the other divs so they're not in the tab order
+  setTimeout(() => {
+     //console.log(toShow.id)
+     allPages.forEach((el) => {
+       if (el.id != toShow.id) {
+         //console.log("hiding",el.id)
+         el.classList.add(HIDDEN)
+       }
+     })
+     //console.log("show",toShow.id)
+     toShow.classList.remove(HIDDEN)
+   }, 300)
+
+}
+/**
+* showByClass(id)
+* removes class=hidden from a DIV with id=id & class="page"
+* @param id
+*/
 export function showPage(id/*:string*/) {
   showByClass(id, "page");
 }
@@ -118,8 +155,13 @@ export function showSubPage(id/*:string*/) {
 
 export function hideDiv(id/*:string*/) {
   byId(id).classList.add(HIDDEN);
-};
-
+}
+;
+//-----------------------------------
+//----- NOTIFICATIONS ---------------
+//-----------------------------------
+// shows a message on ERR_DIV for 5 seconds
+// requires div id="err-div" and css class .show
 
 function displayNoneErr() {
   byId(ERR_DIV).classList.add("hidden");
@@ -143,8 +185,8 @@ var errorId = 0
 
 // returns created err-div item
 // showMs=-1 => indefinite
-export function showMsg(msg/*:string*/, extraClass/*:string*/, showMs/*+?:number+*/) /*:HTMLElement*/{
-  if (!showMs) showMs=6000; //default show for 6 seconds
+export function showMsg(msg/*:string*/, extraClass/*:string*/, showMs/*+?:number+*/) /*:HTMLElement*/ {
+  if (!showMs) showMs = 6000; //default show for 6 seconds
   const errDiv = byId(ERR_DIV)
   const newDiv = document.createElement("DIV")  /*+as HTMLElement+*/
   newDiv.innerText = msg;
@@ -158,8 +200,8 @@ export function showMsg(msg/*:string*/, extraClass/*:string*/, showMs/*+?:number
     setTimeout(() => { newDiv.classList.add("show") }, 30);
     setTimeout(() => { newDiv.classList.remove("show") }, showMs);
   }
-  if (showMs>0){
-    setTimeout(() => { newDiv.remove() }, showMs+300);
+  if (showMs > 0) {
+    setTimeout(() => { newDiv.remove() }, showMs + 300);
   }
   return newDiv;
 }
@@ -179,32 +221,9 @@ export function showErr(msg/*:string*/) {
   console.error(msg)
 }
 
-//---------------------
-// inline HTML templates
-export function templateReplace(template/*:string*/, obj/*:any*/, prefix/*:string*/="") /*:string*/ {
-  var result = template;
-  for (const key in obj) {
-    let value = obj[key];
-    let text = ""
-    if (value == null || value == undefined) {
-      text = "";
-    }
-    else if (typeof value === "number") {
-      text = numberFormatFunction(value, key)
-    }
-    else if (typeof value === "object") {
-      result = templateReplace(result, value, key + ".") //recurse
-      continue;
-    }
-    else {
-      text = value.toString()
-    }
-    while (result.indexOf("{" + prefix + key + "}") !== -1) {
-      result = result.replace("{" + prefix + key + "}", text);
-    }
-  }
-  return result;
-}
+//-----------------------
+//--- WAIT WHEEL  -------
+//-----------------------
 
 let hideTO/*:any*/;
 // wait wheel
@@ -226,17 +245,54 @@ export function hideWait() {
 }
 
 
+//------------------------------------------------------------
+//---  TEMPLATES ---------------------------------------------
+//------------------------------------------------------------
+let numberFormatFunction = function (num/*:number*/, key/*:string*/) {
+  if (key.endsWith("Pct"))
+    return num.toString()
+  return c.toStringDec(num)
+}
+//---------------------
+// inline HTML templates
+export function templateReplace(template/*:string*/, obj/*:any*/, prefix/*:string*/ = "") /*:string*/ {
+  var result = template
+  for (const key in obj) {
+    let value = obj[key]
+    let text = ""
+    if (value == null || value == undefined) {
+      text = ""
+    }
+    else if (typeof value === "number") {
+      text = numberFormatFunction(value, key)
+    }
+    else if (value instanceof Date) {
+      text = value.toString()
+    }
+    else if (typeof value === "object") {
+      result = templateReplace(result, value, key + ".") //recurse
+      continue
+    }
+    else {
+      text = value.toString()
+    }
+    while (result.indexOf("{" + prefix + key + "}") !== -1) {
+      result = result.replace("{" + prefix + key + "}", text)
+    }
+  }
+  return result
+}
 export function clearContainer(containerId/*:string*/) {
   const listContainer = byId(containerId)
-  listContainer.innerHTML = "";
+  listContainer.innerHTML = ""
 }
 
 export function appendTemplate(elType/*:string*/, containerId/*:string*/, templateId/*:string*/, data/*:Record<string,any>*/) {
   const newLI = document.createElement(elType)  /*+as HTMLLIElement+*/
-  const templateElem=byId(templateId)
-  if (!templateElem) console.error("appendTemplate, template id='"+templateId+"' NOT FOUND")
+  const templateElem = byId(templateId)
+  if (!templateElem) console.error("appendTemplate, template id='" + templateId + "' NOT FOUND")
   //-- if data-id has value, set it
-  if (templateElem.dataset.id) newLI.id=templateReplace(templateElem.dataset.id,data) //data-id => id={x}
+  if (templateElem.dataset.id) newLI.id = templateReplace(templateElem.dataset.id, data) //data-id => id={x}
   //-- copy classes from template (except "hidden")
   //@ts-ignore
   newLI.classList.add(...templateElem.classList) //add all classes
@@ -248,7 +304,7 @@ export function appendTemplate(elType/*:string*/, containerId/*:string*/, templa
 }
 
 export function appendTemplateLI(containerId/*:string*/, templateId/*:string*/, data/*:Record<string,any>*/) {
-  appendTemplate("LI",containerId,templateId,data)
+  appendTemplate("LI", containerId, templateId, data)
 }
 export function populateSingleLI(containerId/*:string*/, templateId/*:string*/, multiDataObj/*:Record<string,any>*/, key/*:string*/) {
   const dataItem = {
@@ -296,7 +352,9 @@ export function getClosestChildText(parentSelector/*:string*/, target/*:EventTar
 
 }
 
-//a safe query selector, throws if there's more than one
+//------------------------------------------------------------
+// a safe query selector, throws if there's more than one
+//------------------------------------------------------------
 export function qs(selector/*:string*/) {
   return new El(selector)
 }
@@ -306,7 +364,7 @@ export class El {
   el/*:AnyElement*/ = undefined /*+as unknown as AnyElement+*/;
 
   constructor(selector/*:string*/) {
-    if (selector=="") return;
+    if (selector == "") return;
     try {
       let elems = document.querySelectorAll(selector);
       if (elems.length > 1) throw new Error("more than one!");
@@ -320,7 +378,7 @@ export class El {
     }
   }
 
-  sub(selector/*:string*/)/*:El*/{
+  sub(selector/*:string*/)/*:El*/ {
     try {
       let elems = this.el.querySelectorAll(selector);
       if (elems.length > 1) throw new Error("more than one!");
@@ -370,8 +428,9 @@ export class El {
 }
 
 
-//---------------
-//a safe query selector, throws if there's none
+//------------------------------------------------------------
+// a safe query selector ALL, throws if there's none
+//------------------------------------------------------------
 export function all(selector/*:string*/) {
   return new All(selector)
 }
@@ -405,12 +464,12 @@ export class All {
   }
   addClass(className/*:string*/) {
     this.elems.forEach((item/*:HTMLElement*/) => {
-        item.classList.add(className)
+      item.classList.add(className)
     })
   }
   removeClass(className/*:string*/) {
     this.elems.forEach((item/*:HTMLElement*/) => {
-        item.classList.remove(className)
+      item.classList.remove(className)
     })
   }
 

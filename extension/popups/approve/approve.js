@@ -3,6 +3,8 @@ import * as c from "../../util/conversions.js"
 import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../api/batch-transaction.js"
 import { askBackground } from "../../api/askBackground.js"
 
+let responseSent=false;
+
 //----------------------------------------
 //-- LISTEN to "messages" from background.js
 //----------------------------------------
@@ -14,42 +16,41 @@ chrome.runtime.onMessage.addListener(
   }
 )
 
-function approveOkClicked() {
+async function approveOkClicked() {
   d.showWait()
   try {
     //ask backgroun to apply transaction
     initialMsg.dest = "ext";
-    chrome.runtime.sendMessage(initialMsg, function (response) {
-      if (!response) {
-        resolvedMsg.err = "background page unresponsive";
-      }
-      else if (response.err) {
-        resolvedMsg.err = response.err;
-      }
-      else {
-        resolvedMsg.data = response.data;
-      }
-      //response goes to initiating tab/page, another 5-min wating spinner is there
-      chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //send resolution to original asking tab/page
-      setTimeout(() => { window.close() }, 200);
-    })
+    resolvedMsg.data = await askBackground(initialMsg)
+    //response goes to initiating tab/page, another 5-min wating spinner is there
+    chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //send resolution to original asking tab/page
+    responseSent=true
+    setTimeout(() => { window.close() }, 100);
   }
   catch (ex) {
-    d.showErr(ex.message)
+    d.showErr(ex.message) //some error
+    //the user can retry or cancel the approval
   }
   finally{
     d.hideWait()
   }
 }
 
-function cancelOkClicked() {
-
+function respondRejected(){
   resolvedMsg.err = "User rejected the transaction";
   chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //resolve-reject request
+  responseSent=true
+}
 
+function cancelOkClicked() {
+  respondRejected();
   setTimeout(() => { window.close() }, 200);
 }
 
+window.addEventListener('beforeunload', function(event) {
+  if (!responseSent) respondRejected();
+});
+      
 /*+
 type TxInfo = {
       action:string;
@@ -76,6 +77,39 @@ type ResolvedMsg={
 var initialMsg/*:any*/;
 var resolvedMsg/*:any*/;
 
+function humanReadableValue(value/*:any*/){
+  if (typeof value=="string"){
+    if (/\d{20}/.test(value)){
+      //at least 20 digits. we assume YOCTOS
+      return c.toStringDec(c.yton(value))+"N"
+    }
+    else {
+      return value;
+    }
+  }
+  else {
+    return value.ToString();
+  }
+}
+
+function humanReadableCallArgs(args/*:any*/)/*:string*/{
+  let result="{ "
+  let count=0
+  for(let key in args){
+    if (count>0) result = result+", ";
+    result = result+key+":"
+    let value = args[key]
+    if (typeof value=="object" && !(value instanceof Date)){
+      result = result+humanReadableCallArgs(value); //recurse
+    }
+    else {
+      result = result+humanReadableValue(value)
+    }
+  }
+  result=result+" }"
+  return result
+}
+
 // ---------------------
 function displayTx(msg/*:TxMsg*/) {
 
@@ -100,8 +134,7 @@ function displayTx(msg/*:TxMsg*/) {
       switch (item.action) {
         case "call":
           const f = item /*+as FunctionCall+*/;
-          const argsString = JSON.stringify(f.args);
-          toAdd.action = `call ${f.method}(${argsString == "{}" ? "" : argsString})`;
+          toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
           break;
 
         case "transfer":
@@ -127,3 +160,4 @@ function displayTx(msg/*:TxMsg*/) {
     d.hideWait()
   }
 }
+

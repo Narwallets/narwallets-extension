@@ -3,12 +3,13 @@ import * as naclUtil from "../util/tweetnacl/nacl-util.js";
 import * as sha256 from "../api/sha256.js"
 import * as Network from "../api/network.js";
 import { localStorageRemove, recoverFromLocalStorage, localStorageSave, localStorageSet, localStorageGet } from "./util.js";
-import { showErr, IUOP as INVALID_USER_OR_PASS } from "../util/document.js";
+import { showErr } from "../util/document.js";
 import { Account } from "../api/account.js"; //required for SecureState declaration
 import { askBackground } from "../api/askBackground.js";
 
 const DATA_VERSION = "0.1"
 
+const INVALID_USER_OR_PASS ="Invalid User or Password"
 /*+
 import type {NetworkInfo} from "../api/network.js";
 import type {StateStruct} from "../api/state-type.js";
@@ -19,14 +20,11 @@ export const EmptyState/*:StateStruct*/ = {
   dataVersion: DATA_VERSION,
   usersList: [],
   currentUser: "",
-  unlocked:false,
 };
 
 export var State = Object.assign({}, EmptyState);
 
-export const saveOnUnload = {
-  unlockSHA: "" //while the extension is open. When the ext gets closed, this is saved if auto-unlock is enabled
-}
+export var workingData = {unlockSHA:""}
 
 /*+
 type NetworkNameType=string;
@@ -37,7 +35,6 @@ type AccountIdType=string;
 type NarwalletSecureData = {
   dataVersion: string;
   hashedPass?: string;
-  initialNetworkName: string;
   autoUnlockSeconds: number;
   advancedMode: boolean;
   accounts: Record<NetworkNameType,Record<AccountIdType,Account>>; 
@@ -48,7 +45,6 @@ type NarwalletSecureData = {
 const EmptySecureState/*:NarwalletSecureData*/ = {
   dataVersion: DATA_VERSION,
   hashedPass: undefined,
-  initialNetworkName: Network.defaultName,
   autoUnlockSeconds: 30,
   advancedMode: false,
   accounts: {}
@@ -71,32 +67,27 @@ type callbackERR = (err:string) => void;
 
 export async function recoverState()/*:Promise<void>*/ {
   State = await recoverFromLocalStorage("State", "S", EmptyState)
-  State.unlocked=false;
 }
 
-function sha256PwdBase64(password/*:string*/)/*:string*/ {
+export function sha256PwdBase64(password/*:string*/)/*:string*/ {
   return naclUtil.encodeBase64(sha256.hash(naclUtil.decodeUTF8(password)));
 }
 
 export function lock() {
-  State.unlocked = false;
-  SecureState = EmptySecureState;
-  saveOnUnload.unlockSHA = "";
-  localStorageRemove('uk') //clear auto-unlock
+  SecureState = Object.assign({},EmptySecureState);
+  workingData.unlockSHA=""
+  console.log("LOCKED",SecureState.accounts)
 }
 
 export function createSecureState(password/*:string*/) {
   SecureState.hashedPass = sha256PwdBase64(password);
   SecureState.accounts = {}
   saveSecureState();
-  State.unlocked = true;
 }
 
 export function saveSecureState() {
 
-  if (!State.unlocked) throw new Error("state is locked")
-  if (!State.currentUser) throw new Error("No curent User")
-  if (!SecureState.hashedPass) { throw new Error("Invalid SecureState, no hashedPass") }
+  if (!SecureState.hashedPass) { throw new Error("Invalid/locked SecureState") }
 
   const keyPair = nacl.sign_keyPair_fromSeed(naclUtil.decodeBase64(SecureState.hashedPass));
   const keyUint8Array = keyPair.publicKey;
@@ -116,18 +107,16 @@ export function saveSecureState() {
 
 }
 
-export function setAutoUnlock(user/*:string*/, hashedPassBase64/*:string*/) {
-
+export function setCurrentUser(user/*:string*/) {
   if (State.currentUser != user) {
     //remember last user
     try { State.currentUser = user; saveState(); } catch { }
   }
-
-  saveOnUnload.unlockSHA = hashedPassBase64; //auto-save on popup-unload (with expiry time)
-  const expireMs = SecureState.autoUnlockSeconds * 1000
-  localStorageSet({uk: hashedPassBase64, exp: Date.now() + expireMs})
 }
 
+export function isLocked(){
+  return !SecureState || !SecureState.hashedPass
+}
 
 function decryptIntoJson(hashedPassBase64/*:string*/, encryptedMsg/*:string*/)/*:NarwalletSecureData*/ {
 
@@ -151,10 +140,6 @@ function decryptIntoJson(hashedPassBase64/*:string*/, encryptedMsg/*:string*/)/*
   return JSON.parse(base64DecryptedMessage);
 }
 
-//recover with PASSWORD or throws
-export async function unlockSecureState(email/*:string*/, password/*:string*/) /*:Promise<void>*/ {
-  return unlockSecureStateSHA(email, sha256PwdBase64(password))
-}
 
 //recover with PASSWORD_HASH or throws
 export async function unlockSecureStateSHA(email/*:string*/, hashedPassBase64/*:string*/) /*:Promise<void>*/ {
@@ -164,9 +149,8 @@ export async function unlockSecureStateSHA(email/*:string*/, hashedPassBase64/*:
   if (!encryptedState) throw Error(INVALID_USER_OR_PASS)
   const decrypted = decryptIntoJson(hashedPassBase64, encryptedState);
   SecureState = decrypted
-  State.unlocked = true;
-  try { setAutoUnlock(email, hashedPassBase64); } catch { } //auto-unlock & set current user
-  try { Network.setCurrent(SecureState.initialNetworkName) } catch { };
+  workingData.unlockSHA = hashedPassBase64; //auto-save on popup-unload (with expiry time)
+  setCurrentUser(email) // set & save State.currentUser
 }
 
 //------------------

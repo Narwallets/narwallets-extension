@@ -47,7 +47,7 @@ export class Account {
           this.typeFull += formattedNote
         }
 
-        this.accessStatus = this.accountInfo.privateKey ? "Full Access" : "Read Only"
+        this.accessStatus = this.isReadOnly?"Read Only":"Full Access" 
 
         if (!this.accountInfo.staked) this.accountInfo.staked = 0
         if (!this.accountInfo.unStaked) this.accountInfo.unStaked = 0
@@ -60,11 +60,14 @@ export class Account {
 
         if (this.accountInfo.type == "lock.c"){
           this.available = Math.max(0,this.available-36);
-          if (!this.accountInfo.privateKey) this.accessStatus = "owner";
+          if (!this.isReadOnly) this.accessStatus = "owner";
         }
 
         this.total = this.accountInfo.lastBalance + this.inThePool
 
     }
+
+    get isReadOnly() { return !this.accountInfo.privateKey }
+    get isFullAccess() { return !this.isReadOnly }
 
 }

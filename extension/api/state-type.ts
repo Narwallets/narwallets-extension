@@ -2,8 +2,7 @@
 export type StateStruct= {
     dataVersion: string;
     usersList: string[];
-    currentUser:string;
-    unlocked:boolean;
+    currentUser: string;
   }
   
   export type SecureOptions= {

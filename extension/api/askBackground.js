@@ -3,8 +3,8 @@ import { BatchTransaction, FunctionCall, Transfer } from "./batch-transaction.js
 export function askBackground(requestPayload) {
     requestPayload.dest = "ext";
     return new Promise((resolve, reject) => {
-        console.log("sendMessage", requestPayload);
-        const timeout = setTimeout(() => { return reject(Error("timeout")); }, 10000);
+        console.log("sendMessage", JSON.stringify(requestPayload));
+        const timeout = setTimeout(() => { return reject(Error("timeout")); }, 30000);
         chrome.runtime.sendMessage(requestPayload, function (response) {
             clearTimeout(timeout);
             if (!response) {
@@ -16,6 +16,9 @@ export function askBackground(requestPayload) {
             return resolve(response.data);
         });
     });
+}
+export function askBackgroundIsLocked() {
+    return askBackground({ code: "is-locked" });
 }
 export function askBackgroundGetState() {
     return askBackground({ code: "get-state" });

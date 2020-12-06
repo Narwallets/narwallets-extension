@@ -35,16 +35,14 @@ export class FunctionCall extends BatchAction{
 }
 
 export class Transfer extends BatchAction{
-    constructor(
-        attachedNear:number
-    ){
+    constructor(attachedNear:number){
         super("transfer",attachedNear)
     }
 }
 
 export class DeleteAccountToBeneficiary extends BatchAction{
     constructor(
-        beneficiaryAccountId:string
+        public beneficiaryAccountId:string
     ){
         super("delete")
     }

@@ -146,7 +146,8 @@ async function searchTheAccountName(accName/*:string*/) {
   }
 }
 
-async function importIfNew(accType/*:string*/, accName/*:string*/,accountInfo/*:Account*/, order/*:number*/){
+async function importIfNew(
+  accType/*:string*/, accName/*:string*/,accountInfo/*:Account*/, order/*:number*/) /*:Promise<number>*/ {
 
   const networkAccounts = await askBackgroundAllNetworkAccounts();
 
@@ -188,10 +189,10 @@ async function importClicked(ev /*:Event*/) {
 
   if (importedCount==0){
     //some time to see the error
-    setTimeout(Pages.showMain,5000)
+    setTimeout(Pages.show,5000)
   }
   else {
-    Pages.showMain()
+    Pages.show()
   }
 }
 
@@ -207,7 +208,13 @@ async function searchClicked(ev /*:Event*/) {
   let accName = input.value.trim().toLowerCase()
   const netInfo = await askBackgroundGetNetworkInfo()
   const root = netInfo.rootAccount
-  if (accName && accName.length<60 && !accName.endsWith(root)) accName=accName+ "." +root
+  if (accName 
+    && accName.length<60 
+    && !accName.endsWith(root)
+    && !(netInfo.name=='testnet' && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
+  ){
+    accName=accName+ "." +root
+  }
 
   if (!accName) {
     d.showErr("Enter the account to search for")
@@ -239,6 +246,10 @@ async function searchClicked(ev /*:Event*/) {
 
 async function onNetworkChanged(info/*:NetworkInfo*/) {
   //update indicator visual state
+  if (!info) {
+    console.error("!info")
+    return 
+  }
   d.byId(NET_NAME).innerText = info.name; //serach button
   d.byId(NET_ROOT).innerText = "." + info.rootAccount; //account name label
 }
@@ -264,7 +275,7 @@ export async function addListeners() {
 
 //listen to extension messages
 chrome.runtime.onMessage.addListener(function(msg){
-  if (msg.code="network-changed") {
-    onNetworkChanged(msg.network)
+  if (msg.code=="network-changed") {
+    onNetworkChanged(msg.networkInfo)
   }
 })

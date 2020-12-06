@@ -65,7 +65,7 @@ function initPage() {
     seedTextElem = new d.El("#seed-phrase")
 
     const backLink = new d.El("#account-selected.page .back-link");
-    backLink.onClick(Pages.showMain);
+    backLink.onClick(Pages.show);
 
     d.onClickId("send", sendClicked);
     d.onClickId("stake", stakeClicked);
@@ -185,7 +185,7 @@ function enableOKCancel() {
 }
 
 function checkNormalAccountIsFullAccess() {
-    if (selectedAccountData.accountInfo.privateKey) return true;
+    if (selectedAccountData.isFullAccess) return true;
     showOKToGrantAccess()
     throw Error("Account access is Read-Only")
 }
@@ -249,7 +249,7 @@ async function connectToWebAppClicked()/*: Promise<any>*/{
     d.showWait()
     try{
         await askBackground({code:"connect",accountId:selectedAccountData.name})
-        d.showSuccess("connected")
+        d.showSuccess("connected")    
         window.close()
     }
     catch(ex){
@@ -404,7 +404,7 @@ async function performStake() {
         const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
         if (!isValidAccountID(newStakingPool)) throw Error("Staking pool Account Id is invalid");
 
-        if (!selectedAccountData.accountInfo.privateKey) throw Error("you need full access on " + selectedAccountData.name);
+        if (!selectedAccountData.isFullAccess) throw Error("you need full access on " + selectedAccountData.name);
 
         //const amountToStake = info.lastBalance - info.staked - 36
         const amountToStake = c.toNum(d.inputById("stake-amount").value);
@@ -627,7 +627,7 @@ async function performUnstake() {
         const amount = c.toNum(d.inputById("unstake-amount").value);
         if (!isValidAmount(amount)) throw Error("Amount is not valid");
 
-        if (!selectedAccountData.accountInfo.privateKey) throw Error("you need full access on " + selectedAccountData.name);
+        if (!selectedAccountData.isFullAccess) throw Error("you need full access on " + selectedAccountData.name);
 
         const actualSP = selectedAccountData.accountInfo.stakingPool
         if (!actualSP) throw Error("No staking pool selected in this account");
@@ -737,7 +737,7 @@ async function internalReflectTransfer(sender /*:string*/, receiver /*:string*/,
 
 async function performSend() {
     try {
-        if (!selectedAccountData.accountInfo.privateKey) throw Error("Account is read-only")
+        if (selectedAccountData.isReadOnly) throw Error("Account is read-only")
         const toAccName = new d.El("#send-to-account-name").value
         const amountElem = new d.El("#send-to-account-amount")
         const amountToSend = c.toNum(amountElem.value)
@@ -868,14 +868,14 @@ function getPublicKey(privateKey/*:string*/) /*:string*/ {
 function showPublicKeyClicked() {
     d.hideErr()
 
-    if (!selectedAccountData.accountInfo.privateKey) {
+    if (selectedAccountData.isReadOnly) { //we don't have any key for ReadOnly accounts
         d.showErr("Account is read only")
         d.showSubPage("account-selected-make-full-access")
         showOKCancel(makeFullAccessOKClicked)
     }
     else { //normal acc priv key
         d.showSubPage("account-selected-show-public-key")
-        d.byId("account-selected-public-key").innerText = getPublicKey(selectedAccountData.accountInfo.privateKey)
+        d.byId("account-selected-public-key").innerText = getPublicKey(selectedAccountData.accountInfo.privateKey||"")
         showOKCancel(showButtons)
     }
 }
@@ -895,12 +895,12 @@ function changeAccessClicked() {
     d.hideErr()
     seedTextElem.value = ""
 
-    if (selectedAccountData.accountInfo.privateKey) {
+    if (selectedAccountData.isFullAccess) {
         d.showSubPage("account-selected-make-read-only")
         d.inputById("account-name-confirm").value = ""
         showOKCancel(makeReadOnlyOKClicked)
     }
-    else { //no priv key yet
+    else { //is ReadOnly
         d.showSubPage("account-selected-make-full-access")
         showOKCancel(makeFullAccessOKClicked)
     }
@@ -940,7 +940,7 @@ async function DeleteAccount() {
     d.hideErr()
     try {
 
-        if (!selectedAccountData.accountInfo.privateKey) throw Error("Account is Read-Only")
+        if (selectedAccountData.isReadOnly) throw Error("Account is Read-Only")
 
         await refreshSelectedAccount() //refresh account to have updated balance
 
@@ -965,11 +965,10 @@ async function AccountDeleteOKClicked() {
 
         d.showWait()
 
-        const privateKey = selectedAccountData.accountInfo.privateKey;
-        if (!privateKey) throw Error("Account is Read-Only")
+        if (selectedAccountData.isReadOnly) throw Error("Account is Read-Only")
 
         const toDeleteAccName = d.inputById("delete-account-name-confirm").value
-        if (toDeleteAccName != selectedAccountData.name) throw Error("The account name to delete don't match")
+        if (toDeleteAccName != selectedAccountData.name) throw Error("The account name to delete does not match")
 
         const beneficiary = d.inputById("send-balance-to-account-name").value
         if (!beneficiary) throw Error("Enter the beneficiary account")
@@ -1063,16 +1062,24 @@ async function makeFullAccessOKClicked() {
 
     const words = seedTextElem.value
 
-    let err = seedPhraseUtil.check(words)
-    if (err) {
-        d.showErr(err)
-        return;
-    }
-
     disableOKCancel()
     d.showWait()
     try {
-        let { seedPhrase, secretKey, publicKey } = seedPhraseUtil.parseSeedPhrase(words)
+        let secretKey, publicKey;
+        if (words.startsWith("ed25519:")){ //let's assume is a private key
+            secretKey=words;
+            publicKey = getPublicKey(secretKey)
+        }
+        else  {
+            //a seed phrase
+            let err = seedPhraseUtil.check(words)
+            if (err) throw Error(err)
+
+            const result = seedPhraseUtil.parseSeedPhrase(words)
+            secretKey=result.secretKey;
+            publicKey=result.publicKey;
+        }
+
         try {
             let keyFound = await askBackgroundGetAccessKey(selectedAccountData.name, publicKey)
         }
@@ -1127,16 +1134,16 @@ function cancelClicked() {
 async function removeAccountClicked(ev /*:Event*/) {
     try{
 
-        if (selectedAccountData.accountInfo.privateKey){
+        if (selectedAccountData.isFullAccess){
             //has full access - remove access first
             changeAccessClicked()
             return;
         }
 
         //remove
-        await askBackground({code:"delete-account", accountId:selectedAccountData.name})
+        await askBackground({code:"delete-account", accountId:selectedAccountData.name+"err"})
         //return to main page
-        Pages.showMain()
+        Pages.show()
     }
     catch(ex){
         d.showErr(ex.message)

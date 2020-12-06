@@ -269,15 +269,6 @@ h3 {
 }
 
 
-.btn-primary {
-    color: #fff;
-    background-color: #4e9e56;
-}
-.btn-cancel {
-    color: #fff;
-    background-color: #b45a5a;
-}
-
 
 .select-action-button-box {
     border: 1px solid #d8d8d8;
@@ -731,7 +722,7 @@ button  {
     font-weight: 900;
 }
   
-.footer h2 {
+.subpage .title h2 {
     border-top: 1px solid lightgray;
     border-bottom: 1px solid lightgray;
     margin-top: 7px;
@@ -741,7 +732,8 @@ button  {
     flex: 1 0 90%;
     font-size: 2em;
 }
-.footer h2::before, .footer h2::after {
+.subpage .title h2::before, 
+.subpage .title h2::after {
     content: '';
     display: block;
     height: 0.09em;
@@ -749,12 +741,12 @@ button  {
     flex: 1 1 10%;
   }
   
-.footer h2::before {
+.subpage .title h2::before {
     background: linear-gradient(to right, rgba(240,240,240,0), #a55555);
     margin-right: 4vh;
   }
   
-.footer h2::after {
+.subpage .title h2::after {
     background: linear-gradient(to left, rgba(240,240,240,0), #a55555);
     margin-left: 4vh;
   } 

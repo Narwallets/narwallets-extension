@@ -405,3 +405,13 @@ input[type=checkbox] {
 .hidden {
 display: none !important;
 }
+
+.btn-primary {
+    color: #fff;
+    background-color: #4e9e56;
+}
+.btn-cancel {
+    color: #fff;
+    background-color: #b45a5a;
+}
+

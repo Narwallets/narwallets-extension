@@ -9,9 +9,6 @@
 </head>
 
 <body>
-<header>
-    <h1><span id="net-name"></span> Approve Transaction with <span id="signer-id"></span></h1>
-</header>
 <article>
     <h2 id="web-page"></h2>
     <h3>is asking to execute on</h3>
@@ -22,7 +19,9 @@
         <div class="action">{action}</div>
         <div class="attached-near">{attachedNear}</div>
     </li>
-<!-- OK CANCEL buttons common to all subpages -->
+    <h3>click OK to approve the transaction in <span id="net-name"></span> with account</h3>
+    <h2 id="signer-id"></h2>
+    <!-- OK CANCEL buttons common to all subpages -->
     <div class="button-group ok-cancel">
         <button id="approve-ok" class="button btn-primary">
             OK
@@ -31,15 +30,13 @@
             Cancel
         </button>
     </div>
-<article>
-<footer>
     <!-- -->
     <div id="err-div"></div>
     <!-- -->
-<div id="wait">
+    <div id="wait">
     <div class="lds-ring"><div></div><div></div><div></div><div></div></div>    
-</div>
-</footer>
+    </div>
+</article>
 
 <script type="module" src="approve.js"></script>
 

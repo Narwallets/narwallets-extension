@@ -3,9 +3,10 @@ import * as c from "../util/conversions.js"
 
 import { Account, ExtendedAccountData } from "../api/account.js"
 import { show as AccountSelectedPage_show } from "./account-selected.js"
+import { show as UnlockPage_show } from "./unlock.js"
 
 import { localStorageSet } from "../data/util.js"
-import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetState } from "../api/askBackground.js"
+import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetState, askBackgroundIsLocked } from "../api/askBackground.js"
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER = "welcome-new-user-page"
@@ -114,22 +115,22 @@ async function disconnectFromWepPageClicked() {
 }
 
 //--------------------------
-export async function showMain() {
+export async function show() {
 
   d.hideErr()
 
   //logged and with no accounts? add one
-  const state = await askBackgroundGetState()
-  if (state.unlocked){
+  const locked = await askBackgroundIsLocked()
+  if (locked){
+    UnlockPage_show();
+    return;
+  }
+  else {
     const countAccounts = await askBackground({code:"getNetworkAccountsCount"})
     if (countAccounts==0) {
       d.showPage(IMPORT_OR_CREATE)
       return;
     }
-  }
-  if (!state.unlocked) {
-    d.showPage(UNLOCK)
-    return;
   }
 
   d.clearContainer(ACCOUNTS_LIST);

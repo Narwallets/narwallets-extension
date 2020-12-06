@@ -7,8 +7,10 @@ import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-c
 import { addListeners as Import_addListeners } from "./pages/import.js"
 
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js"
+import { show as UnlockPage_show } from "./pages/unlock.js"
+
 import { localStorageGet, localStorageGetAndRemove, localStorageRemove, localStorageSet } from "./data/util.js"
-import { askBackground, askBackgroundGetNetworkInfo, askBackgroundGetState, askBackgroundSetNetwork } from "./api/askBackground.js"
+import { askBackground, askBackgroundGetNetworkInfo, askBackgroundGetState, askBackgroundIsLocked, askBackgroundSetNetwork } from "./api/askBackground.js"
 import { functionCall } from "./api/transaction.js"
 import { isValidEmail } from "./api/utils/valid.js"
 
@@ -22,8 +24,6 @@ const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 //--- content sections at MAIN popup.html
 const WELCOME_NEW_USER_PAGE = "welcome-new-user-page"
 const CREATE_USER = "create-user"
-
-const UNLOCK = "unlock"
 
 const MAIN_PAGE = "main-page"
 const ADD_ACCOUNT = "add-account"
@@ -60,13 +60,14 @@ const currentNetworkDisplayName = new d.El("#current-network-display-name");
 
 function onNetworkChanged(info/*:NetworkInfo*/) {
   //update indicator visual state
+  if (!info) return;
   currentNetworkDisplayName.innerText = info.displayName //set name
   currentNetworkDisplayName.el.className = "circle " + info.color //set indicator color
 }
 
 async function networkItemClicked(e /*:Event*/) {
   try {
-    //console.log(e.target.getAttribute("data-code"))
+    console.log("networkItemClicked",e)
     if (!e.target) return;
 
     /*+if (!(e.target instanceof HTMLElement)) return;+*/
@@ -79,13 +80,12 @@ async function networkItemClicked(e /*:Event*/) {
     //close dropdown
     closeDropDown(NETWORKS_LIST) //close 
 
-    const global = await askBackgroundGetState()
-    if (!global.unlocked) {
-      d.showPage(UNLOCK);
+    const islocked = await askBackgroundIsLocked()
+    if (islocked) {
+      UnlockPage_show();
       return;
     }
-
-    Pages.showMain(); //refresh accounts list
+    Pages.show() //refresh account list
 
   }
   catch (ex) {
@@ -106,8 +106,8 @@ function selectNetworkClicked(ev /*:Event*/) {
   }
   //open drop down box
   selectionBox.classList.add(d.OPEN)
-  selectionBox.querySelectorAll("li").forEach((li/*:HTMLElement*/) => {
-    li.addEventListener(d.CLICK, networkItemClicked)
+  selectionBox.querySelectorAll("div.circle").forEach((div/*:Element*/) => {
+    div.addEventListener(d.CLICK, networkItemClicked)
   });
 }
 
@@ -115,36 +115,6 @@ function welcomeCreatePassClicked() {
   d.showPage(CREATE_USER)
 }
 
-async function unlockClicked(ev /*:Event*/) {
-
-  const emailEl = d.inputById("unlock-email")
-  const passEl = d.inputById("unlock-pass")
-
-  const email = emailEl.value
-  if (!isValidEmail(email)) {
-    d.showErr("Invalid email");
-    return;
-  }
-
-  const password = passEl.value;
-  passEl.value = ""
-
-  try {
-    await askBackground({code:"unlockSecureState",email:email, password:password})
-    await Pages.showMain()
-    const numAccounts=await askBackground({code:"getNetworkAccountsCount"})
-    if (numAccounts == 0) {
-      d.showPage(IMPORT_OR_CREATE); //auto-add account after unlock
-    }
-    else {
-      tryReposition(); //try reposition
-    }
-  }
-  catch (ex) {
-    d.showErr(ex.message);
-  }
-
-}
 
 function hambClicked() {
   hamb.toggleClass("open")
@@ -154,21 +124,19 @@ function hambClicked() {
 async function asideLock() {
   await askBackground({code:"lock"})
   hambClicked();
-  d.showPage(UNLOCK)
-  const state=await askBackgroundGetState()
-  d.inputById("unlock-email").value = state.currentUser;
-
+  UnlockPage_show();
 }
+
 function asideAccounts() {
   hambClicked();
-  Pages.showMain();
+  Pages.show();
 }
 
 async function asideIsUnlocked() {
   hambClicked();
-  const state=await askBackgroundGetState()
-  if (!state.unlocked) {
-    d.showPage(UNLOCK)
+  const isLocked=await askBackgroundIsLocked()
+  if (isLocked) {
+    UnlockPage_show();
     d.showErr("You need to unlock the wallet first")
     return false;
   }
@@ -184,10 +152,10 @@ async function securityOptions() {
 
   d.showPage("security-options")
   const data=await askBackground({code:"get-options"})
-  d.inputById("auto-unlock-seconds").value = data.getAutoUnlockSeconds().toString()
+  d.inputById("auto-unlock-seconds").value = data.autoUnlockSeconds.toString()
   d.inputById("advanced-mode").checked = data.advancedMode? true : false;
   d.onClickId("save-settings", saveSecurityOptions)
-  d.onClickId("cancel-security-settings", Pages.showMain)
+  d.onClickId("cancel-security-settings", Pages.show)
 }
 
 async function saveSecurityOptions(ev/*:Event*/) {
@@ -200,7 +168,7 @@ async function saveSecurityOptions(ev/*:Event*/) {
 
     await askBackground({code:"set-options",autoUnlockSeconds:aulSecs, advancedMode:checkElem.checked})
 
-    Pages.showMain()
+    Pages.show()
     d.showSuccess("Options saved")
   }
   catch (ex) {
@@ -240,17 +208,21 @@ async function tryReposition() {
     }
     case "account": case "stake":  {
       const account = await localStorageGetAndRemove("account")
-      if (account) {
-        AccountSelectedPage_show(account, reposition)
+      const isLocked = await askBackgroundIsLocked()
+      if (!isLocked) {
+        if (account) {
+          AccountSelectedPage_show(account, reposition)
+        }
       }
     }
   }
 }
 
-// ---------------------
-// DOM Loaded - START
-// ---------------------
-async function onLoad() {
+
+//-----------------------
+async function initPopup() {
+
+  chrome.alarms.clear("unlock-expired")
 
   hamb.onClick(hambClicked)
 
@@ -262,10 +234,6 @@ async function onLoad() {
   d.onClickId(SELECT_NETWORK, selectNetworkClicked);
   d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
   d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
-
-  d.onClickId(UNLOCK, unlockClicked);
-
-  d.onEnterKey("unlock-pass", unlockClicked)
 
   //aside
   d.qs("aside #lock").onClick(asideLock);
@@ -299,17 +267,16 @@ async function onLoad() {
       return; //***
     }
 
-    if (state.unlocked){
-      await Pages.showMain()
+    const locked = await askBackgroundIsLocked()
+    if (!locked){
+      await Pages.show()
       tryReposition();
       return;
     }
 
 
-    d.showPage(UNLOCK); //DEFAULT: ask the user to unlock SecureState
+    UnlockPage_show(); //DEFAULT: ask the user to unlock SecureState
     //showPage clears all input fields, set ddefault value after show-page
-    d.inputById("unlock-email").value = state.currentUser;
-
     // if (state.currentUser) { //we have a "last-user"
     //   //try to get auto-unlock key
     //   const uk = await localStorageGetAndRemove("uk")
@@ -323,7 +290,7 @@ async function onLoad() {
   }
   catch (ex) {
     d.showErr(ex.message)
-    d.showPage(UNLOCK); //ask the user to unlock SecureState
+    UnlockPage_show(); //ask the user to unlock SecureState
   }
   finally {
   }
@@ -355,28 +322,6 @@ async function onLoad() {
 //   return false;
 // }
 
-
-document.addEventListener('DOMContentLoaded', onLoad);
-
-//inform background.js we're unloading (starts auto-lock timer)
-addEventListener("unload", function (event) {
-  chrome.runtime.sendMessage({dest:"ext",code:"popupUnloading"})
-  })
-//   const autoUnlockSeconds = global.getAutoUnlockSeconds()
-//   if (autoUnlockSeconds>0) {
-//     const backgroundPage = chrome.extension.getBackgroundPage()
-//     //@ts-ignore
-//     backgroundPage.popupUnloading(global.saveOnUnload.unlockSHA, autoUnlockSeconds * 1000); //SET AUTO-LOCK after x ms
-//   }
-// }, true);
-
-//listen to extension messages
-chrome.runtime.onMessage.addListener(function(msg){
-  if (msg.code="network-changed") {
-    onNetworkChanged(msg.network)
-  }
-})
-
 //console.log(bip39.mnemonicToSeed("correct horse battery staple"))
 
 function openTermsOfUseOnNewWindow() {
@@ -386,3 +331,30 @@ function openTermsOfUseOnNewWindow() {
   });
   return false
 }
+
+
+var background = chrome.extension.getBackgroundPage();//wake-up background page
+//inform background.js we're unloading (starts auto-lock timer)
+addEventListener("unload", function (event) {
+  //@ts-ignore
+  background.postMessage({code:"popupUnloading"},"*")
+}, true)
+
+// DOM Loaded - START
+document.addEventListener('DOMContentLoaded', onLoad);
+async function onLoad() {
+    //@ts-ignore
+    background.postMessage({code:"popupLoading"},"*")
+    //will reply with "can-init-popup" after retrieving data from localStorage
+}
+
+//listen to background messages
+chrome.runtime.onMessage.addListener(function(msg){
+  if (msg.code=="network-changed") {
+    onNetworkChanged(msg.networkInfo)
+  }
+  else if (msg.code=="can-init-popup") {
+    initPopup()
+  }
+})
+

@@ -1,3 +1,7 @@
+/**
+ * check if this is a valid near account id (syntax-wise)
+ * @param accountId
+ */
 export function isValidAccountID(accountId) {
     const MIN_ACCOUNT_ID_LEN = 2;
     const MAX_ACCOUNT_ID_LEN = 64; //implicit accounts have 64 hex chars

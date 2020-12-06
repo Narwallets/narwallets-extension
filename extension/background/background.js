@@ -13,14 +13,12 @@ import * as TX from "../api/transaction.js"
 import { isValidEmail } from "../api/utils/valid.js"
 
 /*+
-import type { FunctionCall } from "../api/batch-transaction.js"
+import type { FunctionCall,DeleteAccountToBeneficiary } from "../api/batch-transaction.js"
 import type {ResolvedMessage} from "../api/state-type.js"
 +*/
 
-/*HAY QUE HACER QUE BACKGROUND JS HAGA TODO LO RELACIONADO CON COMUNICARSE CON near
-Y debe saber CUAL ES LA RED SELECCIONADA, ETC, ETC
--POPUP DEBE USAR BACKGROUND (askBackground) PARA TODO
-*/
+//---------- working data
+let _connectedTabs/*:Record<number,ConnectedTabInfo>*/ = {};
 
 //----------------------------------------
 //-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
@@ -49,23 +47,6 @@ function runtimeMessageHandler(msg/*:any*/, sender/*:chrome.runtime.MessageSende
   }
   else {
     //from internal pages like popup
-
-    //simple messages
-    if (msg.code == "popupUnloading") {
-      const autoUnlockSeconds = global.getAutoUnlockSeconds()
-      chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + autoUnlockSeconds * 1000 })
-      return;
-    }
-    else if (msg.code == "network-changed") {
-      try {
-        Network.setCurrent(msg.network)
-        localStorageSet({ backgroundNetwork: Network.current })
-      }
-      catch (ex) {
-        console.error(ex)
-      }
-      return;
-    }
     //other codes resolved by promises
     getActionPromise(msg)
       .then((data) => { sendResponse({ data: data }) })
@@ -83,6 +64,7 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
 
     if (msg.code == "set-network") {
       Network.setCurrent(msg.network)
+      localStorageSet({ selectedNetwork: Network.current })
       return Promise.resolve();
     }
     else if (msg.code == "get-network-info") {
@@ -96,8 +78,12 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
       global.lock()
       return Promise.resolve()
     }
+    else if (msg.code == "is-locked") {
+      return Promise.resolve(global.isLocked())
+
+    }
     else if (msg.code == "unlockSecureState") {
-      return global.unlockSecureState(msg.email, msg.password)
+      return global.unlockSecureStateSHA(msg.email, global.sha256PwdBase64(msg.password))
     }
 
     else if (msg.code == "create-user") {
@@ -209,6 +195,10 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
           case "transfer":
             actions.push(TX.transfer(near.ONE_NEAR.muln(item.attachedNear)))
             break;
+          case "delete":
+            const d = item /*+as DeleteAccountToBeneficiary+*/;
+            actions.push(TX.deleteAccount(d.beneficiaryAccountId))
+            break;
           default:
             throw Error("batchTx UNKNOWN item.action=" + item.action)
         }
@@ -274,8 +264,8 @@ function processMessageFromWebPage(msg/*:any*/) {
         if (!accInfo.privateKey) throw Error(`account ${signerId} is read-only`)
 
         //load popup window for the user to approve
-        const width = 600
-        const height = 600
+        const width = 500
+        const height = 500
         chrome.windows.create({
           url: 'popups/approve/approve.html',
           type: 'popup',
@@ -300,7 +290,7 @@ function processMessageFromWebPage(msg/*:any*/) {
       break;
 
     default:
-      console.error("unk msg.code", msg)
+      console.error("unk msg.code", JSON.stringify(msg))
   }
 
 }
@@ -319,43 +309,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
   }
 });
 
-//------------------------
-//on extension suspended
-//------------------------
-chrome.runtime.onSuspend.addListener(function () {
-  global.lock()
-  console.log("onSuspend.");
-  chrome.browserAction.setBadgeText({ text: "" });
-});
-
-
-//------------------------
-//----- expire auto-unlock
-//------------------------
-const UNLOCK_EXPIRED = "unlock-expired"
-// function popupUnloading(unlockSHA/*:string*/, expireMs/*:number*/) {
-//   console.log("BACK: popupUnloading", expireMs);
-//   if (expireMs <= 0) {
-//     chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
-//   }
-//   else {
-//     chrome.alarms.create(UNLOCK_EXPIRED, { when: Date.now() + expireMs })
-//     chrome.storage.local.set({ uk: unlockSHA, exp: Date.now() + expireMs })
-//   }
-// }
-
-//------------------------
-//expire alarm
-//------------------------
-chrome.alarms.onAlarm.addListener(
-  function (alarm/*:any*/) {
-    //console.log("chrome.alarms.onAlarm fired ", alarm);
-    if (alarm.name == UNLOCK_EXPIRED) {
-      global.lock()
-      //chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
-    }
-  }
-);
 
 
 /**
@@ -381,6 +334,7 @@ function connectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<a
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 
       const activeTabId = tabs[0].id || -1;
+      if (!_connectedTabs) _connectedTabs={}
       if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId] = {};
 
       const cpsData/*:CPSDATA*/ = {
@@ -403,7 +357,7 @@ function connectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<a
           if (!response) {
             //not responding, set injected status
             cpsData.ctinfo.injected = false;
-            console.error(chrome.runtime.lastError);
+            console.error(JSON.stringify(chrome.runtime.lastError));
           }
           else {
             //responded set injected status
@@ -457,6 +411,7 @@ function continueCWP_2(cpsData/*:CPSDATA*/) {
 
 ///send connect order
 function continueCWP_3(cpsData/*:CPSDATA*/) {
+  cpsData.ctinfo.connectedResponse={err:undefined};
   console.log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url)
   //send connect order via content script. a response will be received later
   chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network } })
@@ -467,9 +422,8 @@ function continueCWP_3(cpsData/*:CPSDATA*/) {
       return cpsData.resolve();
     }
     else {
-      let errMsg = cpsData.url + " not responding / Not a Narwallets compatible NEAR web page"
-      if (cpsData.ctinfo.connectedResponse) errMsg = cpsData.ctinfo.connectedResponse.err + " " + errMsg;
-      return cpsData.reject(Error(errMsg))
+      let errMsg = cpsData.ctinfo.connectedResponse.err || "not responding / Not a Narwallet-compatible web page"
+      return cpsData.reject(Error(cpsData.url + ": " + errMsg))
     }
   }, 250);
 }
@@ -578,8 +532,6 @@ type ConnectedTabInfo = {
 }
 +*/
 
-let _connectedTabs/*:Record<number,ConnectedTabInfo>*/ = {};
-
 function disconnectFromWebPage()/*:Promise<any>*/ {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -606,16 +558,120 @@ function isConnected()/*:Promise<boolean>*/ {
   })
 }
 
-async function onLoad() {
-  console.log("background.js onLoad", new Date())
-  await recoverOptions()
-  await global.recoverState()
-  //console.log(global.State)
-  if (!global.State.dataVersion) {
-    global.clearState();
+
+function saveWorkingData() {
+  localStorageSet({ _ct: _connectedTabs })
+  if (!global.isLocked()) {
+    //store unlock-SHA as an alarm (is volatile, more secure than storing in localStorage)
+    chrome.alarms.create("SHA_" + global.workingData.unlockSHA, { delayInMinutes: 24 * 60 })
   }
-  const nw = await localStorageGet("backgroundNetwork");
-  if (nw) Network.setCurrent(nw);
+}
+//recover working data if it was suspended
+async function recoverWorkingData()/*:Promise<void>*/ {
+  //@ts-ignore 
+  _connectedTabs = await localStorageGet("_ct");
+  console.log("RECOVERED _connectedTabs", _connectedTabs)
+  return new Promise((resolve, reject) => {
+    chrome.alarms.getAll(function (alarms/*:any[]*/) {
+      for (let a of alarms) {
+        console.log(a, new Date(a.scheduledTime))
+        if (a.name.startsWith("SHA_")) {
+          chrome.alarms.clear(a.name);
+          global.workingData.unlockSHA = a.name.replace("SHA_", "")
+          console.log("RECOVERED SHA from alarms")
+          return resolve()
+        }
+      }
+      return resolve()
+    })
+  })
 }
 
+
+//------------------------
+//on bg page suspended
+//------------------------
+chrome.runtime.onSuspend.addListener(function () {
+  //save working data
+  saveWorkingData()
+  console.log("onSuspend.");
+  chrome.browserAction.setBadgeText({ text: "" });
+});
+
+
+//------------------------
+//----- expire auto-unlock
+//------------------------
+const UNLOCK_EXPIRED = "unlock-expired"
+
+//------------------------
+//expire alarm
+//------------------------
+chrome.alarms.onAlarm.addListener(
+  function (alarm/*:any*/) {
+    //console.log("chrome.alarms.onAlarm fired ", alarm);
+    if (alarm.name == UNLOCK_EXPIRED) {
+      global.lock()
+      chrome.alarms.clearAll()
+      window.close()//unload this background page 
+      //chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
+    }
+  }
+);
+
+var lockTimeout/*:any*/;
+var unlockExpire/*:any*/;
+//only to receive "popupLoading"|"popupUnloading" events
+window.addEventListener("message",
+  async function (event) {
+    if (event.data.code == "popupUnloading") {
+      if (!global.isLocked()) {
+        const autoUnlockSeconds = global.getAutoUnlockSeconds()
+        unlockExpire = Date.now() + autoUnlockSeconds * 1000
+        chrome.alarms.create(UNLOCK_EXPIRED, { when: unlockExpire })
+        console.log(UNLOCK_EXPIRED, autoUnlockSeconds)
+        if (autoUnlockSeconds < 60 * 5) {
+          //also setTimeout to Lock, because alarms fire only once per minute
+          if (lockTimeout) clearTimeout(lockTimeout)
+          lockTimeout = setTimeout(global.lock, autoUnlockSeconds * 1000)
+        }
+      }
+      return;
+    }
+    else if (event.data.code == "popupLoading") {
+      console.log("popupLoading")
+      await retrieveBgInfoFromStorage()
+      chrome.runtime.sendMessage({dest:"popup",code:"can-init-popup"})
+    }
+  },
+  false);
+
+// called on popupLoading to consider the possibility the user added accounts to the wallet on another tab
+  async function retrieveBgInfoFromStorage(){
+    if (unlockExpire && Date.now()>unlockExpire) global.lock()
+    if (lockTimeout) clearTimeout(lockTimeout)
+    //To manage the possibilit that the user has added/removed accounts ON ANOTHER TAB
+    //we reload state & secureState from storage when the popup opens
+    await global.recoverState()
+    if (!global.State.dataVersion) {
+      global.clearState();
+    }
+    if (global.State.currentUser && global.workingData.unlockSHA){
+      //try to recover secure state
+      try {
+        await global.unlockSecureStateSHA(global.State.currentUser, global.workingData.unlockSHA);
+      }
+      catch (ex) {
+        console.error("recovering secure state after suspension", ex.message)
+      }
+    }
+    const nw = await localStorageGet("selectedNetwork") /*+as string+*/;
+    if (nw) Network.setCurrent(nw);
+}
+  
 document.addEventListener('DOMContentLoaded', onLoad);
+async function onLoad() {
+  console.log("background.js onLoad", new Date())
+  await recoverWorkingData()
+  await retrieveBgInfoFromStorage()
+}

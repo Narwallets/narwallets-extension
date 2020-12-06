@@ -29,7 +29,7 @@ export class ExtendedAccountData {
             this.type += formattedNote;
             this.typeFull += formattedNote;
         }
-        this.accessStatus = this.accountInfo.privateKey ? "Full Access" : "Read Only";
+        this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
         if (!this.accountInfo.staked)
             this.accountInfo.staked = 0;
         if (!this.accountInfo.unStaked)
@@ -41,10 +41,12 @@ export class ExtendedAccountData {
         this.available = this.accountInfo.lastBalance - this.accountInfo.lockedOther;
         if (this.accountInfo.type == "lock.c") {
             this.available = Math.max(0, this.available - 36);
-            if (!this.accountInfo.privateKey)
+            if (!this.isReadOnly)
                 this.accessStatus = "owner";
         }
         this.total = this.accountInfo.lastBalance + this.inThePool;
     }
+    get isReadOnly() { return !this.accountInfo.privateKey; }
+    get isFullAccess() { return !this.isReadOnly; }
 }
 //# sourceMappingURL=account.js.map

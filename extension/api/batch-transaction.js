@@ -36,6 +36,7 @@ export class Transfer extends BatchAction {
 export class DeleteAccountToBeneficiary extends BatchAction {
     constructor(beneficiaryAccountId) {
         super("delete");
+        this.beneficiaryAccountId = beneficiaryAccountId;
     }
 }
 //# sourceMappingURL=batch-transaction.js.map
