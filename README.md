@@ -48,7 +48,7 @@
 * Chrome Dev Tools: Map folder to Narwallets-extension/extension
 * Use Chrome Dev Tools as an quick-and-dirty IDE with Edit & Continue
 * Use VSCode as the main IDE - Ctrl-Shift-B to build with (plus)typescript
-* This project uses [plus-typescript](github.com/luciotato/plus-typescript) so you can modify "sources" directly from Chrome Dev Tools (no source-maps, no transpiling).  This can change in future versions, we might move to standard ts
+* This project uses [plus-typescript](https://github.com/luciotato/plus-typescript) so you can modify "sources" directly from Chrome Dev Tools (no source-maps, no transpiling).  This can change in future versions, we might move to standard ts
 
 ## Low-level Technical debt
 
