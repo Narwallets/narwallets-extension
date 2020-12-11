@@ -333,20 +333,11 @@ function openTermsOfUseOnNewWindow() {
 }
 
 
-var background = chrome.extension.getBackgroundPage();//wake-up background page
-//inform background.js we're unloading (starts auto-lock timer)
+//event to inform background.js we're unloading (starts auto-lock timer)
 addEventListener("unload", function (event) {
   //@ts-ignore
   background.postMessage({code:"popupUnloading"},"*")
 }, true)
-
-// DOM Loaded - START
-document.addEventListener('DOMContentLoaded', onLoad);
-async function onLoad() {
-    //@ts-ignore
-    background.postMessage({code:"popupLoading"},"*")
-    //will reply with "can-init-popup" after retrieving data from localStorage
-}
 
 //listen to background messages
 chrome.runtime.onMessage.addListener(function(msg){
@@ -357,4 +348,13 @@ chrome.runtime.onMessage.addListener(function(msg){
     initPopup()
   }
 })
+
+var background/*:Window|undefined*/;
+//wake-up background page
+chrome.runtime.getBackgroundPage((bgpage)=>{
+  background=bgpage;
+  //@ts-ignore
+  background.postMessage({code:"popupLoading"},"*")
+  //will reply with "can-init-popup" after retrieving data from localStorage
+});
 

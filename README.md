@@ -53,8 +53,13 @@
 ## Low-level Technical debt
 
 * Main code is plus-typescript, but /api (light-near-api) is standard typescript. The mix creates confusion
+ - [ ] Remove plus-typescript, convert all to typescript
+ - [ ] npm i eslint --save-dev
+ - [ ] When wallet-API was added a lot of functions became `async`. Add `npm install eslint-plugin-no-floating-promise --save-dev`
 
-* We're using base crypto libs as a bundle (The ideal solution would be to have typescript versions of each lib and compile to ES2020 modules) 
+
+We're using base crypto libs as a bundle (The ideal solution would be to have typescript versions of each lib and compile to ES2020 modules) 
+ - [ ] Replace bundle with typescript versions of basic crypto tools
 
 We need to reduce the bundle's size. Bundle is at https://github.com/Narwallets/bundled-crypto-libs.git
 

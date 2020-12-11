@@ -2,18 +2,22 @@ import * as c from "../util/conversions.js"
 import * as d from "../util/document.js"
 
 import * as sha256 from "../api/sha256.js"
-import * as naclUtil from "../util/tweetnacl/nacl-util.js";
-import * as near from "../api/near-rpc.js";
+import * as naclUtil from "../api/tweetnacl/util.js";
+
+//import * as near from "../api/near-rpc.js";
 import * as StakingPool from "../api/staking-pool.js";
-import * as TX from "../api/transaction.js";
+//import * as TX from "../api/transaction.js";
 import { Account } from "../api/account.js"
-import {isValidAccountID} from "../api/utils/valid.js";
-import { askBackgroundGetNetworkInfo } from "../api/askBackground.js";
+import {isValidAccountID, isValidAmount} from "../api/utils/valid.js";
+import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../api/askBackground.js";
+import { FunctionCall } from "../api/batch-transaction.js";
 
 /*+
 import { BN } from "../bundled-types/BN.js";
 import type {StakingPoolAccountInfoResult} from "../api/staking-pool.js";
 +*/
+
+const BASE_GAS = 25;//new BN("25" + "0".repeat(12));
 
 export class LockupContract {
 
@@ -22,19 +26,22 @@ export class LockupContract {
   liquidBalance/*:number*/ = 0
   locked/*:number*/ = 0
 
-  BASE_GAS/*:BN*/;
-  BN_ZERO/*:BN*/;
-
   constructor(info/*:Account*/) {
-    this.BASE_GAS = new BN("25" + "0".repeat(12));
-    this.BN_ZERO = new BN("0");
+    //this.BN_ZERO = new BN("0");
     this.accountInfo = info
     this.accountInfo.type = "lock.c"
   }
 
+  //--helper fn
+  static bufferToHex(buffer/*:any*/) {
+  return [...new Uint8Array(buffer)]
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
   static hexContractAccount(accountId /*:string*/) {
     const b = sha256.hash(naclUtil.decodeUTF8(accountId)).buffer
-    const hex = near.bufferToHex(b)
+    const hex = LockupContract.bufferToHex(b)
     return `${hex.slice(0, 40)}`;
   }
 
@@ -57,7 +64,7 @@ export class LockupContract {
   }
 
   async getAmount(method/*:string*/) /*:Promise<number>*/ {
-    const yoctos = await near.view(this.contractAccount, method)
+    const yoctos = await askBackgroundViewMethod(this.contractAccount, method, {})
     return c.yton(yoctos) //cut to 4 dec places
   }
 
@@ -66,7 +73,7 @@ export class LockupContract {
 
     try {
 
-      let stateResultYoctos = await near.queryAccount(this.contractAccount)
+      let stateResultYoctos = await askBackground({code:"query-near-account", accountId:this.contractAccount})
       this.accountInfo.lastBalance = c.yton(stateResultYoctos.amount)
       firstOneOK = true;
 
@@ -78,14 +85,14 @@ export class LockupContract {
       //this.accountInfo.lastBalance = ownerBal + locked
       this.accountInfo.lockedOther = locked
       const contractKnownPoolDeposited = await this.getAmount("get_known_deposited_balance")
-      this.accountInfo.stakingPool = await near.view(this.contractAccount, "get_staking_pool_account_id")
+      this.accountInfo.stakingPool = await askBackgroundViewMethod(this.contractAccount, "get_staking_pool_account_id", {})
       if (this.accountInfo.stakingPool) {
         //get total amount in the staking pool to compute staking rewards
         const poolAcc = await this.getStakingPoolAccInfo()
         this.accountInfo.staked = c.yton(poolAcc.staked_balance)
-        this.accountInfo.unStaked = c.yton(poolAcc.unstaked_balance)
-        const inThePool = this.accountInfo.staked+this.accountInfo.unStaked
-        this.accountInfo.rewards = this.accountInfo.staked + this.accountInfo.unStaked - contractKnownPoolDeposited
+        this.accountInfo.unstaked = c.yton(poolAcc.unstaked_balance)
+        const inThePool = this.accountInfo.staked+this.accountInfo.unstaked
+        this.accountInfo.rewards = this.accountInfo.staked + this.accountInfo.unstaked - contractKnownPoolDeposited
         this.accountInfo.stakingPoolPct = await StakingPool.getFee(this.accountInfo.stakingPool)
       }
 
@@ -103,19 +110,18 @@ export class LockupContract {
   //   return this.liquidBalance + this.locked + this.accountInfo.staked + this.accountInfo.rewards;
   // }
 
-  //wraps a tx with  TX.functionCall(method, params, gas, this.BN_ZERO)
-  call_method(method/*:string*/, params/*:any*/, gas/*:BN*/,sender/*:string*/, privateKey/*:string*/) /*:Promise<any>*/ {
-    
-    return near.broadcast_tx_commit_actions(
-          [TX.functionCall(method, params, gas, this.BN_ZERO)],
-          sender, this.contractAccount, privateKey)
+  //wraps call to this loickup contract (method, params, gas)
+  call_method(method/*:string*/, args/*:any*/, gas/*:number*/) /*:Promise<any>*/ {
+    if (!this.accountInfo.ownerId) throw Error("accountInfo.ownerId is undefined")
+    return askBackgroundApplyTxAction(this.contractAccount,
+              new FunctionCall(method,args,gas,0), this.accountInfo.ownerId)
   }
 
 
   //-------------------------------------------
   //owner calls
   //-------------------------------------------
-  async stakeWith(sender /*:string*/, newStakingPool /*:string*/, amountNear /*:number*/, privateKey /*:string*/) /*: Promise<any>*/ {
+  async stakeWith(newStakingPool /*:string*/, amountNear /*:number*/) /*: Promise<any>*/ {
 
     if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount")
 
@@ -145,7 +151,7 @@ export class LockupContract {
         }
 
         //if ZERO in the pool, unselect current staking pool
-        await this.call_method("unselect_staking_pool", {}, this.BASE_GAS.muln(3), sender, privateKey)
+        await this.call_method("unselect_staking_pool", {}, BASE_GAS*3)
 
         actualSP = ""
         this.accountInfo.stakingPool = ""
@@ -154,7 +160,7 @@ export class LockupContract {
 
     if (!actualSP) {
       //select the new staking pool
-      await this.call_method("select_staking_pool", {staking_pool_account_id:newStakingPool}, this.BASE_GAS.muln(3), sender, privateKey)
+      await this.call_method("select_staking_pool", {staking_pool_account_id:newStakingPool}, BASE_GAS*3)
 
       this.accountInfo.stakingPool = newStakingPool
       poolAccInfo = await this.getStakingPoolAccInfo() //refresh info
@@ -162,23 +168,23 @@ export class LockupContract {
 
     if (poolAccInfo.unstaked_balance != "0" && poolAccInfo.staked_balance == "0") { //deposited but unstaked, stake
       //just re-stake (maybe the user asked unstaking but now regrets it)
-      await this.call_method("stake", {amount:poolAccInfo.unstaked_balance}, this.BASE_GAS.muln(5), sender, privateKey)
+      await this.call_method("stake", {amount:poolAccInfo.unstaked_balance}, BASE_GAS*5)
     }
     else {
       //deposit and stake
-      await this.call_method("deposit_and_stake", { amount: near.ntoy(amountNear) }, this.BASE_GAS.muln(5), sender, privateKey)
+      await this.call_method("deposit_and_stake", { amount: c.ntoy(amountNear) }, BASE_GAS*5)
     }
 
   }
 
   //-------------------------------
-  async transfer(sender /*:string*/, amountNear /*:number*/, receiverId /*:string*/, privateKey /*:string*/) /*: Promise<any>*/ {
+  async transfer(amountNear /*:number*/, receiverId /*:string*/) /*: Promise<any>*/ {
 
-    if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount")
+    if (!isValidAmount(amountNear)) throw Error("invalid amount")
     if (!isValidAccountID(receiverId)) throw Error("invalid receiver account Id")
 
     //try to transfer
-    await this.call_method("transfer",{amount:near.ntoy(amountNear),receiver_id:receiverId}, this.BASE_GAS.muln(2), sender, privateKey)
+    await this.call_method("transfer",{amount:c.ntoy(amountNear),receiver_id:receiverId}, BASE_GAS*2)
 
   }
 
@@ -189,7 +195,7 @@ export class LockupContract {
   }
 
   //---------------------------------------------------
-  async unstakeAndWithdrawAll(sender /*:string*/, privateKey /*:string*/) /*: Promise<string>*/ {
+  async unstakeAndWithdrawAll(signer /*:string*/, privateKey /*:string*/) /*: Promise<string>*/ {
 
     //refresh lockup acc info - get staking pool and balances
     if (!await this.tryRetrieveInfo()) throw Error("Error refreshing account info")
@@ -205,7 +211,7 @@ export class LockupContract {
 
       if (poolAccInfo.unstaked_balance == "0") {
         //nothing to withdraw either! unselect the staking pool
-        await this.call_method("unselect_staking_pool",{}, this.BASE_GAS.muln(1), sender, privateKey)
+        await this.call_method("unselect_staking_pool",{}, BASE_GAS)
         return "No funds left in the pool. Clearing pool selection"
         //----------------
       }
@@ -217,35 +223,35 @@ export class LockupContract {
       }
 
       //ok we've unstaked funds and can withdraw 
-      await this.call_method("withdraw_all_from_staking_pool",{}, this.BASE_GAS.muln(8), sender, privateKey)
+      await this.call_method("withdraw_all_from_staking_pool",{}, BASE_GAS*8)
       return "Withdrawing all from the pool"
       //----------------
     }
 
     //here we've staked balance in the pool, call unstake
-    await this.call_method("unstake_all",{}, this.BASE_GAS.muln(5), sender, privateKey)
+    await this.call_method("unstake_all",{}, BASE_GAS*5)
 
     return "Unstake requested, you must wait (36-48hs) for withdrawal"
   }
 
   //-------------------------------------------
   get_staking_pool_account_id() /*: Promise<string>*/ {
-    return near.view(this.contractAccount, "get_staking_pool_account_id")
+    return askBackgroundViewMethod(this.contractAccount, "get_staking_pool_account_id",{})
   }
 
   //-------------------------------------------
-  async select_staking_pool(sender /*:string*/, stakingPool /*:string*/, privateKey /*:string*/) /*: Promise<any>*/ {
+  async select_staking_pool(signer /*:string*/, stakingPool /*:string*/, privateKey /*:string*/) /*: Promise<any>*/ {
 
-    return this.call_method("select_staking_pool",{staking_pool_account_id:stakingPool}, this.BASE_GAS.muln(3), sender, privateKey)
+    return this.call_method("select_staking_pool",{staking_pool_account_id:stakingPool}, BASE_GAS*3)
 
   }
 
   //-------------------------------------------
-  async deposit_and_stake(sender /*:string*/, amountNear /*:number*/, privateKey /*:string*/) /*: Promise<any>*/ {
+  async deposit_and_stake(signer /*:string*/, amountNear /*:number*/, privateKey /*:string*/) /*: Promise<any>*/ {
 
     if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount")
 
-    return this.call_method("deposit_and_stake",{amount:near.ntoy(amountNear)}, this.BASE_GAS.muln(5), sender, privateKey)
+    return this.call_method("deposit_and_stake",{amount:c.ntoy(amountNear)}, BASE_GAS*5)
 
   }
 

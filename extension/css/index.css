@@ -273,8 +273,8 @@ h3 {
 .select-action-button-box {
     border: 1px solid #d8d8d8;
     border-radius: 10px;
-    margin: 10px 2px;
-    padding: 5px;
+    margin: 10px 23px;
+    padding: 3px;
     min-width: 320px;
     display: flex;
     flex-flow: column;
@@ -720,6 +720,7 @@ button  {
     font-size: 0.6em;
     margin: 0px;
     font-weight: 900;
+    min-width: 350px;
 }
   
 .subpage .title h2 {
@@ -772,6 +773,10 @@ button.big{
     border: 2px solid #ffff0030;
     font-size: 1.6em;
     /* font-weight: 600!important; */
+}
+
+button.wide{
+    min-width: 286px;
 }
 
 button.ultrabig{

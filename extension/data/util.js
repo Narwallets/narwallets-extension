@@ -22,6 +22,7 @@ export async function localStorageGetAndRemove(code/*:string*/) /*:Promise<any>*
   localStorageRemove(code)
   return value
 }
+
 // set for simpler items
 export function localStorageSet(payload/*:any*/) {
   //console.log("localStorageSet",payload)

@@ -75,15 +75,15 @@ async function accountItem_dragend(ev/*:Event*/) {
   //save new order
   const accountLis = d.all("li.account-item")
   accountLis.toggleClass("unselectable")
-  let n = 1;
+  let order = 1;
   const networkAccounts = await askBackgroundAllNetworkAccounts()
   accountLis.elems.forEach(async (li) => {
     const accInfo = networkAccounts[li.id]
     //console.log(n,accInfo.type,li.id)
-    if (accInfo && accInfo.order!=n) {
-      accInfo.order = n++;
-      await askBackground({code:"set-account", accountId:li.id, accinfo:accInfo})
+    if (accInfo && accInfo.order!=order) {
+      await askBackground({code:"set-account-order", accountId:li.id, order:order})
     }
+    order++;
   })
 }
 

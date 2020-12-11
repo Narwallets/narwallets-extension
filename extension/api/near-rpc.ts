@@ -177,7 +177,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
 
     if (result.status && result.status.SuccessValue) {
         const sv = naclUtil.encodeUTF8(naclUtil.decodeBase64(result.status.SuccessValue))
-        console.log("result.status.SuccessValue:", sv)
+        //console.log("result.status.SuccessValue:", sv)
         if (sv == "false") {
             console.error(JSON.stringify(result))
             throw Error(getLogsAndErrorsFromReceipts(result))

@@ -2,7 +2,6 @@ import * as d from "../util/document.js"
 import * as c from "../util/conversions.js"
 import * as StakingPool from "../api/staking-pool.js"
 
-import * as rpc from "../api/utils/json-rpc.js"
 import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../api/askBackground.js"
 
 
@@ -105,7 +104,7 @@ async function displaySatakingPools() {
 // ---------------------
 async function init() {
   try {
-    rpc.addHeader("mode","no-cors")
+    //rpc.addHeader("mode","no-cors")
     displaySatakingPools();
   } 
   catch (ex) {

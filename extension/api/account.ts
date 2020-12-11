@@ -6,7 +6,7 @@ export class Account {
     lastBalance: number =0 // native balance from rpc:query/account & near state
     stakingPool?:string
     staked:  number = 0 // in the pool & staked
-    unStaked:number = 0 // in the pool & unstaked (maybe can withdraw)
+    unstaked:number = 0 // in the pool & unstaked (maybe can withdraw)
     rewards: number = 0 //Stakingpool rewards (initial staking - (staked+unstaked))
     stakingPoolPct?:number
     privateKey?:string
@@ -14,7 +14,7 @@ export class Account {
     lockedOther:number = 0 //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
 
     get totalInThePool():number {
-        return this.staked + this.unStaked;
+        return this.staked + this.unstaked;
     }
     
   }
@@ -50,8 +50,8 @@ export class Account {
         this.accessStatus = this.isReadOnly?"Read Only":"Full Access" 
 
         if (!this.accountInfo.staked) this.accountInfo.staked = 0
-        if (!this.accountInfo.unStaked) this.accountInfo.unStaked = 0
-        this.inThePool = this.accountInfo.staked+this.accountInfo.unStaked
+        if (!this.accountInfo.unstaked) this.accountInfo.unstaked = 0
+        this.inThePool = this.accountInfo.staked+this.accountInfo.unstaked
         
         if (!this.accountInfo.lockedOther) this.accountInfo.lockedOther = 0
         this.unlockedOther = this.accountInfo.lastBalance + this.inThePool - this.accountInfo.lockedOther
@@ -60,7 +60,6 @@ export class Account {
 
         if (this.accountInfo.type == "lock.c"){
           this.available = Math.max(0,this.available-36);
-          if (!this.isReadOnly) this.accessStatus = "owner";
         }
 
         this.total = this.accountInfo.lastBalance + this.inThePool

@@ -122,9 +122,7 @@ left:0px
 left:-600px
 }
 
-.subpage.show {
-display:block;
-}
+.subpage.show {display: block;}
 .subpage.slide-hide {
 display:none;
 }
@@ -270,9 +268,6 @@ justify-content: space-evenly!important;
 
 .balance:after {
   content: "\24c3";
-  display: flex;
-  align-items: center
-  /* font-size: 1em; */
 }
 
 button {font-family: "Segoe UI",Arimo,Roboto, Oxygen-Sans, Cantarell, Ubuntu, "Helvetica Neue", -apple-system,  BlinkMacSystemFont,sans-serif!important;/* padding: 7px 20px 12px 20px; */margin: 15px 20px;font-weight: 500;font-size: 1.5em;font-weight: 250;/* line-height: 1.25rem; */border-radius: 6px;transition: border-color 0.4s ease, background-color 0.4s ease;flex: 1 1;max-width: 150px;min-height: 37px;min-width: 110px;border: 2px solid #00800029;font-stretch: expanded;font-variant: all-small-caps;letter-spacing: 3px;padding: 4px 10px 7px 14px;line-height: 1em;margin: 8px;}

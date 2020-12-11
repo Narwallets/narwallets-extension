@@ -2,12 +2,13 @@ import type {StateStruct,SecureOptions} from "./state-type.js";
 import { NetworkInfo } from "./network.js"
 import { Account } from "./account.js"
 import { BatchAction, BatchTransaction, FunctionCall, Transfer} from "./batch-transaction.js";
+import { log } from "./log.js"
 
 //ask background, wait for response, return a Promise
 export function askBackground(requestPayload:any):Promise<any>{
     requestPayload.dest="ext";
     return new Promise((resolve,reject)=>{
-        console.log("sendMessage",JSON.stringify(requestPayload))
+        log("sendMessage",JSON.stringify(requestPayload))
         const timeout=setTimeout(()=>{return reject(Error("timeout"));},30000);
         chrome.runtime.sendMessage(requestPayload,function(response){
             clearTimeout(timeout);
@@ -20,6 +21,10 @@ export function askBackground(requestPayload:any):Promise<any>{
             return resolve(response.data);
         })
     })
+}
+
+export function askBackgroundSetAccount(accountId:string, accInfo:Account) :Promise<any> {
+    return askBackground({code:"set-account", accountId:accountId, accInfo:accInfo})
 }
 
 export function askBackgroundIsLocked():Promise<boolean>{
@@ -47,6 +52,10 @@ export function askBackgroundGetValidators() :Promise<any> {
 
 export function askBackgroundGetAccessKey(accountId:string, publicKey:string) :Promise<any> {
     return askBackground({code:"access-key", accountId:accountId, publicKey:publicKey})
+}
+
+export function askBackgroundViewMethod(contract:string, method:string, args:any) :Promise<any> {
+        return askBackground({code:"view",contract:contract, method:method, args:args})
 }
 
 export function askBackgroundCallMethod(    

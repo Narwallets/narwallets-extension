@@ -8,7 +8,7 @@ import * as Pages from "../pages/main.js"
 import { Account, ExtendedAccountData } from "../api/account.js"
 import { LockupContract } from "../contracts/LockupContract.js"
 import {searchThePools} from "./account-selected.js"
-import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../api/askBackground.js"
+import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundGetValidators, askBackgroundSetAccount } from "../api/askBackground.js"
 
 /*+
 import type { NetworkInfo} from "../api/network.js"
@@ -147,20 +147,29 @@ async function searchTheAccountName(accName/*:string*/) {
 }
 
 async function importIfNew(
-  accType/*:string*/, accName/*:string*/,accountInfo/*:Account*/, order/*:number*/) /*:Promise<number>*/ {
+  accType/*:string*/, accName/*:string*/,accountInfo/*:Account*/, order/*:number*/) /*:Promise<boolean>*/ {
 
   const networkAccounts = await askBackgroundAllNetworkAccounts();
 
   if (networkAccounts && networkAccounts[accName]){
     d.showErr(`${accType} ${accName} is already in the wallet`)
-    return 0;
+    //repair: if we found staking pool info and the account in the wallet has no pool associated, we update that info
+    const walletInfo=networkAccounts[accName]
+    if (!walletInfo.stakingPool && accountInfo.stakingPool){
+      walletInfo.stakingPool = accountInfo.stakingPool
+      walletInfo.staked = accountInfo.staked
+      walletInfo.unstaked = accountInfo.unstaked
+      walletInfo.stakingPoolPct = accountInfo.stakingPoolPct
+      await askBackgroundSetAccount(accName, walletInfo)              
+    }
+    return false;
     }
   else  {
     d.showSuccess("Account added: "+accName)//new account
     accountInfo.order = order
     console.log("added ",order,accName)
-    await askBackground({code:"set-account",accountId:accName, accInfo:accountInfo})
-    return 1;
+    await askBackgroundSetAccount(accName, accountInfo)              
+    return true;
     }
 }
 
@@ -172,22 +181,22 @@ async function importClicked(ev /*:Event*/) {
   const networkAccounts = await askBackgroundAllNetworkAccounts()
   let accountOrder = networkAccounts? Object.keys(networkAccounts).length+1: 0
 
-  let importedCount=0;
+  let couldNotImport=false;
   
   const importedMain = await importIfNew("Account", 
       lastSearchResult.mainAccountName,
       lastSearchResult.mainAccount, accountOrder)
 
-  importedCount+=importedMain;
+  if (!importedMain) couldNotImport=true;
 
   if (lastSearchResult.lockupContract) {
     const importedLc = await importIfNew("Lockup Contract",
         lastSearchResult.lockupContract.contractAccount,
         lastSearchResult.lockupContract.accountInfo, accountOrder+1)
-    importedCount+=importedLc;
+    if (!importedLc) couldNotImport=true;
   }
 
-  if (importedCount==0){
+  if (couldNotImport){
     //some time to see the error
     setTimeout(Pages.show,5000)
   }

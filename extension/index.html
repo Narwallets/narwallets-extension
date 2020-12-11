@@ -83,7 +83,7 @@
                     <div class="form-field-label">
                         <label data-shrink="true" for="email">Your e-mail</label>
                         <div class="form-control">
-                            <input type="text" tabindex="0" autocomplete="e-mail" id="email" />
+                            <input type="text" tabindex="0" autocomplete="email" id="email" />
                         </div>
                     </div>
                     <div class="form-field-label">
@@ -97,7 +97,7 @@
                         <label class="form-field-label" data-shrink="true" for="pass-confirm"
                             id="confirm-password-label">Confirm password</label>
                         <div class="form-control">
-                            <input type="password" autocomplete="confirm password" id="pass-confirm">
+                            <input type="password" autocomplete="new-password" id="pass-confirm">
                         </div>
                     </div>
                     <div class="checkbox-container">
@@ -129,12 +129,17 @@
                     <div class="select-action-button-box">
                         <div class="text-big">Yes, I already have a NEAR account</div>
                         <div class="text-small">Import your existing account</div>
-                        <button id="option-import" class="btn-primary">Import account</button>
+                        <button id="option-import" class="btn-primary wide">Import existing account</button>
                     </div>
                     <div disabled="" class="select-action-button-box">
-                        <div class="text-big">No, create a new account</div>
-                        <div class="text-small">This will create a new NEAR account in this wallet</div>
-                        <button id="option-create" class="btn-primary">Create Account</button>
+                        <div class="text-big">No, create a new <i>named</i> account</div>
+                        <div class="text-small">This will create a new NEAR <i>named</i> account, you can choose the account name, but <b>you'll need to send 3 NEAR to complete account creation</b></div>
+                        <button id="option-create" class="btn-primary wide">Create Named Account</button>
+                    </div>
+                    <div disabled="" class="select-action-button-box">
+                        <div class="text-big">No, create a new <i>implicit</i> account</div>
+                        <div class="text-small">This will create a new NEAR <i>implicit</i> account. It's free to create but it's a large string of numbers</div>
+                        <button id="option-create-implicit" class="btn-primary wide">Create Implicit Account</button>
                     </div>
                 </div>
 
@@ -211,13 +216,13 @@
                     <div class="form-field-label">
                         <label for="email">Your e-mail</label>
                         <div class="form-control">
-                            <input type="text" tabindex="0" autocomplete="e-mail" id="unlock-email">
+                            <input type="text" tabindex="0" autocomplete="email" id="unlock-email">
                         </div>
                     </div>
                     <div class="form-field-label">
                         <label for="unlock-pass">Password</label>
                         <div class="form-control">
-                            <input autocomplete="password" id="unlock-pass" type="password">
+                            <input autocomplete="new-password" id="unlock-pass" type="password">
                         </div>
                     </div>
                 </div>
@@ -327,7 +332,7 @@
                         <label>Staked</label>
                         <div class="balance">{accountInfo.staked}</div>
                         <label>Unstaked</label>
-                        <div class="balance">{accountInfo.unStaked}</div>
+                        <div class="balance">{accountInfo.unstaked}</div>
                     </div>
                     <div class="single-account-item-group small-labels">
                         <label>Balance</label>
@@ -364,6 +369,7 @@
                             <button id="explore" class="small">Explore Account</button>
                         </div>
                         <div class="buttons-more button-group hidden">
+                            <button id="detailed-rewards" class="small" title="provided by near-staking.com">Detailed rewards</button>
                             <button id="remove" class="small">Remove from Wallet</button>
                         </div>
                         <div class="buttons-more advanced button-group hidden">
@@ -387,7 +393,7 @@
                                     Send to Account Id
                                 </label>
                                 <div class="form-control">
-                                    <input aria-invalid="false" id="send-to-account-name" type="text" dir="auto"
+                                    <input  id="send-to-account-name" type="text" dir="auto"
                                         value="">
                                 </div>
                             </div>
@@ -396,10 +402,24 @@
                                     Amount in NEAR (Max. <span id="max-amount-send"></span>)
                                 </label>
                                 <div class="form-control">
-                                    <input aria-invalid="false" id="send-to-account-amount" type="text" dir="auto"
+                                    <input  id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto"
                                         value="">
                                 </div>
                             </div>
+                        </form>
+                    </div>
+
+                    <!-- subpage SEND CONFIRMATION -->
+                    <div id="account-selected-send-confirmation" class="subpage hidden">
+                        <div class="title">
+                            <h2>Confirm Send</h2>
+                        </div>
+                        <form class="send-form-confirmation">
+                            <div class="subtitle">
+                                <h3 class="warning">Send <span id="send-confirmation-amount"></span> NEAR
+                                    to <span id="send-confirmation-receiver"></span> ?</h3>
+                            </div>
+                            <br>
                         </form>
                     </div>
 
@@ -414,7 +434,7 @@
                                     Balance beneficiary Account Id
                                 </label>
                                 <div class="form-control">
-                                    <input aria-invalid="false" id="send-balance-to-account-name" type="text" dir="auto"
+                                    <input  id="send-balance-to-account-name" type="text" dir="auto"
                                         value="">
                                 </div>
                             </div>
@@ -428,7 +448,7 @@
                                     Type the account name you want to Delete to confirm
                                 </label>
                                 <div class="form-control">
-                                    <input aria-invalid="false" placeholder="" id="delete-account-name-confirm"
+                                    <input  placeholder="" id="delete-account-name-confirm"
                                         type="text" dir="auto" value="">
                                 </div>
                             </div>
@@ -536,8 +556,8 @@
                                     Seed Phrase
                                 </label>
                                 <div class="form-control">
-                                    <input aria-invalid="false" placeholder="correct horse battery staple..."
-                                        id="seed-phrase" type="text" dir="auto" value="">
+                                    <input autocomplete="off" placeholder="correct horse battery staple..."
+                                        id="seed-phrase" type="text">
                                 </div>
                             </div>
                         </form>
@@ -560,7 +580,7 @@
                                     Type the account name to confirm
                                 </label>
                                 <div class="form-control">
-                                    <input aria-invalid="false" placeholder="" id="account-name-confirm" type="text"
+                                    <input  placeholder="" id="account-name-confirm" type="text"
                                         dir="auto" value="">
                                 </div>
                             </div>
@@ -573,7 +593,7 @@
                             <h2>Add Full Access Key to Lockup</h2>
                         </div>
                         <div class="subtitle">
-                            <h3>Owner's public key will be added as Full Access Key</h3>
+                            <h3>Owner's public key will be added as Full Access Key to this Lockup Contract Account</h3>
                         </div>
                         <!--<div class="subtitle">
                             <h3>Enter the Public Key to Add</h3>
@@ -584,7 +604,7 @@
                                     New Public Key for Full Access
                                 </label>
                                 <div class="form-control">
-                                    <input aria-invalid="false" placeholder="ed25519:..."
+                                    <input  placeholder="ed25519:..."
                                         id="add-public-key" type="text" dir="auto" value="">
                                 </div>
                             </div>

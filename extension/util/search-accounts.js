@@ -49,17 +49,17 @@ export async function asyncRefreshAccountInfo(accName/*:string*/, info/*:Account
 
         info.lastBalance = c.yton(stateResultYoctos.amount)
         if (info.stakingPool) {
-            const previnThePool = info.staked + info.unStaked;
+            const previnThePool = info.staked + info.unstaked;
             const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool)
             info.staked = c.yton(stakingInfo.staked_balance)
-            info.unStaked = c.yton(stakingInfo.unstaked_balance)
-            info.rewards = previnThePool > 0 ? info.staked + info.unStaked - previnThePool : 0;
+            info.unstaked = c.yton(stakingInfo.unstaked_balance)
+            info.rewards = previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
             if (info.rewards < 0) info.rewards = 0;
             info.stakingPoolPct = await StakingPool.getFee(info.stakingPool)
         }
         else {
             info.staked = 0
-            info.unStaked = 0
+            info.unstaked = 0
         }
     }
 

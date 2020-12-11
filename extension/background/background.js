@@ -1,6 +1,6 @@
 import * as c from "../util/conversions.js"
 import * as global from "../data/global.js"
-import { recoverOptions, options } from "../data/options.js"
+import { log } from "../api/log.js"
 
 import * as Network from "../api/network.js"
 import * as nearAccounts from "../util/search-accounts.js"
@@ -35,7 +35,7 @@ function runtimeMessageHandler(msg/*:any*/, sender/*:chrome.runtime.MessageSende
   const fromPage = !url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
 
   //console.log("runtimeMessage received ",sender, url)
-  console.log("runtimeMessage received " + (fromPage ? "FROM PAGE " : "from popup ") + JSON.stringify(msg));
+  log("runtimeMessage received " + (fromPage ? "FROM PAGE " : "from popup ") + JSON.stringify(msg));
   if (msg.dest != "ext") {
     sendResponse({ err: "msg.dest must be 'ext'" })
   }
@@ -125,12 +125,24 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
       return Promise.resolve(global.SecureState.accounts[Network.current][msg.accountId])
     }
     else if (msg.code == "set-account") {
+      if (!msg.accountId) return Promise.reject(Error("!msg.accountId"))
+      if (!msg.accInfo) return Promise.reject(Error("!msg.accInfo"))
       if (!global.SecureState.accounts[Network.current]) global.SecureState.accounts[Network.current] = {}
       global.SecureState.accounts[Network.current][msg.accountId] = msg.accInfo;
       global.saveSecureState()
       return Promise.resolve()
     }
-    else if (msg.code == "delete-account") {
+    else if (msg.code == "set-account-order") { //whe the user reorders the account list
+      try{
+        global.SecureState.accounts[Network.current][msg.accountId].order = msg.order;
+        global.saveSecureState()
+        return Promise.resolve()
+      }
+      catch (ex){
+        return Promise.reject(ex)
+      }
+    }
+    else if (msg.code == "remove-account") {
       delete global.SecureState.accounts[Network.current][msg.accountId];
       //persist
       global.saveSecureState()
@@ -156,11 +168,6 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
       return isConnected();
     }
 
-    else if (msg.code == "view") {
-      //view-call request
-      return near.view(msg.contract, msg.method, msg.args);
-    }
-
     else if (msg.code == "get-validators") {
       //view-call request
       return near.getValidators();
@@ -174,10 +181,14 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
       return near.queryAccount(msg.accountId);
     }
 
+    else if (msg.code == "view") {
+      //view-call request
+      return near.view(msg.contract, msg.method, msg.args);
+    }
 
     else if (msg.code == "apply") {
       //apply transaction request from popup
-      //tx.apply request
+      //{code:"apply", signerId:<account>, tx:BatchTransction} 
       //when resolved, send msg to content-script->page
       const signerId = msg.signerId || "...";
       const accInfo = global.SecureState.accounts[Network.current][signerId]
@@ -203,7 +214,7 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
             throw Error("batchTx UNKNOWN item.action=" + item.action)
         }
       }
-      //restuns the Promise required to complete this action
+      //returns the Promise required to complete this action
       return near.broadcast_tx_commit_actions(actions, signerId, msg.tx.receiver, accInfo.privateKey)
     }
     //default
@@ -219,7 +230,7 @@ function getActionPromise(msg/*:Record<string,any>*/)/*:Promise<any>*/ {
 //---------------------------------------------------
 function processMessageFromWebPage(msg/*:any*/) {
 
-  console.log("processMessageFromWebPage", msg);
+  log("processMessageFromWebPage", msg);
 
   if (!msg.tabId) {
     console.error("msg.tabId is ", msg.tabId)
@@ -238,6 +249,10 @@ function processMessageFromWebPage(msg/*:any*/) {
       ctinfo.connectedResponse = msg
       break;
 
+    case "disconnect":
+      ctinfo.aceptedConnection = false
+      break;
+
     case "view":
       //view-call request
       near.view(msg.contract, msg.method, msg.args)
@@ -252,6 +267,7 @@ function processMessageFromWebPage(msg/*:any*/) {
       break;
 
     case "apply":
+      //tx apply, change call request, requires user approval
       try {
         if (!ctinfo.connectedAccountId) {
           throw Error("connectedAccountId is null")  //if error also send msg to content-script->tab
@@ -300,7 +316,7 @@ function processMessageFromWebPage(msg/*:any*/) {
 //------------------------
 chrome.runtime.onInstalled.addListener(function (details) {
 
-  console.log("onInstalled")
+  log("onInstalled")
 
   if (details.reason == "install") {
     //call a function to handle a first install
@@ -327,7 +343,7 @@ type CPSDATA=
   }
 +*/
 function connectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<any>*/ {
-  console.log("connectToWebPage start")
+  log("connectToWebPage start")
 
   return new Promise((resolve, reject) => {
 
@@ -346,18 +362,18 @@ function connectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<a
         resolve: resolve,
         reject: reject
       }
-      console.log("activeTabId", cpsData)
+      log("activeTabId", cpsData)
       cpsData.ctinfo = _connectedTabs[cpsData.activeTabId]
       cpsData.ctinfo.aceptedConnection = false; //we're connecting another
       cpsData.ctinfo.connectedResponse = {};
 
-      //check if it responds
+      //check if it responds (if it is already injected)
       try {
         chrome.tabs.sendMessage(cpsData.activeTabId, { code: "ping" }, function (response) {
           if (!response) {
-            //not responding, set injected status
+            //not responding, set injected status to false
             cpsData.ctinfo.injected = false;
-            console.error(JSON.stringify(chrome.runtime.lastError));
+            //console.error(JSON.stringify(chrome.runtime.lastError));
           }
           else {
             //responded set injected status
@@ -388,7 +404,7 @@ function continueCWP_2(cpsData/*:CPSDATA*/) {
   //contentScript replies with a chrome.runtime.sendmessage 
   //it also listens to page messages and relays via chrome.runtime.sendmessage 
   //basically contentScript.js acts as a proxy to pass messages from ext<->tab
-  console.log("injecting")
+  log("injecting")
   try {
     chrome.tabs.executeScript({ file: 'background/contentScript.js' },
       function () {
@@ -412,7 +428,7 @@ function continueCWP_2(cpsData/*:CPSDATA*/) {
 ///send connect order
 function continueCWP_3(cpsData/*:CPSDATA*/) {
   cpsData.ctinfo.connectedResponse={err:undefined};
-  console.log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url)
+  log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url)
   //send connect order via content script. a response will be received later
   chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network } })
   //wait 250 for response
@@ -427,100 +443,6 @@ function continueCWP_3(cpsData/*:CPSDATA*/) {
     }
   }, 250);
 }
-
-
-// function OLDconnectToWebPage(accountId/*:string*/, network/*:string*/)/*: Promise<any>*/ {
-//   console.log("connectToWebPage start")
-
-//   return new Promise((resolve, reject) => {
-
-//     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-
-//       const activeTabId=tabs[0].id||-1
-//       console.log("activeTabId",activeTabId)
-//       if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId]={};
-//       if (_connectedTabs[activeTabId].aceptedConnection){
-//         //already connected, verify 
-//         try {
-//           chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
-//             if (!response) {
-//               _connectedTabs[activeTabId].injected=false;
-//               _connectedTabs[activeTabId].aceptedConnection=false;
-//               const errMsg="Try again. "+(chrome.runtime.lastError?chrome.runtime.lastError.message:"")
-//               return reject(Error(errMsg))
-//             }
-//             else{
-//               console.log("return reject(Error(already connected))")
-//               return reject(Error("already connected"))
-//             }
-//           })
-//           return;//verification is async
-//         }
-//         catch(ex){
-//           return reject(ex)
-//         }
-//       }
-//       if (!_connectedTabs[activeTabId].injected){
-//         //not injected yet inject/execute contentScript on activeTab
-//         //contentScript replies with a chrome.runtime.sendmessage 
-//         //it also listens to page messages and relays via chrome.runtime.sendmessage 
-//         //basically contentScript.js acts as a proxy to pass messages from ext<->tab
-//         console.log("injecting")
-//         chrome.tabs.executeScript({file: 'background/contentScript.js' },
-//           function () {
-//             if (chrome.runtime.lastError) {
-//               console.error(JSON.stringify(chrome.runtime.lastError))
-//               return reject(chrome.runtime.lastError)
-//             }
-//             else {
-//               _connectedTabs[activeTabId].injected=true
-//               console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
-//               //send via content script. a response will be received later
-//               chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
-//               //wait 250 for response
-//               setTimeout(() => {
-//                 if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
-//                   _connectedTabs[activeTabId].connectedAccountId //register connected acount
-//                   return resolve();
-//                 }
-//                 else {
-//                   let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
-//                   if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
-//                   return reject(Error(errMsg))
-//                 }
-//               }, 250);
-//             }
-//         })
-//       }
-//       else {
-//         //it was injected already
-//         //verify
-//         chrome.tabs.sendMessage(activeTabId,{code: "ping"},function(response){
-//           if (!response) {
-//             _connectedTabs[activeTabId].injected=false;
-//             return reject(chrome.runtime.lastError||Error("page not responding. Try again"))
-//           }
-//           else {
-//             //send via content script. a response will be received later
-//             console.log("chrome.tabs.sendMessage to", activeTabId,tabs[0].url)
-//             chrome.tabs.sendMessage(activeTabId,{ dest: "page", code: "connect", data: { accountId: accountId, network: network}})
-//             //wait 250 for response
-//             setTimeout(() => {
-//               if (_connectedTabs[activeTabId].aceptedConnection) { //page responded with connection info
-//                 return resolve();
-//               }
-//               else {
-//                 let errMsg="Tab:"+activeTabId + " not responding / Not a Narwallets compatible NEAR web page"
-//                 if (_connectedTabs[activeTabId].connectedResponse) errMsg= _connectedTabs[activeTabId].connectedResponse.err+" "+errMsg;
-//                 return reject(Error(errMsg))
-//               }
-//             }, 250);
-//           }
-//         })
-//       }
-//     })
-//   })
-// }
 
 
 /*+
@@ -570,15 +492,15 @@ function saveWorkingData() {
 async function recoverWorkingData()/*:Promise<void>*/ {
   //@ts-ignore 
   _connectedTabs = await localStorageGet("_ct");
-  console.log("RECOVERED _connectedTabs", _connectedTabs)
+  log("RECOVERED _connectedTabs", _connectedTabs)
   return new Promise((resolve, reject) => {
     chrome.alarms.getAll(function (alarms/*:any[]*/) {
       for (let a of alarms) {
-        console.log(a, new Date(a.scheduledTime))
+        log(a, new Date(a.scheduledTime))
         if (a.name.startsWith("SHA_")) {
           chrome.alarms.clear(a.name);
           global.workingData.unlockSHA = a.name.replace("SHA_", "")
-          console.log("RECOVERED SHA from alarms")
+          log("RECOVERED SHA from alarms")
           return resolve()
         }
       }
@@ -594,7 +516,7 @@ async function recoverWorkingData()/*:Promise<void>*/ {
 chrome.runtime.onSuspend.addListener(function () {
   //save working data
   saveWorkingData()
-  console.log("onSuspend.");
+  log("onSuspend.");
   chrome.browserAction.setBadgeText({ text: "" });
 });
 
@@ -609,7 +531,7 @@ const UNLOCK_EXPIRED = "unlock-expired"
 //------------------------
 chrome.alarms.onAlarm.addListener(
   function (alarm/*:any*/) {
-    //console.log("chrome.alarms.onAlarm fired ", alarm);
+    //log("chrome.alarms.onAlarm fired ", alarm);
     if (alarm.name == UNLOCK_EXPIRED) {
       global.lock()
       chrome.alarms.clearAll()
@@ -629,7 +551,7 @@ window.addEventListener("message",
         const autoUnlockSeconds = global.getAutoUnlockSeconds()
         unlockExpire = Date.now() + autoUnlockSeconds * 1000
         chrome.alarms.create(UNLOCK_EXPIRED, { when: unlockExpire })
-        console.log(UNLOCK_EXPIRED, autoUnlockSeconds)
+        log(UNLOCK_EXPIRED, autoUnlockSeconds)
         if (autoUnlockSeconds < 60 * 5) {
           //also setTimeout to Lock, because alarms fire only once per minute
           if (lockTimeout) clearTimeout(lockTimeout)
@@ -639,7 +561,7 @@ window.addEventListener("message",
       return;
     }
     else if (event.data.code == "popupLoading") {
-      console.log("popupLoading")
+      log("popupLoading")
       await retrieveBgInfoFromStorage()
       chrome.runtime.sendMessage({dest:"popup",code:"can-init-popup"})
     }
@@ -662,7 +584,7 @@ window.addEventListener("message",
         await global.unlockSecureStateSHA(global.State.currentUser, global.workingData.unlockSHA);
       }
       catch (ex) {
-        console.error("recovering secure state after suspension", ex.message)
+        console.error("recovering secure state on retrieveBgInfoFromStorage", ex.message)
       }
     }
     const nw = await localStorageGet("selectedNetwork") /*+as string+*/;
@@ -671,7 +593,7 @@ window.addEventListener("message",
   
 document.addEventListener('DOMContentLoaded', onLoad);
 async function onLoad() {
-  console.log("background.js onLoad", new Date())
+  log("background.js onLoad", new Date())
   await recoverWorkingData()
   await retrieveBgInfoFromStorage()
 }

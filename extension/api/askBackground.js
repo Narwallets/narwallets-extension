@@ -1,9 +1,10 @@
 import { BatchTransaction, FunctionCall, Transfer } from "./batch-transaction.js";
+import { log } from "./log.js";
 //ask background, wait for response, return a Promise
 export function askBackground(requestPayload) {
     requestPayload.dest = "ext";
     return new Promise((resolve, reject) => {
-        console.log("sendMessage", JSON.stringify(requestPayload));
+        log("sendMessage", JSON.stringify(requestPayload));
         const timeout = setTimeout(() => { return reject(Error("timeout")); }, 30000);
         chrome.runtime.sendMessage(requestPayload, function (response) {
             clearTimeout(timeout);
@@ -16,6 +17,9 @@ export function askBackground(requestPayload) {
             return resolve(response.data);
         });
     });
+}
+export function askBackgroundSetAccount(accountId, accInfo) {
+    return askBackground({ code: "set-account", accountId: accountId, accInfo: accInfo });
 }
 export function askBackgroundIsLocked() {
     return askBackground({ code: "is-locked" });
@@ -40,6 +44,9 @@ export function askBackgroundGetValidators() {
 }
 export function askBackgroundGetAccessKey(accountId, publicKey) {
     return askBackground({ code: "access-key", accountId: accountId, publicKey: publicKey });
+}
+export function askBackgroundViewMethod(contract, method, args) {
+    return askBackground({ code: "view", contract: contract, method: method, args: args });
 }
 export function askBackgroundCallMethod(contractId, method, params, signerId, Tgas = 25, attachedNear = 0) {
     const batchTx = new BatchTransaction(contractId);

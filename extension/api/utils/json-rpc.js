@@ -29,7 +29,7 @@ export function formatJSONErr(obj) {
             const parts = matches.split(" ");
             const yoctosString = parts.pop() || "";
             if (yoctosString.length >= 20) {
-                // show reference line
+                // convert to NEAR
                 text = text.replace(new RegExp(yoctosString, "g"), ytonFull(yoctosString));
             }
         }
@@ -41,8 +41,10 @@ export function formatJSONErr(obj) {
     if (n > 0 && n < text.length - kl - 5) {
         const i = text.indexOf("'", n + kl);
         const cutted = text.slice(n + kl, i);
-        if (cutted.trim().length > 5)
+        if (cutted.trim().length > 5) {
+            console.error(text.slice(n, i + 40)); //show info in the console before removing extra info
             text = cutted;
+        }
     }
     return text;
 }
@@ -68,8 +70,6 @@ export async function jsonRpcInternal(payload) {
         }
         if (error) {
             const errorMessage = formatJSONErr(error);
-            // NOTE: All this hackery is happening because structured errors not implemented
-            // TODO: Fix when https://github.com/nearprotocol/nearcore/issues/1839 gets resolved
             if (error.data === 'Timeout' || errorMessage.indexOf('Timeout error') != -1) {
                 const err = new Error('jsonRpc has timed out');
                 err.name = 'TimeoutError';
