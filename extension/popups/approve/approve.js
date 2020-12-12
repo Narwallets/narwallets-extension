@@ -107,6 +107,7 @@ function humanReadableCallArgs(args/*:any*/)/*:string*/{
     }
   }
   result=result+" }"
+  if (result=="{  }") return ""
   return result
 }
 
