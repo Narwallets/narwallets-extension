@@ -3,7 +3,7 @@
 ## Vision
 
 Assumptions:
-1) We want to support static-server SPA DApps (i.e. can be served from IPFS or siasky). Also I want to not disrupt the SPA state (not leaving the site), that's why this is a chrome/chromium extension wallet
+1) We want to support static-server single-page decentralized-web-apps: SPA DApps, that can be served from IPFS or siasky. Also we want to preserve the SPA state (avoid  navigating out of the site), that's why this is a chrome/chromium extension wallet.
 
 2) Our "model-user" is not an expert. Our user doesn't want to have to acquire deep knowledge of the underlying technologies to use the application. 
 For example, even if EIP712 is a huge improvement, in the eyes of our hypothetical user, the before and after of EIP721 are unreadable
@@ -34,11 +34,12 @@ The wallet-SDK is very-light. The Wallet-SDK only has the code required to commu
 
 The chrome extension-wallet has all the required dependencies to communicate with the chain, and its job is to sign and boradcast transactions into the chain, *hiding all the complexity from the DApp*.
 
-Because the wallet-SDK is very simple, it could be possible to create a single DApp that works with different blockchains, depending on what extension-wallet you decide to activate to "connect-to-the-web-page". The wallet itself handles all the complexity of tx-signing and broadcasting, and the smart contracts are different for each chain, but because the wallet-SDK is simple and high-level, it could "*theoretically*" be possible to use the same DApp UX code to operate on different chains.
+Because the Wallet-SDK is very simple, it could be possible to create a single DApp that works with different blockchains, depending on what extension-wallet you decide to activate to "connect-to-the-web-page". The wallet itself handles all the complexity of tx-signing and broadcasting, and the smart contracts are different for each chain, but because the wallet-SDK is simple and high-level, it could "*theoretically*" be possible to use the same DApp UX code to operate on different chains.
 
-The core Wallet integration API is 200 lines of typescript, and this is all a DApp must include. There's no other dependencies than this one (no tweetnacl,bn,bip39,crypto,sha256). So [this problem](https://github.com/ethereum/web3.js/issues/1178) is avoided for the DApps.
+The core Wallet integration API is 200 lines of typescript, and this is all a DApp must include. There's no other dependencies than this one (no tweetnacl,bn,bip39,crypto,sha256). 
 
-All the complexity of connecting to the chain is handled by the chrome-extension wallet listening on the other side. This represents an advantage for DApps on the download size. Narwallets integration is 200 lines of typescript, while web3.js is 12MB unpacked, and ether.js is 9MB unpacked
+All the complexity of connecting to the chain is handled by the chrome-extension wallet listening on the other side. This represents an advantage for DApps on the download size. Narwallets integration is 200 lines of typescript, while web3.js is 12MB unpacked, and ether.js is 9MB unpacked. 
+Our design of the ultra-ligth Wallet-API solves [the download-size problem](https://github.com/ethereum/web3.js/issues/1178) for all integrated DApps.
 
 *Core Wallet API:*
 ```typescript

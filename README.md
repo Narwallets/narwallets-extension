@@ -18,18 +18,18 @@
 * Narwallets is not yet integrated with Ledger or other HW Wallets
 * Narwallets has only one option regading account recovery: Write-down the seed phrase. NEAR Web Wallet has other user-friendly recovery options (email & phone recovery).
 * Narwallets, aiming at simplicity, has no 2FA support.
-* The good:
+
+The good:
 * It's an extension-wallet: You'll be able to interact with DApps without leaving the DApp site
 * Provides a similar experience as Metamask/other eth extension-wallets, easing the onboard ethereum users into the NEAR ecosystem.
 * You can have multiple wallets by providing different user/passwords. 
 * Each wallet can have multiple accounts. You can see the sum of all accounts in the wallet
 * Accounts are first added to a wallet in safe-by-default read-only mode. 
 * All private data is stored encrypted on chrome local storage
-* You can create *implict accounts*
-* Lockup contract accounts are auto-discovered and treated as another account in the group
-* Advanced mode allows you to take control and liquidate lockup contract accounts
-
- - [x] Integration with DApps. New model: wallet initiated connection to active tab, resulting in chain & wallet agnostic DApps
+ - [x] Create free *implict accounts* (no near required)
+ - [x] Lockup contract accounts are auto-discovered and treated as another account in the group
+ - [x] Advanced mode allows you to take control and liquidate lockup contract accounts
+ - [x] Integration with DApps. New model: wallet initiated connection to active tab, resulting in chain & wallet agnostic DApps. See [Wallet integration API Documentation here](API-design.md)
 
 ![multiple accounts and total](docs/images/multiple-accounts-and-total.png)
 
