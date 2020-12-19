@@ -67,7 +67,7 @@ li:hover {
 li div{
     font-size: 1.2em;
     margin-bottom: 5px;
-    word-break: break-all;
+    word-break: break-word;
 }
 
 .button-group{

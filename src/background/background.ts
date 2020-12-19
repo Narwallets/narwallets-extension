@@ -295,6 +295,7 @@ function processMessageFromWebPage(msg:any) {
             popupWindow.alwaysOnTop = true;
             msg.dest = "approve" //send msg to the approval popup
             msg.signerId = ctinfo.connectedAccountId;
+            msg.network = Network.current;
             setTimeout(() => { chrome.runtime.sendMessage(msg) }, 100)
           }
         })

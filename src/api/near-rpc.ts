@@ -1,6 +1,6 @@
 import { jsonRpc, jsonRpcQuery, formatJSONErr } from "./utils/json-rpc.js"
 import * as naclUtil from "./tweetnacl/util.js"
-import {isValidAccountID} from "./utils/valid.js";
+import { isValidAccountID } from "./utils/valid.js";
 import { PublicKey, KeyPairEd25519 } from "./utils/key-pair.js"
 import { serialize, base_decode } from "./utils/serialize.js"
 import * as TX from "./transaction.js"
@@ -181,6 +181,16 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
         if (sv == "false") {
             console.error(JSON.stringify(result))
             throw Error(getLogsAndErrorsFromReceipts(result))
+        }
+        else if (sv == "null")
+            return ""; //I strongly prefer "" as alias to null (ORACLE style)
+        else {
+            try {
+                return JSON.parse(sv); //result from fn_call
+            }
+            catch (ex) {
+                throw Error("ERR at JSON.parse: " + sv);
+            }
         }
     }
 

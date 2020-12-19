@@ -45,11 +45,11 @@ export function formatJSONErr(obj: any): any {
     }
 
     //if panicked-at: show relevant info only
-    const KEY = "panicked at '"
+    const KEY = "panicked at "
     const kl = KEY.length
     let n = text.indexOf(KEY)
     if (n > 0 && n < text.length - kl - 5) {
-        const i = text.indexOf("'", n + kl)
+        const i = text.indexOf("'", n + kl + 4)
         const cutted = text.slice(n + kl, i)
         if (cutted.trim().length > 5) {
             console.error(text.slice(n, i+40)) //show info in the console before removing extra info
@@ -64,7 +64,6 @@ let id = 0
 export async function jsonRpcInternal(payload: Record<string, any>): Promise<any> {
 
     try {
-
         const rpcOptions = {
             body: JSON.stringify(payload),
             method: "POST",
@@ -78,10 +77,11 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
 
         let error=response.error
         if (!error && response.result && response.result.error) {
+            if (response.result.logs && response.result.logs.length) {
+                console.log("response.result.logs:",response.result.logs);
+            }
             error={
-                message:response.result.error,
-                code:"",
-                data:""
+                message:response.result.error
             }
         }
         if (error) {
@@ -92,13 +92,14 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
                 throw err;
             }
             else {
-                throw new Error("Network Error: " + errorMessage);
+                throw new Error("Error: " + errorMessage);
             }
         }
         return response.result;
     }
     catch (ex) {
-        throw new Error(rpcUrl+": " + ex.message)
+        //add rpc url to err info
+        throw new Error(ex.message + " ("+rpcUrl+")")
     }
 }
     // if (!response.ok) {

@@ -105,6 +105,7 @@ function humanReadableCallArgs(args:any):string{
     else {
       result = result+humanReadableValue(value)
     }
+    count++;
   }
   result=result+" }"
   if (result=="{  }") return ""
@@ -118,7 +119,6 @@ function displayTx(msg:TxMsg) {
   resolvedMsg = { dest: "page", code: "request-resolved", tabId:initialMsg.tabId, requestId:initialMsg.requestId }
 
   try {
-
     d.byId("net-name").innerText = msg.network || ""
     d.byId("signer-id").innerText = msg.signerId || ""
     d.byId("web-page").innerText = msg.url

@@ -88,6 +88,7 @@ function initPage() {
     d.onClickId("detailed-rewards", detailedRewardsClicked);
     d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("show-public-key", showPublicKeyClicked);
+    d.onClickId("show-private-key", showPrivateKeyClicked);
     d.onClickId("lockup-add-public-key", LockupAddPublicKey);
     d.onClickId("delete-account", DeleteAccount);
 
@@ -922,6 +923,22 @@ function showPublicKeyClicked() {
     else { //normal acc priv key
         d.showSubPage("account-selected-show-public-key")
         d.byId("account-selected-public-key").innerText = getPublicKey(selectedAccountData.accountInfo.privateKey || "")
+        showOKCancel(showButtons)
+    }
+}
+
+//---------------------------------------
+function showPrivateKeyClicked() {
+    d.hideErr()
+
+    if (selectedAccountData.isReadOnly) { //we don't have any key for ReadOnly accounts
+        d.showErr("Account is read only")
+        d.showSubPage("account-selected-make-full-access")
+        showOKCancel(makeFullAccessOKClicked)
+    }
+    else { //normal acc priv key
+        d.showSubPage("account-selected-show-private-key")
+        d.byId("account-selected-private-key").innerText = selectedAccountData.accountInfo.privateKey||""
         showOKCancel(showButtons)
     }
 }
