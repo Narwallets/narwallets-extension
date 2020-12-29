@@ -114,6 +114,14 @@ async function asideLock() {
   UnlockPage_show();
 }
 
+function asideExpand() {
+  chrome.windows.create({
+      url: chrome.runtime.getURL("index.html"),
+      state: "maximized"
+  });
+}
+
+
 function asideAccounts() {
   hambClicked();
   Pages.show();
@@ -239,6 +247,7 @@ async function initPopup() {
 
   //aside
   d.qs("aside #lock").onClick(asideLock);
+  //d.qs("aside #expand").onClick(asideExpand);
   d.qs("aside #accounts").onClick(asideAccounts);
   d.qs("aside #create-user").onClick(asideCreateUserClicked);
   d.qs("aside #add-account").onClick(asideAddAccount);

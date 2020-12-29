@@ -32,7 +32,7 @@ export function formatJSONErr(obj: any): any {
     //try some enhancements
     //---------
     //convert yoctos to near
-    const largeNumbersFound = text.match(/.*?['" ]\d{14,50}/g)
+    const largeNumbersFound = text.match(/\d{14,50}/g)
     if (largeNumbersFound) {
         for (const matches of largeNumbersFound) {
             const parts=matches.split(" ")
@@ -45,6 +45,7 @@ export function formatJSONErr(obj: any): any {
     }
 
     //if panicked-at: show relevant info only
+    console.error(text); //show info in the console before removing extra info
     const KEY = "panicked at "
     const kl = KEY.length
     let n = text.indexOf(KEY)
@@ -52,8 +53,8 @@ export function formatJSONErr(obj: any): any {
         const i = text.indexOf("'", n + kl + 4)
         const cutted = text.slice(n + kl, i)
         if (cutted.trim().length > 5) {
-            console.error(text.slice(n, i+40)) //show info in the console before removing extra info
-            text = cutted
+            console.error(text.slice(n, i+80)) //show info in the console before removing extra info
+            text = "panicked at: " + cutted;
         }
     }
 

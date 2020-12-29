@@ -143,7 +143,7 @@ export class LockupContract {
 
       if (actualSP != newStakingPool) { //requesting a change of SP
 
-        if (poolAccInfo.unstaked_balance != "0" || poolAccInfo.staked_balance != "0") {
+        if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 || c.yton(poolAccInfo.staked_balance) >= 0.005) {
           const staked = c.yton(poolAccInfo.staked_balance)
           const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked
           throw Error(`Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(staked)}`);

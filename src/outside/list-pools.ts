@@ -29,7 +29,7 @@ function clicked(name:string) {
 }
 
 // ---------------------
-async function displaySatakingPools() {
+async function displayStakingPools() {
 
   d.showWait()
   try {
@@ -105,7 +105,7 @@ async function displaySatakingPools() {
 async function init() {
   try {
     //rpc.addHeader("mode","no-cors")
-    displaySatakingPools();
+    displayStakingPools();
   } 
   catch (ex) {
     d.showErr(ex.message);

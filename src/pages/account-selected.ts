@@ -91,6 +91,7 @@ function initPage() {
     d.onClickId("show-private-key", showPrivateKeyClicked);
     d.onClickId("lockup-add-public-key", LockupAddPublicKey);
     d.onClickId("delete-account", DeleteAccount);
+    //d.onClickId("assign-staking-pool", assignStakingPool);
 
 
     removeButton.onClick(removeAccountClicked);
@@ -168,12 +169,12 @@ type StateResult={
 
 
 function listPoolsClicked() {
+    d.inputById("stake-with-staking-pool").value=""
     localStorageSet({ reposition: "stake", account: selectedAccountData.name })
     chrome.windows.create({
         url: chrome.runtime.getURL("outside/list-pools.html"),
         state: "maximized"
     });
-
 }
 
 
@@ -455,7 +456,14 @@ async function performStake() {
         if (amountToStake < 5) throw Error("Stake at least 5 Near");
 
         //refresh status
+        // if there's an error during "refresh" still continue
+        //maybe current staking pool does not exists
+        try {
         await refreshSaveSelectedAccount()
+        }
+        catch(ex){
+            d.showErr(ex.message)
+        }
 
         let actualSP = selectedAccountData.accountInfo.stakingPool
 
@@ -473,7 +481,7 @@ async function performStake() {
 
             if (actualSP != newStakingPool) { //requesting a change of SP
 
-                if (poolAccInfo.unstaked_balance != "0" || poolAccInfo.staked_balance != "0") {
+                if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 || c.yton(poolAccInfo.staked_balance) >= 0.005) {
                     const staked = c.yton(poolAccInfo.staked_balance)
                     const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked
                     throw Error(`Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(staked)}`);
@@ -487,9 +495,10 @@ async function performStake() {
         }
 
         if (!actualSP) {
-            //select the new staking pool
-            selectedAccountData.accountInfo.stakingPool = newStakingPool
+            //1st check the pool exists
             poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, newStakingPool)
+            //2nd select the new staking pool. ONLY if the pool exists
+            selectedAccountData.accountInfo.stakingPool = newStakingPool
         }
 
         if (c.yton(poolAccInfo.unstaked_balance) >= 10) { //at least 10 deposited but unstaked, stake that
@@ -644,10 +653,10 @@ async function unstakeClicked() {
 function fixUserAmountInY(amount:number, yoctosMax:string) :string {
 
     let yoctosResult = yoctosMax //default => all 
-    if (amount + 1 < c.yton(yoctosResult)) {
+    if (amount + 2 < c.yton(yoctosResult)) {
         yoctosResult = c.ntoy(amount) //only if it's less of what's available, we take the input amount
     }
-    else if (amount > 1 + c.yton(yoctosMax)) { //only if it's +1 above max
+    else if (amount > 2 + c.yton(yoctosMax)) { //only if it's +1 above max
         throw Error("Max amount is " + c.toStringDec(c.yton(yoctosMax)))
         //----------------
     }
@@ -886,6 +895,7 @@ export async function searchThePools(exAccData:ExtendedAccountData) :Promise<boo
                 }
             }
         }
+
     }
     catch (ex) {
         d.showErr(ex.message)
@@ -893,17 +903,27 @@ export async function searchThePools(exAccData:ExtendedAccountData) :Promise<boo
     finally {
         doingDiv.remove()
         d.hideWait()
-        return (lastAmountFound > 0)
     }
+
+    return (lastAmountFound > 0)
 
 }
 
+//-------------------------------
 async function searchPoolsButtonClicked() {
-    const found = searchThePools(selectedAccountData)
+    const found:boolean = await searchThePools(selectedAccountData)
     if (found) {
         await refreshSaveSelectedAccount()
     }
 }
+
+// //-------------------------------
+// async function assignStakingPool() {
+//     const found:boolean = await searchThePools(selectedAccountData)
+//     if (found) {
+//         await refreshSaveSelectedAccount()
+//     }
+// }
 
 //-------------------------------
 function getPublicKey(privateKey:string) :string {

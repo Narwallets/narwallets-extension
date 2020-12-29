@@ -192,8 +192,8 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
       //when resolved, send msg to content-script->page
       const signerId = msg.signerId || "...";
       const accInfo = global.SecureState.accounts[Network.current][signerId]
-      if (!accInfo) throw Error(`account ${signerId} NOT FOUND on wallet`)
-      if (!accInfo.privateKey) throw Error(`account ${signerId} is read-only`)
+      if (!accInfo) throw Error(`Narwallets: account ${signerId} NOT FOUND on wallet`)
+      if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`)
       //convert wallet-api actions to near.TX.Action
       const actions:TX.Action[] = []
       for (let item of msg.tx.items) {
@@ -276,8 +276,8 @@ function processMessageFromWebPage(msg:any) {
         //creify account exists and is full-access
         const signerId = ctinfo.connectedAccountId
         const accInfo = global.SecureState.accounts[Network.current][signerId]
-        if (!accInfo) throw Error(`account ${signerId} NOT FOUND on wallet`)
-        if (!accInfo.privateKey) throw Error(`account ${signerId} is read-only`)
+        if (!accInfo) throw Error(`Narwallets: account ${signerId} NOT FOUND on wallet`)
+        if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`)
 
         //load popup window for the user to approve
         const width = 500
