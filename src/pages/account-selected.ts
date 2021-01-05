@@ -835,7 +835,7 @@ async function detailedRewardsClicked() {
     localStorageSet({ reposition: "account", account: selectedAccountData.name })
     const netInfo = await askBackgroundGetNetworkInfo()
     if (netInfo.name!="mainnet"){
-        d.showErr("This function is only available for mainnet")
+        d.showErr("This function is only available in mainnet")
     }
     else {
         chrome.windows.create({
@@ -956,7 +956,7 @@ function showPublicKeyClicked() {
 }
 
 //---------------------------------------
-function showPrivateKeyClicked() {
+export function showPrivateKeyClicked() {
     d.hideErr()
 
     if (selectedAccountData.isReadOnly) { //we don't have any key for ReadOnly accounts

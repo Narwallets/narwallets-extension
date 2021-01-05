@@ -182,7 +182,8 @@ export async function show() {
 
   d.showPage(MAIN)
 
-  const isConnected = true;// await sendBackground({code:"isConnected"})
+  d.qs("#disconnect-line").hide();
+  const isConnected = await askBackground({code:"isConnected"})
   d.qs("#disconnect-line").showIf(isConnected);
 }
 

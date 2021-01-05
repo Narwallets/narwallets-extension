@@ -346,6 +346,12 @@ background-color:#add8e6b0;
 border-radius: 6px;
 color: #5d5d5d;
 }
+.bg-yellow {
+background-color:#e6e553cc;
+border-radius: 6px;
+color: #212121;
+border: 2px red solid;
+}
 
 .checkbox-container {
   padding: 24px 0px;

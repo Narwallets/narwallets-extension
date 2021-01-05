@@ -476,7 +476,9 @@ function isConnected():Promise<boolean> {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true },
       function (tabs) {
-        const activeTabId = tabs[0].id || -1
+        if (!tabs || tabs.length==0 || !tabs[0]) return resolve(false);
+        const activeTabId = tabs[0].id
+        if (!activeTabId) return resolve(false);
         return resolve(!!(_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection))
       })
   })
