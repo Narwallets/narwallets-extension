@@ -1,11 +1,8 @@
 # Narwallet Chrome Extension 
 
-## Beta Test Installation (v0.1)
+## Installation
 
-* clone this repository on your machine and:
-  * open chrome
-  * enable Extensions Developer Mode
-  * load unpacked extension from [dir-where-you-cloned]/Narwallets-extension/extension
+Install from [Narwallets Extension in the Chrome Web Store](https://chrome.google.com/webstore/detail/narwallets/bnbmlmjhaohpobnjfifeghjmamjfolnb)
 
 ## Objectives
 * Be the deafult chrome-extension wallet for NEAR DApps
@@ -17,18 +14,18 @@
 * Narwallets is available only in english, NEAR Web wallet supports multiple languages
 * Narwallets is not yet integrated with Ledger or other HW Wallets
 * Narwallets has only one option regading account recovery: Write-down the seed phrase. NEAR Web Wallet has other user-friendly recovery options (email & phone recovery).
-* Narwallets, aiming at simplicity, has no 2FA support.
+* Narwallets, aiming at simplicity, has no 2FA support yet.
 
 The good:
-* It's an extension-wallet: You'll be able to interact with DApps without leaving the DApp site
-* Provides a similar experience as Metamask/other eth extension-wallets, easing the onboard ethereum users into the NEAR ecosystem.
+* It's an extension-wallet: You'll be able to interact with DApps without leaving the DApp web site
+* Provides a similar experience as Metamask/other extension-wallets, easing the onboard of ethereum users into the NEAR ecosystem.
+* Each wallet can have multiple accounts. You can see the sum of all your accounts in the wallet
 * You can have multiple wallets by providing different user/passwords. 
-* Each wallet can have multiple accounts. You can see the sum of all accounts in the wallet
-* Accounts are first added to a wallet in safe-by-default read-only mode. 
+* Accounts are first added to in safe-by-default read-only mode (no keys)
 * All private data is stored encrypted on chrome local storage
  - [x] Create free *implict accounts* (no near required)
  - [x] Lockup contract accounts are auto-discovered and treated as another account in the group
- - [x] Advanced mode allows you to take control and liquidate lockup contract accounts
+ - [x] Advanced mode allows you to take full control of your lockup contract account
  - [x] Integration with DApps. New model: wallet initiated connection to active tab, resulting in chain & wallet agnostic DApps. See [Wallet integration API Documentation here](API-design.md)
 
 ![multiple accounts and total](docs/images/multiple-accounts-and-total.png)
@@ -38,23 +35,22 @@ The good:
 
 ## Future versions
 * Ledger integration
+* 2FA Support
 * Manage Create named account (currently redirecting to NEAR Web Wallet)
 
 ## Dev Tooling (v0.1)
-* This project uses ES2020 modules import/export
+* This project uses typescript
 * Being a chrome extension, no bundler/minimizer is needed 
-* No frameworks are used neither, this is plain typescript & HTML
+* No frameworks are used neither, this is plain typescript and a main index.html
 
 ## Dev Flow (v0.1)
 * Chrome Dev Tools: Map folder to Narwallets-extension/extension
 * Use Chrome Dev Tools as an quick-and-dirty IDE with Edit & Continue
 * Use VSCode as the main IDE - Ctrl-Shift-B to build with typescript
-* This is being removed. -This project uses [plus-typescript](https://github.com/luciotato/plus-typescript) so you can modify "sources" directly from Chrome Dev Tools (no source-maps, no transpiling)-
 
 ## Low-level Technical debt
 
-* Main code is plus-typescript, but /api (light-near-api) is standard typescript. The mix creates confusion
- - [ ] Remove plus-typescript, convert all to typescript
+ - [x] Remove plus-typescript, convert all to typescript
  - [ ] npm i eslint --save-dev
  - [ ] When wallet-API was added a lot of functions became `async`. Add `npm install eslint-plugin-no-floating-promise --save-dev`
 
@@ -71,5 +67,11 @@ Bundle includes:
 * globalThis.pbkdf2 = pbkdf2
 * globalThis.createHmacPackage = {createHmac:createHmac} 
 
-## VSCode config tips
+## Beta Test Installation (Latest Unstable Version)
+
+* clone this repository on your machine and:
+  * open chrome
+  * enable Extensions Developer Mode
+  * load unpacked extension from [dir-where-you-cloned]/Narwallets-extension/extension
+
 
