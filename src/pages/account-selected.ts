@@ -34,7 +34,7 @@ let seedTextElem :d.El;
 
 export async function show(accName:string, reposition?:string) {
     initPage();
-    await showAccountData(accName);
+    await SelectAndShowAccount(accName);
     d.showPage(THIS_PAGE)
     if (reposition) {
         switch (reposition) {
@@ -119,7 +119,7 @@ function getAccountRecord(accName:string):Promise<Account> {
     return askBackground({ code: "get-account", accountId: accName }) /*as Promise<Account>*/
 }
 
-async function showAccountData(accName:string) {
+async function SelectAndShowAccount(accName:string) {
 
     const accInfo = await getAccountRecord(accName)
     if (!accInfo) throw new Error("Account is not in this wallet: " + accName)
@@ -131,6 +131,14 @@ async function showAccountData(accName:string) {
         const ownerInfo = await getAccountRecord(accInfo.ownerId)
         if (ownerInfo && ownerInfo.privateKey) selectedAccountData.accessStatus = "Owner";
     }
+
+    showSelectedAccount()
+}
+
+function showSelectedAccount() {
+
+    //make sure available is up to date before displaying
+    selectedAccountData.available = selectedAccountData.accountInfo.lastBalance - selectedAccountData.accountInfo.lockedOther
 
     const SELECTED_ACCOUNT = "selected-account"
     d.clearContainer(SELECTED_ACCOUNT)
@@ -434,7 +442,7 @@ async function stakeClicked() {
     }
 }
 
-function saveSelectedAccount():Promise<any> {
+async function saveSelectedAccount():Promise<any> {
     return askBackgroundSetAccount(selectedAccountData.name, selectedAccountData.accountInfo)
 }
 
@@ -772,7 +780,7 @@ async function internalReflectTransfer(sender :string, receiver :string, amountN
     if (sender == selectedAccountData.name) {
         selectedAccountData.accountInfo.lastBalance -= amountNear
         selectedAccountData.available -= amountNear
-        await showAccountData(sender)
+        showSelectedAccount();
         await saveSelectedAccount();
     }
     //check if receiver is also in this wallet
@@ -1013,7 +1021,7 @@ async function addNoteOKClicked() {
     d.hideErr()
     selectedAccountData.accountInfo.note = d.inputById("add-note").value.trim()
     await saveSelectedAccount()
-    showAccountData(selectedAccountData.name)
+    showSelectedAccount()
     showButtons()
 }
 
@@ -1133,18 +1141,23 @@ async function AddPublicKeyToLockupOKClicked() {
 }
 
 //-----------------------------------
-function makeReadOnlyOKClicked() {
-    const confirmAccName = d.inputById("account-name-confirm").value
-    if (confirmAccName != selectedAccountData.name) {
-        d.showErr("Names don't match")
+async function makeReadOnlyOKClicked() {
+    try {
+        const confirmAccName = d.inputById("account-name-confirm").value
+        if (confirmAccName != selectedAccountData.name) {
+            d.showErr("Names don't match")
+        }
+        else {
+            selectedAccountData.accountInfo.privateKey = undefined
+            await saveSelectedAccount()
+            selectedAccountData.accessStatus = "Read Only"
+            showSelectedAccount()
+            d.showMsg("Account access removed", "success")
+            showButtons()
+        }
     }
-    else {
-        selectedAccountData.accountInfo.privateKey = undefined
-        saveSelectedAccount()
-        selectedAccountData.accessStatus = "Read Only"
-        d.showMsg("Account access removed", "success")
-        showAccountData(selectedAccountData.name)
-        showButtons()
+    catch(ex){
+        d.showErr(ex.message);
     }
 }
 
@@ -1185,7 +1198,7 @@ async function makeFullAccessOKClicked() {
         seedTextElem.value = ""
         await saveSelectedAccount()
         d.showMsg("Seed Phrase is correct. Access granted", "success")
-        showAccountData(selectedAccountData.name)
+        showSelectedAccount()
         showButtons()
     }
     catch (ex) {
@@ -1243,8 +1256,8 @@ async function removeAccountClicked(ev :Event) {
 
 async function refreshSaveSelectedAccount() {
     await searchAccounts.asyncRefreshAccountInfo(selectedAccountData.name, selectedAccountData.accountInfo)
-    await saveSelectedAccount() //save, because yes, and because showAccountData reads from saved
-    await showAccountData(selectedAccountData.name);
+    await saveSelectedAccount() //save
+    showSelectedAccount();
 }
 
 async function refreshClicked(ev :Event) {

@@ -32,6 +32,7 @@ export async function asyncRefreshAccountInfo(accName:string, info:Account) {
     if (accName.endsWith(suffix)) {
         //lockup contract
         if (!info.ownerId) return;
+        //get lockup contract data and update info param
         const lockup = await getLockupContract(info)
         if (!lockup) return;
     }
