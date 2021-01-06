@@ -20,6 +20,9 @@ import type {ResolvedMessage} from "../api/state-type.js"
 //---------- working data
 let _connectedTabs:Record<number,ConnectedTabInfo> = {};
 
+// if the transaction include attached near, store here to update acc balance async
+let global_NearsSent = {from:"", to:"", amount:0};
+
 //----------------------------------------
 //-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
 //-- msg path is popup->here->action->sendResponse(err,data)
@@ -48,13 +51,49 @@ function runtimeMessageHandler(msg:any, sender:chrome.runtime.MessageSender, sen
   else {
     //from internal pages like popup
     //other codes resolved by promises
+    global_NearsSent = {from:"", to:"", amount:0};
     getActionPromise(msg)
-      .then((data) => { sendResponse({ data: data }) })
-      .catch((ex) => { sendResponse({ err: ex.message }) })
+      .then((data) => { //promise resolved OK
+          setTimeout(reflectTransfer,200); //move amounts if accounts are in the wallet
+          sendResponse({ data: data }) 
+      })
+      .catch((ex) => { 
+        sendResponse({ err: ex.message }) 
+      })
     //sendResponse will be called async .- always return true
     //returning void cancels all pending callbacks
   }
   return true; //a prev callback could be pending.- always return true
+}
+
+//-- reflec transfer in wallet accounts
+function reflectTransfer() {
+  try {
+    if (global_NearsSent.amount==0 || !global.SecureState ) return;
+    let modified=false;
+    //check if sender is in this wallet
+    if (global_NearsSent.from) {
+        const senderAccInfo = global.SecureState.accounts[Network.current][global_NearsSent.from]
+        if (senderAccInfo) {
+          senderAccInfo.lastBalance -= global_NearsSent.amount
+          modified = true;
+        }
+    }
+    //check if receiver is also in this wallet
+    if (global_NearsSent.to) {
+        const receiverAccInfo = global.SecureState.accounts[Network.current][global_NearsSent.to]
+        if (receiverAccInfo) {
+          receiverAccInfo.lastBalance += global_NearsSent.amount
+          modified = true;
+        }
+    }
+    if (modified){
+      global.saveSecureState();
+    }
+  }
+  catch(ex){
+    console.error(ex.message);
+  }
 }
 
 //create a promise to resolve the action requested by the popup
@@ -202,9 +241,11 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
           case "call":
             const f = item as FunctionCall;
             actions.push(TX.functionCall(f.method, f.args, near.ONE_TGAS.muln(f.Tgas), near.ONE_NEAR.muln(f.attachedNear)))
+            global_NearsSent = {from: signerId, to:msg.tx.receiver, amount:f.attachedNear};
             break;
           case "transfer":
             actions.push(TX.transfer(near.ONE_NEAR.muln(item.attachedNear)))
+            global_NearsSent = {from: signerId, to:msg.tx.receiver, amount:item.attachedNear};
             break;
           case "delete":
             const d = item as DeleteAccountToBeneficiary;
@@ -279,6 +320,14 @@ function processMessageFromWebPage(msg:any) {
         if (!accInfo) throw Error(`Narwallets: account ${signerId} NOT FOUND on wallet`)
         if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`)
 
+        msg.dest = "approve" //send msg to the approval popup
+        msg.signerId = ctinfo.connectedAccountId;
+        msg.network = Network.current;
+
+        //pass message via chrome.extension.getBackgroundPage() common window
+        //@ts-ignore
+        window.pendingApprovalMsg = msg;
+
         //load popup window for the user to approve
         const width = 500
         const height = 500
@@ -290,17 +339,11 @@ function processMessageFromWebPage(msg:any) {
           width: width,
           height: height,
           focused: true
-        }, function (popupWindow) {
-          if (popupWindow) {
-            popupWindow.alwaysOnTop = true;
-            msg.dest = "approve" //send msg to the approval popup
-            msg.signerId = ctinfo.connectedAccountId;
-            msg.network = Network.current;
-            setTimeout(() => { chrome.runtime.sendMessage(msg) }, 100)
-          }
         })
       }
       catch (ex) {
+        //@ts-ignore
+        window.pendingApprovalMsg = undefined;
         resolvedMsg.err = ex.message;  //if error, also send msg to content-script->tab
         chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
       }
@@ -440,7 +483,7 @@ function continueCWP_3(cpsData:CPSDATA) {
       return cpsData.resolve();
     }
     else {
-      let errMsg = cpsData.ctinfo.connectedResponse.err || "not responding / Not a Narwallet-compatible web page"
+      let errMsg = cpsData.ctinfo.connectedResponse.err || "not responding / Not a Narwallets-compatible Web App"
       return cpsData.reject(Error(cpsData.url + ": " + errMsg))
     }
   }, 250);
@@ -474,6 +517,7 @@ function disconnectFromWebPage():Promise<void> {
 
 function isConnected():Promise<boolean> {
   return new Promise((resolve, reject) => {
+    if (!_connectedTabs) return resolve(false);
     chrome.tabs.query({ active: true, currentWindow: true },
       function (tabs) {
         if (!tabs || tabs.length==0 || !tabs[0]) return resolve(false);

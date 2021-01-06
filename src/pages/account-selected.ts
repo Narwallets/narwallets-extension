@@ -388,7 +388,7 @@ async function performLockupContractSend() {
 
         d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName)
 
-        await internalReflectTransfer(selectedAccountData.name, toAccName, amountToSend)
+        displayReflectTransfer(amountToSend)
 
         showButtons()
 
@@ -774,22 +774,15 @@ async function performLockupContractUnstake() {
 }
 
 
-async function internalReflectTransfer(sender :string, receiver :string, amountNear :number) {
-    let updated = false
-    //the sender should be the selected account
-    if (sender == selectedAccountData.name) {
-        selectedAccountData.accountInfo.lastBalance -= amountNear
-        selectedAccountData.available -= amountNear
-        showSelectedAccount();
-        await saveSelectedAccount();
-    }
-    //check if receiver is also in this wallet
-    const receiverAccInfo = await getAccountRecord(receiver)
-    if (receiverAccInfo) { //receiver is also in the wallet
-        receiverAccInfo.lastBalance += amountNear
-        return askBackgroundSetAccount(receiver, receiverAccInfo)
-    }
+function displayReflectTransfer(amountNear :number) {
+    //sender and receiver .accountInfo.lastBalance are asnyc updated and saved by background.ts function reflectTransfer()
+    //here we only refresh displayed account data
+    if (amountNear==0) return;
+    selectedAccountData.accountInfo.lastBalance -= amountNear
+    selectedAccountData.available -= amountNear
+    showSelectedAccount();
 }
+
 
 async function performSend() {
     try {
@@ -809,7 +802,7 @@ async function performSend() {
 
         d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName)
 
-        await internalReflectTransfer(selectedAccountData.name, toAccName, amountToSend)
+        displayReflectTransfer(amountToSend)
 
     }
     catch (ex) {
@@ -1065,8 +1058,6 @@ async function AccountDeleteOKClicked() {
         if (!beneficiary) throw Error("Enter the beneficiary account")
 
         const result = await askBackgroundApplyTxAction(toDeleteAccName, new DeleteAccountToBeneficiary(beneficiary), selectedAccountData.name)
-
-        await internalReflectTransfer(selectedAccountData.name, beneficiary, selectedAccountData.accountInfo.lastBalance)
 
         //remove from wallet
         await askBackground({ code: "remove-account", accountId: selectedAccountData.name})

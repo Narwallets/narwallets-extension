@@ -12,7 +12,6 @@
     "module": "es2020",
     "target": "es2020",
     "outDir": "extension/dist",
-    "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

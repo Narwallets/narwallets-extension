@@ -21,7 +21,7 @@
 				"isDefault": true,
 			},
 			"label": "npm: build",
-			"detail": "plus-ts build"
+			"detail": "build"
 		},
 		{
 			"type": "typescript",

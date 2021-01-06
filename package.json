@@ -11,8 +11,8 @@
     "url": "git+https://github.com/Narwallets/narwallets-extension.git"
   },
   "scripts": {
-    "build": "tsc -b -verbose",
-    "buildw": "tsc -b -verbose -w",
+    "build": "tsc -b -verbose tsconfig-sourcemap.json",
+    "buildw": "tsc -b -verbose -w tsconfig-sourcemap.json",
     "test": "chrome chrome://extensions/",
     "start": "chrome chrome://extensions/"
   },

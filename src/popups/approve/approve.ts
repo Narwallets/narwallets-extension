@@ -3,24 +3,37 @@ import * as c from "../../util/conversions.js"
 import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../api/batch-transaction.js"
 import { askBackground } from "../../api/askBackground.js"
 
+type TxInfo = {
+      action:string;
+      attachedNear: string;
+}
+
+type TxMsg = {
+      tabId: number;
+      requestId: number;
+      url: string;
+      network: string|undefined;
+      signerId:string;
+      tx:BatchTransaction;
+}
+type ResolvedMsg={
+    dest:"page";
+    code:"request-resolved";
+    tabId:number;
+    requestId:number;
+    err?:any;
+    data?:any
+}
+
 let responseSent=false;
 
-//----------------------------------------
-//-- LISTEN to "messages" from background.js
-//----------------------------------------
-console.log("approve.js chrome.runtime.onMessage.addListener")
-chrome.runtime.onMessage.addListener(
-  function (msg) {
-    if (msg.dest != "approve") return;
-    displayTx(msg)
-  }
-)
+var initialMsg:TxMsg;
+var resolvedMsg:ResolvedMsg;
 
 async function approveOkClicked() {
   d.showWait()
   try {
     //ask backgroun to apply transaction
-    initialMsg.dest = "ext";
     resolvedMsg.data = await askBackground(initialMsg)
     //response goes to initiating tab/page, another 5-min wating spinner is there
     chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //send resolution to original asking tab/page
@@ -51,31 +64,6 @@ window.addEventListener('beforeunload', function(event) {
   if (!responseSent) respondRejected();
 });
       
-
-type TxInfo = {
-      action:string;
-      attachedNear: string;
-}
-
-
-type TxMsg = {
-      url: string;
-      network: string|undefined;
-      signerId:string;
-      tx:BatchTransaction;
-}
-type ResolvedMsg={
-    dest:"page";
-    code:"request-resolved";
-    tabId:number;
-    requestId:number;
-    err?:any;
-    data?:any
-}
-
-
-var initialMsg:any;
-var resolvedMsg:any;
 
 function humanReadableValue(value:any){
   if (typeof value=="string"){
@@ -161,4 +149,9 @@ function displayTx(msg:TxMsg) {
     d.hideWait()
   }
 }
+
+//Display transaction for user approval
+//@ts-ignore
+const msg= chrome.extension.getBackgroundPage().pendingApprovalMsg
+displayTx(msg);
 
