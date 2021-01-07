@@ -235,10 +235,14 @@ export function showWait() {
     return;
   }
   waitDiv.classList.add("show");
+  window.addEventListener("keydown", ignoreKeys, true);
   hideTO = setTimeout(hideWait, 30000);//in case there's a programming error, hideWait is called automatically after 30 sec
 }
 
+function ignoreKeys(event:Event){ event.preventDefault() }
+
 export function hideWait() {
+  window.removeEventListener("keydown", ignoreKeys, true);
   clearTimeout(hideTO);
   const waitDiv = byId(WAIT)
   if (waitDiv) waitDiv.classList.remove("show"); //hide
