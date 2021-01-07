@@ -1,5 +1,9 @@
-import * as nacl from "../util/tweetnacl/nacl-fast.js"
-import * as naclUtil from "../util/tweetnacl/nacl-util.js";
+//import * as nacl from "../util/tweetnacl/nacl-fast.js"
+//import * as naclUtil from "../util/tweetnacl/nacl-util.js";
+import * as nacl from "../api/tweetnacl/sign.js"
+import * as naclUtil from "../api/tweetnacl/util.js"
+import {randomBytes} from "../api/tweetnacl/core/random.js"
+
 import * as sha256 from "../api/sha256.js"
 import * as Network from "../api/network.js";
 import { localStorageRemove, recoverFromLocalStorage, localStorageSave, localStorageSet, localStorageGet } from "./util.js";
