@@ -3,7 +3,7 @@
 ## Vision
 
 Assumptions:
-1) We want to support static-server single-page decentralized-web-apps: SPA DApps, that can be served from IPFS or siasky. Also we want to preserve the SPA state (avoid  navigating out of the site), that's why this is a chrome/chromium extension wallet.
+1) We want to support static-server single-page web-apps: SPA Web Apps, that can be served from IPFS or siasky. Also we want to preserve the SPA state (avoid  navigating out of the site), that's why this is a chrome/chromium extension wallet.
 
 2) Our "model-user" is not an expert. Our user doesn't want to have to acquire deep knowledge of the underlying technologies to use the application. 
 For example, even if EIP712 is a huge improvement, in the eyes of our hypothetical user, the before and after of EIP721 are unreadable
@@ -26,20 +26,20 @@ This solves two problems:
 
 1. Multiple extension wallets: If you have multiple wallets installed, **you choose** which wallet you want to use to "connect" to the web page. (Here's an example help page the user is directed to when tries to "login" from the DApp: https://www.narwallets.com/help/connect-to-web-app/. There could be a generic help page for DApps directing how to connect each compatible extension-wallet.)
 
-2. The DApp can be "chain and wallet agnostic". Because the connection is initiated from the wallet *and all access to the chain is made thru the wallet*, it's easier to make a DApp "chain and wallet agnostic"
+2. The DApp can be "chain and wallet agnostic". Because the connection is initiated from the wallet *and all access to the chain is made through the wallet*, it's easier to make a Web App "chain and wallet agnostic"
 
 **All access to the chain is made thru the wallet**
 
-The wallet-SDK is very-light. The Wallet-SDK only has the code required to communicate with an chrome-extension wallet (chrome.runtime.sendMessage, listeners, window.postMessage, marshaling). That's very few lines of code. It **does not** include json-RPC, crypto, BN, BIP-39, ed25519, tweetnacl, sha or any other dependency.
+The wallet-SDK is very-light. The Wallet-SDK only has the code required to communicate with a chrome-extension wallet (chrome.runtime.sendMessage, listeners, window.postMessage, marshaling). That's very few lines of code. It **does not** include json-RPC, crypto, BN, BIP-39, ed25519, tweetnacl, sha256 or any other dependency.
 
-The chrome extension-wallet has all the required dependencies to communicate with the chain, and its job is to sign and boradcast transactions into the chain, *hiding all the complexity from the DApp*.
+The chrome extension-wallet has all the required dependencies to communicate with the chain, and its job is to sign and boradcast transactions into the chain, *hiding all the complexity from the Web App*.
 
-Because the Wallet-SDK is very simple, it could be possible to create a single DApp that works with different blockchains, depending on what extension-wallet you decide to activate to "connect-to-the-web-page". The wallet itself handles all the complexity of tx-signing and broadcasting, and the smart contracts are different for each chain, but because the wallet-SDK is simple and high-level, it could "*theoretically*" be possible to use the same DApp UX code to operate on different chains.
+Because the Wallet-SDK is very simple, it could be possible to create a single Web App that works with different blockchains, depending on what extension-wallet you decide to activate to "connect-to-the-web-page". The wallet itself handles all the complexity of tx-signing and broadcasting, and the smart contracts are different for each chain, but because the wallet-SDK is simple and high-level, it could "*theoretically*" be possible to use the same Web App UX code to operate on different chains.
 
-The core Wallet integration API is 200 lines of typescript, and this is all a DApp must include. There's no other dependencies than this one (no tweetnacl,bn,bip39,crypto,sha256). 
+The core Wallet integration API is about 200 lines of typescript, and this is all a Web App must include. There's no other dependencies than this one (no tweetnacl,bn,bip39,crypto,sha256,web3.js or near-sdk-js). 
 
-All the complexity of connecting to the chain is handled by the chrome-extension wallet listening on the other side. This represents an advantage for DApps on the download size. Narwallets integration is 200 lines of typescript, while web3.js is 12MB unpacked, and ether.js is 9MB unpacked. 
-Our design of the ultra-ligth Wallet-API solves [the download-size problem](https://github.com/ethereum/web3.js/issues/1178) for all integrated DApps.
+All the complexity of connecting to the chain is handled by the chrome-extension wallet listening on the other side. This represents an advantage for Web Apps on the download size. Narwallets integration is 200 lines of typescript, while web3.js is 12MB unpacked, and ether.js is 9MB unpacked. 
+Our design of the ultra-ligth Wallet-API solves [the download-size problem](https://github.com/ethereum/web3.js/issues/1178) for all integrated Web Apps.
 
 *Core Wallet API:*
 ```typescript
