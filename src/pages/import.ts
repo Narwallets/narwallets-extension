@@ -254,12 +254,12 @@ async function searchClicked(ev :Event) {
 // }
 
 async function onNetworkChanged(info:NetworkInfo) {
-  //update indicator visual state
   if (!info) {
     console.error("!info")
     return 
   }
-  d.byId(NET_NAME).innerText = info.name; //serach button
+  //update .root-account
+  d.byId(NET_NAME).innerText = info.name; //search button
   d.byId(NET_ROOT).innerText = "." + info.rootAccount; //account name label
 }
 

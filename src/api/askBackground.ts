@@ -33,14 +33,14 @@ export function askBackgroundIsLocked():Promise<boolean>{
 export function askBackgroundGetState():Promise<StateStruct>{
     return askBackground({code:"get-state"}) as Promise<StateStruct>
 }
+export function askBackgroundSetNetwork(networkName:string):Promise<NetworkInfo>{
+    return askBackground({code:"set-network",network:networkName})
+}
 export function askBackgroundGetNetworkInfo():Promise<NetworkInfo>{
     return askBackground({code:"get-network-info"})
 }
 export function askBackgroundGetOptions():Promise<SecureOptions>{
     return askBackground({code:"get-options"}) as Promise<SecureOptions>
-}
-export function askBackgroundSetNetwork(networkName:string):Promise<any>{
-    return askBackground({code:"set-network",network:networkName})
 }
 export function askBackgroundAllNetworkAccounts():Promise<Record<string,Account>>{
     return askBackground({code:"all-network-accounts"}) as Promise<Record<string,Account>>

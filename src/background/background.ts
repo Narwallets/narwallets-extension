@@ -104,7 +104,7 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
     if (msg.code == "set-network") {
       Network.setCurrent(msg.network)
       localStorageSet({ selectedNetwork: Network.current })
-      return Promise.resolve();
+      return Promise.resolve(Network.currentInfo());
     }
     else if (msg.code == "get-network-info") {
       return Promise.resolve(Network.currentInfo());

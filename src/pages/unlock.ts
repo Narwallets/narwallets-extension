@@ -14,7 +14,8 @@ async function unlockClicked(ev :Event) {
     return;
   }
 
-  const password = passEl.value;
+  const password = passEl.value.trim();
+  if (!password) return;
   passEl.value = ""
 
   try {

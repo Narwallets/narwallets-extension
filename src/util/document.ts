@@ -3,10 +3,7 @@
 //---------------------
 import * as c from "./conversions.js"
 
-
 export type ClickHandler = (()=>void) | ((ev:Event)=>void) |  ((ev:Event)=>Promise<void>) | (()=>Promise<void>) 
-
-
 
 //events
 export const CLICK = "click"
@@ -21,6 +18,7 @@ export const HIDDEN = "hidden"
 export const ERR_DIV = "err-div"
 export const WAIT = "wait"
 
+export let activePage = "";
 
 //----DOM COMMON simple independent utility FUNCTIONS  -------
 /**
@@ -146,6 +144,7 @@ export function showByClass(id:string, className:string) {
 * @param id
 */
 export function showPage(id:string) {
+  activePage=id;
   showByClass(id, "page");
 }
 export function showSubPage(id:string) {

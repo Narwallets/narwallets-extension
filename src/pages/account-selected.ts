@@ -66,7 +66,7 @@ function initPage() {
     seedTextElem = new d.El("#seed-phrase")
 
     const backLink = new d.El("#account-selected.page .back-link");
-    backLink.onClick(Pages.show);
+    backLink.onClick(Pages.backToAccountsList);
 
     d.onClickId("send", sendClicked);
     d.onClickId("stake", stakeClicked);
