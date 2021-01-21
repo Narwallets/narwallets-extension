@@ -1,4 +1,4 @@
-# Wallet API - DApp connection design
+# Wallet API - Web App connection design
 
 ## Vision
 
@@ -20,13 +20,13 @@ For example, even if EIP712 is a huge improvement, in the eyes of our hypothetic
 
 ## Design
 
-We're using a kind of "dependency inversion". Instead of the DApp having a "login" button or several "login" buttons, one for each supported wallet, **the connection is initiated by the wallet**.
+We're using a kind of "dependency inversion". Instead of the Web App having a "login" button or several "login" buttons, one for each supported wallet, **the connection is initiated by the wallet**.
 
 This solves two problems:
 
-1. Multiple extension wallets: If you have multiple wallets installed, **you choose** which wallet you want to use to "connect" to the web page. (Here's an example help page the user is directed to when tries to "login" from the DApp: https://www.narwallets.com/help/connect-to-web-app/. There could be a generic help page for DApps directing how to connect each compatible extension-wallet.)
+1. Multiple extension wallets: If you have multiple wallets installed, **you choose** which wallet you want to use to "connect" to the web page. (Here's an example help page the user is directed to when tries to "login" from the Web App: https://www.narwallets.com/help/connect-to-web-app/. There could be a generic help page for Web Apps directing how to connect each compatible extension-wallet.)
 
-2. The DApp can be "chain and wallet agnostic". Because the connection is initiated from the wallet *and all access to the chain is made through the wallet*, it's easier to make a Web App "chain and wallet agnostic"
+2. The Web App can be "chain and wallet agnostic". Because the connection is initiated from the wallet *and all access to the chain is made through the wallet*, it's easier to make a Web App "chain and wallet agnostic"
 
 **All access to the chain is made thru the wallet**
 
@@ -34,7 +34,7 @@ The wallet-SDK is very-light. The Wallet-SDK only has the code required to commu
 
 The chrome extension-wallet has all the required dependencies to communicate with the chain, and its job is to sign and boradcast transactions into the chain, *hiding all the complexity from the Web App*.
 
-Because the Wallet-SDK is very simple, it could be possible to create a single Web App that works with different blockchains, depending on what extension-wallet you decide to activate to "connect-to-the-web-page". The wallet itself handles all the complexity of tx-signing and broadcasting, and the smart contracts are different for each chain, but because the wallet-SDK is simple and high-level, it could "*theoretically*" be possible to use the same Web App UX code to operate on different chains.
+Because the Wallet-SDK is very simple, it could be possible to create a single Web App that works with different blockchains, depending on what extension-wallet the user decides to activate to "connect-to-the-web-page". The wallet itself handles all the complexity of tx-signing and broadcasting, and the smart contracts are different for each chain, but because the wallet-SDK is simple and high-level, it could "*theoretically*" be possible to use the same Web App UX code to operate on different chains.
 
 The core Wallet integration API is about 200 lines of typescript, and this is all a Web App must include. There's no other dependencies than this one (no tweetnacl,bn,bip39,crypto,sha256,web3.js or near-sdk-js). 
 
@@ -60,8 +60,8 @@ export class Wallet {
     set network(value:string){ this._network = value;}
 
     // Note: Connection is started from the chrome-extension, so web pages don't get any info before the user decides to "connect"
-    // Also pages don't need to create buttons/options to connect to different wallets, as long all wallets connect with Dapp-pages by using this API
-    // potentially, a single DApp can be used to operate on multiple chains, since all requests are high-level and go thru the chrome-extension
+    // Also pages don't need to create buttons/options to connect to different wallets, as long all wallets connect with web pages by using this API
+    // potentially, a single web app can be used to operate on multiple chains, since all requests are high-level and go thru the chrome-extension
 
     get isConnected() {return this._isConnected}
    
