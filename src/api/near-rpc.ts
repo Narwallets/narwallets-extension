@@ -171,7 +171,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
 
     if (result.status && result.status.Failure) {
         console.error(JSON.stringify(result))
-        console.error(result)
+        console.error(getLogsAndErrorsFromReceipts(result))
         throw Error(formatJSONErr(result.status.Failure))
     }
 

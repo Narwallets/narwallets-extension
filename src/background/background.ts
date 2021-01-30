@@ -43,7 +43,8 @@ function runtimeMessageHandler(msg:any, sender:chrome.runtime.MessageSender, sen
     sendResponse({ err: "msg.dest must be 'ext'" })
   }
   else if (fromPage) {
-    // from a tab/content-script
+    // from web-app/tab -> content-script
+    // process separated from internal requests for security
     msg.url = url; //add source
     msg.tabId = (sender.tab ? sender.tab.id : -1); //add tab.id
     processMessageFromWebPage(msg)
@@ -72,7 +73,7 @@ function reflectTransfer() {
     if (global_NearsSent.amount==0 || !global.SecureState ) return;
     let modified=false;
     //check if sender is in this wallet
-    if (global_NearsSent.from) {
+    if (global_NearsSent.from && global.SecureState.accounts[Network.current]) {
         const senderAccInfo = global.SecureState.accounts[Network.current][global_NearsSent.from]
         if (senderAccInfo) {
           senderAccInfo.lastBalance -= global_NearsSent.amount
@@ -80,7 +81,7 @@ function reflectTransfer() {
         }
     }
     //check if receiver is also in this wallet
-    if (global_NearsSent.to) {
+    if (global_NearsSent.to && global.SecureState.accounts[Network.current]) {
         const receiverAccInfo = global.SecureState.accounts[Network.current][global_NearsSent.to]
         if (receiverAccInfo) {
           receiverAccInfo.lastBalance += global_NearsSent.amount
@@ -173,7 +174,8 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
     }
     else if (msg.code == "set-account-order") { //whe the user reorders the account list
       try{
-        global.SecureState.accounts[Network.current][msg.accountId].order = msg.order;
+        let accInfo = global.getAccount(msg.accountId)
+        accInfo.order = msg.order;
         global.saveSecureState()
         return Promise.resolve()
       }
@@ -230,8 +232,7 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
       //{code:"apply", signerId:<account>, tx:BatchTransction} 
       //when resolved, send msg to content-script->page
       const signerId = msg.signerId || "...";
-      const accInfo = global.SecureState.accounts[Network.current][signerId]
-      if (!accInfo) throw Error(`Narwallets: account ${signerId} NOT FOUND on wallet`)
+      const accInfo = global.getAccount(signerId);
       if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`)
       //convert wallet-api actions to near.TX.Action
       const actions:TX.Action[] = []
@@ -314,10 +315,9 @@ function processMessageFromWebPage(msg:any) {
           throw Error("connectedAccountId is null")  //if error also send msg to content-script->tab
         }
 
-        //creify account exists and is full-access
+        //verify account exists and is full-access
         const signerId = ctinfo.connectedAccountId
-        const accInfo = global.SecureState.accounts[Network.current][signerId]
-        if (!accInfo) throw Error(`Narwallets: account ${signerId} NOT FOUND on wallet`)
+        const accInfo = global.getAccount(signerId)
         if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`)
 
         msg.dest = "approve" //send msg to the approval popup
@@ -330,7 +330,7 @@ function processMessageFromWebPage(msg:any) {
 
         //load popup window for the user to approve
         const width = 500
-        const height = 500
+        const height = 540
         chrome.windows.create({
           url: 'popups/approve/approve.html',
           type: 'popup',
