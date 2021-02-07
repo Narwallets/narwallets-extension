@@ -17,3 +17,11 @@ You will not use any trade mark, service mark, trade name, logo of Narwallet or 
  
 If you have any questions, comments or interest in pursuing any other use cases, please reach out to us at hello@narwallets.com
 
+----
+License Spirit:
+All of the following is not part of the license but can explain the spirit:
+
+> Developers can still copy, modify, and distribute versions of this source code. 
+Yet for developers that copy, modify, or fork the Narwallets codebase for commercial use, we invite you to start a conversation with us to see how we can find a path forward together. For example, if you’ve copied Narwallets and offer it commercially to an audience larger than 10,000 monthly active users, we would like to enter into a formal commercial agreement to share a modest amount of profits as the code authors. Narwallets provides an essential and free community service, and to continue to do so, we need a sustainable future.
+
+[License Rationale Article (Metamask)](/docs/license-rationale.md)
