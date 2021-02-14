@@ -3,6 +3,7 @@ import * as naclUtil from "../util/tweetnacl/nacl-util.js";
 import * as sha256 from "../api/sha256.js";
 import * as Network from "../api/network.js";
 import { recoverFromLocalStorage, localStorageSave, localStorageGet } from "./util.js";
+import { log } from "../api/log.js";
 const DATA_VERSION = "0.1";
 const INVALID_USER_OR_PASS = "Invalid User or Password";
 //---- GLOBAL STATE ----
@@ -71,6 +72,11 @@ export function setCurrentUser(user) {
     }
 }
 export function isLocked() {
+    //DEBUG
+    if (!SecureState)
+        log("isLocked()? yes, !SecureState");
+    else if (!SecureState.hashedPass)
+        log("isLocked()? yes, !SecureState.hashedPass");
     return !SecureState || !SecureState.hashedPass;
 }
 function decryptIntoJson(hashedPassBase64, encryptedMsg) {

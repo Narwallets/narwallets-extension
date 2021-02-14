@@ -1,6 +1,6 @@
 import * as c from "../util/conversions.js"
 import * as global from "../data/global.js"
-import { log } from "../api/log.js"
+import { log, logEnabled } from "../api/log.js"
 
 import * as Network from "../api/network.js"
 import * as nearAccounts from "../util/search-accounts.js"
@@ -665,6 +665,7 @@ window.addEventListener("message",
   
 document.addEventListener('DOMContentLoaded', onLoad);
 async function onLoad() {
+  logEnabled(true);/*NOTE: REMOVE logEnabled(true) before publishing -- ad this note to the manifest to disable it*/
   log("background.js onLoad", new Date())
   await recoverWorkingData()
   await retrieveBgInfoFromStorage()

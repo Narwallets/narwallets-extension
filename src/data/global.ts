@@ -6,6 +6,7 @@ import { localStorageRemove, recoverFromLocalStorage, localStorageSave, localSto
 import { showErr } from "../util/document.js";
 import { Account } from "../api/account.js"; //required for SecureState declaration
 import { askBackground } from "../api/askBackground.js";
+import { log } from "../api/log.js";
 
 const DATA_VERSION = "0.1"
 
@@ -115,6 +116,10 @@ export function setCurrentUser(user:string) {
 }
 
 export function isLocked(){
+  //DEBUG
+  if (!SecureState) log("isLocked()? yes, !SecureState")
+  else if (!SecureState.hashedPass) log("isLocked()? yes, !SecureState.hashedPass");
+
   return !SecureState || !SecureState.hashedPass
 }
 

@@ -3,7 +3,7 @@
 
   "name": "Narwallets",
   "description": "NEAR protocol multi-account wallets",
-  "version": "1.0.2",
+  "version": "1.0.2", /*NOTE: REMOVE logEnabled(true) before publishing*/
 
   "browser_action": {
     "default_popup": "index.html"

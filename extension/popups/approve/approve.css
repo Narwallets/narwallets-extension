@@ -19,7 +19,8 @@ h1,h2,h3,h4 {
   text-align: center;
   font-weight: 270!important;
   word-break: break-word;
-  margin: 6px!important;
+  margin: 4px 20px;
+  padding: 2px;
 }
 h3,h4 {
   margin: 2px;
@@ -44,6 +45,7 @@ footer {
 .list {
     width: 100%;
     align-items: center;
+    margin: 4px;
 }
 
 li {

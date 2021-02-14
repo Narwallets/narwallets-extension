@@ -1,5 +1,5 @@
 import * as global from "../data/global.js";
-import { log } from "../api/log.js";
+import { log, logEnabled } from "../api/log.js";
 import * as Network from "../api/network.js";
 import * as near from "../api/near-rpc.js";
 import { localStorageSet, localStorageGet } from "../data/util.js";
@@ -577,6 +577,7 @@ async function retrieveBgInfoFromStorage() {
 }
 document.addEventListener('DOMContentLoaded', onLoad);
 async function onLoad() {
+    logEnabled(true); /*NOTE: REMOVE logEnabled(true) before publishing -- ad this note to the manifest to disable it*/
     log("background.js onLoad", new Date());
     await recoverWorkingData();
     await retrieveBgInfoFromStorage();
