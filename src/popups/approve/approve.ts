@@ -65,7 +65,7 @@ window.addEventListener('beforeunload', function(event) {
 });
       
 
-function humanReadableValue(value:any){
+function humanReadableValue(value:Object):string{
   if (typeof value=="string"){
     if (/\d{20}/.test(value)){
       //at least 20 digits. we assume YOCTOS
@@ -76,17 +76,17 @@ function humanReadableValue(value:any){
     }
   }
   else {
-    return value.ToString();
+    return value.toString();
   }
 }
 
-function humanReadableCallArgs(args:any):string{
+function humanReadableCallArgs(args:Object):string{
   let result="{ "
   let count=0
   for(let key in args){
     if (count>0) result = result+", ";
     result = result+key+":"
-    let value = args[key]
+    let value = (args as any)[key]
     if (typeof value=="object" && !(value instanceof Date)){
       result = result+humanReadableCallArgs(value); //recurse
     }
@@ -137,21 +137,21 @@ function displayTx(msg:TxMsg) {
       d.appendTemplateLI("list", "item-template", toAdd)
     }
 
+    //only if it displayed ok, enable ok action
     d.onClickId("approve-ok", approveOkClicked)
-    d.onClickId("approve-cancel", cancelOkClicked)
-
 
   }
   catch (ex) {
     d.showErr(ex.message)
-  }
-  finally {
-    d.hideWait()
+    d.qs("#approve-ok").hide() //hide ok button
   }
 }
 
+//--- INIT
+d.onClickId("approve-cancel", cancelOkClicked)
+//Get transaction to approve from background page window
+const bgpage:any = chrome.extension.getBackgroundPage() as any
+const msg:TxMsg=bgpage.pendingApprovalMsg
 //Display transaction for user approval
-//@ts-ignore
-const msg= chrome.extension.getBackgroundPage().pendingApprovalMsg
 displayTx(msg);
 

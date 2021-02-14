@@ -54,7 +54,7 @@ export function askBackgroundGetAccessKey(accountId:string, publicKey:string) :P
     return askBackground({code:"access-key", accountId:accountId, publicKey:publicKey})
 }
 
-export function askBackgroundViewMethod(contract:string, method:string, args:any) :Promise<any> {
+export function askBackgroundViewMethod(contract:string, method:string, args:Object) :Promise<any> {
         return askBackground({code:"view",contract:contract, method:method, args:args})
 }
 

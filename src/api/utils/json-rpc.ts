@@ -51,7 +51,7 @@ export function formatJSONErr(obj: any): any {
     let n = text.indexOf(KEY)
     if (n > 0 && n < text.length - kl - 5) {
         const i = text.indexOf("'", n + kl + 4)
-        const cutted = text.slice(n + kl, i)
+        const cutted = text.slice(n + kl, i+1)
         if (cutted.trim().length > 5) {
             console.error(text.slice(n, i + 80)) //show info in the console before removing extra info
             text = "panicked at: " + cutted;

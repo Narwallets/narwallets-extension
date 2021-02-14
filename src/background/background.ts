@@ -295,6 +295,30 @@ function processMessageFromWebPage(msg:any) {
       ctinfo.aceptedConnection = false
       break;
 
+    case "get-account-balance":
+      near.queryAccount(msg.accountId)
+        .then(data => {
+          resolvedMsg.data = data.amount;  //if resolved ok, send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+        })
+        .catch(ex => {
+          resolvedMsg.err = ex.message;  //if error ok, also send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+        })
+      break;
+
+    case "get-account-state":
+      near.queryAccount(msg.accountId)
+        .then(data => {
+          resolvedMsg.data = data;  //if resolved ok, send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+        })
+        .catch(ex => {
+          resolvedMsg.err = ex.message;  //if error ok, also send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+        })
+      break;
+  
     case "view":
       //view-call request
       near.view(msg.contract, msg.method, msg.args)
