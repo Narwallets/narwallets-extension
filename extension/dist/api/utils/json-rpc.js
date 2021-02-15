@@ -58,6 +58,7 @@ export async function jsonRpcInternal(payload) {
             headers: { 'Content-type': 'application/json; charset=utf-8' }
         };
         let timeoutRetries = 0;
+        let accountDontExistsRetries = 0;
         while (true) {
             let fetchResult = await fetch(rpcUrl, rpcOptions);
             let response = await fetchResult.json();
@@ -83,6 +84,13 @@ export async function jsonRpcInternal(payload) {
                     }
                     err.name = 'TimeoutError';
                     throw err;
+                }
+                else if (rpcUrl.indexOf("mainnet") == -1 && errorMessage.indexOf("doesn't exist") != -1) {
+                    //often in testnet there's failure searching existing accounts. Retry
+                    if (accountDontExistsRetries < 2) {
+                        accountDontExistsRetries++;
+                        continue;
+                    }
                 }
                 else {
                     throw new Error("Error: " + errorMessage);
