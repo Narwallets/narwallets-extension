@@ -12,10 +12,12 @@ import * as TX from "../api/transaction.js"
 
 import { isValidEmail } from "../api/utils/valid.js"
 
-
 import type { FunctionCall,DeleteAccountToBeneficiary } from "../api/batch-transaction.js"
 import type {ResolvedMessage} from "../api/state-type.js"
 
+//version: major+minor+version, 3 digits each
+function semver(major:number,minor:number,version:number):number{return major*1e6+minor*1e3+version}
+const WALLET_VERSION = semver(1,0,3) 
 
 //---------- working data
 let _connectedTabs:Record<number,ConnectedTabInfo> = {};
@@ -499,7 +501,7 @@ function continueCWP_3(cpsData:CPSDATA) {
   cpsData.ctinfo.connectedResponse={err:undefined};
   log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url)
   //send connect order via content script. a response will be received later
-  chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network } })
+  chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network, version: WALLET_VERSION } })
   //wait 250 for response
   setTimeout(() => {
     if (cpsData.ctinfo.aceptedConnection) { //page responded with connection info
@@ -662,10 +664,16 @@ window.addEventListener("message",
     const nw = await localStorageGet("selectedNetwork") as string;
     if (nw) Network.setCurrent(nw);
 }
-  
+
+//returns true if loaded-upacked, developer mode
+//false if installed from the chrome store
+function isDeveloperMode() {
+  return !('update_url' in chrome.runtime.getManifest());
+}
+
 document.addEventListener('DOMContentLoaded', onLoad);
 async function onLoad() {
-  logEnabled(true);/*NOTE: REMOVE logEnabled(true) before publishing -- ad this note to the manifest to disable it*/
+  logEnabled(isDeveloperMode());
   log("background.js onLoad", new Date())
   await recoverWorkingData()
   await retrieveBgInfoFromStorage()

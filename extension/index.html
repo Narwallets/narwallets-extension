@@ -82,7 +82,7 @@
             <!-- New User create pass-->
             <div id="create-user" class="page slide-hide">
                 <h1>Create User</h1>
-                <form class="create-pass-form">
+                <div class="create-pass-form">
                     <div class="form-field-label">
                         <label data-shrink="true" for="email">Your e-mail</label>
                         <div class="form-control">
@@ -117,7 +117,7 @@
                         <button class="btn-primary" id="create-user">Create
                         </button>
                     </div>
-                </form>
+                </div>
 
             </div>
 
@@ -151,7 +151,7 @@
             <!-- Import Account -->
             <div id="import-account" class="page slide-hide">
                 <h1>Import existing account</h1>
-                <form class="import-form">
+                <div class="import-form">
                     <div class="form-field-label">
                         <label for="search-account-name">Search Account Name</label>
                         <div class="form-control">
@@ -205,7 +205,7 @@
                     <button id="import" class="button btn-primary medium hidden">
                         Import Account into this Wallet
                     </button>
-                </form>
+                </div>
             </div>
 
 
@@ -394,7 +394,7 @@
                         <div class="title">
                             <h2>Send</h2>
                         </div>
-                        <form class="send-form">
+                        <div class="send-form">
                             <div class="form-field-label">
                                 <label for="send-to-account-name">
                                     Send to Account Id
@@ -413,7 +413,7 @@
                                         value="">
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- subpage SEND CONFIRMATION -->
@@ -421,13 +421,13 @@
                         <div class="title">
                             <h2>Confirm Send</h2>
                         </div>
-                        <form class="send-form-confirmation">
+                        <div class="send-form-confirmation">
                             <div class="subtitle">
                                 <h3 class="warning">Send <span id="send-confirmation-amount"></span> NEAR
                                     to <span id="send-confirmation-receiver"></span> ?</h3>
                             </div>
                             <br>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- subpage DELETE ACCOUNT -->
@@ -435,7 +435,7 @@
                         <div class="title">
                             <h2>Delete Account</h2>
                         </div>
-                        <form class="delete-account">
+                        <div class="delete-account">
                             <div class="form-field-label">
                                 <label for="send-balance-to-account-name">
                                     Balance beneficiary Account Id
@@ -459,8 +459,8 @@
                                         type="text" dir="auto" value="">
                                 </div>
                             </div>
-                        </form>
-                        </form>
+                        </div>
+                        </div>
                     </div>
 
                     <!-- subpage STAKE -->
@@ -569,7 +569,7 @@
                         <div class="subtitle">
                             <h3>Enter the seed phrase (or private key)<br> for this account</h3>
                         </div>
-                        <form class="seed-phrase-form">
+                        <div class="seed-phrase-form">
                             <div class="form-field-label">
                                 <label for="seed-phrase">
                                     Seed Phrase
@@ -579,7 +579,7 @@
                                         id="seed-phrase" type="text">
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- subpage MAKE READ ONLY -->
@@ -593,7 +593,7 @@
                                 without the seed phrase. Please make sure you
                                 have the seed phrase securely stored and available</h3>
                         </div>
-                        <form class="make-read-only-form">
+                        <div class="make-read-only-form">
                             <div class="form-field-label">
                                 <label for="account-name-confirm">
                                     Type the account name to confirm
@@ -603,7 +603,7 @@
                                         dir="auto" value="">
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- subpage ADD FAK TO LOCKUP -->
@@ -617,7 +617,7 @@
                         <!--<div class="subtitle">
                             <h3>Enter the Public Key to Add</h3>
                         </div>
-                        <form class="public-key">
+                        <div class="public-key">
                             <div class="form-field-label">
                                 <label for="add-public-key">
                                     New Public Key for Full Access
@@ -627,7 +627,7 @@
                                         id="add-public-key" type="text" dir="auto" value="">
                                 </div>
                             </div>
-                        </form>
+                        </div>
                         -->
                     </div>
 
@@ -641,7 +641,7 @@
                         </div>
                         <!--<div class="round-box bg-lightblue">
                         </div>-->
-                        <form class="public-key">
+                        <div class="public-key">
                             <div class="form-field-label">
                                 <label for="add-note">
                                     Note:
@@ -650,7 +650,7 @@
                                     <input id="add-note" type="text">
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- OK CANCEL buttons common to all subpages -->

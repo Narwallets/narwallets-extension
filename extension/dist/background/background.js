@@ -5,6 +5,9 @@ import * as near from "../api/near-rpc.js";
 import { localStorageSet, localStorageGet } from "../data/util.js";
 import * as TX from "../api/transaction.js";
 import { isValidEmail } from "../api/utils/valid.js";
+//version: major+minor+version, 3 digits each
+function semver(major, minor, version) { return major * 1e6 + minor * 1e3 + version; }
+const WALLET_VERSION = semver(1, 0, 3);
 //---------- working data
 let _connectedTabs = {};
 // if the transaction include attached near, store here to update acc balance async
@@ -431,7 +434,7 @@ function continueCWP_3(cpsData) {
     cpsData.ctinfo.connectedResponse = { err: undefined };
     log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url);
     //send connect order via content script. a response will be received later
-    chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network } });
+    chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network, version: WALLET_VERSION } });
     //wait 250 for response
     setTimeout(() => {
         if (cpsData.ctinfo.aceptedConnection) { //page responded with connection info
@@ -575,9 +578,14 @@ async function retrieveBgInfoFromStorage() {
     if (nw)
         Network.setCurrent(nw);
 }
+//returns true if loaded-upacked, developer mode
+//false if installed from the chrome store
+function isDeveloperMode() {
+    return !('update_url' in chrome.runtime.getManifest());
+}
 document.addEventListener('DOMContentLoaded', onLoad);
 async function onLoad() {
-    logEnabled(true); /*NOTE: REMOVE logEnabled(true) before publishing -- ad this note to the manifest to disable it*/
+    logEnabled(isDeveloperMode());
     log("background.js onLoad", new Date());
     await recoverWorkingData();
     await retrieveBgInfoFromStorage();

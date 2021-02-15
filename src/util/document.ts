@@ -60,7 +60,9 @@ export function onClickId(id:string, clickHandler:(ev:Event)=>void) {
  * @param clickHandler
  */
 export function onEnterKey(textId:string, clickHandler:(ev:Event)=>void) {
-  byId(textId).addEventListener("keyup", (event:KeyboardEvent) => { if (event.key === 'Enter') clickHandler(event) })
+  byId(textId).addEventListener("keyup", (event:KeyboardEvent) => { 
+    if (event.key === 'Enter') clickHandler(event) 
+  })
 }
 
 export function onClickSelector(selector:string, clickHandler:(ev:Event)=>void) {
