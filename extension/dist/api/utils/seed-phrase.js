@@ -11,7 +11,9 @@ export function check(seedPhrase) {
         return "expected 12 words";
     return "";
 }
-export function normalizeSeedPhrase(seedPhrase) { return seedPhrase.trim().split(/\s+/).map(part => part.toLowerCase()).join(' '); }
+export function normalizeSeedPhrase(seedPhrase) {
+    return seedPhrase.trim().split(/\s+/).map(part => part.toLowerCase()).join(' ');
+}
 export function parseSeedPhrase(seedPhrase) {
     const seed = bip39.mnemonicToSeed(normalizeSeedPhrase(seedPhrase));
     const { key } = derivePath(KEY_DERIVATION_PATH, seed.toString('hex'));
@@ -20,4 +22,3 @@ export function parseSeedPhrase(seedPhrase) {
     const secretKey = 'ed25519:' + bs58.encode(Buffer.from(keyPair.secretKey));
     return { seedPhrase, secretKey, publicKey };
 }
-//# sourceMappingURL=seed-phrase.js.map

@@ -1,7 +1,7 @@
 import * as sha256 from './sha256.js';
 import { Enum, Assignable } from './utils/enums.js';
 import { serialize, deserialize } from './utils/serialize.js';
-import { PublicKey } from './utils/key-pair.js';
+import { CurveAndArrayKey } from './utils/key-pair.js';
 //import { Signer } from './signer';
 export class FunctionCallPermission extends Assignable {
 }
@@ -105,13 +105,13 @@ export const SCHEMA = new Map([
             ] }],
     [Transaction, { kind: 'struct', fields: [
                 ['signerId', 'string'],
-                ['publicKey', PublicKey],
+                ['publicKey', CurveAndArrayKey],
                 ['nonce', 'u64'],
                 ['receiverId', 'string'],
                 ['blockHash', [32]],
                 ['actions', [Action]]
             ] }],
-    [PublicKey, { kind: 'struct', fields: [
+    [CurveAndArrayKey, { kind: 'struct', fields: [
                 ['keyType', 'u8'],
                 ['data', [32]]
             ] }],
@@ -154,14 +154,14 @@ export const SCHEMA = new Map([
             ] }],
     [Stake, { kind: 'struct', fields: [
                 ['stake', 'u128'],
-                ['publicKey', PublicKey]
+                ['publicKey', CurveAndArrayKey]
             ] }],
     [AddKey, { kind: 'struct', fields: [
-                ['publicKey', PublicKey],
+                ['publicKey', CurveAndArrayKey],
                 ['accessKey', AccessKey]
             ] }],
     [DeleteKey, { kind: 'struct', fields: [
-                ['publicKey', PublicKey]
+                ['publicKey', CurveAndArrayKey]
             ] }],
     [DeleteAccount, { kind: 'struct', fields: [
                 ['beneficiaryId', 'string']
@@ -201,4 +201,3 @@ export function createSignedTransaction(transaction, keyPair) {
     let result = createHashAndSignedTransaction(transaction, keyPair);
     return result.signedTransaction;
 }
-//# sourceMappingURL=transaction.js.map

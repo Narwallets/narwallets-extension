@@ -1,13 +1,14 @@
 import {Assignable} from './enums.js';
 import * as nacl from '../tweetnacl/sign.js';
 import { base_encode, base_decode } from './serialize.js';
+import { ByteArray } from '../tweetnacl/core/array.js';
 //import { Assignable } from './enums';
 
 export type Arrayish = string | ArrayLike<number>;
 
 export interface Signature {
     signature: Uint8Array;
-    publicKey: PublicKey;
+    publicKey: CurveAndArrayKey;
 }
 
 /** All supported key types */
@@ -32,23 +33,16 @@ function str_to_key_type(keyType: string): KeyType {
 /**
  * PublicKey representation that has type and bytes of the key.
  */
-export class PublicKey extends Assignable {
+export class CurveAndArrayKey extends Assignable {
     keyType!: KeyType 
     data!: Uint8Array
 
-    static from(value: string | PublicKey): PublicKey {
-        if (typeof value === 'string') {
-            return PublicKey.fromString(value);
-        }
-        return value;
-    }
-
-    static fromString(encodedKey: string): PublicKey {
+    static fromString(encodedKey: string): CurveAndArrayKey {
         const parts = encodedKey.split(':');
-        if (parts.length === 1) {
-            return new PublicKey({keyType:KeyType.ED25519, data:base_decode(parts[0])});
+        if (parts.length === 1) { //assume is all a ed25519 key
+            return new CurveAndArrayKey({keyType:KeyType.ED25519, data:base_decode(parts[0])});
         } else if (parts.length === 2) {
-            return new PublicKey({keyType:str_to_key_type(parts[0]),data:base_decode(parts[1])});
+            return new CurveAndArrayKey({keyType:str_to_key_type(parts[0]),data:base_decode(parts[1])});
         } else {
             throw new Error('Invalid encoded key format, must be <curve>:<encoded key>');
         }
@@ -63,7 +57,13 @@ export abstract class KeyPair {
     abstract sign(message: Uint8Array): Signature;
     abstract verify(message: Uint8Array, signature: Uint8Array): boolean;
     abstract toString(): string;
-    abstract getPublicKey(): PublicKey;
+    abstract getPublicKey(): CurveAndArrayKey;
+    abstract getSecretKey(): Uint8Array;
+
+    static fromString(privateKey: string): KeyPair {
+        const t = CurveAndArrayKey.fromString(privateKey);
+        return new KeyPairEd25519(t.data);
+    }
 
     /**
      * @param curve Name of elliptical curve, case-insensitive
@@ -75,20 +75,6 @@ export abstract class KeyPair {
         default: throw new Error(`Unknown curve ${curve}`);
         }
     }
-
-    static fromString(encodedKey: string): KeyPair {
-        const parts = encodedKey.split(':');
-        if (parts.length === 1) {
-            return new KeyPairEd25519(parts[0]);
-        } else if (parts.length === 2) {
-            switch (parts[0].toUpperCase()) {
-            case 'ED25519': return new KeyPairEd25519(parts[1]);
-            default: throw new Error(`Unknown curve: ${parts[0]}`);
-            }
-        } else {
-            throw new Error('Invalid encoded key format, must be <curve>:<encoded key>');
-        }
-    }
 }
 
 /**
@@ -96,18 +82,18 @@ export abstract class KeyPair {
  * generating key pairs, encoding key pairs, signing and verifying.
  */
 export class KeyPairEd25519 extends KeyPair {
-    readonly publicKey: PublicKey;
-    readonly secretKey: string;
+    readonly publicKey: CurveAndArrayKey;
+    readonly secretKey: Uint8Array;
 
     /**
      * Construct an instance of key pair given a secret key.
      * It's generally assumed that these are encoded in base58.
      * @param {string} secretKey
      */
-    constructor(secretKey: string) {
+    constructor(secretKey: Uint8Array) {
         super();
-        const keyPair = nacl.sign_keyPair_fromSecretKey(base_decode(secretKey));
-        this.publicKey = new PublicKey({keyType:KeyType.ED25519, data:keyPair.publicKey});
+        const keyPair = nacl.sign_keyPair_fromSecretKey(secretKey);
+        this.publicKey = new CurveAndArrayKey({keyType:KeyType.ED25519, data:keyPair.publicKey});
         this.secretKey = secretKey;
     }
 
@@ -123,11 +109,11 @@ export class KeyPairEd25519 extends KeyPair {
      */
     static fromRandom() {
         const newKeyPair = nacl.sign_keyPair();
-        return new KeyPairEd25519(base_encode(newKeyPair.secretKey));
+        return new KeyPairEd25519(newKeyPair.secretKey);
     }
 
     sign(message: Uint8Array): Signature {
-        const signature = nacl.sign_detached(message, base_decode(this.secretKey));
+        const signature = nacl.sign_detached(message, this.secretKey);
         return { signature, publicKey: this.publicKey };
     }
 
@@ -135,11 +121,17 @@ export class KeyPairEd25519 extends KeyPair {
         return nacl.sign_detached_verify(message, signature, this.publicKey.data);
     }
 
+    //returns private key .- good enough to re-build the pair
     toString(): string {
         return `ed25519:${this.secretKey}`;
     }
 
-    getPublicKey(): PublicKey {
+    getPublicKey(): CurveAndArrayKey {
         return this.publicKey;
     }
+
+    getSecretKey(): Uint8Array {
+        return this.secretKey;
+    }
+
 }

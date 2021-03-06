@@ -7,7 +7,7 @@ import * as Pages from "../pages/main.js"
 import * as StakingPool from "../api/staking-pool.js"
 import { isValidAccountID, isValidAmount } from "../api/utils/valid.js";
 import * as seedPhraseUtil from "../api/utils/seed-phrase.js"
-import { PublicKey, KeyPairEd25519 } from "../api/utils/key-pair.js"
+import { CurveAndArrayKey, KeyPairEd25519 } from "../api/utils/key-pair.js"
 
 import { LockupContract } from "../contracts/LockupContract.js"
 import { Account, ExtendedAccountData } from "../api/account.js"
@@ -200,6 +200,7 @@ function disableOKCancel() {
 function enableOKCancel() {
     confirmBtn.disabled = false
     cancelBtn.disabled = false
+    cancelBtn.hidden = false
 }
 
 function checkNormalAccountIsFullAccess() {
@@ -877,7 +878,11 @@ export async function searchThePools(exAccData:ExtendedAccountData) :Promise<boo
                         //validator is not a staking pool - ignore
                         isStakingPool = false
                     }
-                    else throw (ex)
+                    else {
+                        //just ignore
+                        continue;
+                        //throw (ex)
+                    }
                 }
                 checked[pool.account_id] = true
                 if (isStakingPool && poolAccInfo) {
@@ -961,6 +966,7 @@ export function showPrivateKeyClicked() {
         d.showSubPage("account-selected-show-private-key")
         d.byId("account-selected-private-key").innerText = selectedAccountData.accountInfo.privateKey||""
         showOKCancel(showButtons)
+        cancelBtn.hidden = true
     }
 }
 

@@ -9,7 +9,13 @@ import {sign_keyPair_fromSeed} from "../tweetnacl/sign.js"
 
 const KEY_DERIVATION_PATH = "m/44'/397'/0'"
 
-export function generateSeedPhrase(){
+export type SeedPhraseResult = {
+    seedPhrase:string;
+    secretKey:string;
+    publicKey:string;
+}
+
+export function generateSeedPhrase():SeedPhraseResult {
     return parseSeedPhrase(bip39.generateMnemonic())
 }
 
@@ -19,9 +25,11 @@ export function check(seedPhrase:string):string{
     return ""
 }
 
-export function normalizeSeedPhrase(seedPhrase:string){ return seedPhrase.trim().split(/\s+/).map(part => part.toLowerCase()).join(' ') }
+export function normalizeSeedPhrase(seedPhrase:string):string{ 
+    return seedPhrase.trim().split(/\s+/).map(part => part.toLowerCase()).join(' ') 
+}
 
-export function parseSeedPhrase(seedPhrase:string) {
+export function parseSeedPhrase(seedPhrase:string):SeedPhraseResult {
     const seed = bip39.mnemonicToSeed(normalizeSeedPhrase(seedPhrase))
     const { key } = derivePath(KEY_DERIVATION_PATH, seed.toString('hex'))
     const keyPair = sign_keyPair_fromSeed(key)

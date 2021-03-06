@@ -1,7 +1,7 @@
 import { jsonRpc, jsonRpcQuery, formatJSONErr } from "./utils/json-rpc.js"
 import * as naclUtil from "./tweetnacl/util.js"
 import { isValidAccountID } from "./utils/valid.js";
-import { PublicKey, KeyPairEd25519 } from "./utils/key-pair.js"
+import { CurveAndArrayKey, KeyPairEd25519 } from "./utils/key-pair.js"
 import { serialize, base_decode } from "./utils/serialize.js"
 import * as TX from "./transaction.js"
 

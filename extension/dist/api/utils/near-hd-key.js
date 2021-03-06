@@ -73,4 +73,3 @@ export function derivePath(path, seed) {
     return segments.reduce((parentKeys, segment) => CKDPriv(parentKeys, segment + HARDENED_OFFSET), { key, chainCode });
 }
 ;
-//# sourceMappingURL=near-hd-key.js.map

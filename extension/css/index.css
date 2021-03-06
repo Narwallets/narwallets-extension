@@ -82,6 +82,12 @@ li {
     list-style-type: none;
 }
 
+.form {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
 .circle:before {
     display: inline-block;
     content: "";
@@ -229,7 +235,7 @@ h1 {
 
 #welcome-new-user-page .contents-body{
     display: flex;
-    height: 100%
+    height: 100%;
     flex-flow: column nowrap;
     height: 500px;
     justify-content: center;
@@ -238,7 +244,7 @@ h1 {
 h2 {
     text-align: center;
     color: #1d1d1d;
-    font-size: 2.1em;
+    font-size: 1.9em;
     font-weight: 250;
 }
 
@@ -252,6 +258,8 @@ h3 {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .contents-body, form {
@@ -528,7 +536,7 @@ h3 {
     justify-content: space-around;
     display: flex;
     min-width: 230px;
-    max-width: 250px;
+    max-width: 340px;
     padding: 3px 0px;
     border-top: solid 1px lightgray;
 }
@@ -540,11 +548,11 @@ h3 {
 }
 
 button  {
-    font-size: 1.3em;
+    font-size: 1.2em;
     flex: 1 1 30%;
     min-height: 35px;
     /* max-height: 40px; */
-    padding: 6px 10px 10px 12px;
+    /* padding: 6px 10px 10px 12px; */
     line-height: 0.8em;
     margin: 4px;
 }
@@ -761,6 +769,19 @@ button  {
     word-break: break-all;
     /* padding: 10px; */
 }
+
+.seed-phrase {
+    font-size: 1.2em;
+    font-family: monospace;
+    /* padding-left: 16px; */
+    /* padding-bottom: 4px; */
+    /* padding-top: 0px; */
+    color: black;
+    /*word-break: break-all;*/
+    /* padding: 10px; */
+    margin: 20px;
+}
+
 
 button.big{
     padding: 8px 10px 12px 11px!important;

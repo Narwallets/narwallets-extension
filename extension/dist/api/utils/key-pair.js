@@ -21,20 +21,14 @@ function str_to_key_type(keyType) {
 /**
  * PublicKey representation that has type and bytes of the key.
  */
-export class PublicKey extends Assignable {
-    static from(value) {
-        if (typeof value === 'string') {
-            return PublicKey.fromString(value);
-        }
-        return value;
-    }
+export class CurveAndArrayKey extends Assignable {
     static fromString(encodedKey) {
         const parts = encodedKey.split(':');
-        if (parts.length === 1) {
-            return new PublicKey({ keyType: KeyType.ED25519, data: base_decode(parts[0]) });
+        if (parts.length === 1) { //assume is all a ed25519 key
+            return new CurveAndArrayKey({ keyType: KeyType.ED25519, data: base_decode(parts[0]) });
         }
         else if (parts.length === 2) {
-            return new PublicKey({ keyType: str_to_key_type(parts[0]), data: base_decode(parts[1]) });
+            return new CurveAndArrayKey({ keyType: str_to_key_type(parts[0]), data: base_decode(parts[1]) });
         }
         else {
             throw new Error('Invalid encoded key format, must be <curve>:<encoded key>');
@@ -45,6 +39,10 @@ export class PublicKey extends Assignable {
     }
 }
 export class KeyPair {
+    static fromString(privateKey) {
+        const t = CurveAndArrayKey.fromString(privateKey);
+        return new KeyPairEd25519(t.data);
+    }
     /**
      * @param curve Name of elliptical curve, case-insensitive
      * @returns Random KeyPair based on the curve
@@ -53,21 +51,6 @@ export class KeyPair {
         switch (curve.toUpperCase()) {
             case 'ED25519': return KeyPairEd25519.fromRandom();
             default: throw new Error(`Unknown curve ${curve}`);
-        }
-    }
-    static fromString(encodedKey) {
-        const parts = encodedKey.split(':');
-        if (parts.length === 1) {
-            return new KeyPairEd25519(parts[0]);
-        }
-        else if (parts.length === 2) {
-            switch (parts[0].toUpperCase()) {
-                case 'ED25519': return new KeyPairEd25519(parts[1]);
-                default: throw new Error(`Unknown curve: ${parts[0]}`);
-            }
-        }
-        else {
-            throw new Error('Invalid encoded key format, must be <curve>:<encoded key>');
         }
     }
 }
@@ -83,8 +66,8 @@ export class KeyPairEd25519 extends KeyPair {
      */
     constructor(secretKey) {
         super();
-        const keyPair = nacl.sign_keyPair_fromSecretKey(base_decode(secretKey));
-        this.publicKey = new PublicKey({ keyType: KeyType.ED25519, data: keyPair.publicKey });
+        const keyPair = nacl.sign_keyPair_fromSecretKey(secretKey);
+        this.publicKey = new CurveAndArrayKey({ keyType: KeyType.ED25519, data: keyPair.publicKey });
         this.secretKey = secretKey;
     }
     /**
@@ -99,20 +82,23 @@ export class KeyPairEd25519 extends KeyPair {
      */
     static fromRandom() {
         const newKeyPair = nacl.sign_keyPair();
-        return new KeyPairEd25519(base_encode(newKeyPair.secretKey));
+        return new KeyPairEd25519(newKeyPair.secretKey);
     }
     sign(message) {
-        const signature = nacl.sign_detached(message, base_decode(this.secretKey));
+        const signature = nacl.sign_detached(message, this.secretKey);
         return { signature, publicKey: this.publicKey };
     }
     verify(message, signature) {
         return nacl.sign_detached_verify(message, signature, this.publicKey.data);
     }
+    //returns private key .- good enough to re-build the pair
     toString() {
         return `ed25519:${this.secretKey}`;
     }
     getPublicKey() {
         return this.publicKey;
     }
+    getSecretKey() {
+        return this.secretKey;
+    }
 }
-//# sourceMappingURL=key-pair.js.map

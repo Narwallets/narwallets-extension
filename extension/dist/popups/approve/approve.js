@@ -115,4 +115,3 @@ const bgpage = chrome.extension.getBackgroundPage();
 const msg = bgpage.pendingApprovalMsg;
 //Display transaction for user approval
 displayTx(msg);
-//# sourceMappingURL=approve.js.map

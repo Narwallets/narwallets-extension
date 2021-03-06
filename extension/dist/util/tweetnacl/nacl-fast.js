@@ -2234,4 +2234,3 @@ export function setPRNG(fn) {
         }
     }
 })();
-//# sourceMappingURL=nacl-fast.js.map

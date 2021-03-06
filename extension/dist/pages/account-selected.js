@@ -143,6 +143,7 @@ function disableOKCancel() {
 function enableOKCancel() {
     confirmBtn.disabled = false;
     cancelBtn.disabled = false;
+    cancelBtn.hidden = false;
 }
 function checkNormalAccountIsFullAccess() {
     if (selectedAccountData.isFullAccess)
@@ -722,8 +723,11 @@ export async function searchThePools(exAccData) {
                         //validator is not a staking pool - ignore
                         isStakingPool = false;
                     }
-                    else
-                        throw (ex);
+                    else {
+                        //just ignore
+                        continue;
+                        //throw (ex)
+                    }
                 }
                 checked[pool.account_id] = true;
                 if (isStakingPool && poolAccInfo) {
@@ -797,6 +801,7 @@ export function showPrivateKeyClicked() {
         d.showSubPage("account-selected-show-private-key");
         d.byId("account-selected-private-key").innerText = selectedAccountData.accountInfo.privateKey || "";
         showOKCancel(showButtons);
+        cancelBtn.hidden = true;
     }
 }
 //---------------------------------------
@@ -1071,4 +1076,3 @@ async function refreshClicked(ev) {
         d.hideWait();
     }
 }
-//# sourceMappingURL=account-selected.js.map

@@ -303,26 +303,26 @@ border-color: #dfdfdf;
 }
 
 button.medium {
-font-size: 1.4em!important;
-padding: 5px 11px!important;
-/* line-height: 1em!important; */
-/* vertical-align: text-bottom; */
-/* max-height: 40px !important; */
-/* padding-top: 3px!important; */
-letter-spacing: 2.4px;
-min-width: 205px;
-border: 2px solid #b9bc5c7a;
-margin: 5px !important;
+  font-size: 1.4em!important;
+  /* padding: 5px 11px!important; *//* line-height: 1em!important; */
+  /* vertical-align: text-bottom; *//* max-height: 40px !important; */
+  /* padding-top: 3px!important; */
+  letter-spacing: 2.4px;
+  min-width: 190px;
+  border: 2px solid #b9bc5c7a;
+  margin: 5px !important;
 }
 
 button.small {
-font-size: 1em!important;
-padding: 3px 6px!important;
-line-height: 13px!important;
-/* vertical-align: text-bottom; */
-/* max-height: 40px !important; */
-/* padding-top: 3px!important; */
-letter-spacing: 2.4px;
+  font-size: 1em!important;
+  /* padding: 3px 6px!important; */
+  line-height: 13px!important;
+  /* vertical-align: text-bottom; */
+  /* max-height: 40px !important; */
+  /* padding-top: 3px!important; */
+  letter-spacing: 2.4px;
+  max-width: 130px;
+  /* min-width: 106px; */
 }
 
 

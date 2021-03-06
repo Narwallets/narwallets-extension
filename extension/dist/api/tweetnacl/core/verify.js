@@ -18,4 +18,3 @@ export function verify(x, y) {
         x.length == y.length &&
         vn(x, 0, y, 0, x.length) == 0;
 }
-//# sourceMappingURL=verify.js.map

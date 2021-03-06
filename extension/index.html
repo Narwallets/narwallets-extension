@@ -82,7 +82,7 @@
             <!-- New User create pass-->
             <div id="create-user" class="page slide-hide">
                 <h1>Create User</h1>
-                <div class="create-pass-form">
+                <div class="form">
                     <div class="form-field-label">
                         <label data-shrink="true" for="email">Your e-mail</label>
                         <div class="form-control">
@@ -106,17 +106,15 @@
                     <div class="checkbox-container">
                         <input id="agree-check" type="checkbox" bind:checked aria-checked="false"
                             aria-labelledby="checkbox-label" />
-                        <label for="checkbox" class="checkbox-label">
+                        <label for="agree-check" class="checkbox-label">
                             I have read and agree to the
                             <a href=# id="open-terms-of-use">Terms of
                                 Use
                             </a>
                         </label>
                     </div>
-                    <div class="center">
-                        <button class="btn-primary" id="create-user">Create
-                        </button>
-                    </div>
+                    <button class="big btn-primary" id="create-user">Create
+                    </button>
                 </div>
 
             </div>
@@ -140,18 +138,52 @@
                     </div>
                     <div disabled="" class="select-action-button-box">
                         <div class="text-big">No, create a new <i>named</i> account</div>
-                        <div class="text-small">This will create a new <i>named</i> account, you can choose the account name, but <b>you'll need to send 3 NEAR to complete account creation</b></div>
+                        <div class="text-small">This will create a new <i>named</i> account, you can choose the account name, but <b>you will have to send 1 NEAR to a temporary account</b> to complete the account creation</div>
                         <button id="option-create" class="btn-primary wide">Create Named Account</button>
                     </div>
                 </div>
 
             </div>
 
+            <div id="display-seed-phrase" class="page slide-hide">
+                <div class="contents-header">
+                    <h1>This is your Seed Phrase</h1>
+                    <h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed phrase owns the account.</b></h3>
+                </div>
+                <div class="contents-body">
+                    <div class="round-box bg-yellow">
+                        <h3>Your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
+                        <div id="seed-phrase-show-box" class="seed-phrase"></div>
+                    </div>
+                    <div class="flex-row">
+                        <button id="seed-phrase-continue" class="btn-primary">OK, I've written down the Seed Phrase</button>
+                        <button id="seed-phrase-cancel" class="btn-cancel">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seed-phrase-step-2" class="page slide-hide">
+                <div class="contents-header">
+                    <h1>Verifying your Seed Phrase</h1>
+                    <h2>What was word #<span id="seed-phrase-word-number"></span>?</h2>
+                </div>
+                <div class="form">
+                    <div class="form-field-label">
+                        <div class="form-control">
+                            <input  id="seed-word" type="text" dir="auto" value="">
+                        </div>
+                    </div>
+                    <div class="flex-row">
+                        <button id="seed-word-continue" class="medium btn-primary">Continue</button>
+                        <button id="seed-word-cancel" class="medium btn-cancel">Back</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Import Account -->
             <div id="import-account" class="page slide-hide">
                 <h1>Import existing account</h1>
-                <div class="import-form">
+                <div class="form">
                     <div class="form-field-label">
                         <label for="search-account-name">Search Account Name</label>
                         <div class="form-control">
@@ -535,7 +567,7 @@
                     <div id="account-selected-show-private-key" class="subpage hidden">
                         <div class="subtitle">
                             <h3>Please store the private key in a safe place. You WILL eventually need a seed phrase 
-                                or this private key to regain acces to your funds.
+                                or this private key to regain access to your funds.
                             <b>It's extremely important that you preserve your seed phrase or your private key</b></h3>
                         </div>
                         <div class="round-box bg-yellow">

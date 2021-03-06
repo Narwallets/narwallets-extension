@@ -10,4 +10,3 @@ export function randomBytes(n) {
     _randomBytes(b, n);
     return b;
 }
-//# sourceMappingURL=random.js.map

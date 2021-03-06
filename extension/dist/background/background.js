@@ -360,6 +360,8 @@ function connectToWebPage(accountId, network) {
     log("connectToWebPage start");
     return new Promise((resolve, reject) => {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            if (chrome.runtime.lastError)
+                console.error(chrome.runtime.lastError.message);
             const activeTabId = tabs[0].id || -1;
             if (!_connectedTabs)
                 _connectedTabs = {};
@@ -381,6 +383,9 @@ function connectToWebPage(accountId, network) {
             //check if it responds (if it is already injected)
             try {
                 chrome.tabs.sendMessage(cpsData.activeTabId, { code: "ping" }, function (response) {
+                    if (chrome.runtime.lastError) {
+                        response = undefined;
+                    }
                     if (!response) {
                         //not responding, set injected status to false
                         cpsData.ctinfo.injected = false;
@@ -454,6 +459,8 @@ function continueCWP_3(cpsData) {
 function disconnectFromWebPage() {
     return new Promise((resolve, reject) => {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            if (chrome.runtime.lastError)
+                console.error(chrome.runtime.lastError.message);
             const activeTabId = tabs[0].id || -1;
             if (_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection) {
                 _connectedTabs[activeTabId].aceptedConnection = false;
@@ -471,9 +478,8 @@ function isConnected() {
         if (!_connectedTabs)
             return resolve(false);
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            if (chrome.runtime.lastError) {
-                console.error(JSON.stringify(chrome.runtime.lastError));
-            }
+            if (chrome.runtime.lastError)
+                console.error(chrome.runtime.lastError.message);
             if (!tabs || tabs.length == 0 || !tabs[0])
                 return resolve(false);
             const activeTabId = tabs[0].id;
@@ -484,15 +490,16 @@ function isConnected() {
     });
 }
 function saveWorkingData() {
-    localStorageSet({ _ct: [_connectedTabs, global.workingData.unlockSHA] });
+    localStorageSet({ _ct: _connectedTabs, _us: global.workingData.unlockSHA });
     // if (!global.isLocked()) {
     //   localStorageSet({ _unlock:  })
     // }
 }
 //recover working data if it was suspended
 async function recoverWorkingData() {
-    [_connectedTabs, global.workingData.unlockSHA] = await localStorageGet("_ct");
+    _connectedTabs = await localStorageGet("_ct");
     log("RECOVERED _connectedTabs", _connectedTabs);
+    global.workingData.unlockSHA = await localStorageGet("_us");
     log("RECOVERED SHA", global.workingData.unlockSHA);
     //@ts-ignore 
     //_connectedTabs = await localStorageGet("_ct");
@@ -585,11 +592,7 @@ async function onLoad() {
     //chrome will process "MessageFromPage" ASAP, meaning BEFORE the 2nd await.
     //solution: MessageFromPage is on a setTimeout to execute async
     //logEnabled(isDeveloperMode());
-    log("background.js onLoad", new Date());
-    [_connectedTabs, global.workingData.unlockSHA] = await localStorageGet("_ct");
-    log("_ct RECOVERED ", JSON.stringify(_connectedTabs), global.workingData.unlockSHA);
-    //await recoverWorkingData()
+    await recoverWorkingData();
     if (!_bgDataRecovered)
         await retrieveBgInfoFromStorage();
 }
-//# sourceMappingURL=background.js.map

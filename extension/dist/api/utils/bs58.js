@@ -93,4 +93,3 @@ export function decode(str) {
     return new Uint8Array(bytes.reverse());
 }
 ;
-//# sourceMappingURL=bs58.js.map

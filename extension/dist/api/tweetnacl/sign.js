@@ -288,4 +288,3 @@ function pow2523(o, i) {
     for (a = 0; a < 16; a++)
         o[a] = c[a];
 }
-//# sourceMappingURL=sign.js.map

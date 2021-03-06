@@ -4,7 +4,7 @@ import type {BN} from '../bundled-types/BN';
 
 import { Enum, Assignable } from './utils/enums.js';
 import { serialize, deserialize } from './utils/serialize.js';
-import { KeyType, PublicKey } from './utils/key-pair.js';
+import { KeyType, CurveAndArrayKey } from './utils/key-pair.js';
 import { KeyPair } from './utils/key-pair.js';
 //import { Signer } from './signer';
 
@@ -41,9 +41,9 @@ class CreateAccount extends IAction {}
 class DeployContract extends IAction { code!: Uint8Array; }
 class FunctionCall extends IAction { methodName!: string; args!: Uint8Array; gas!: BN; deposit!: BN; }
 class Transfer extends IAction { deposit!: BN; }
-class Stake extends IAction { stake!: BN; publicKey!: PublicKey; }
-class AddKey extends IAction { publicKey!: PublicKey; accessKey!: AccessKey; }
-class DeleteKey extends IAction { publicKey!: PublicKey; }
+class Stake extends IAction { stake!: BN; publicKey!: CurveAndArrayKey; }
+class AddKey extends IAction { publicKey!: CurveAndArrayKey; accessKey!: AccessKey; }
+class DeleteKey extends IAction { publicKey!: CurveAndArrayKey; }
 class DeleteAccount extends IAction { beneficiaryId!: string; }
 
 export function createAccount(): Action {
@@ -74,15 +74,15 @@ export function transfer(deposit: BN): Action {
     return new Action({transfer: new Transfer({ deposit }) });
 }
 
-export function stake(stake: BN, publicKey: PublicKey): Action {
+export function stake(stake: BN, publicKey: CurveAndArrayKey): Action {
     return new Action({stake: new Stake({ stake, publicKey }) });
 }
 
-export function addKey(publicKey: PublicKey, accessKey: AccessKey): Action {
+export function addKey(publicKey: CurveAndArrayKey, accessKey: AccessKey): Action {
     return new Action({addKey: new AddKey({ publicKey, accessKey}) });
 }
 
-export function deleteKey(publicKey: PublicKey): Action {
+export function deleteKey(publicKey: CurveAndArrayKey): Action {
     return new Action({deleteKey: new DeleteKey({ publicKey }) });
 }
 
@@ -97,7 +97,7 @@ export class Signature extends Assignable {
 
 export class Transaction extends Assignable {
     signerId!: string;
-    publicKey!: PublicKey;
+    publicKey!: CurveAndArrayKey;
     nonce!: number;
     receiverId!: string;
     actions!: Action[];
@@ -150,13 +150,13 @@ export const SCHEMA = new Map<Function, any>([
     ]}],
     [Transaction, { kind: 'struct', fields: [
         ['signerId', 'string'],
-        ['publicKey', PublicKey],
+        ['publicKey', CurveAndArrayKey],
         ['nonce', 'u64'],
         ['receiverId', 'string'],
         ['blockHash', [32]],
         ['actions', [Action]]
     ]}],
-    [PublicKey, { kind: 'struct', fields: [
+    [CurveAndArrayKey, { kind: 'struct', fields: [
         ['keyType', 'u8'],
         ['data', [32]]
     ]}],
@@ -199,21 +199,21 @@ export const SCHEMA = new Map<Function, any>([
     ]}],
     [Stake, { kind: 'struct', fields: [
         ['stake', 'u128'],
-        ['publicKey', PublicKey]
+        ['publicKey', CurveAndArrayKey]
     ]}],
     [AddKey, { kind: 'struct', fields: [
-        ['publicKey', PublicKey],
+        ['publicKey', CurveAndArrayKey],
         ['accessKey', AccessKey]
     ]}],
     [DeleteKey, { kind: 'struct', fields: [
-        ['publicKey', PublicKey]
+        ['publicKey', CurveAndArrayKey]
     ]}],
     [DeleteAccount, { kind: 'struct', fields: [
         ['beneficiaryId', 'string']
     ]}],
 ]);
 
-export function createTransaction(signerId: string, publicKey: PublicKey, receiverId: string, nonce: number, actions: Action[], blockHash: Uint8Array): Transaction {
+export function createTransaction(signerId: string, publicKey: CurveAndArrayKey, receiverId: string, nonce: number, actions: Action[], blockHash: Uint8Array): Transaction {
     return new Transaction({ signerId, publicKey, nonce, receiverId, actions, blockHash });
 }
 
