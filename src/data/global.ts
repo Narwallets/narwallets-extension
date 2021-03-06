@@ -77,7 +77,7 @@ export function sha256PwdBase64(password:string):string {
 export function lock() {
   workingData.unlockSHA=""
   SecureState = Object.assign({},EmptySecureState);
-  console.log("LOCKED",SecureState.accounts)
+  log("LOCKED")
 }
 
 export function createSecureState(password:string) {
@@ -161,6 +161,7 @@ export async function unlockSecureStateSHA(email:string, hashedPassBase64:string
 //------------------
 // get existing account on Network.current or throw
 export function getAccount(accName:string): Account {
+  log("getAccount",accName)
   if (isLocked()) throw Error(`Narwallets: Wallet is locked`)
   const network = Network.current;
   if (!network) throw Error(`Narwallets: No network selected. Unlock the wallet`)

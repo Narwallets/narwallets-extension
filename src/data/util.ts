@@ -6,6 +6,9 @@ export async function localStorageGet(code:string):Promise<any> {
     try {
       chrome.storage.local.get(code, (obj) => {
         //console.log("localStorageGet",code,obj)
+        if (chrome.runtime.lastError) {
+          console.error(JSON.stringify(chrome.runtime.lastError))
+        }
         return resolve(obj[code])
       })
     }
@@ -40,6 +43,9 @@ export async function recoverFromLocalStorage(title:string,code:string,defaultVa
     return new Promise((resolve, reject) => {
       try {
         chrome.storage.local.get(code, (keys) => {
+          if (chrome.runtime.lastError) {
+            console.error(JSON.stringify(chrome.runtime.lastError))
+          }
           let result = (keys[code] || {})
           if (Object.keys(result).length == 0) Object.assign(result, defaultValue);
           return resolve(result)

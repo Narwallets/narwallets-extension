@@ -6,6 +6,14 @@ import { serialize, base_decode } from "./utils/serialize.js";
 import * as TX from "./transaction.js";
 import * as bs58 from "./utils/bs58.js";
 import * as sha256 from './sha256.js';
+export function BNTGas(tgas) {
+    return new BN(tgas * 1e12);
+}
+export function BNntoy(near) {
+    let by1e6 = Math.round(near * 1e6).toString(); // near * 1e6, round. MAX 6 decimal places
+    let yoctosText = by1e6 + "0".repeat(18); //  6+18=24
+    return new BN(yoctosText);
+}
 //---------------------------
 //-- NEAR PROTOCOL RPC CALLS
 //---------------------------
@@ -132,7 +140,7 @@ export async function broadcast_tx_commit_actions(actions, signerId, receiver, p
     });
     const result = await broadcast_tx_commit_signed(signedTransaction);
     if (result.status && result.status.Failure) {
-        console.error(JSON.stringify(result));
+        //console.error(JSON.stringify(result))
         console.error(getLogsAndErrorsFromReceipts(result));
         throw Error(formatJSONErr(result.status.Failure));
     }
@@ -140,7 +148,7 @@ export async function broadcast_tx_commit_actions(actions, signerId, receiver, p
         const sv = naclUtil.encodeUTF8(naclUtil.decodeBase64(result.status.SuccessValue));
         //console.log("result.status.SuccessValue:", sv)
         if (sv == "false") {
-            console.error(JSON.stringify(result));
+            //console.error(JSON.stringify(result))
             throw Error(getLogsAndErrorsFromReceipts(result));
         }
         else if (sv == "null")
@@ -195,12 +203,21 @@ export function send(sender, receiver, amountNear, privateKey) {
 //-------------------------------
 //-- CALL CONTRACT METHOD -------
 //-------------------------------
-export const BN_ZERO = new BN("0");
-export const ONE_TGAS = new BN("1" + "0".repeat(12));
-export const ONE_NEAR = new BN("1" + "0".repeat(24));
-export function call_method(contractId, method, params, sender, privateKey, gas, attachedAmount = 0) {
-    return broadcast_tx_commit_actions([TX.functionCall(method, params, gas, ONE_NEAR.muln(attachedAmount))], sender, contractId, privateKey);
-}
+// export const BN_ZERO = new BN("0")
+// export const ONE_TGAS = new BN("1" + "0".repeat(12));
+// export const ONE_NEAR = new BN("1" + "0".repeat(24));
+// export function call_method(
+//     contractId: string,
+//     method: string,
+//     params: any,
+//     sender: string,
+//     privateKey: string,
+//     gas: BNType,
+//     attachedAmount: number = 0): Promise<any> {
+//     return broadcast_tx_commit_actions(
+//         [TX.functionCall(method, params, gas, ONE_NEAR.muln(attachedAmount))],
+//         sender, contractId, privateKey)
+// }
 //-------------------------------
 export function delete_account(accountToDelete, privateKey, beneficiary) {
     if (!isValidAccountID(accountToDelete))

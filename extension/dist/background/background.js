@@ -10,6 +10,7 @@ function semver(major, minor, version) { return major * 1e6 + minor * 1e3 + vers
 const WALLET_VERSION = semver(1, 0, 3);
 //---------- working data
 let _connectedTabs = {};
+let _bgDataRecovered;
 // if the transaction include attached near, store here to update acc balance async
 let global_NearsSent = { from: "", to: "", amount: 0 };
 //----------------------------------------
@@ -33,7 +34,7 @@ function runtimeMessageHandler(msg, sender, sendResponse) {
         // process separated from internal requests for security
         msg.url = url; //add source
         msg.tabId = (sender.tab ? sender.tab.id : -1); //add tab.id
-        processMessageFromWebPage(msg);
+        setTimeout(() => { processMessageFromWebPage(msg); }, 100); //execute async
     }
     else {
         //from internal pages like popup
@@ -218,11 +219,11 @@ function getActionPromise(msg) {
                 switch (item.action) {
                     case "call":
                         const f = item;
-                        actions.push(TX.functionCall(f.method, f.args, near.ONE_TGAS.muln(f.Tgas), near.ONE_NEAR.muln(f.attachedNear)));
+                        actions.push(TX.functionCall(f.method, f.args, near.BNTGas(f.Tgas), near.BNntoy(f.attachedNear)));
                         global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: f.attachedNear };
                         break;
                     case "transfer":
-                        actions.push(TX.transfer(near.ONE_NEAR.muln(item.attachedNear)));
+                        actions.push(TX.transfer(near.BNntoy(item.attachedNear)));
                         global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: item.attachedNear };
                         break;
                     case "delete":
@@ -246,17 +247,20 @@ function getActionPromise(msg) {
 //---------------------------------------------------
 //process msgs from web-page->content-script->here
 //---------------------------------------------------
-function processMessageFromWebPage(msg) {
-    log("processMessageFromWebPage", msg);
+async function processMessageFromWebPage(msg) {
+    log(`enter processMessageFromWebPage _bgDataRecovered ${_bgDataRecovered}`);
     if (!msg.tabId) {
         console.error("msg.tabId is ", msg.tabId);
         return;
     }
+    if (!_bgDataRecovered)
+        await retrieveBgInfoFromStorage();
     if (!_connectedTabs[msg.tabId])
         _connectedTabs[msg.tabId] = {};
     const ctinfo = _connectedTabs[msg.tabId];
     //when resolved, send msg to content-script->page
     let resolvedMsg = { dest: "page", code: "request-resolved", tabId: msg.tabId, requestId: msg.requestId };
+    log(`processMessageFromWebPage _bgDataRecovered ${_bgDataRecovered}`, JSON.stringify(msg));
     switch (msg.code) {
         case "connected":
             ctinfo.aceptedConnection = (!msg.err);
@@ -467,6 +471,9 @@ function isConnected() {
         if (!_connectedTabs)
             return resolve(false);
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            if (chrome.runtime.lastError) {
+                console.error(JSON.stringify(chrome.runtime.lastError));
+            }
             if (!tabs || tabs.length == 0 || !tabs[0])
                 return resolve(false);
             const activeTabId = tabs[0].id;
@@ -477,31 +484,18 @@ function isConnected() {
     });
 }
 function saveWorkingData() {
-    localStorageSet({ _ct: _connectedTabs });
-    if (!global.isLocked()) {
-        //store unlock-SHA as an alarm (is volatile, more secure than storing in localStorage)
-        chrome.alarms.create("SHA_" + global.workingData.unlockSHA, { delayInMinutes: 24 * 60 });
-    }
+    localStorageSet({ _ct: [_connectedTabs, global.workingData.unlockSHA] });
+    // if (!global.isLocked()) {
+    //   localStorageSet({ _unlock:  })
+    // }
 }
 //recover working data if it was suspended
 async function recoverWorkingData() {
-    //@ts-ignore 
-    _connectedTabs = await localStorageGet("_ct");
+    [_connectedTabs, global.workingData.unlockSHA] = await localStorageGet("_ct");
     log("RECOVERED _connectedTabs", _connectedTabs);
-    return new Promise((resolve, reject) => {
-        chrome.alarms.getAll(function (alarms) {
-            for (let a of alarms) {
-                log(a, new Date(a.scheduledTime));
-                if (a.name.startsWith("SHA_")) {
-                    chrome.alarms.clear(a.name);
-                    global.workingData.unlockSHA = a.name.replace("SHA_", "");
-                    log("RECOVERED SHA from alarms");
-                    return resolve();
-                }
-            }
-            return resolve();
-        });
-    });
+    log("RECOVERED SHA", global.workingData.unlockSHA);
+    //@ts-ignore 
+    //_connectedTabs = await localStorageGet("_ct");
 }
 //------------------------
 //on bg page suspended
@@ -574,9 +568,11 @@ async function retrieveBgInfoFromStorage() {
             console.error("recovering secure state on retrieveBgInfoFromStorage", ex.message);
         }
     }
+    _bgDataRecovered = true;
     const nw = await localStorageGet("selectedNetwork");
     if (nw)
         Network.setCurrent(nw);
+    log("NETWORK=", nw);
 }
 //returns true if loaded-upacked, developer mode
 //false if installed from the chrome store
@@ -585,9 +581,15 @@ function isDeveloperMode() {
 }
 document.addEventListener('DOMContentLoaded', onLoad);
 async function onLoad() {
+    //WARNING:: if the background page wakes-up because a tx-apply
+    //chrome will process "MessageFromPage" ASAP, meaning BEFORE the 2nd await.
+    //solution: MessageFromPage is on a setTimeout to execute async
     logEnabled(isDeveloperMode());
     log("background.js onLoad", new Date());
-    await recoverWorkingData();
-    await retrieveBgInfoFromStorage();
+    [_connectedTabs, global.workingData.unlockSHA] = await localStorageGet("_ct");
+    log("_ct RECOVERED ", JSON.stringify(_connectedTabs), global.workingData.unlockSHA);
+    //await recoverWorkingData()
+    if (!_bgDataRecovered)
+        await retrieveBgInfoFromStorage();
 }
 //# sourceMappingURL=background.js.map

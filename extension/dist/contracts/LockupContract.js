@@ -85,7 +85,7 @@ export class LockupContract {
     // get totalBalance():number {
     //   return this.liquidBalance + this.locked + this.accountInfo.staked + this.accountInfo.rewards;
     // }
-    //wraps call to this loickup contract (method, params, gas)
+    //wraps call to this lockup contract (method, params, gas)
     call_method(method, args, gas) {
         if (!this.accountInfo.ownerId)
             throw Error("accountInfo.ownerId is undefined");

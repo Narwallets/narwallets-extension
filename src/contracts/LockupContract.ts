@@ -12,12 +12,10 @@ import {isValidAccountID, isValidAmount} from "../api/utils/valid.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../api/askBackground.js";
 import { FunctionCall } from "../api/batch-transaction.js";
 
-
-import { BN } from "../bundled-types/BN.js";
 import type {StakingPoolAccountInfoResult} from "../api/staking-pool.js";
 
 
-const BASE_GAS = 25;//new BN("25" + "0".repeat(12));
+const BASE_GAS = 25;
 
 export class LockupContract {
 
@@ -27,7 +25,6 @@ export class LockupContract {
   locked:number = 0
 
   constructor(info:Account) {
-    //this.BN_ZERO = new BN("0");
     this.accountInfo = info
     this.accountInfo.type = "lock.c"
   }
@@ -110,7 +107,7 @@ export class LockupContract {
   //   return this.liquidBalance + this.locked + this.accountInfo.staked + this.accountInfo.rewards;
   // }
 
-  //wraps call to this loickup contract (method, params, gas)
+  //wraps call to this lockup contract (method, params, gas)
   call_method(method:string, args:any, gas:number) :Promise<any> {
     if (!this.accountInfo.ownerId) throw Error("accountInfo.ownerId is undefined")
     return askBackgroundApplyTxAction(this.contractAccount,

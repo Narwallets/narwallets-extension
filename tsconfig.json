@@ -9,6 +9,7 @@
       "es2020.bigint",
       "es2020.string"
     ],
+    "rootDir": "src",
     "module": "es2020",
     "target": "es2020",
     "outDir": "extension/dist",
@@ -17,6 +18,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": false,
     "experimentalDecorators": true
-  },
-  "include":["src"]
+  }
 }

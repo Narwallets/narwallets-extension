@@ -210,9 +210,14 @@ chrome.runtime.onMessage.addListener(function (msg) {
 var background;
 //wake-up background page
 chrome.runtime.getBackgroundPage((bgpage) => {
-    background = bgpage;
-    //@ts-ignore
-    background.postMessage({ code: "popupLoading" }, "*");
-    //will reply with "can-init-popup" after retrieving data from localStorage
+    if (chrome.runtime.lastError) {
+        console.error(JSON.stringify(chrome.runtime.lastError));
+    }
+    else {
+        background = bgpage;
+        //@ts-ignore
+        background.postMessage({ code: "popupLoading" }, "*");
+        //will reply with "can-init-popup" after retrieving data from localStorage
+    }
 });
 //# sourceMappingURL=index.js.map

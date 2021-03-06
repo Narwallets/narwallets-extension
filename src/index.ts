@@ -14,7 +14,6 @@ import { askBackground, askBackgroundGetNetworkInfo, askBackgroundGetState, askB
 import { functionCall } from "./api/transaction.js"
 import { isValidEmail } from "./api/utils/valid.js"
 
-import * as bip39 from "./bundled-types/bip39-light"
 import type { NetworkInfo} from "./api/network.js"
 
 
@@ -269,9 +268,14 @@ chrome.runtime.onMessage.addListener(function(msg){
 var background:Window|undefined
 //wake-up background page
 chrome.runtime.getBackgroundPage((bgpage)=>{
-  background=bgpage;
-  //@ts-ignore
-  background.postMessage({code:"popupLoading"},"*")
-  //will reply with "can-init-popup" after retrieving data from localStorage
+  if (chrome.runtime.lastError) {
+    console.error(JSON.stringify(chrome.runtime.lastError))
+  }
+  else {
+    background=bgpage;
+    //@ts-ignore
+    background.postMessage({code:"popupLoading"},"*")
+    //will reply with "can-init-popup" after retrieving data from localStorage
+  }
 });
 

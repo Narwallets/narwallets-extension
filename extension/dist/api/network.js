@@ -25,8 +25,8 @@ export function setCurrent(networkName) {
     }
     current = networkName;
     setRpcUrl(info.rpc);
-    //broadcast change
-    chrome.runtime.sendMessage({ code: "network-changed", network: current, networkInfo: info });
+    //COMMENTED: this is called from processMsgFromPage-- bettter not broadcast changes
+    //chrome.runtime.sendMessage({ code: "network-changed", network:current, networkInfo:info });
 }
 ;
 export function getInfo(name) {

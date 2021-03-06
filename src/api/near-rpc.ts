@@ -10,7 +10,16 @@ import * as sha256 from './sha256.js';
 import type { BN as BNType } from '../bundled-types/BN.js';
 declare var BN: typeof BNType;
 
-//---------------------------
+export function BNTGas(tgas:number):BNType {
+    return new BN(tgas*1e12);
+  }
+export function BNntoy(near:number):BNType {
+    let by1e6 = Math.round(near * 1e6).toString() // near * 1e6, round. MAX 6 decimal places
+    let yoctosText = by1e6 + "0".repeat(18) //  6+18=24
+    return new BN(yoctosText);
+}
+
+  //---------------------------
 //-- NEAR PROTOCOL RPC CALLS
 //---------------------------
 
@@ -170,7 +179,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
     const result = await broadcast_tx_commit_signed(signedTransaction)
 
     if (result.status && result.status.Failure) {
-        console.error(JSON.stringify(result))
+        //console.error(JSON.stringify(result))
         console.error(getLogsAndErrorsFromReceipts(result))
         throw Error(formatJSONErr(result.status.Failure))
     }
@@ -179,7 +188,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
         const sv = naclUtil.encodeUTF8(naclUtil.decodeBase64(result.status.SuccessValue))
         //console.log("result.status.SuccessValue:", sv)
         if (sv == "false") {
-            console.error(JSON.stringify(result))
+            //console.error(JSON.stringify(result))
             throw Error(getLogsAndErrorsFromReceipts(result))
         }
         else if (sv == "null")
@@ -237,23 +246,23 @@ export function send(sender: string, receiver: string, amountNear: number, priva
 //-------------------------------
 //-- CALL CONTRACT METHOD -------
 //-------------------------------
-export const BN_ZERO = new BN("0")
-export const ONE_TGAS = new BN("1" + "0".repeat(12));
-export const ONE_NEAR = new BN("1" + "0".repeat(24));
+// export const BN_ZERO = new BN("0")
+// export const ONE_TGAS = new BN("1" + "0".repeat(12));
+// export const ONE_NEAR = new BN("1" + "0".repeat(24));
 
-export function call_method(
-    contractId: string,
-    method: string,
-    params: any,
-    sender: string,
-    privateKey: string,
-    gas: BNType,
-    attachedAmount: number = 0): Promise<any> {
+// export function call_method(
+//     contractId: string,
+//     method: string,
+//     params: any,
+//     sender: string,
+//     privateKey: string,
+//     gas: BNType,
+//     attachedAmount: number = 0): Promise<any> {
 
-    return broadcast_tx_commit_actions(
-        [TX.functionCall(method, params, gas, ONE_NEAR.muln(attachedAmount))],
-        sender, contractId, privateKey)
-}
+//     return broadcast_tx_commit_actions(
+//         [TX.functionCall(method, params, gas, ONE_NEAR.muln(attachedAmount))],
+//         sender, contractId, privateKey)
+// }
 
 //-------------------------------
 export function delete_account(accountToDelete: string, privateKey: string, beneficiary: string): Promise<any> {
