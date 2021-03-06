@@ -673,7 +673,7 @@ async function onLoad() {
   //WARNING:: if the background page wakes-up because a tx-apply
   //chrome will process "MessageFromPage" ASAP, meaning BEFORE the 2nd await.
   //solution: MessageFromPage is on a setTimeout to execute async
-  logEnabled(isDeveloperMode());
+  //logEnabled(isDeveloperMode());
   log("background.js onLoad", new Date());
   [ _connectedTabs, global.workingData.unlockSHA ] = await localStorageGet("_ct");
   log("_ct RECOVERED ", JSON.stringify(_connectedTabs), global.workingData.unlockSHA)

@@ -1,5 +1,5 @@
 import * as global from "../data/global.js";
-import { log, logEnabled } from "../api/log.js";
+import { log } from "../api/log.js";
 import * as Network from "../api/network.js";
 import * as near from "../api/near-rpc.js";
 import { localStorageSet, localStorageGet } from "../data/util.js";
@@ -584,7 +584,7 @@ async function onLoad() {
     //WARNING:: if the background page wakes-up because a tx-apply
     //chrome will process "MessageFromPage" ASAP, meaning BEFORE the 2nd await.
     //solution: MessageFromPage is on a setTimeout to execute async
-    logEnabled(isDeveloperMode());
+    //logEnabled(isDeveloperMode());
     log("background.js onLoad", new Date());
     [_connectedTabs, global.workingData.unlockSHA] = await localStorageGet("_ct");
     log("_ct RECOVERED ", JSON.stringify(_connectedTabs), global.workingData.unlockSHA);
