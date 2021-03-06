@@ -38,7 +38,7 @@ export function sha256PwdBase64(password) {
 export function lock() {
     workingData.unlockSHA = "";
     SecureState = Object.assign({}, EmptySecureState);
-    log("LOCKED", SecureState.accounts);
+    log("LOCKED");
 }
 export function createSecureState(password) {
     SecureState.hashedPass = sha256PwdBase64(password);

@@ -7,13 +7,12 @@ import * as StakingPool from "../api/staking-pool.js";
 import { isValidAccountID, isValidAmount } from "../api/utils/valid.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../api/askBackground.js";
 import { FunctionCall } from "../api/batch-transaction.js";
-const BASE_GAS = 25; //new BN("25" + "0".repeat(12));
+const BASE_GAS = 25;
 export class LockupContract {
     constructor(info) {
         this.contractAccount = "";
         this.liquidBalance = 0;
         this.locked = 0;
-        //this.BN_ZERO = new BN("0");
         this.accountInfo = info;
         this.accountInfo.type = "lock.c";
     }
