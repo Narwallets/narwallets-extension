@@ -13,28 +13,19 @@ async function hmac_sha512_Async(seed, passwordSalt) {
     // const I = hmac.update(seed).digest();
     // console.log(JSON.stringify(Buffer.from(I)))
     // return I
-    var enc = new TextEncoder();
     const key = await window.crypto.subtle.importKey("raw", // raw format of the key - should be Uint8Array
-    enc.encode(passwordSalt), {
+    passwordSalt, {
         name: "HMAC",
         hash: { name: "SHA-512" }
     }, false, // export = false
     ["sign", "verify"] // what this key can do
     );
     return window.crypto.subtle.sign("HMAC", key, seed);
-    //console.log("signature",JSON.stringify(Buffer.from(signature)));
-    //return Buffer.from(signature);
-    // var b = new Uint8Array(signature);
-    // //convert to hex
-    // var str = Array.prototype.map.call(b, x => ('00'+x.toString(16)).slice(-2)).join("")
-    // return str;
 }
 //------------
 export async function getMasterKeyFromSeed(seed) {
-    // const hmac = createHmac('sha512', ED25519_CURVE);
-    // const I = hmac.update(Buffer.from(seed, 'hex')).digest();
-    // console.log(JSON.stringify(I))
-    const I = Buffer.from(await hmac_sha512_Async(seed, ED25519_CURVE_SEED));
+    var pwdSalt = new TextEncoder().encode(ED25519_CURVE_SEED);
+    const I = Buffer.from(await hmac_sha512_Async(seed, pwdSalt));
     const IL = I.slice(0, 32);
     const IR = I.slice(32);
     return {
@@ -43,21 +34,18 @@ export async function getMasterKeyFromSeed(seed) {
     };
 }
 ;
-//@ts-ignore
-async function CKDPrivAsync({ key, chainCode }, index) {
+export async function CKDPrivAsync(k, index) {
     const indexBuffer = Buffer.allocUnsafe(4);
     indexBuffer.writeUInt32BE(index, 0);
-    const data = Buffer.concat([Buffer.alloc(1, 0), key, indexBuffer]);
-    // const I = createHmac('sha512', chainCode)
-    //     .update(data)
-    //     .digest();
-    const I = Buffer.from(await hmac_sha512_Async(data, chainCode));
+    const data = Buffer.concat([Buffer.alloc(1, 0), k.key, indexBuffer]);
+    const I = Buffer.from(await hmac_sha512_Async(data, k.chainCode));
     const IL = I.slice(0, 32);
     const IR = I.slice(32);
-    return {
+    const result = {
         key: IL,
         chainCode: IR,
     };
+    return result;
 }
 ;
 export function getPublicKey(privateKey, withZeroByte = true) {
@@ -78,11 +66,6 @@ export function isValidPath(path) {
             return false;
     }
     return true;
-    // return !path
-    //     .split('/')
-    //     .slice(1)
-    //     .map(replaceDerive)
-    //     .some(isNaN);
 }
 ;
 export async function derivePathAsync(path, seed) {
@@ -96,17 +79,10 @@ export async function derivePathAsync(path, seed) {
         .map(el => parseInt(el, 10));
     //derive
     let keys = await getMasterKeyFromSeed(seed);
-    // for(let n=0;n<segments.length;n++){
-    //     keys=await CKDPrivAsync(keys, segments[n] + HARDENED_OFFSET)
-    // }
-    //@ts-ignore
-    let result2 = await segments.reduce(
-        async (parentKeys, segment) => 
-            await CKDPriv(parentKeys, segment + HARDENED_OFFSET)
-            , { key, chainCode });
-    //@ts-ignore
-    return result2;
-    //return keys
+    for (let n = 0; n < segments.length; n++) {
+        keys = await CKDPrivAsync(keys, segments[n] + HARDENED_OFFSET);
+    }
+    return keys;
 }
 ;
-//# sourceMappingURL=near-hd-key.js.map
+//# sourceMappingURL=near-hd-key-Async.js.map

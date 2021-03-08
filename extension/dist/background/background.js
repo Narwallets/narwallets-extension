@@ -360,9 +360,7 @@ function connectToWebPage(accountId, network) {
     log("connectToWebPage start");
     return new Promise((resolve, reject) => {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            if (chrome.runtime.lastError)
-                console.error(chrome.runtime.lastError.message);
-            const activeTabId = tabs[0].id || -1;
+            const activeTabId = (tabs[0] ? tabs[0].id : -1) || -1;
             if (!_connectedTabs)
                 _connectedTabs = {};
             if (!_connectedTabs[activeTabId])
@@ -382,6 +380,10 @@ function connectToWebPage(accountId, network) {
             cpsData.ctinfo.connectedResponse = {};
             //check if it responds (if it is already injected)
             try {
+                if (chrome.runtime.lastError)
+                    throw Error(chrome.runtime.lastError.message);
+                if (!tabs || !tabs[0])
+                    throw Error("can access chrome tabs");
                 chrome.tabs.sendMessage(cpsData.activeTabId, { code: "ping" }, function (response) {
                     if (chrome.runtime.lastError) {
                         response = undefined;
@@ -460,7 +462,9 @@ function disconnectFromWebPage() {
     return new Promise((resolve, reject) => {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             if (chrome.runtime.lastError)
-                console.error(chrome.runtime.lastError.message);
+                throw Error(chrome.runtime.lastError.message);
+            if (!tabs || !tabs[0])
+                reject(Error("can access chrome tabs"));
             const activeTabId = tabs[0].id || -1;
             if (_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection) {
                 _connectedTabs[activeTabId].aceptedConnection = false;
@@ -479,7 +483,7 @@ function isConnected() {
             return resolve(false);
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             if (chrome.runtime.lastError)
-                console.error(chrome.runtime.lastError.message);
+                console.log(chrome.runtime.lastError.message);
             if (!tabs || tabs.length == 0 || !tabs[0])
                 return resolve(false);
             const activeTabId = tabs[0].id;

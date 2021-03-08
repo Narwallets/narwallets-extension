@@ -1008,8 +1008,8 @@ async function makeFullAccessOKClicked() {
         selectedAccountData.accountInfo.privateKey = secretKey;
         seedTextElem.value = "";
         await saveSelectedAccount();
-        d.showMsg("Seed Phrase is correct. Access granted", "success");
         selectAndShowAccount(selectedAccountData.name);
+        d.showMsg("Seed Phrase is correct. Access granted", "success");
         showButtons();
     }
     catch (ex) {
