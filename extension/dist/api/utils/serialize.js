@@ -4,6 +4,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+import { fromBE, toBufferLE } from '../crypto-lite/bigint-buffer.js';
 import * as bs58 from './bs58.js';
 // TODO: Make sure this polyfill not included when not required
 //import * as encoding from 'text-encoding-utf-8';
@@ -54,11 +55,11 @@ export class BinaryWriter {
     }
     write_u64(value) {
         this.maybe_resize();
-        this.write_buffer(Buffer.from(new BN(value).toArray('le', 8)));
+        this.write_buffer(toBufferLE(value, 8));
     }
     write_u128(value) {
         this.maybe_resize();
-        this.write_buffer(Buffer.from(new BN(value).toArray('le', 16)));
+        this.write_buffer(toBufferLE(value, 16));
     }
     write_buffer(buffer) {
         // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
@@ -120,11 +121,11 @@ export class BinaryReader {
     }
     read_u64() {
         const buf = this.read_buffer(8);
-        return new BN(buf, 'le');
+        return fromBE(buf);
     }
     read_u128() {
         const buf = this.read_buffer(16);
-        return new BN(buf, 'le');
+        return fromBE(buf);
     }
     read_buffer(len) {
         if ((this.offset + len) > this.buf.length) {
@@ -309,3 +310,4 @@ export function deserialize(schema, classType, buffer) {
     }
     return result;
 }
+//# sourceMappingURL=serialize.js.map

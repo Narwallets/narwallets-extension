@@ -244,11 +244,11 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
         switch (item.action) {
           case "call":
             const f = item as FunctionCall;
-            actions.push(TX.functionCall(f.method, f.args, near.BNTGas(f.Tgas), near.BNntoy(f.attachedNear)))
+            actions.push(TX.functionCall(f.method, f.args, near.TGas(f.Tgas), near.toYoctos(f.attachedNear)))
             global_NearsSent = {from: signerId, to:msg.tx.receiver, amount:f.attachedNear};
             break;
           case "transfer":
-            actions.push(TX.transfer(near.BNntoy(item.attachedNear)))
+            actions.push(TX.transfer(near.toYoctos(item.attachedNear)))
             global_NearsSent = {from: signerId, to:msg.tx.receiver, amount:item.attachedNear};
             break;
           case "delete":

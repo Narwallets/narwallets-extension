@@ -37,3 +37,4 @@ export function getInfo(name) {
 }
 export function currentInfo() { return getInfo(current); }
 ;
+//# sourceMappingURL=network.js.map

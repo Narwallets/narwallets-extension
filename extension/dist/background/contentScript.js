@@ -40,3 +40,4 @@ window.addEventListener("message", function (event) {
         }
     }
 }, false);
+//# sourceMappingURL=contentScript.js.map

@@ -1,7 +1,5 @@
 import * as sha256 from './sha256.js';
 
-import type {BN} from '../bundled-types/BN';
-
 import { Enum, Assignable } from './utils/enums.js';
 import { serialize, deserialize } from './utils/serialize.js';
 import { KeyType, CurveAndArrayKey } from './utils/key-pair.js';
@@ -9,7 +7,7 @@ import { KeyPair } from './utils/key-pair.js';
 //import { Signer } from './signer';
 
 export class FunctionCallPermission extends Assignable {
-    allowance?: BN;
+    allowance?: bigint;
     receiverId!: string;
     methodNames!: String[];
 }
@@ -31,7 +29,7 @@ export function fullAccessKey(): AccessKey {
     return new AccessKey({ nonce: 0, permission: new AccessKeyPermission({fullAccess: new FullAccessPermission({})}) });
 }
 
-export function functionCallAccessKey(receiverId: string, methodNames: String[], allowance?: BN): AccessKey {
+export function functionCallAccessKey(receiverId: string, methodNames: String[], allowance?: bigint): AccessKey {
     return new AccessKey({ nonce: 0, permission: new AccessKeyPermission({functionCall: new FunctionCallPermission({receiverId, allowance, methodNames})})});
 }
 
@@ -39,9 +37,9 @@ export class IAction extends Assignable {}
 
 class CreateAccount extends IAction {}
 class DeployContract extends IAction { code!: Uint8Array; }
-class FunctionCall extends IAction { methodName!: string; args!: Uint8Array; gas!: BN; deposit!: BN; }
-class Transfer extends IAction { deposit!: BN; }
-class Stake extends IAction { stake!: BN; publicKey!: CurveAndArrayKey; }
+class FunctionCall extends IAction { methodName!: string; args!: Uint8Array; gas!: bigint; deposit!: bigint; }
+class Transfer extends IAction { deposit!: bigint; }
+class Stake extends IAction { stake!: bigint; publicKey!: CurveAndArrayKey; }
 class AddKey extends IAction { publicKey!: CurveAndArrayKey; accessKey!: AccessKey; }
 class DeleteKey extends IAction { publicKey!: CurveAndArrayKey; }
 class DeleteAccount extends IAction { beneficiaryId!: string; }
@@ -63,18 +61,18 @@ export function deployContract(code: Uint8Array): Action {
  * @param gas max amount of gas that method call can use
  * @param deposit amount of NEAR (in yoctoNEAR) to send together with the call
  */
-export function functionCall(methodName: string, args: Uint8Array | object, gas: BN, deposit: BN): Action {
+export function functionCall(methodName: string, args: Uint8Array | object, gas: bigint, deposit: bigint): Action {
     const anyArgs = args as any;
     const isUint8Array = anyArgs.byteLength !== undefined && anyArgs.byteLength === anyArgs.length;
     const serializedArgs = isUint8Array ? args : Buffer.from(JSON.stringify(args));
     return new Action({functionCall: new FunctionCall({methodName, args: serializedArgs, gas, deposit }) });
 }
 
-export function transfer(deposit: BN): Action {
+export function transfer(deposit: bigint): Action {
     return new Action({transfer: new Transfer({ deposit }) });
 }
 
-export function stake(stake: BN, publicKey: CurveAndArrayKey): Action {
+export function stake(stake: bigint, publicKey: CurveAndArrayKey): Action {
     return new Action({stake: new Stake({ stake, publicKey }) });
 }
 

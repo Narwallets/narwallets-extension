@@ -6,7 +6,7 @@ import * as Pages from "../pages/main.js"
 
 import * as StakingPool from "../api/staking-pool.js"
 import { isValidAccountID, isValidAmount } from "../api/utils/valid.js";
-import * as seedPhraseUtil from "../api/utils/seed-phrase.js"
+import {checkSeedPhrase,parseSeedPhraseAsync}from "../api/utils/seed-phrase.js"
 import { CurveAndArrayKey, KeyPairEd25519 } from "../api/utils/key-pair.js"
 
 import { LockupContract } from "../contracts/LockupContract.js"
@@ -34,7 +34,7 @@ let seedTextElem :d.El;
 
 export async function show(accName:string, reposition?:string) {
     initPage();
-    await SelectAndShowAccount(accName);
+    await selectAndShowAccount(accName);
     d.showPage(THIS_PAGE)
     if (reposition) {
         switch (reposition) {
@@ -119,7 +119,7 @@ function getAccountRecord(accName:string):Promise<Account> {
     return askBackground({ code: "get-account", accountId: accName }) /*as Promise<Account>*/
 }
 
-async function SelectAndShowAccount(accName:string) {
+async function selectAndShowAccount(accName:string) {
 
     const accInfo = await getAccountRecord(accName)
     if (!accInfo) throw new Error("Account is not in this wallet: " + accName)
@@ -1173,10 +1173,9 @@ async function makeFullAccessOKClicked() {
         }
         else {
             //a seed phrase
-            let err = seedPhraseUtil.check(words)
-            if (err) throw Error(err)
-
-            const result = seedPhraseUtil.parseSeedPhrase(words)
+            const seedPrhase = words.split(' ')
+            checkSeedPhrase(seedPrhase)
+            const result = await parseSeedPhraseAsync(seedPrhase)
             secretKey = result.secretKey;
             publicKey = result.publicKey;
         }
@@ -1194,8 +1193,8 @@ async function makeFullAccessOKClicked() {
         selectedAccountData.accountInfo.privateKey = secretKey
         seedTextElem.value = ""
         await saveSelectedAccount()
+        selectAndShowAccount(selectedAccountData.name)
         d.showMsg("Seed Phrase is correct. Access granted", "success")
-        showSelectedAccount()
         showButtons()
     }
     catch (ex) {

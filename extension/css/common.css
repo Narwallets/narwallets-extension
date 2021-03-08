@@ -365,10 +365,10 @@ border-radius: 6px;
 color: #5d5d5d;
 }
 .bg-yellow {
-background-color:#e6e553cc;
-border-radius: 6px;
-color: #212121;
-border: 2px red solid;
+  background-color: #e6e55321;
+  border-radius: 6px;
+  color: #212121;
+  border: 3px #b45a5a solid;
 }
 
 .checkbox-container {

@@ -394,3 +394,4 @@ export function pbkdf2(password, salt, iterations, dkLen) {
     prf.clean();
     return dk;
 }
+//# sourceMappingURL=sha256.js.map

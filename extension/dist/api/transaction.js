@@ -201,3 +201,4 @@ export function createSignedTransaction(transaction, keyPair) {
     let result = createHashAndSignedTransaction(transaction, keyPair);
     return result.signedTransaction;
 }
+//# sourceMappingURL=transaction.js.map

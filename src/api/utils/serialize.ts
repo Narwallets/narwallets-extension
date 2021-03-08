@@ -1,7 +1,5 @@
+import { fromBE, toBufferLE } from '../crypto-lite/bigint-buffer.js';
 import * as bs58 from './bs58.js';
-
-import type {BN as BNClass} from '../../bundled-types/BN';
-declare var BN:typeof BNClass
 
 // TODO: Make sure this polyfill not included when not required
 //import * as encoding from 'text-encoding-utf-8';
@@ -67,14 +65,14 @@ export class BinaryWriter {
         this.length += 4;
     }
 
-    public write_u64(value: BNClass) {
+    public write_u64(value: bigint) {
         this.maybe_resize();
-        this.write_buffer(Buffer.from(new BN(value).toArray('le', 8)));
+        this.write_buffer(toBufferLE(value,8));
     }
 
-    public write_u128(value: BNClass) {
+    public write_u128(value: bigint) {
         this.maybe_resize();
-        this.write_buffer(Buffer.from(new BN(value).toArray('le', 16)));
+        this.write_buffer(toBufferLE(value,16));
     }
 
     private write_buffer(buffer: Buffer) {
@@ -149,15 +147,15 @@ export class BinaryReader {
     }
 
     @handlingRangeError
-    read_u64(): BNClass {
+    read_u64(): bigint {
         const buf = this.read_buffer(8);
-        return new BN(buf, 'le');
+        return fromBE(buf);
     }
 
     @handlingRangeError
-    read_u128(): BNClass {
+    read_u128(): bigint {
         const buf = this.read_buffer(16);
-        return new BN(buf, 'le');
+        return fromBE(buf);
     }
 
     private read_buffer(len: number): Buffer {

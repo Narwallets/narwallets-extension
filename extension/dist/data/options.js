@@ -11,3 +11,4 @@ export async function recoverOptions() {
 export function saveOptions() {
     localStorageSave("options", "opt", options);
 }
+//# sourceMappingURL=options.js.map

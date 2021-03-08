@@ -6,13 +6,16 @@ import { serialize, base_decode } from "./utils/serialize.js";
 import * as TX from "./transaction.js";
 import * as bs58 from "./utils/bs58.js";
 import * as sha256 from './sha256.js';
-export function BNTGas(tgas) {
-    return new BN(tgas * 1e12);
+const base1e = BigInt(10);
+function b1e(n) { return base1e ** BigInt(n); }
+;
+const b1e12 = b1e(12);
+const b1e24 = b1e(24);
+export function TGas(tgas) {
+    return BigInt(tgas) * b1e12; // tgas*1e12
 }
-export function BNntoy(near) {
-    let by1e6 = Math.round(near * 1e6).toString(); // near * 1e6, round. MAX 6 decimal places
-    let yoctosText = by1e6 + "0".repeat(18); //  6+18=24
-    return new BN(yoctosText);
+export function toYoctos(near) {
+    return BigInt(near) * b1e24; // near*1e24
 }
 //---------------------------
 //-- NEAR PROTOCOL RPC CALLS
@@ -191,33 +194,9 @@ function getLogsAndErrorsFromReceipts(txResult) {
 export function send(sender, receiver, amountNear, privateKey) {
     if (isNaN(amountNear) || amountNear <= 0)
         throw Error("invalid amount");
-    const actions = [TX.transfer(new BN(ntoy(amountNear)))];
+    const actions = [TX.transfer(toYoctos(amountNear))];
     return broadcast_tx_commit_actions(actions, sender, receiver, privateKey);
 }
-//-------------------------------
-// export function stake(stakingPoolId: string, amountNear: number, sender: string, privateKey: string): Promise<any> {
-//     if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount")
-//     const actions = [TX.stake(new BN(ntoy(amountNear)), publicKey???which one?)]
-//     return broadcast_tx_commit_actions(actions, sender, stakingPoolId, privateKey)
-// }
-//-------------------------------
-//-- CALL CONTRACT METHOD -------
-//-------------------------------
-// export const BN_ZERO = new BN("0")
-// export const ONE_TGAS = new BN("1" + "0".repeat(12));
-// export const ONE_NEAR = new BN("1" + "0".repeat(24));
-// export function call_method(
-//     contractId: string,
-//     method: string,
-//     params: any,
-//     sender: string,
-//     privateKey: string,
-//     gas: BNType,
-//     attachedAmount: number = 0): Promise<any> {
-//     return broadcast_tx_commit_actions(
-//         [TX.functionCall(method, params, gas, ONE_NEAR.muln(attachedAmount))],
-//         sender, contractId, privateKey)
-// }
 //-------------------------------
 export function delete_account(accountToDelete, privateKey, beneficiary) {
     if (!isValidAccountID(accountToDelete))
@@ -227,3 +206,4 @@ export function delete_account(accountToDelete, privateKey, beneficiary) {
     const actions = [TX.deleteAccount(beneficiary)];
     return broadcast_tx_commit_actions(actions, accountToDelete, accountToDelete, privateKey);
 }
+//# sourceMappingURL=near-rpc.js.map

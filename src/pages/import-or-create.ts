@@ -6,7 +6,7 @@ import { show as AccountPage_show, showPrivateKeyClicked } from "./account-selec
 import { bufferToHex } from "../api/near-rpc.js";
 import { Account } from "../api/account.js";
 
-import { generateSeedPhrase } from "../api/utils/seed-phrase.js";
+import { generateSeedPhraseAsync } from "../api/utils/seed-phrase.js";
 import type { SeedPhraseResult } from "../api/utils/seed-phrase.js";
 import { backToAccountsList } from "./main.js";
 
@@ -30,7 +30,7 @@ let seedWordAskIndex:number;
 
 async function createImplicitAccountClicked(ev :Event) {
   try {
-    seedResult = generateSeedPhrase();
+    seedResult = await generateSeedPhraseAsync();
     createImplicitAccount_Step1();
   }
   catch (ex) {
@@ -41,7 +41,7 @@ async function createImplicitAccountClicked(ev :Event) {
 async function createImplicitAccount_Step1() {
   try {
     d.showPage("display-seed-phrase");
-    d.byId("seed-phrase-show-box").innerText = seedResult.seedPhrase;
+    d.byId("seed-phrase-show-box").innerText = seedResult.seedPhrase.join(" ");
     d.onClickId("seed-phrase-continue",createImplicitAccount_Step2);
     d.onClickId("seed-phrase-cancel",backToAccountsList);
     //showOKCancel(createImplicitAccount_Step2, );
@@ -81,7 +81,7 @@ async function createImplicitAccount_Step2() {
 async function createImplicitAccount_Step3() {
   try {
     const entered = d.inputById("seed-word").value.toLowerCase().trim();
-    const findIt = seedResult.seedPhrase.split(" ").indexOf(entered);
+    const findIt = seedResult.seedPhrase.indexOf(entered);
     if (findIt!=seedWordAskIndex) throw Error("Incorrect Word");
     
     //success!!!

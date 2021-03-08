@@ -4,6 +4,8 @@ import type createHmacNamespace from "../../bundled-types/create-hmac.js"
 declare var createHmacPackage:typeof createHmacNamespace
 const createHmac = createHmacPackage.createHmac
 
+//import {sha512Async} from "../crypto-lite/crypto-primitives-browser.js"
+
 declare type Keys = {
     key: Buffer;
     chainCode: Buffer;

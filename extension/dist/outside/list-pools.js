@@ -90,3 +90,4 @@ async function init() {
     }
 }
 document.addEventListener('DOMContentLoaded', init);
+//# sourceMappingURL=list-pools.js.map

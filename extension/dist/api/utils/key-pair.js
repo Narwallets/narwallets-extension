@@ -102,3 +102,4 @@ export class KeyPairEd25519 extends KeyPair {
         return this.secretKey;
     }
 }
+//# sourceMappingURL=key-pair.js.map
