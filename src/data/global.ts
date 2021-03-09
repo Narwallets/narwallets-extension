@@ -46,7 +46,7 @@ type NarwalletSecureData = {
 const EmptySecureState:NarwalletSecureData = {
   dataVersion: DATA_VERSION,
   hashedPass: undefined,
-  autoUnlockSeconds: 30,
+  autoUnlockSeconds: 300,
   advancedMode: false,
   accounts: {}
 };
