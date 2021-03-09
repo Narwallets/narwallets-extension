@@ -1,7 +1,5 @@
 // originally from https://github.com/no2chem/bigint-buffer/blob/master/src/index.ts
 
-import { assert } from "console";
-
 /**
  * Convert a big-endian buffer into a BigInt
  * @param buf The big-endian buffer to convert.

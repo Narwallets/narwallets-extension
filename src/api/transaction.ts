@@ -4,7 +4,6 @@ import { Enum, Assignable } from './utils/enums.js';
 import { serialize, deserialize } from './utils/serialize.js';
 import { KeyType, CurveAndArrayKey } from './utils/key-pair.js';
 import { KeyPair } from './utils/key-pair.js';
-//import { Signer } from './signer';
 
 export class FunctionCallPermission extends Assignable {
     allowance?: bigint;

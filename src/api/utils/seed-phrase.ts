@@ -33,7 +33,7 @@ export async function parseSeedPhraseAsync(seedPhrase:string[]): Promise<SeedPhr
     const seed = await mnemonicToSeedAsync(normalizeSeedPhrase(seedPhrase))
     const { key } = await derivePathAsync(KEY_DERIVATION_PATH, seed)
     const keyPair = sign_keyPair_fromSeed(key)
-    const publicKey = 'ed25519:' + bs58.encode(Buffer.from(keyPair.publicKey))
-    const secretKey = 'ed25519:' + bs58.encode(Buffer.from(keyPair.secretKey))
+    const publicKey = 'ed25519:' + bs58.encode(keyPair.publicKey)
+    const secretKey = 'ed25519:' + bs58.encode(keyPair.secretKey)
     return { seedPhrase, secretKey, publicKey }
 }

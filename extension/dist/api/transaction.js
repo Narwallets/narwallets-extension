@@ -2,7 +2,6 @@ import * as sha256 from './sha256.js';
 import { Enum, Assignable } from './utils/enums.js';
 import { serialize, deserialize } from './utils/serialize.js';
 import { CurveAndArrayKey } from './utils/key-pair.js';
-//import { Signer } from './signer';
 export class FunctionCallPermission extends Assignable {
 }
 export class FullAccessPermission extends Assignable {
