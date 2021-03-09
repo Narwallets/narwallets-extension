@@ -175,7 +175,7 @@ export function getAccount(accName:string): Account {
 export function saveAccount(accName:string, accountInfo:Account) {
 
   if (!accName || !accountInfo) {
-    console.error("saveFoundAccount called but no data")
+    log("saveFoundAccount called but no data")
     return;
   }
 

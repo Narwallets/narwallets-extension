@@ -96,7 +96,7 @@ function reflectTransfer() {
     }
   }
   catch(ex){
-    console.error(ex.message);
+    log(ex.message);
   }
 }
 
@@ -278,7 +278,7 @@ async function processMessageFromWebPage(msg:any) {
   log(`enter processMessageFromWebPage _bgDataRecovered ${_bgDataRecovered}`);
 
   if (!msg.tabId) {
-    console.error("msg.tabId is ", msg.tabId)
+    log("msg.tabId is ", msg.tabId)
     return;
   }
 
@@ -381,7 +381,7 @@ async function processMessageFromWebPage(msg:any) {
       break;
 
     default:
-      console.error("unk msg.code", JSON.stringify(msg))
+      log("unk msg.code", JSON.stringify(msg))
   }
 
 }
@@ -466,7 +466,7 @@ function connectToWebPage(accountId:string, network:string): Promise<any> {
       catch (ex) {
         //err trying to talk to the page, set injected status
         cpsData.ctinfo.injected = false;
-        console.error(ex);
+        log(ex);
         //CPS
         return continueCWP_2(cpsData)
       }
@@ -489,7 +489,7 @@ function continueCWP_2(cpsData:CPSDATA) {
     chrome.tabs.executeScript({ file: 'dist/background/contentScript.js' },
       function () {
         if (chrome.runtime.lastError) {
-          console.error(JSON.stringify(chrome.runtime.lastError))
+          log(JSON.stringify(chrome.runtime.lastError))
           return cpsData.reject(chrome.runtime.lastError)
         }
         else {
@@ -658,7 +658,7 @@ window.addEventListener("message",
         await global.unlockSecureStateSHA(global.State.currentUser, global.workingData.unlockSHA);
       }
       catch (ex) {
-        console.error("recovering secure state on retrieveBgInfoFromStorage", ex.message)
+        log("recovering secure state on retrieveBgInfoFromStorage", ex.message)
       }
     }
     _bgDataRecovered = true;

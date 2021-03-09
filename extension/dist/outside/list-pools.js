@@ -63,7 +63,7 @@ async function displayStakingPools() {
                 }
             })
                 .catch((ex) => {
-                console.error(ex);
+                console.log(ex);
                 //no contract on account_id
                 const elem = d.byId(item.account_id);
                 elem.classList.add("hidden"); //bye bye 

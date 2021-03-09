@@ -1,3 +1,4 @@
+import { log } from "../log.js";
 let rpcUrl = "https://rpc.mainnet.near.org/";
 export function setRpcUrl(newUrl) {
     rpcUrl = newUrl;
@@ -35,7 +36,7 @@ export function formatJSONErr(obj) {
         }
     }
     //if panicked-at: show relevant info only
-    console.error(text); //show info in the console before removing extra info
+    log(text); //show info in the console before removing extra info
     const KEY = "panicked at ";
     const kl = KEY.length;
     let n = text.indexOf(KEY);
@@ -43,7 +44,7 @@ export function formatJSONErr(obj) {
         const i = text.indexOf("'", n + kl + 4);
         const cutted = text.slice(n + kl, i + 1);
         if (cutted.trim().length > 5) {
-            console.error(text.slice(n, i + 80)); //show info in the console before removing extra info
+            log(text.slice(n, i + 80)); //show info in the console before removing extra info
             text = "panicked at: " + cutted;
         }
     }
@@ -79,7 +80,7 @@ export async function jsonRpcInternal(payload) {
                     const err = new Error('jsonRpc has timed out');
                     if (timeoutRetries < 3) {
                         timeoutRetries++;
-                        console.error(err.message, "RETRY #", timeoutRetries);
+                        log(err.message, "RETRY #", timeoutRetries);
                         continue;
                     }
                     err.name = 'TimeoutError';

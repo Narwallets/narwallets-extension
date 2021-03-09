@@ -5,20 +5,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { fromBE, toBufferLE } from '../crypto-lite/bigint-buffer.js';
-import * as bs58 from './bs58.js';
 // TODO: Make sure this polyfill not included when not required
 //import * as encoding from 'text-encoding-utf-8';
 //const TextDecoder = (typeof (global as any).TextDecoder !== 'function') ? encoding.TextDecoder : (global as any).TextDecoder;
 //const textDecoder = new TextDecoder('utf-8', { fatal: true });
-export function base_encode(value) {
-    if (typeof (value) === 'string') {
-        value = Buffer.from(value, 'utf8');
-    }
-    return bs58.encode(Buffer.from(value));
-}
-export function base_decode(value) {
-    return Buffer.from(bs58.decode(value));
-}
+// export function base_encode(value: Uint8Array | string): string {
+//     if (typeof(value) === 'string') {
+//         value = Buffer.from(value, 'utf8');
+//     }
+//     return bs58.encode(Buffer.from(value));
+// }
+// export function base_decode(value: string): Uint8Array {
+//     return Buffer.from(bs58.decode(value));
+// }
 const INITIAL_LENGTH = 1024;
 export class BorshError extends Error {
     constructor(message) {

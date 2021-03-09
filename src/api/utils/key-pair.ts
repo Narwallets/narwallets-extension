@@ -1,6 +1,6 @@
 import {Assignable} from './enums.js';
 import * as nacl from '../tweetnacl/sign.js';
-import { base_encode, base_decode } from './serialize.js';
+import * as bs58 from './bs58.js';
 import { ByteArray } from '../tweetnacl/core/array.js';
 //import { Assignable } from './enums';
 
@@ -40,16 +40,16 @@ export class CurveAndArrayKey extends Assignable {
     static fromString(encodedKey: string): CurveAndArrayKey {
         const parts = encodedKey.split(':');
         if (parts.length === 1) { //assume is all a ed25519 key
-            return new CurveAndArrayKey({keyType:KeyType.ED25519, data:base_decode(parts[0])});
+            return new CurveAndArrayKey({keyType:KeyType.ED25519, data:bs58.decode(parts[0])});
         } else if (parts.length === 2) {
-            return new CurveAndArrayKey({keyType:str_to_key_type(parts[0]),data:base_decode(parts[1])});
+            return new CurveAndArrayKey({keyType:str_to_key_type(parts[0]),data:bs58.decode(parts[1])});
         } else {
             throw new Error('Invalid encoded key format, must be <curve>:<encoded key>');
         }
     }
 
     toString(): string {
-        return `${key_type_to_str(this.keyType)}:${base_encode(this.data)}`;
+        return `${key_type_to_str(this.keyType)}:${bs58.encode(this.data)}`;
     }
 }
 
@@ -123,7 +123,7 @@ export class KeyPairEd25519 extends KeyPair {
 
     //returns private key .- good enough to re-build the pair
     toString(): string {
-        return `ed25519:${this.secretKey}`;
+        return `ed25519:${bs58.encode(this.secretKey)}`;
     }
 
     getPublicKey(): CurveAndArrayKey {

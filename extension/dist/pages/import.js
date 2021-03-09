@@ -184,7 +184,7 @@ async function searchClicked(ev) {
 // }
 async function onNetworkChanged(info) {
     if (!info) {
-        console.error("!info");
+        console.log("!info");
         return;
     }
     //update .root-account

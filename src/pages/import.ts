@@ -255,7 +255,7 @@ async function searchClicked(ev :Event) {
 
 async function onNetworkChanged(info:NetworkInfo) {
   if (!info) {
-    console.error("!info")
+    console.log("!info")
     return 
   }
   //update .root-account

@@ -1,9 +1,9 @@
 import * as d from "../util/document.js"
 import { askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../api/askBackground.js";
 import { KeyPairEd25519 } from "../api/utils/key-pair.js";
-import { base_encode, base_decode } from '../api/utils/serialize.js';
+import * as bs58 from '../api/utils/bs58.js';
 import { show as AccountPage_show, showPrivateKeyClicked } from "./account-selected.js";
-import { bufferToHex } from "../api/near-rpc.js";
+import { encodeHex } from "../api/tweetnacl/util.js";
 import { Account } from "../api/account.js";
 
 import { generateSeedPhraseAsync } from "../api/utils/seed-phrase.js";
@@ -44,21 +44,6 @@ async function createImplicitAccount_Step1() {
     d.byId("seed-phrase-show-box").innerText = seedResult.seedPhrase.join(" ");
     d.onClickId("seed-phrase-continue",createImplicitAccount_Step2);
     d.onClickId("seed-phrase-cancel",backToAccountsList);
-    //showOKCancel(createImplicitAccount_Step2, );
-
-    // d.showSubPage("account-selected-show-private-key")
-    // d.byId("account-selected-private-key").innerText = selectedAccountData.accountInfo.privateKey||""
-    // showOKCancel(showButtons)
-    // cancelBtn.hidden = true
-
-    // const newKeyPair = KeyPairEd25519.fromString(seedResult.secretKey);
-    // const accountId = bufferToHex(newKeyPair.getPublicKey().data)
-    // const accInfo = new Account()
-    // accInfo.privateKey= base_encode(newKeyPair.getSecretKey())
-    // await askBackgroundSetAccount(accountId,accInfo)
-    // await AccountPage_show(accountId);
-    // d.showSuccess("Account "+accountId+" created")
-    // showPrivateKeyClicked()
   }
   catch (ex) {
     d.showErr(ex.message)
@@ -87,9 +72,10 @@ async function createImplicitAccount_Step3() {
     //success!!!
     d.hideErr() 
     const newKeyPair = KeyPairEd25519.fromString(seedResult.secretKey);
-    const accountId = bufferToHex(newKeyPair.getPublicKey().data)
+    const accountId = encodeHex(newKeyPair.getPublicKey().data)
     const accInfo = new Account()
-    accInfo.privateKey= base_encode(newKeyPair.getSecretKey())
+    
+    accInfo.privateKey= bs58.encode(newKeyPair.getSecretKey())
     await askBackgroundSetAccount(accountId,accInfo)
     await AccountPage_show(accountId);
     d.showSuccess("Account "+accountId+" created")

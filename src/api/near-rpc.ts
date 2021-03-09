@@ -2,12 +2,15 @@ import { jsonRpc, jsonRpcQuery, formatJSONErr } from "./utils/json-rpc.js"
 import * as naclUtil from "./tweetnacl/util.js"
 import { isValidAccountID } from "./utils/valid.js";
 import { CurveAndArrayKey, KeyPairEd25519 } from "./utils/key-pair.js"
-import { serialize, base_decode } from "./utils/serialize.js"
+import { serialize } from "./utils/serialize.js"
 import * as TX from "./transaction.js"
 
 import * as bs58 from "./utils/bs58.js";
 import * as sha256 from './sha256.js';
 
+import{log} from "./log.js"
+
+//BigInt scientific notation
 const base1e=BigInt(10);
 function b1e(n:number){return base1e**BigInt(n)};
 const b1e12=b1e(12);
@@ -30,12 +33,6 @@ export function getRecentBlockHash(): Uint8Array {
     return recentBlockHash
 }
 
-//--helper fn
-export function bufferToHex(buffer: any) {
-    return [...new Uint8Array(buffer)]
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-}
 //--helper fn
 export function decodeJsonFromResult(result: Uint8Array): string {
     let text = naclUtil.encodeUTF8(result)
@@ -150,7 +147,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
     // converts a recent block hash into an array of bytes 
     // this hash was retrieved earlier when creating the accessKey (Line 26)
     // this is required to prove the tx was recently constructed (within 24hrs)
-    recentBlockHash = base_decode(accessKey.block_hash);
+    recentBlockHash = bs58.decode(accessKey.block_hash);
 
     // each transaction requires a unique number or nonce
     // this is created by taking the current nonce and incrementing it
@@ -180,8 +177,8 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
     const result = await broadcast_tx_commit_signed(signedTransaction)
 
     if (result.status && result.status.Failure) {
-        //console.error(JSON.stringify(result))
-        console.error(getLogsAndErrorsFromReceipts(result))
+        //log(JSON.stringify(result))
+        log(getLogsAndErrorsFromReceipts(result))
         throw Error(formatJSONErr(result.status.Failure))
     }
 
@@ -189,7 +186,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
         const sv = naclUtil.encodeUTF8(naclUtil.decodeBase64(result.status.SuccessValue))
         //console.log("result.status.SuccessValue:", sv)
         if (sv == "false") {
-            //console.error(JSON.stringify(result))
+            //log(JSON.stringify(result))
             throw Error(getLogsAndErrorsFromReceipts(result))
         }
         else if (sv == "null")

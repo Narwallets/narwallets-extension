@@ -6,16 +6,16 @@ import * as bs58 from './bs58.js';
 //const TextDecoder = (typeof (global as any).TextDecoder !== 'function') ? encoding.TextDecoder : (global as any).TextDecoder;
 //const textDecoder = new TextDecoder('utf-8', { fatal: true });
 
-export function base_encode(value: Uint8Array | string): string {
-    if (typeof(value) === 'string') {
-        value = Buffer.from(value, 'utf8');
-    }
-    return bs58.encode(Buffer.from(value));
-}
+// export function base_encode(value: Uint8Array | string): string {
+//     if (typeof(value) === 'string') {
+//         value = Buffer.from(value, 'utf8');
+//     }
+//     return bs58.encode(Buffer.from(value));
+// }
 
-export function base_decode(value: string): Uint8Array {
-    return Buffer.from(bs58.decode(value));
-}
+// export function base_decode(value: string): Uint8Array {
+//     return Buffer.from(bs58.decode(value));
+// }
 
 const INITIAL_LENGTH = 1024;
 

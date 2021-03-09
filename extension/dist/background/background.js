@@ -80,7 +80,7 @@ function reflectTransfer() {
         }
     }
     catch (ex) {
-        console.error(ex.message);
+        log(ex.message);
     }
 }
 //create a promise to resolve the action requested by the popup
@@ -250,7 +250,7 @@ function getActionPromise(msg) {
 async function processMessageFromWebPage(msg) {
     log(`enter processMessageFromWebPage _bgDataRecovered ${_bgDataRecovered}`);
     if (!msg.tabId) {
-        console.error("msg.tabId is ", msg.tabId);
+        log("msg.tabId is ", msg.tabId);
         return;
     }
     if (!_bgDataRecovered)
@@ -341,7 +341,7 @@ async function processMessageFromWebPage(msg) {
             }
             break;
         default:
-            console.error("unk msg.code", JSON.stringify(msg));
+            log("unk msg.code", JSON.stringify(msg));
     }
 }
 //------------------------
@@ -404,7 +404,7 @@ function connectToWebPage(accountId, network) {
             catch (ex) {
                 //err trying to talk to the page, set injected status
                 cpsData.ctinfo.injected = false;
-                console.error(ex);
+                log(ex);
                 //CPS
                 return continueCWP_2(cpsData);
             }
@@ -425,7 +425,7 @@ function continueCWP_2(cpsData) {
     try {
         chrome.tabs.executeScript({ file: 'dist/background/contentScript.js' }, function () {
             if (chrome.runtime.lastError) {
-                console.error(JSON.stringify(chrome.runtime.lastError));
+                log(JSON.stringify(chrome.runtime.lastError));
                 return cpsData.reject(chrome.runtime.lastError);
             }
             else {
@@ -576,7 +576,7 @@ async function retrieveBgInfoFromStorage() {
             await global.unlockSecureStateSHA(global.State.currentUser, global.workingData.unlockSHA);
         }
         catch (ex) {
-            console.error("recovering secure state on retrieveBgInfoFromStorage", ex.message);
+            log("recovering secure state on retrieveBgInfoFromStorage", ex.message);
         }
     }
     _bgDataRecovered = true;

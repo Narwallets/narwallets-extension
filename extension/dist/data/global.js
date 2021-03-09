@@ -126,7 +126,7 @@ export function getAccount(accName) {
 //------------------
 export function saveAccount(accName, accountInfo) {
     if (!accName || !accountInfo) {
-        console.error("saveFoundAccount called but no data");
+        log("saveFoundAccount called but no data");
         return;
     }
     let accountsForCurrentNetwork = SecureState.accounts[Network.current];
