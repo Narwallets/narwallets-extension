@@ -1,7 +1,7 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
-import * as StakingPool from "../api/staking-pool.js";
-import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../api/askBackground.js";
+import * as StakingPool from "../contracts/staking-pool.js";
+import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../background/askBackground.js";
 function sortCompare(a, b) {
     if (a.stakeY > b.stakeY)
         return -1;
@@ -63,7 +63,7 @@ async function displayStakingPools() {
                 }
             })
                 .catch((ex) => {
-                console.error(ex);
+                console.log(ex);
                 //no contract on account_id
                 const elem = d.byId(item.account_id);
                 elem.classList.add("hidden"); //bye bye 

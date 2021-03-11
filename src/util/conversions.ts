@@ -22,7 +22,7 @@ export function yton(yoctos:string):number {
         return Number(just4dec) // truncated to 4 decimals 
     }
     catch (ex) {
-        console.error("ERR: yton(", yoctos, ")", ex)
+        console.log("ERR: yton(", yoctos, ")", ex)
         return NaN;
     }
 }

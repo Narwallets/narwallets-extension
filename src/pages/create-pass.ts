@@ -1,4 +1,4 @@
-import { askBackground, askBackgroundGetState } from "../api/askBackground.js"
+import { askBackground, askBackgroundGetState } from "../background/askBackground.js"
 import * as d from "../util/document.js"
 
 const EMAIL = "email"

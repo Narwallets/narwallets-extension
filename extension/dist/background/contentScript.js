@@ -31,7 +31,7 @@ window.addEventListener("message", function (event) {
         }
         catch (ex) {
             //maybe disconnected
-            console.error(ex);
+            console.log(ex);
             if (event.data.requestId) {
                 window.postMessage({ dest: "page", code: "request-resolved", requestId: event.data.requestId, err: ex.message }, "*");
             }

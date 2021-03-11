@@ -2,15 +2,15 @@ import * as c from "../util/conversions.js";
 import * as d from "../util/document.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import * as Pages from "../pages/main.js";
-import * as StakingPool from "../api/staking-pool.js";
-import { isValidAccountID, isValidAmount } from "../api/utils/valid.js";
-import * as seedPhraseUtil from "../api/utils/seed-phrase.js";
-import { KeyPairEd25519 } from "../api/utils/key-pair.js";
+import * as StakingPool from "../contracts/staking-pool.js";
+import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/valid.js";
+import { checkSeedPhrase, parseSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
+import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { ExtendedAccountData } from "../api/account.js";
+import { ExtendedAccountData } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
-import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount } from "../api/askBackground.js";
-import { DeleteAccountToBeneficiary } from "../api/batch-transaction.js";
+import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount } from "../background/askBackground.js";
+import { DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
@@ -21,7 +21,7 @@ let refreshButton;
 let seedTextElem;
 export async function show(accName, reposition) {
     initPage();
-    await SelectAndShowAccount(accName);
+    await selectAndShowAccount(accName);
     d.showPage(THIS_PAGE);
     if (reposition) {
         switch (reposition) {
@@ -87,7 +87,7 @@ async function moreLessClicked() {
 function getAccountRecord(accName) {
     return askBackground({ code: "get-account", accountId: accName }); /*as Promise<Account>*/
 }
-async function SelectAndShowAccount(accName) {
+async function selectAndShowAccount(accName) {
     const accInfo = await getAccountRecord(accName);
     if (!accInfo)
         throw new Error("Account is not in this wallet: " + accName);
@@ -988,10 +988,9 @@ async function makeFullAccessOKClicked() {
         }
         else {
             //a seed phrase
-            let err = seedPhraseUtil.check(words);
-            if (err)
-                throw Error(err);
-            const result = seedPhraseUtil.parseSeedPhrase(words);
+            const seedPrhase = words.split(' ');
+            checkSeedPhrase(seedPrhase);
+            const result = await parseSeedPhraseAsync(seedPrhase);
             secretKey = result.secretKey;
             publicKey = result.publicKey;
         }
@@ -1009,8 +1008,8 @@ async function makeFullAccessOKClicked() {
         selectedAccountData.accountInfo.privateKey = secretKey;
         seedTextElem.value = "";
         await saveSelectedAccount();
+        selectAndShowAccount(selectedAccountData.name);
         d.showMsg("Seed Phrase is correct. Access granted", "success");
-        showSelectedAccount();
         showButtons();
     }
     catch (ex) {

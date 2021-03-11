@@ -1,7 +1,7 @@
 import * as d from "../../util/document.js"
 import * as c from "../../util/conversions.js"
-import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../api/batch-transaction.js"
-import { askBackground } from "../../api/askBackground.js"
+import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../lib/near-api-lite/batch-transaction.js"
+import { askBackground } from "../../background/askBackground.js"
 
 type TxInfo = {
       action:string;

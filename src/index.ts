@@ -1,6 +1,6 @@
 import * as d from "./util/document.js"
 import * as Pages from "./pages/main.js"
-import {NetworkList} from "./api/network.js"
+import {NetworkList} from "./lib/near-api-lite/network.js"
 
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js"
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js"
@@ -10,11 +10,11 @@ import { show as AccountSelectedPage_show } from "./pages/account-selected.js"
 import { show as UnlockPage_show } from "./pages/unlock.js"
 
 import { localStorageSet } from "./data/util.js"
-import { askBackground, askBackgroundGetNetworkInfo, askBackgroundGetState, askBackgroundIsLocked, askBackgroundSetNetwork } from "./api/askBackground.js"
-import { functionCall } from "./api/transaction.js"
-import { isValidEmail } from "./api/utils/valid.js"
+import { askBackground, askBackgroundGetNetworkInfo, askBackgroundGetState, askBackgroundIsLocked, askBackgroundSetNetwork } from "./background/askBackground.js"
+import { functionCall } from "./lib/near-api-lite/transaction.js"
+import { isValidEmail } from "./lib/near-api-lite/utils/valid.js"
 
-import type { NetworkInfo} from "./api/network.js"
+import type { NetworkInfo} from "./lib/near-api-lite/network.js"
 
 
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr

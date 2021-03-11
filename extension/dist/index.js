@@ -1,12 +1,12 @@
 import * as d from "./util/document.js";
 import * as Pages from "./pages/main.js";
-import { NetworkList } from "./api/network.js";
+import { NetworkList } from "./lib/near-api-lite/network.js";
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
 import { addListeners as Import_addListeners } from "./pages/import.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { localStorageSet } from "./data/util.js";
-import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork } from "./api/askBackground.js";
+import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork } from "./background/askBackground.js";
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 //--- content sections at MAIN popup.html
 const IMPORT_OR_CREATE = "import-or-create";

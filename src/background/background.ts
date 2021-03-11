@@ -1,19 +1,19 @@
 import * as c from "../util/conversions.js"
 import * as global from "../data/global.js"
-import { log, logEnabled } from "../api/log.js"
+import { log, logEnabled } from "../lib/log.js"
 
-import * as Network from "../api/network.js"
+import * as Network from "../lib/near-api-lite/network.js"
 import * as nearAccounts from "../util/search-accounts.js"
 
-import * as near from "../api/near-rpc.js"
-import { setRpcUrl } from "../api/utils/json-rpc.js"
+import * as near from "../lib/near-api-lite/near-rpc.js"
+import { setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js"
 import { localStorageSet, localStorageGet } from "../data/util.js"
-import * as TX from "../api/transaction.js"
+import * as TX from "../lib/near-api-lite/transaction.js"
 
-import { isValidEmail } from "../api/utils/valid.js"
+import { isValidEmail } from "../lib/near-api-lite/utils/valid.js"
 
-import type { FunctionCall,DeleteAccountToBeneficiary } from "../api/batch-transaction.js"
-import type {ResolvedMessage} from "../api/state-type.js"
+import type { FunctionCall,DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transaction.js"
+import type {ResolvedMessage} from "../data/state-type.js"
 
 //version: major+minor+version, 3 digits each
 function semver(major:number,minor:number,version:number):number{return major*1e6+minor*1e3+version}
@@ -96,7 +96,7 @@ function reflectTransfer() {
     }
   }
   catch(ex){
-    console.error(ex.message);
+    log(ex.message);
   }
 }
 
@@ -126,28 +126,11 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
 
     }
     else if (msg.code == "unlockSecureState") {
-      return global.unlockSecureStateSHA(msg.email, global.sha256PwdBase64(msg.password))
+      return global.unlockSecureStateAsync(msg.email, msg.password)
     }
 
     else if (msg.code == "create-user") {
-
-      if (!isValidEmail(msg.email)) {
-        throw Error("Invalid email");
-      }
-      else if (global.State.usersList.includes(msg.email)) {
-        throw Error("User already exists")
-      }
-      else if (!msg.password || msg.password.length < 8) {
-        throw Error("password must be at least 8 characters long")
-      }
-      global.lock() //log out current user
-
-      global.State.currentUser = msg.email;
-      global.createSecureState(msg.password);
-      //save new user in usersList
-      global.State.usersList.push(msg.email);
-      global.saveState()
-      return Promise.resolve()
+      return global.createUserAsync(msg.email,msg.password )
     }
 
     else if (msg.code == "set-options") {
@@ -244,11 +227,11 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
         switch (item.action) {
           case "call":
             const f = item as FunctionCall;
-            actions.push(TX.functionCall(f.method, f.args, near.BNTGas(f.Tgas), near.BNntoy(f.attachedNear)))
+            actions.push(TX.functionCall(f.method, f.args, near.TGas(f.Tgas), near.toYoctos(f.attachedNear)))
             global_NearsSent = {from: signerId, to:msg.tx.receiver, amount:f.attachedNear};
             break;
           case "transfer":
-            actions.push(TX.transfer(near.BNntoy(item.attachedNear)))
+            actions.push(TX.transfer(near.toYoctos(item.attachedNear)))
             global_NearsSent = {from: signerId, to:msg.tx.receiver, amount:item.attachedNear};
             break;
           case "delete":
@@ -278,7 +261,7 @@ async function processMessageFromWebPage(msg:any) {
   log(`enter processMessageFromWebPage _bgDataRecovered ${_bgDataRecovered}`);
 
   if (!msg.tabId) {
-    console.error("msg.tabId is ", msg.tabId)
+    log("msg.tabId is ", msg.tabId)
     return;
   }
 
@@ -381,7 +364,7 @@ async function processMessageFromWebPage(msg:any) {
       break;
 
     default:
-      console.error("unk msg.code", JSON.stringify(msg))
+      log("unk msg.code", JSON.stringify(msg))
   }
 
 }
@@ -425,9 +408,7 @@ function connectToWebPage(accountId:string, network:string): Promise<any> {
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 
-      if (chrome.runtime.lastError) console.error(chrome.runtime.lastError.message);
-
-      const activeTabId = tabs[0].id || -1;
+      const activeTabId = (tabs[0]? tabs[0].id:-1)||-1;
       if (!_connectedTabs) _connectedTabs={}
       if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId] = {};
 
@@ -447,6 +428,9 @@ function connectToWebPage(accountId:string, network:string): Promise<any> {
 
       //check if it responds (if it is already injected)
       try {
+        if (chrome.runtime.lastError) throw Error(chrome.runtime.lastError.message);
+        if (!tabs||!tabs[0]) throw Error("can access chrome tabs");
+
         chrome.tabs.sendMessage(cpsData.activeTabId, { code: "ping" }, function (response) {
           if (chrome.runtime.lastError) {response=undefined}
           if (!response) {
@@ -465,7 +449,7 @@ function connectToWebPage(accountId:string, network:string): Promise<any> {
       catch (ex) {
         //err trying to talk to the page, set injected status
         cpsData.ctinfo.injected = false;
-        console.error(ex);
+        log(ex);
         //CPS
         return continueCWP_2(cpsData)
       }
@@ -488,7 +472,7 @@ function continueCWP_2(cpsData:CPSDATA) {
     chrome.tabs.executeScript({ file: 'dist/background/contentScript.js' },
       function () {
         if (chrome.runtime.lastError) {
-          console.error(JSON.stringify(chrome.runtime.lastError))
+          log(JSON.stringify(chrome.runtime.lastError))
           return cpsData.reject(chrome.runtime.lastError)
         }
         else {
@@ -536,7 +520,8 @@ type ConnectedTabInfo = {
 function disconnectFromWebPage():Promise<void> {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      if (chrome.runtime.lastError) console.error(chrome.runtime.lastError.message);
+      if (chrome.runtime.lastError) throw Error(chrome.runtime.lastError.message);
+      if (!tabs||!tabs[0]) reject(Error("can access chrome tabs"));
       const activeTabId = tabs[0].id || -1
       if (_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection) {
         _connectedTabs[activeTabId].aceptedConnection = false;
@@ -555,7 +540,7 @@ function isConnected():Promise<boolean> {
     if (!_connectedTabs) return resolve(false);
     chrome.tabs.query({ active: true, currentWindow: true },
       function (tabs) {
-        if (chrome.runtime.lastError) console.error(chrome.runtime.lastError.message);
+        if (chrome.runtime.lastError) console.log(chrome.runtime.lastError.message);
         if (!tabs || tabs.length==0 || !tabs[0]) return resolve(false);
         const activeTabId = tabs[0].id
         if (!activeTabId) return resolve(false);
@@ -656,7 +641,7 @@ window.addEventListener("message",
         await global.unlockSecureStateSHA(global.State.currentUser, global.workingData.unlockSHA);
       }
       catch (ex) {
-        console.error("recovering secure state on retrieveBgInfoFromStorage", ex.message)
+        log("recovering secure state on retrieveBgInfoFromStorage", ex.message)
       }
     }
     _bgDataRecovered = true;

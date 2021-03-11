@@ -2,16 +2,16 @@ import * as d from "../util/document.js"
 import * as c from "../util/conversions.js"
 
 import * as searchAccounts from "../util/search-accounts.js"
-import {isValidAccountID} from "../api/utils/valid.js"
+import {isValidAccountID} from "../lib/near-api-lite/utils/valid.js"
 import * as Pages from "../pages/main.js"
 
-import { Account, ExtendedAccountData } from "../api/account.js"
+import { Account, ExtendedAccountData } from "../data/account.js"
 import { LockupContract } from "../contracts/LockupContract.js"
 import {searchThePools} from "./account-selected.js"
-import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundGetValidators, askBackgroundSetAccount } from "../api/askBackground.js"
+import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundGetValidators, askBackgroundSetAccount } from "../background/askBackground.js"
 
 
-import type { NetworkInfo} from "../api/network.js"
+import type { NetworkInfo} from "../lib/near-api-lite/network.js"
 
 
 const NET_NAME = "net-name"
@@ -255,7 +255,7 @@ async function searchClicked(ev :Event) {
 
 async function onNetworkChanged(info:NetworkInfo) {
   if (!info) {
-    console.error("!info")
+    console.log("!info")
     return 
   }
   //update .root-account

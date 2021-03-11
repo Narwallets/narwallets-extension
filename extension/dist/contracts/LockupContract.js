@@ -1,12 +1,12 @@
 import * as c from "../util/conversions.js";
 import * as d from "../util/document.js";
-import * as sha256 from "../api/sha256.js";
-import * as naclUtil from "../api/tweetnacl/util.js";
+import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js";
 //import * as near from "../api/near-rpc.js";
-import * as StakingPool from "../api/staking-pool.js";
-import { isValidAccountID, isValidAmount } from "../api/utils/valid.js";
-import { askBackground, askBackgroundApplyTxAction, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../api/askBackground.js";
-import { FunctionCall } from "../api/batch-transaction.js";
+import * as StakingPool from "./staking-pool.js";
+import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/valid.js";
+import { askBackground, askBackgroundApplyTxAction, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../background/askBackground.js";
+import { FunctionCall } from "../lib/near-api-lite/batch-transaction.js";
+import { encodeHex, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
 const BASE_GAS = 25;
 export class LockupContract {
     constructor(info) {
@@ -16,15 +16,9 @@ export class LockupContract {
         this.accountInfo = info;
         this.accountInfo.type = "lock.c";
     }
-    //--helper fn
-    static bufferToHex(buffer) {
-        return [...new Uint8Array(buffer)]
-            .map(b => b.toString(16).padStart(2, "0"))
-            .join("");
-    }
-    static hexContractAccount(accountId) {
-        const b = sha256.hash(naclUtil.decodeUTF8(accountId)).buffer;
-        const hex = LockupContract.bufferToHex(b);
+    static async hexContractAccountAsync(accountId) {
+        const b = await sha256Async(Uint8ArrayFromString(accountId));
+        const hex = encodeHex(new Uint8Array(b));
         return `${hex.slice(0, 40)}`;
     }
     static async getLockupSuffix() {
@@ -42,7 +36,7 @@ export class LockupContract {
         const suffix = await LockupContract.getLockupSuffix();
         if (owner.endsWith(suffix))
             throw Error("use the owner account Id to init a lockup contract instance");
-        const hexName = LockupContract.hexContractAccount(owner);
+        const hexName = await LockupContract.hexContractAccountAsync(owner);
         this.contractAccount = hexName + suffix;
     }
     async getAmount(method) {
