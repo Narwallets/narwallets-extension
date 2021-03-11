@@ -1,7 +1,7 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
-import * as StakingPool from "../api/staking-pool.js";
-import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../api/askBackground.js";
+import * as StakingPool from "../contracts/staking-pool.js";
+import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../background/askBackground.js";
 function sortCompare(a, b) {
     if (a.stakeY > b.stakeY)
         return -1;
@@ -90,4 +90,3 @@ async function init() {
     }
 }
 document.addEventListener('DOMContentLoaded', init);
-//# sourceMappingURL=list-pools.js.map

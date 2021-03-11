@@ -1,9 +1,9 @@
 import * as c from "./conversions.js"
 
-import * as StakingPool from "../api/staking-pool.js";
+import * as StakingPool from "../contracts/staking-pool.js";
 import { LockupContract } from "../contracts/LockupContract.js"
-import { Account } from "../api/account.js"
-import { askBackground } from "../api/askBackground.js";
+import { Account } from "../data/account.js"
+import { askBackground } from "../background/askBackground.js";
 
 async function checkNotLockup(accName:string) {
     const suffix = await LockupContract.getLockupSuffix()

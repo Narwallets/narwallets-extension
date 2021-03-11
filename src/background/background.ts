@@ -1,19 +1,19 @@
 import * as c from "../util/conversions.js"
 import * as global from "../data/global.js"
-import { log, logEnabled } from "../api/log.js"
+import { log, logEnabled } from "../lib/log.js"
 
-import * as Network from "../api/network.js"
+import * as Network from "../lib/near-api-lite/network.js"
 import * as nearAccounts from "../util/search-accounts.js"
 
-import * as near from "../api/near-rpc.js"
-import { setRpcUrl } from "../api/utils/json-rpc.js"
+import * as near from "../lib/near-api-lite/near-rpc.js"
+import { setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js"
 import { localStorageSet, localStorageGet } from "../data/util.js"
-import * as TX from "../api/transaction.js"
+import * as TX from "../lib/near-api-lite/transaction.js"
 
-import { isValidEmail } from "../api/utils/valid.js"
+import { isValidEmail } from "../lib/near-api-lite/utils/valid.js"
 
-import type { FunctionCall,DeleteAccountToBeneficiary } from "../api/batch-transaction.js"
-import type {ResolvedMessage} from "../api/state-type.js"
+import type { FunctionCall,DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transaction.js"
+import type {ResolvedMessage} from "../data/state-type.js"
 
 //version: major+minor+version, 3 digits each
 function semver(major:number,minor:number,version:number):number{return major*1e6+minor*1e3+version}
@@ -126,28 +126,11 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
 
     }
     else if (msg.code == "unlockSecureState") {
-      return global.unlockSecureStateSHA(msg.email, global.sha256PwdBase64(msg.password))
+      return global.unlockSecureStateAsync(msg.email, msg.password)
     }
 
     else if (msg.code == "create-user") {
-
-      if (!isValidEmail(msg.email)) {
-        throw Error("Invalid email");
-      }
-      else if (global.State.usersList.includes(msg.email)) {
-        throw Error("User already exists")
-      }
-      else if (!msg.password || msg.password.length < 8) {
-        throw Error("password must be at least 8 characters long")
-      }
-      global.lock() //log out current user
-
-      global.State.currentUser = msg.email;
-      global.createSecureState(msg.password);
-      //save new user in usersList
-      global.State.usersList.push(msg.email);
-      global.saveState()
-      return Promise.resolve()
+      return global.createUserAsync(msg.email,msg.password )
     }
 
     else if (msg.code == "set-options") {

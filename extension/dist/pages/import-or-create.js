@@ -1,12 +1,12 @@
 import * as d from "../util/document.js";
-import { askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../api/askBackground.js";
-import { KeyPairEd25519 } from "../api/utils/key-pair.js";
-import * as bs58 from '../api/utils/bs58.js';
+import { askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../background/askBackground.js";
+import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
+import * as bs58 from '../lib/crypto-lite/bs58.js';
 import { show as AccountPage_show } from "./account-selected.js";
-import { encodeHex } from "../api/tweetnacl/util.js";
-import { Account } from "../api/account.js";
-import { generateSeedPhraseAsync } from "../api/utils/seed-phrase.js";
+import { Account } from "../data/account.js";
+import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { backToAccountsList } from "./main.js";
+import { encodeHex } from "../lib/crypto-lite/encode.js";
 const IMPORT_ACCOUNT = "import-account";
 async function createAccountClicked(ev) {
     const netInfo = await askBackgroundGetNetworkInfo();
@@ -78,4 +78,3 @@ export function addListeners() {
     d.onClickId("option-create", createAccountClicked);
     d.onClickId("option-create-implicit", createImplicitAccountClicked);
 }
-//# sourceMappingURL=import-or-create.js.map

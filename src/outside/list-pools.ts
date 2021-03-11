@@ -1,8 +1,8 @@
 import * as d from "../util/document.js"
 import * as c from "../util/conversions.js"
-import * as StakingPool from "../api/staking-pool.js"
+import * as StakingPool from "../contracts/staking-pool.js"
 
-import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../api/askBackground.js"
+import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../background/askBackground.js"
 
 
 

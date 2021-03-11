@@ -2,15 +2,15 @@ import * as c from "../util/conversions.js";
 import * as d from "../util/document.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import * as Pages from "../pages/main.js";
-import * as StakingPool from "../api/staking-pool.js";
-import { isValidAccountID, isValidAmount } from "../api/utils/valid.js";
-import { checkSeedPhrase, parseSeedPhraseAsync } from "../api/utils/seed-phrase.js";
-import { KeyPairEd25519 } from "../api/utils/key-pair.js";
+import * as StakingPool from "../contracts/staking-pool.js";
+import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/valid.js";
+import { checkSeedPhrase, parseSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
+import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { ExtendedAccountData } from "../api/account.js";
+import { ExtendedAccountData } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
-import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount } from "../api/askBackground.js";
-import { DeleteAccountToBeneficiary } from "../api/batch-transaction.js";
+import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount } from "../background/askBackground.js";
+import { DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
@@ -1075,4 +1075,3 @@ async function refreshClicked(ev) {
         d.hideWait();
     }
 }
-//# sourceMappingURL=account-selected.js.map

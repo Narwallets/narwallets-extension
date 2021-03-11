@@ -1,6 +1,6 @@
 import * as d from "../util/document.js";
-import { askBackground, askBackgroundGetState } from "../api/askBackground.js";
-import { isValidEmail } from "../api/utils/valid.js";
+import { askBackground, askBackgroundGetState } from "../background/askBackground.js";
+import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 import { show as MainPage_show } from "./main.js";
 async function unlockClicked(ev) {
     const emailEl = d.inputById("unlock-email");
@@ -35,4 +35,3 @@ export async function show() {
     const state = await askBackgroundGetState();
     d.inputById("unlock-email").value = state.currentUser;
 }
-//# sourceMappingURL=unlock.js.map

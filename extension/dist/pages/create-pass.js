@@ -1,4 +1,4 @@
-import { askBackground, askBackgroundGetState } from "../api/askBackground.js";
+import { askBackground, askBackgroundGetState } from "../background/askBackground.js";
 import * as d from "../util/document.js";
 const EMAIL = "email";
 const PASS = "pass";
@@ -38,4 +38,3 @@ export function addListeners() {
     d.onClickId(AGREE_CHECK, agreeCheckboxClicked);
     d.onClickId(CREATE_USER, createClicked);
 }
-//# sourceMappingURL=create-pass.js.map

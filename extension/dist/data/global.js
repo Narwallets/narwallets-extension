@@ -1,11 +1,12 @@
-import * as nacl from "../util/tweetnacl/nacl-fast.js";
-import * as naclUtil from "../util/tweetnacl/nacl-util.js";
-import * as sha256 from "../api/sha256.js";
-import * as Network from "../api/network.js";
+import * as secret from "../lib/naclfast-secret-box/nacl-fast.js";
+import * as Network from "../lib/near-api-lite/network.js";
 import { recoverFromLocalStorage, localStorageSave, localStorageGet } from "./util.js";
-import { log } from "../api/log.js";
+import { log } from "../lib/log.js";
+import * as clite from "../lib/crypto-lite/crypto-primitives-browser.js";
+import { encodeBase64, decodeBase64, stringFromUint8Array, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
 const DATA_VERSION = "0.1";
 const INVALID_USER_OR_PASS = "Invalid User or Password";
+import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 //---- GLOBAL STATE ----
 export const EmptyState = {
     dataVersion: DATA_VERSION,
@@ -18,7 +19,7 @@ export var workingData = { unlockSHA: "" };
 const EmptySecureState = {
     dataVersion: DATA_VERSION,
     hashedPass: undefined,
-    autoUnlockSeconds: 30,
+    autoUnlockSeconds: 1800,
     advancedMode: false,
     accounts: {}
 };
@@ -32,16 +33,34 @@ export function saveState() {
 export async function recoverState() {
     State = await recoverFromLocalStorage("State", "S", EmptyState);
 }
-export function sha256PwdBase64(password) {
-    return naclUtil.encodeBase64(sha256.hash(naclUtil.decodeUTF8(password)));
+export async function sha256PwdBase64Async(password) {
+    const hash = await clite.sha256Async(Uint8ArrayFromString(password));
+    return encodeBase64(new Uint8Array(hash));
 }
 export function lock() {
     workingData.unlockSHA = "";
     SecureState = Object.assign({}, EmptySecureState);
     log("LOCKED");
 }
-export function createSecureState(password) {
-    SecureState.hashedPass = sha256PwdBase64(password);
+export async function createUserAsync(email, password) {
+    if (!isValidEmail(email)) {
+        throw Error("Invalid email");
+    }
+    else if (State.usersList.includes(email)) {
+        throw Error("User already exists");
+    }
+    else if (!password || password.length < 8) {
+        throw Error("password must be at least 8 characters long");
+    }
+    lock(); //log out current user
+    State.currentUser = email;
+    await createSecureStateAsync(password);
+    //save new user in usersList
+    State.usersList.push(email);
+    saveState();
+}
+export async function createSecureStateAsync(password) {
+    SecureState.hashedPass = await sha256PwdBase64Async(password);
     SecureState.accounts = {};
     saveSecureState();
 }
@@ -49,15 +68,15 @@ export function saveSecureState() {
     if (!SecureState.hashedPass) {
         throw new Error("Invalid/locked SecureState");
     }
-    const keyPair = nacl.sign_keyPair_fromSeed(naclUtil.decodeBase64(SecureState.hashedPass));
+    const keyPair = secret.sign_keyPair_fromSeed(decodeBase64(SecureState.hashedPass));
     const keyUint8Array = keyPair.publicKey;
-    const nonce = nacl.randomBytes(nacl.secretbox_nonceLength);
-    const messageUint8 = naclUtil.decodeUTF8(JSON.stringify(SecureState));
-    const box = nacl.secretbox(messageUint8, nonce, keyUint8Array);
+    const nonce = secret.randomBytes(secret.secretbox_nonceLength);
+    const messageUint8 = Uint8ArrayFromString(JSON.stringify(SecureState));
+    const box = secret.secretbox(messageUint8, nonce, keyUint8Array);
     const fullMessage = new Uint8Array(nonce.length + box.length);
     fullMessage.set(nonce);
     fullMessage.set(box, nonce.length);
-    const base64FullMessage = naclUtil.encodeBase64(fullMessage);
+    const base64FullMessage = encodeBase64(fullMessage);
     //localStorage.setItem("SS", base64FullMessage)
     localStorageSave("Secure State", State.currentUser, base64FullMessage);
 }
@@ -82,16 +101,20 @@ export function isLocked() {
 function decryptIntoJson(hashedPassBase64, encryptedMsg) {
     if (!encryptedMsg)
         throw new Error("encryptedState is empty");
-    const keyPair = nacl.sign_keyPair_fromSeed(naclUtil.decodeBase64(hashedPassBase64));
+    const keyPair = secret.sign_keyPair_fromSeed(decodeBase64(hashedPassBase64));
     const keyUint8Array = keyPair.publicKey;
-    const messageWithNonceAsUint8Array = naclUtil.decodeBase64(encryptedMsg);
-    const nonce = messageWithNonceAsUint8Array.slice(0, nacl.secretbox_nonceLength);
-    const message = messageWithNonceAsUint8Array.slice(nacl.secretbox_nonceLength, encryptedMsg.length);
-    const decrypted = nacl.secretbox_open(message, nonce, keyUint8Array);
+    const messageWithNonceAsUint8Array = decodeBase64(encryptedMsg);
+    const nonce = messageWithNonceAsUint8Array.slice(0, secret.secretbox_nonceLength);
+    const message = messageWithNonceAsUint8Array.slice(secret.secretbox_nonceLength, encryptedMsg.length);
+    const decrypted = secret.secretbox_open(message, nonce, keyUint8Array);
     if (decrypted == null || !decrypted)
         throw Error(INVALID_USER_OR_PASS);
-    const base64DecryptedMessage = naclUtil.encodeUTF8(decrypted);
-    return JSON.parse(base64DecryptedMessage);
+    const decryptedAsString = stringFromUint8Array(decrypted);
+    return JSON.parse(decryptedAsString);
+}
+export async function unlockSecureStateAsync(email, password) {
+    const hash = await sha256PwdBase64Async(password);
+    return unlockSecureStateSHA(email, hash);
 }
 //recover with PASSWORD_HASH or throws
 export async function unlockSecureStateSHA(email, hashedPassBase64) {
@@ -149,4 +172,3 @@ export function getAutoUnlockSeconds() {
         aul = 30;
     return aul;
 }
-//# sourceMappingURL=global.js.map

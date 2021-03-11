@@ -1,10 +1,10 @@
 import * as d from "../util/document.js";
 import * as searchAccounts from "../util/search-accounts.js";
-import { isValidAccountID } from "../api/utils/valid.js";
+import { isValidAccountID } from "../lib/near-api-lite/utils/valid.js";
 import * as Pages from "../pages/main.js";
-import { Account, ExtendedAccountData } from "../api/account.js";
+import { Account, ExtendedAccountData } from "../data/account.js";
 import { searchThePools } from "./account-selected.js";
-import { askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../api/askBackground.js";
+import { askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../background/askBackground.js";
 const NET_NAME = "net-name";
 const NET_ROOT = "net-root";
 const IMPORT_OR_CREATE = "import-or-create";
@@ -209,4 +209,3 @@ chrome.runtime.onMessage.addListener(function (msg) {
         onNetworkChanged(msg.networkInfo);
     }
 });
-//# sourceMappingURL=import.js.map

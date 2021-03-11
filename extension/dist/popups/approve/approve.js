@@ -1,6 +1,6 @@
 import * as d from "../../util/document.js";
 import * as c from "../../util/conversions.js";
-import { askBackground } from "../../api/askBackground.js";
+import { askBackground } from "../../background/askBackground.js";
 let responseSent = false;
 var initialMsg;
 var resolvedMsg;
@@ -115,4 +115,3 @@ const bgpage = chrome.extension.getBackgroundPage();
 const msg = bgpage.pendingApprovalMsg;
 //Display transaction for user approval
 displayTx(msg);
-//# sourceMappingURL=approve.js.map
