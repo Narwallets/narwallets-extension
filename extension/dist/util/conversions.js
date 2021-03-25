@@ -1,13 +1,25 @@
 //----------------------------------
 //------ conversions Yoctos->Near
 //----------------------------------
+//BigInt scientific notation
+const base1e = BigInt(10);
+function b1e(n) { return base1e ** BigInt(n); }
+;
+const b1e12 = b1e(12);
+const b1e24 = b1e(24);
+export function TGas(tgas) {
+    return (BigInt(tgas) * b1e12).toString(); // tgas*1e12 // Note: gas is u64
+}
+export function ntoy(near) {
+    return (BigInt(near) * b1e24).toString(); // near*1e24 // Note: YoctoNear is u128
+}
 /**
  * returns string representing NEAR with thsnds separators, and 2 decimal places
  * @param {string} yoctos
  */
 export function ytonString(yoctos) {
-    const just2dec = ytonFull(yoctos).slice(0, -22);
-    return addCommas(just2dec);
+    const just5dec = ytonFull(yoctos).slice(0, -19); //truncate at 5 decs
+    return addCommas(just5dec);
 }
 /**
  * returns Near number with 4 decimal digits
@@ -15,22 +27,13 @@ export function ytonString(yoctos) {
  */
 export function yton(yoctos) {
     try {
-        const just4dec = ytonFull(yoctos).slice(0, -20);
-        return Number(just4dec); // truncated to 4 decimals 
+        const just5dec = ytonFull(yoctos).slice(0, -19);
+        return Number(just5dec); // truncated to 4 decimals 
     }
     catch (ex) {
         console.log("ERR: yton(", yoctos, ")", ex);
         return NaN;
     }
-}
-/**
- * convert nears expressed as a js-number with MAX 4 decimals into a yoctos-string
- * @param n amount in near MAX 4 DECIMALS
- */
-export function ntoy(n) {
-    let by1e4 = Math.round(n * 1e4).toString(); // near * 1e4 - round
-    let yoctosText = by1e4 + "0".repeat(20); //  mul by 1e20 => yoctos = near * 1e(4+20)
-    return yoctosText;
 }
 /**
  * Formats a number in NEAR to a string with commas and 2 decimal places
@@ -50,10 +53,10 @@ export function toNum(str) {
 }
 /**
  * returns string with a decimal point and 24 decimal places
- * @param {string} str amount in yoctos
+ * @param {string} yoctoString amount in yoctos
  */
-export function ytonFull(str) {
-    let result = (str + "").padStart(25, "0");
+export function ytonFull(yoctoString) {
+    let result = (yoctoString + "").padStart(25, "0");
     result = result.slice(0, -24) + "." + result.slice(-24);
     return result;
 }
@@ -69,3 +72,4 @@ export function addCommas(str) {
     }
     return str;
 }
+//# sourceMappingURL=conversions.js.map

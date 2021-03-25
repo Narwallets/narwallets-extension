@@ -5,7 +5,7 @@
 // -> resend to page as window.postMessage
 //--------------------------------------
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    console.log("@contentScript received runtime.onMessage", msg, "from", sender);
+    //console.log("@contentScript received runtime.onMessage",msg,"from",sender);
     if (msg.code == "ping") {
         sendResponse({ code: "pong" });
         return;
@@ -24,7 +24,7 @@ window.addEventListener("message", function (event) {
     if (event.source != window)
         return;
     if (event.data.dest == "ext") {
-        console.log("Content script received msg to ext: ", event.data);
+        //console.log("Content script received msg to ext: ", event.data);
         //send to background.js 
         try {
             chrome.runtime.sendMessage(event.data); //chrome.runtime.sendMessage includes origin(sender)
@@ -40,3 +40,4 @@ window.addEventListener("message", function (event) {
         }
     }
 }, false);
+//# sourceMappingURL=contentScript.js.map

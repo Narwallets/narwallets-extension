@@ -111,7 +111,7 @@ async function importIfNew(accType, accName, accountInfo, order) {
     else {
         d.showSuccess("Account added: " + accName); //new account
         accountInfo.order = order;
-        console.log("added ", order, accName);
+        //console.log("added ",order,accName)
         await askBackgroundSetAccount(accName, accountInfo);
         return true;
     }
@@ -184,7 +184,7 @@ async function searchClicked(ev) {
 // }
 async function onNetworkChanged(info) {
     if (!info) {
-        console.log("!info");
+        //console.log("!info")
         return;
     }
     //update .root-account
@@ -209,3 +209,4 @@ chrome.runtime.onMessage.addListener(function (msg) {
         onNetworkChanged(msg.networkInfo);
     }
 });
+//# sourceMappingURL=import.js.map

@@ -1,3 +1,4 @@
+import * as c from "../util/conversions.js";
 import * as global from "../data/global.js";
 import { log } from "../lib/log.js";
 import * as Network from "../lib/near-api-lite/network.js";
@@ -6,12 +7,12 @@ import { localStorageSet, localStorageGet } from "../data/util.js";
 import * as TX from "../lib/near-api-lite/transaction.js";
 //version: major+minor+version, 3 digits each
 function semver(major, minor, version) { return major * 1e6 + minor * 1e3 + version; }
-const WALLET_VERSION = semver(1, 0, 3);
+const WALLET_VERSION = semver(2, 0, 0);
 //---------- working data
 let _connectedTabs = {};
 let _bgDataRecovered;
 // if the transaction include attached near, store here to update acc balance async
-let global_NearsSent = { from: "", to: "", amount: 0 };
+let global_NearsSent = { from: "", to: "", amount: "0" };
 //----------------------------------------
 //-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
 //-- msg path is popup->here->action->sendResponse(err,data)
@@ -38,7 +39,7 @@ function runtimeMessageHandler(msg, sender, sendResponse) {
     else {
         //from internal pages like popup
         //other codes resolved by promises
-        global_NearsSent = { from: "", to: "", amount: 0 };
+        global_NearsSent = { from: "", to: "", amount: "0" };
         getActionPromise(msg)
             .then((data) => {
             setTimeout(reflectTransfer, 200); //move amounts if accounts are in the wallet
@@ -55,14 +56,14 @@ function runtimeMessageHandler(msg, sender, sendResponse) {
 //-- reflec transfer in wallet accounts
 function reflectTransfer() {
     try {
-        if (global_NearsSent.amount == 0 || !global.SecureState)
+        if (global_NearsSent.amount == "0" || !global.SecureState)
             return;
         let modified = false;
         //check if sender is in this wallet
         if (global_NearsSent.from && global.SecureState.accounts[Network.current]) {
             const senderAccInfo = global.SecureState.accounts[Network.current][global_NearsSent.from];
             if (senderAccInfo) {
-                senderAccInfo.lastBalance -= global_NearsSent.amount;
+                senderAccInfo.lastBalance -= c.yton(global_NearsSent.amount);
                 modified = true;
             }
         }
@@ -70,7 +71,7 @@ function reflectTransfer() {
         if (global_NearsSent.to && global.SecureState.accounts[Network.current]) {
             const receiverAccInfo = global.SecureState.accounts[Network.current][global_NearsSent.to];
             if (receiverAccInfo) {
-                receiverAccInfo.lastBalance += global_NearsSent.amount;
+                receiverAccInfo.lastBalance += c.yton(global_NearsSent.amount);
                 modified = true;
             }
         }
@@ -203,12 +204,12 @@ function getActionPromise(msg) {
                 switch (item.action) {
                     case "call":
                         const f = item;
-                        actions.push(TX.functionCall(f.method, f.args, near.TGas(f.Tgas), near.toYoctos(f.attachedNear)));
-                        global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: f.attachedNear };
+                        actions.push(TX.functionCall(f.method, f.args, BigInt(f.gas), BigInt(f.attached)));
+                        global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: f.attached };
                         break;
                     case "transfer":
-                        actions.push(TX.transfer(near.toYoctos(item.attachedNear)));
-                        global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: item.attachedNear };
+                        actions.push(TX.transfer(BigInt(item.attached)));
+                        global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: item.attached };
                         break;
                     case "delete":
                         const d = item;
@@ -584,3 +585,4 @@ async function onLoad() {
     if (!_bgDataRecovered)
         await retrieveBgInfoFromStorage();
 }
+//# sourceMappingURL=background.js.map

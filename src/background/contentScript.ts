@@ -5,7 +5,7 @@
 //--------------------------------------
 chrome.runtime.onMessage.addListener(
     function(msg:any,sender,sendResponse){
-        console.log("@contentScript received runtime.onMessage",msg,"from",sender);
+        //console.log("@contentScript received runtime.onMessage",msg,"from",sender);
         if (msg.code=="ping"){
             sendResponse({code:"pong"})
             return;
@@ -25,7 +25,7 @@ window.addEventListener("message",
         // We only accept messages from ourselves (the DApp/web app)
         if (event.source != window) return;
         if (event.data.dest=="ext") {
-            console.log("Content script received msg to ext: ", event.data);
+            //console.log("Content script received msg to ext: ", event.data);
             //send to background.js 
             try {
                 chrome.runtime.sendMessage(event.data) //chrome.runtime.sendMessage includes origin(sender)

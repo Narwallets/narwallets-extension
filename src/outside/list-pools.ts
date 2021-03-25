@@ -22,7 +22,7 @@ function sortCompare(a:PoolInfo, b:PoolInfo) {
 
 
 function clicked(name:string) {
-  console.log(name);
+  //console.log(name);
   navigator.clipboard.writeText(name);
   d.showSuccess("Copied to clipboard: " + name)
   setTimeout(window.close, 600);
@@ -61,7 +61,7 @@ async function displayStakingPools() {
         .then((fee) => {
           //debug
           if (item.account_id.indexOf("node0") != -1) {
-            console.log(fee)
+            //console.log(fee)
           }
           const elem = d.byId(item.account_id)
           if (fee >= 50) elem.classList.add("hidden") //bye bye 

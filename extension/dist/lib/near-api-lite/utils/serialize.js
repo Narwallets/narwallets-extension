@@ -296,3 +296,4 @@ export function deserialize(schema, classType, buffer) {
     }
     return result;
 }
+//# sourceMappingURL=serialize.js.map

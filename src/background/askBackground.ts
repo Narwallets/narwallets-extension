@@ -63,17 +63,17 @@ export function askBackgroundCallMethod(
     method: string,
     params: any,
     signerId: string,
-    Tgas: number=25,
-    attachedNear: number = 0):Promise<any>
+    gas?: string,
+    attached?: string):Promise<any>
     {
         const batchTx=new BatchTransaction(contractId);
-        batchTx.addItem(new FunctionCall(method,params,Tgas,attachedNear))
+        batchTx.addItem(new FunctionCall(method,params,gas,attached))
         return askBackground({code:"apply",signerId:signerId, tx:batchTx})
 }
 
-export function askBackgroundTransferNear( fromAccountId:string, receiverId:string, attachedNear:number) :Promise<any> {
+export function askBackgroundTransferNear( fromAccountId:string, receiverId:string, attached:string) :Promise<any> {
     const batchTx=new BatchTransaction(receiverId);
-    batchTx.addItem(new Transfer(attachedNear))
+    batchTx.addItem(new Transfer(attached))
     return askBackground({code:"apply", signerId:fromAccountId, tx:batchTx})
 }
 export function askBackgroundApplyTxAction(receiverId:string, action:BatchAction, signerId:string) :Promise<any> {
