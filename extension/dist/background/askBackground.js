@@ -48,14 +48,14 @@ export function askBackgroundGetAccessKey(accountId, publicKey) {
 export function askBackgroundViewMethod(contract, method, args) {
     return askBackground({ code: "view", contract: contract, method: method, args: args });
 }
-export function askBackgroundCallMethod(contractId, method, params, signerId, Tgas = 25, attachedNear = 0) {
+export function askBackgroundCallMethod(contractId, method, params, signerId, gas, attached) {
     const batchTx = new BatchTransaction(contractId);
-    batchTx.addItem(new FunctionCall(method, params, Tgas, attachedNear));
+    batchTx.addItem(new FunctionCall(method, params, gas, attached));
     return askBackground({ code: "apply", signerId: signerId, tx: batchTx });
 }
-export function askBackgroundTransferNear(fromAccountId, receiverId, attachedNear) {
+export function askBackgroundTransferNear(fromAccountId, receiverId, attached) {
     const batchTx = new BatchTransaction(receiverId);
-    batchTx.addItem(new Transfer(attachedNear));
+    batchTx.addItem(new Transfer(attached));
     return askBackground({ code: "apply", signerId: fromAccountId, tx: batchTx });
 }
 export function askBackgroundApplyTxAction(receiverId, action, signerId) {
@@ -66,3 +66,4 @@ export function askBackgroundApplyTxAction(receiverId, action, signerId) {
 export function askBackgroundApplyBatchTx(signerId, batchTx) {
     return askBackground({ code: "apply", signerId: signerId, tx: batchTx });
 }
+//# sourceMappingURL=askBackground.js.map

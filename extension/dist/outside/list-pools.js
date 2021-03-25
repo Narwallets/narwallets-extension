@@ -8,7 +8,7 @@ function sortCompare(a, b) {
     return 1;
 }
 function clicked(name) {
-    console.log(name);
+    //console.log(name);
     navigator.clipboard.writeText(name);
     d.showSuccess("Copied to clipboard: " + name);
     setTimeout(window.close, 600);
@@ -38,7 +38,7 @@ async function displayStakingPools() {
                 .then((fee) => {
                 //debug
                 if (item.account_id.indexOf("node0") != -1) {
-                    console.log(fee);
+                    //console.log(fee)
                 }
                 const elem = d.byId(item.account_id);
                 if (fee >= 50)
@@ -90,3 +90,4 @@ async function init() {
     }
 }
 document.addEventListener('DOMContentLoaded', init);
+//# sourceMappingURL=list-pools.js.map

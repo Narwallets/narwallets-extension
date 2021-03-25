@@ -40,3 +40,4 @@ export function toBufferBE(num, width) {
 export function toBufferLE(num, width) {
     return toBufferBE(num, width).reverse();
 }
+//# sourceMappingURL=bigint-buffer.js.map

@@ -68,7 +68,7 @@ export class LockupContract {
             return true;
         }
         catch (ex) {
-            console.log("INFO", "retrieving lockupcontract ", ex.message);
+            //console.log("INFO", "retrieving lockupcontract ", ex.message);
             if (firstOneOK)
                 d.showErr("lockup.c search error: " + ex.message); //another error
             return false;
@@ -82,7 +82,7 @@ export class LockupContract {
     call_method(method, args, gas) {
         if (!this.accountInfo.ownerId)
             throw Error("accountInfo.ownerId is undefined");
-        return askBackgroundApplyTxAction(this.contractAccount, new FunctionCall(method, args, gas, 0), this.accountInfo.ownerId);
+        return askBackgroundApplyTxAction(this.contractAccount, new FunctionCall(method, args, gas), this.accountInfo.ownerId);
     }
     //-------------------------------------------
     //owner calls
@@ -111,24 +111,24 @@ export class LockupContract {
                     //----------------------
                 }
                 //if ZERO in the pool, unselect current staking pool
-                await this.call_method("unselect_staking_pool", {}, BASE_GAS * 3);
+                await this.call_method("unselect_staking_pool", {}, c.TGas(BASE_GAS * 3));
                 actualSP = "";
                 this.accountInfo.stakingPool = "";
             }
         }
         if (!actualSP) {
             //select the new staking pool
-            await this.call_method("select_staking_pool", { staking_pool_account_id: newStakingPool }, BASE_GAS * 3);
+            await this.call_method("select_staking_pool", { staking_pool_account_id: newStakingPool }, c.TGas(BASE_GAS * 3));
             this.accountInfo.stakingPool = newStakingPool;
             poolAccInfo = await this.getStakingPoolAccInfo(); //refresh info
         }
         if (poolAccInfo.unstaked_balance != "0" && poolAccInfo.staked_balance == "0") { //deposited but unstaked, stake
             //just re-stake (maybe the user asked unstaking but now regrets it)
-            await this.call_method("stake", { amount: poolAccInfo.unstaked_balance }, BASE_GAS * 5);
+            await this.call_method("stake", { amount: poolAccInfo.unstaked_balance }, c.TGas(BASE_GAS * 5));
         }
         else {
             //deposit and stake
-            await this.call_method("deposit_and_stake", { amount: c.ntoy(amountNear) }, BASE_GAS * 5);
+            await this.call_method("deposit_and_stake", { amount: c.ntoy(amountNear) }, c.TGas(BASE_GAS * 5));
         }
     }
     //-------------------------------
@@ -138,7 +138,7 @@ export class LockupContract {
         if (!isValidAccountID(receiverId))
             throw Error("invalid receiver account Id");
         //try to transfer
-        await this.call_method("transfer", { amount: c.ntoy(amountNear), receiver_id: receiverId }, BASE_GAS * 2);
+        await this.call_method("transfer", { amount: c.ntoy(amountNear), receiver_id: receiverId }, c.TGas(BASE_GAS * 2));
     }
     //-------------------------------------------
     async getStakingPoolAccInfo() {
@@ -160,23 +160,23 @@ export class LockupContract {
             //nothing staked, maybe waiting to withdrawal
             if (poolAccInfo.unstaked_balance == "0") {
                 //nothing to withdraw either! unselect the staking pool
-                await this.call_method("unselect_staking_pool", {}, BASE_GAS);
+                await this.call_method("unselect_staking_pool", {}, c.TGas(BASE_GAS));
                 return "No funds left in the pool. Clearing pool selection";
                 //----------------
             }
             //something to withdraw
             if (!poolAccInfo.can_withdraw) {
-                throw Error("Funds are unstaked but you must wait (36-48hs) for withdrawal");
+                throw Error("Funds are unstaked but you must wait (36-48hs) to withdraw");
                 //----------------
             }
             //ok we've unstaked funds and can withdraw 
-            await this.call_method("withdraw_all_from_staking_pool", {}, BASE_GAS * 8);
+            await this.call_method("withdraw_all_from_staking_pool", {}, c.TGas(BASE_GAS * 8));
             return "Withdrawing all from the pool";
             //----------------
         }
         //here we've staked balance in the pool, call unstake
-        await this.call_method("unstake_all", {}, BASE_GAS * 5);
-        return "Unstake requested, you must wait (36-48hs) for withdrawal";
+        await this.call_method("unstake_all", {}, c.TGas(BASE_GAS * 5));
+        return "Unstake requested, you must wait (36-48hs) to withdraw";
     }
     //-------------------------------------------
     get_staking_pool_account_id() {
@@ -184,12 +184,13 @@ export class LockupContract {
     }
     //-------------------------------------------
     async select_staking_pool(signer, stakingPool, privateKey) {
-        return this.call_method("select_staking_pool", { staking_pool_account_id: stakingPool }, BASE_GAS * 3);
+        return this.call_method("select_staking_pool", { staking_pool_account_id: stakingPool }, c.TGas(BASE_GAS * 3));
     }
     //-------------------------------------------
     async deposit_and_stake(signer, amountNear, privateKey) {
         if (isNaN(amountNear) || amountNear <= 0)
             throw Error("invalid amount");
-        return this.call_method("deposit_and_stake", { amount: c.ntoy(amountNear) }, BASE_GAS * 5);
+        return this.call_method("deposit_and_stake", { amount: c.ntoy(amountNear) }, c.TGas(BASE_GAS * 5));
     }
 }
+//# sourceMappingURL=LockupContract.js.map

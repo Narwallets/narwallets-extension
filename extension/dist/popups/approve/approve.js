@@ -42,7 +42,7 @@ function humanReadableValue(value) {
             return c.toStringDec(c.yton(value)) + "N";
         }
         else {
-            return value;
+            return `"${value}"`;
         }
     }
     else {
@@ -83,7 +83,7 @@ function displayTx(msg) {
         for (let item of msg.tx.items) {
             let toAdd = {
                 action: item.action,
-                attachedNear: (item.attachedNear ? `with <span class="near">${c.toStringDec(item.attachedNear)}</span> attached NEAR` : "")
+                attached: (item.attached != "0" ? `with <span class="near">${c.ytonString(item.attached)}</span> attached NEAR` : "")
             };
             //explain action
             switch (item.action) {
@@ -93,7 +93,7 @@ function displayTx(msg) {
                     break;
                 case "transfer":
                     toAdd.action = "";
-                    toAdd.attachedNear = `transfer <span class="near">${c.toStringDec(item.attachedNear)}</span> NEAR`;
+                    toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`;
                     break;
                 default:
                     toAdd.action = JSON.stringify(item);
@@ -115,3 +115,4 @@ const bgpage = chrome.extension.getBackgroundPage();
 const msg = bgpage.pendingApprovalMsg;
 //Display transaction for user approval
 displayTx(msg);
+//# sourceMappingURL=approve.js.map

@@ -167,7 +167,7 @@ async function importIfNew(
   else  {
     d.showSuccess("Account added: "+accName)//new account
     accountInfo.order = order
-    console.log("added ",order,accName)
+    //console.log("added ",order,accName)
     await askBackgroundSetAccount(accName, accountInfo)              
     return true;
     }
@@ -255,7 +255,7 @@ async function searchClicked(ev :Event) {
 
 async function onNetworkChanged(info:NetworkInfo) {
   if (!info) {
-    console.log("!info")
+    //console.log("!info")
     return 
   }
   //update .root-account

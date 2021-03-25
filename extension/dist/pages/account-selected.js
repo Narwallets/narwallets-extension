@@ -425,16 +425,16 @@ async function performStake() {
             //just re-stake (maybe the user asked unstaking but now regrets it)
             const amountToStakeY = fixUserAmountInY(amountToStake, poolAccInfo.unstaked_balance);
             if (amountToStakeY == poolAccInfo.unstaked_balance) {
-                await askBackgroundCallMethod(newStakingPool, "stake_all", {}, selectedAccountData.name, 125);
+                await askBackgroundCallMethod(newStakingPool, "stake_all", {}, selectedAccountData.name);
             }
             else {
-                await askBackgroundCallMethod(newStakingPool, "stake", { amount: amountToStakeY }, selectedAccountData.name, 125);
+                await askBackgroundCallMethod(newStakingPool, "stake", { amount: amountToStakeY }, selectedAccountData.name);
                 //await near.call_method(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
             }
         }
         else { //no unstaked funds
             //deposit and stake
-            await askBackgroundCallMethod(newStakingPool, "deposit_and_stake", {}, selectedAccountData.name, 125, amountToStake);
+            await askBackgroundCallMethod(newStakingPool, "deposit_and_stake", {}, selectedAccountData.name, c.TGas(75), c.ntoy(amountToStake));
             // await near.call_method(newStakingPool, "deposit_and_stake", {},
             //     selectedAccountData.name,
             //     selectedAccountData.accountInfo.privateKey,
@@ -584,15 +584,15 @@ async function performUnstake() {
         const poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
         if (modeWithraw) {
             if (poolAccInfo.unstaked_balance == "0")
-                throw Error("No funds unstaked for withdraw");
+                throw Error("No funds unstaked to withdraw");
             //if (!poolAccInfo.can_withdraw) throw Error("Funds are unstaked but you must wait (36-48hs) after unstaking to withdraw")
             //ok we've unstaked funds we can withdraw 
             let yoctosToWithdraw = fixUserAmountInY(amount, poolAccInfo.unstaked_balance); // round user amount
             if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
-                await askBackgroundCallMethod(actualSP, "withdraw_all", {}, selectedAccountData.name, 125);
+                await askBackgroundCallMethod(actualSP, "withdraw_all", {}, selectedAccountData.name);
             }
             else {
-                await askBackgroundCallMethod(actualSP, "withdraw", { amount: yoctosToWithdraw }, selectedAccountData.name, 125);
+                await askBackgroundCallMethod(actualSP, "withdraw", { amount: yoctosToWithdraw }, selectedAccountData.name);
             }
             d.showSuccess(c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool");
             //----------------
@@ -603,12 +603,12 @@ async function performUnstake() {
                 throw Error("No funds staked to unstake");
             let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
             if (yoctosToUnstake == poolAccInfo.staked_balance) {
-                await askBackgroundCallMethod(actualSP, "unstake_all", {}, selectedAccountData.name, 125);
+                await askBackgroundCallMethod(actualSP, "unstake_all", {}, selectedAccountData.name);
             }
             else {
-                await askBackgroundCallMethod(actualSP, "unstake", { amount: yoctosToUnstake }, selectedAccountData.name, 125);
+                await askBackgroundCallMethod(actualSP, "unstake", { amount: yoctosToUnstake }, selectedAccountData.name);
             }
-            d.showSuccess("Unstake requested, you must wait (36-48hs) for withdrawal");
+            d.showSuccess("Unstake requested, you must wait (36-48hs) to withdraw");
         }
         //refresh status
         await refreshSaveSelectedAccount();
@@ -663,7 +663,7 @@ async function performSend() {
         const amountToSend = c.toNum(d.byId("send-confirmation-amount").innerText);
         disableOKCancel();
         d.showWait();
-        await askBackgroundTransferNear(selectedAccountData.name, toAccName, amountToSend);
+        await askBackgroundTransferNear(selectedAccountData.name, toAccName, c.ntoy(amountToSend));
         showButtons();
         //TODO transaction history per network
         //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
@@ -888,7 +888,7 @@ async function AccountDeleteOKClicked() {
         const result = await askBackgroundApplyTxAction(toDeleteAccName, new DeleteAccountToBeneficiary(beneficiary), selectedAccountData.name);
         //remove from wallet
         await askBackground({ code: "remove-account", accountId: selectedAccountData.name });
-        console.log("remove-account sent ", selectedAccountData.name);
+        //console.log("remove-account sent ",selectedAccountData.name)
         //return to accounts page
         await AccountPages_show();
         d.showSuccess("Account Deleted, remaining funds sent to " + beneficiary);
@@ -916,7 +916,7 @@ async function AddPublicKeyToLockupOKClicked() {
         if (!privateKey)
             throw Error("Owner Account is Read-Only");
         try {
-            const pingTransfer = await askBackgroundCallMethod(selectedAccountData.name, "check_transfers_vote", {}, owner, 75);
+            const pingTransfer = await askBackgroundCallMethod(selectedAccountData.name, "check_transfers_vote", {}, owner);
         }
         catch (ex) {
             if (ex.message.indexOf("Transfers are already enabled") != -1) {
@@ -926,7 +926,7 @@ async function AddPublicKeyToLockupOKClicked() {
                 throw ex;
         }
         const newPubKey = getPublicKey(privateKey);
-        const result = await askBackgroundCallMethod(selectedAccountData.name, "add_full_access_key", { new_public_key: newPubKey }, owner, 50);
+        const result = await askBackgroundCallMethod(selectedAccountData.name, "add_full_access_key", { new_public_key: newPubKey }, owner);
         d.showSuccess("Public Key added");
         //check if that's a known-key 
         const allNetworkAccounts = await askBackgroundAllNetworkAccounts();
@@ -988,7 +988,7 @@ async function makeFullAccessOKClicked() {
         }
         else {
             //a seed phrase
-            const seedPrhase = words.split(' ');
+            const seedPrhase = words.trim().split(' ');
             checkSeedPhrase(seedPrhase);
             const result = await parseSeedPhraseAsync(seedPrhase);
             secretKey = result.secretKey;
@@ -1075,3 +1075,4 @@ async function refreshClicked(ev) {
         d.hideWait();
     }
 }
+//# sourceMappingURL=account-selected.js.map

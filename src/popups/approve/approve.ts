@@ -5,7 +5,7 @@ import { askBackground } from "../../background/askBackground.js"
 
 type TxInfo = {
       action:string;
-      attachedNear: string;
+      attached: string;
 }
 
 type TxMsg = {
@@ -72,7 +72,7 @@ function humanReadableValue(value:Object):string{
       return c.toStringDec(c.yton(value))+"N"
     }
     else {
-      return value;
+      return `"${value}"`;
     }
   }
   else {
@@ -117,7 +117,7 @@ function displayTx(msg:TxMsg) {
     for (let item of msg.tx.items) {
       let toAdd:TxInfo = {
         action: item.action,
-        attachedNear: (item.attachedNear ? `with <span class="near">${c.toStringDec(item.attachedNear)}</span> attached NEAR` : "")
+        attached: (item.attached!="0"? `with <span class="near">${c.ytonString(item.attached)}</span> attached NEAR` : "")
       }
       //explain action
       switch (item.action) {
@@ -128,7 +128,7 @@ function displayTx(msg:TxMsg) {
 
         case "transfer":
           toAdd.action = ""
-          toAdd.attachedNear = `transfer <span class="near">${c.toStringDec(item.attachedNear)}</span> NEAR`
+          toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
           break;
 
         default:

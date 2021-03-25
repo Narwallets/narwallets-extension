@@ -47,3 +47,4 @@ export class ExtendedAccountData {
     get isReadOnly() { return !this.accountInfo.privateKey; }
     get isFullAccess() { return !this.isReadOnly; }
 }
+//# sourceMappingURL=account.js.map

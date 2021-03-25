@@ -11,18 +11,6 @@ import {sha256Async} from '../crypto-lite/crypto-primitives-browser.js';
 import{log} from "../log.js"
 import { decodeBase64, stringFromArray, stringFromUint8Array } from "../crypto-lite/encode.js";
 
-//BigInt scientific notation
-const base1e=BigInt(10);
-function b1e(n:number){return base1e**BigInt(n)};
-const b1e12=b1e(12);
-const b1e24=b1e(24);
-
-export function TGas(tgas:number):bigint {
-    return BigInt(tgas)*b1e12; // tgas*1e12
-  }
-export function toYoctos(near:number):bigint {
-    return BigInt(near)*b1e24; // near*1e24
-}
 
 //---------------------------
 //-- NEAR PROTOCOL RPC CALLS
@@ -229,9 +217,8 @@ function getLogsAndErrorsFromReceipts(txResult: any) {
 }
 
 //-------------------------------
-export function send(sender: string, receiver: string, amountNear: number, privateKey: string): Promise<any> {
-    if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount")
-    const actions = [TX.transfer(toYoctos(amountNear))]
+export function send(sender: string, receiver: string, amountYoctos: string, privateKey: string): Promise<any> {
+    const actions = [TX.transfer(BigInt(amountYoctos))]
     return broadcast_tx_commit_actions(actions, sender, receiver, privateKey)
 }
 
