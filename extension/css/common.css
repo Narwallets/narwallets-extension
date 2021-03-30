@@ -269,6 +269,7 @@ justify-content: space-evenly!important;
 
 .balance:after {
   content: "\24c3";
+  padding-left: 0.15em;
 }
 
 button {

@@ -69,7 +69,7 @@ function humanReadableValue(value:Object):string{
   if (typeof value=="string"){
     if (/\d{20}/.test(value)){
       //at least 20 digits. we assume YOCTOS
-      return c.toStringDec(c.yton(value))+"N"
+      return c.toStringDecMin(c.yton(value))+"N"
     }
     else {
       return `"${value}"`;
@@ -117,7 +117,8 @@ function displayTx(msg:TxMsg) {
     for (let item of msg.tx.items) {
       let toAdd:TxInfo = {
         action: item.action,
-        attached: (item.attached!="0"? `with <span class="near">${c.ytonString(item.attached)}</span> attached NEAR` : "")
+        attached: (item.attached!="0" && item.attached!="1") ? 
+                      `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
       }
       //explain action
       switch (item.action) {
@@ -147,11 +148,23 @@ function displayTx(msg:TxMsg) {
   }
 }
 
+let retries =0;
+
+async function initFromBgPage(){
+
+  //Get transaction to approve from background page window
+  const bgpage:any = chrome.extension.getBackgroundPage() as any
+  if (!bgpage && retries<4) {
+    retries++; //retry if we can't get bg page
+    setTimeout(initFromBgPage, 200);
+    return;
+  }
+  const msg:TxMsg=bgpage.pendingApprovalMsg
+  //Display transaction for user approval
+  displayTx(msg);
+
+}
+
 //--- INIT
 d.onClickId("approve-cancel", cancelOkClicked)
-//Get transaction to approve from background page window
-const bgpage:any = chrome.extension.getBackgroundPage() as any
-const msg:TxMsg=bgpage.pendingApprovalMsg
-//Display transaction for user approval
-displayTx(msg);
-
+initFromBgPage()

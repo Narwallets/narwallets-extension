@@ -267,9 +267,11 @@ chrome.runtime.onMessage.addListener(function(msg){
 
 var background:Window|undefined
 //wake-up background page
+//WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
 chrome.runtime.getBackgroundPage((bgpage)=>{
   if (chrome.runtime.lastError) {
     console.error(JSON.stringify(chrome.runtime.lastError))
+    alert(chrome.runtime.lastError);
   }
   else {
     background=bgpage;
@@ -278,4 +280,3 @@ chrome.runtime.getBackgroundPage((bgpage)=>{
     //will reply with "can-init-popup" after retrieving data from localStorage
   }
 });
-

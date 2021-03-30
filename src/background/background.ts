@@ -118,7 +118,7 @@ function getActionPromise(msg:Record<string,any>):Promise<any> {
       return Promise.resolve(global.State);
     }
     else if (msg.code == "lock") {
-      global.lock()
+      global.lock(JSON.stringify(msg))
       return Promise.resolve()
     }
     else if (msg.code == "is-locked") {
@@ -266,12 +266,19 @@ async function processMessageFromWebPage(msg:any) {
   }
 
   if (!_bgDataRecovered) await retrieveBgInfoFromStorage()
-  if (!_connectedTabs[msg.tabId]) _connectedTabs[msg.tabId] = {};
-  const ctinfo = _connectedTabs[msg.tabId];
 
   //when resolved, send msg to content-script->page
   let resolvedMsg :ResolvedMessage = { dest: "page", code: "request-resolved", tabId: msg.tabId, requestId: msg.requestId }
+  log(JSON.stringify(resolvedMsg))
+  log("_connectedTabs[msg.tabId]",JSON.stringify(_connectedTabs[msg.tabId]))
 
+  if (!_connectedTabs[msg.tabId]) {
+    resolvedMsg.err = `chrome-tab ${msg.tabId} is not connected to Narwallets`;  //if error also send msg to content-script->tab
+    chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+    return;
+  }
+
+  const ctinfo = _connectedTabs[msg.tabId];
   log(`processMessageFromWebPage _bgDataRecovered ${_bgDataRecovered}`, JSON.stringify(msg));
 
   switch (msg.code) {
@@ -408,7 +415,11 @@ function connectToWebPage(accountId:string, network:string): Promise<any> {
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 
+      if (chrome.runtime.lastError) return reject(Error(chrome.runtime.lastError.message));
+
       const activeTabId = (tabs[0]? tabs[0].id:-1)||-1;
+      if (activeTabId==-1) return reject(Error("no activeTabId"))
+
       if (!_connectedTabs) _connectedTabs={}
       if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId] = {};
 
@@ -428,7 +439,7 @@ function connectToWebPage(accountId:string, network:string): Promise<any> {
 
       //check if it responds (if it is already injected)
       try {
-        if (chrome.runtime.lastError) throw Error(chrome.runtime.lastError.message);
+        if (chrome.runtime.lastError) throw Error(chrome.runtime.lastError);
         if (!tabs||!tabs[0]) throw Error("can access chrome tabs");
 
         chrome.tabs.sendMessage(cpsData.activeTabId, { code: "ping" }, function (response) {
@@ -540,7 +551,7 @@ function isConnected():Promise<boolean> {
     if (!_connectedTabs) return resolve(false);
     chrome.tabs.query({ active: true, currentWindow: true },
       function (tabs) {
-        if (chrome.runtime.lastError) console.log(chrome.runtime.lastError.message);
+        if (chrome.runtime.lastError) return reject(chrome.runtime.lastError.message);
         if (!tabs || tabs.length==0 || !tabs[0]) return resolve(false);
         const activeTabId = tabs[0].id
         if (!activeTabId) return resolve(false);
@@ -590,9 +601,9 @@ chrome.alarms.onAlarm.addListener(
   function (alarm:any) {
     //log("chrome.alarms.onAlarm fired ", alarm);
     if (alarm.name == UNLOCK_EXPIRED) {
-      global.lock()
       chrome.alarms.clearAll()
-      window.close()//unload this background page 
+      global.lock("chrome.alarms.onAlarm "+JSON.stringify(alarm))
+      //window.close()//unload this background page 
       //chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
     }
   }
@@ -627,7 +638,7 @@ window.addEventListener("message",
 
 // called on popupLoading to consider the possibility the user added accounts to the wallet on another tab
   async function retrieveBgInfoFromStorage(){
-    if (unlockExpire && Date.now()>unlockExpire) global.lock()
+    if (unlockExpire && Date.now()>unlockExpire) global.lock("retrieveBgInfoFromStorage")
     if (lockTimeout) clearTimeout(lockTimeout)
     //To manage the possibilit that the user has added/removed accounts ON ANOTHER TAB
     //we reload state & secureState from storage when the popup opens
@@ -662,6 +673,8 @@ async function onLoad() {
   //chrome will process "MessageFromPage" ASAP, meaning BEFORE the 2nd await.
   //solution: MessageFromPage is on a setTimeout to execute async
   //logEnabled(isDeveloperMode());
+  //logEnabled(true);
   await recoverWorkingData()
   if (!_bgDataRecovered) await retrieveBgInfoFromStorage()
 }
+

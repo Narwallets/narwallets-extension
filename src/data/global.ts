@@ -78,10 +78,11 @@ export async function sha256PwdBase64Async(password:string): Promise<string> {
   return encodeBase64(new Uint8Array(hash));
 }
 
-export function lock() {
+export function lock(source:string) {
   workingData.unlockSHA=""
   SecureState = Object.assign({},EmptySecureState);
-  log("LOCKED")
+  log("LOCKED from:"+source)
+  log("LOCKED call stack:"+JSON.stringify(new Error().stack))
 }
 
 export async function createUserAsync(email:string, password:string): Promise<void>{
@@ -95,7 +96,7 @@ export async function createUserAsync(email:string, password:string): Promise<vo
   else if (!password || password.length < 8) {
     throw Error("password must be at least 8 characters long")
   }
-  lock() //log out current user
+  lock("createUserAsync") //log out current user
 
   State.currentUser = email;
   await createSecureStateAsync(password);

@@ -209,9 +209,11 @@ chrome.runtime.onMessage.addListener(function (msg) {
 });
 var background;
 //wake-up background page
+//WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
 chrome.runtime.getBackgroundPage((bgpage) => {
     if (chrome.runtime.lastError) {
         console.error(JSON.stringify(chrome.runtime.lastError));
+        alert(chrome.runtime.lastError);
     }
     else {
         background = bgpage;

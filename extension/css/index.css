@@ -393,7 +393,7 @@ h3 {
     /* flex-flow: column nowrap; */
     /* justify-content: flex-start; */
     /* align-items: baseline; */
-    font-size: 1.2em;
+    font-size: 1em;
     /*border: 2px solid #9292be;*/
     border-bottom: 1px solid #80808021;
     /*border-radius: 7px;*/
@@ -424,12 +424,15 @@ h3 {
     border-radius: 8px;
     font-weight: 300;
     margin-right: 4px;
-    min-height: 36px;
+    min-height: 30px;
     text-overflow: ellipsis!important;
     overflow: hidden!important;
 }
 .account-item-group > label {
     justify-content: space-around;
+}
+.account-item-group .balance {
+    min-width: 8em;
 }
 
 .account-item-group.staked label{
