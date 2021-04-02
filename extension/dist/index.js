@@ -98,7 +98,7 @@ async function asideIsUnlocked() {
     return true;
 }
 async function securityOptions() {
-    //close moreless because options can change behavior
+    //close more/less because options can change behavior
     const buttonsMore = new d.All(".buttons-more");
     buttonsMore.addClass("hidden");
     d.qs("#moreless").innerText = "More...";
@@ -210,13 +210,13 @@ chrome.runtime.onMessage.addListener(function (msg) {
 var background;
 //wake-up background page
 //WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
-chrome.runtime.getBackgroundPage((bgpage) => {
+chrome.runtime.getBackgroundPage((backgroundPage) => {
     if (chrome.runtime.lastError) {
         console.error(JSON.stringify(chrome.runtime.lastError));
         alert(chrome.runtime.lastError);
     }
     else {
-        background = bgpage;
+        background = backgroundPage;
         //@ts-ignore
         background.postMessage({ code: "popupLoading" }, "*");
         //will reply with "can-init-popup" after retrieving data from localStorage
