@@ -3,6 +3,7 @@ import * as global from "../data/global.js";
 import { log } from "../lib/log.js";
 import * as Network from "../lib/near-api-lite/network.js";
 import * as near from "../lib/near-api-lite/near-rpc.js";
+import { jsonRpc } from "../lib/near-api-lite/utils/json-rpc.js";
 import { localStorageSet, localStorageGet } from "../data/util.js";
 import * as TX from "../lib/near-api-lite/transaction.js";
 //version: major+minor+version, 3 digits each
@@ -330,8 +331,22 @@ async function processMessageFromWebPage(msg) {
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             }
             break;
+        case "json-rpc":
+            //low-level query
+            jsonRpc(msg.method, msg.args)
+                .then(data => {
+                resolvedMsg.data = data; //if resolved ok, send msg to content-script->tab
+                chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+            })
+                .catch(ex => {
+                resolvedMsg.err = ex.message; //if error ok, also send msg to content-script->tab
+                chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+            });
+            break;
         default:
             log("unk msg.code", JSON.stringify(msg));
+            resolvedMsg.err = "invalid code: " + msg.code; //if error ok, also send msg to content-script->tab
+            chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
     }
 }
 //------------------------
@@ -595,8 +610,4 @@ async function onLoad() {
     if (!_bgDataRecovered)
         await retrieveBgInfoFromStorage();
 }
-//event to inform background.js we're unloading (starts auto-lock timer)
-addEventListener("unload", function (event) {
-    console.error("background unloading");
-}, true);
 //# sourceMappingURL=background.js.map

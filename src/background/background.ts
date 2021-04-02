@@ -6,7 +6,7 @@ import * as Network from "../lib/near-api-lite/network.js"
 import * as nearAccounts from "../util/search-accounts.js"
 
 import * as near from "../lib/near-api-lite/near-rpc.js"
-import { setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js"
+import { jsonRpc, setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js"
 import { localStorageSet, localStorageGet } from "../data/util.js"
 import * as TX from "../lib/near-api-lite/transaction.js"
 
@@ -370,9 +370,24 @@ async function processMessageFromWebPage(msg:any) {
       }
       break;
 
+    case "json-rpc":
+      //low-level query
+      jsonRpc(msg.method, msg.args) 
+        .then(data => {
+          resolvedMsg.data = data;  //if resolved ok, send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+        })
+        .catch(ex => {
+          resolvedMsg.err = ex.message;  //if error ok, also send msg to content-script->tab
+          chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+        })
+      break;
+
     default:
       log("unk msg.code", JSON.stringify(msg))
-  }
+      resolvedMsg.err = "invalid code: "+msg.code;  //if error ok, also send msg to content-script->tab
+      chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+}
 
 }
 
