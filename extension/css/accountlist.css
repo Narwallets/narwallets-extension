@@ -1,0 +1,76 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* account items -------------------------------------------------------------------*/
+
+.accountlistscrollarea
+{
+	position:absolute;
+	width: 400px;
+	height: 510px;
+	max-height: 510px;
+	top: 0px;;
+	left: 0px;
+	display: block;
+	margin:0px;
+	padding: 0px;
+	overflow-y: scroll;
+		
+}
+
+.accountlistitem
+{
+	width: 400px;
+	height: 46px;
+	display: inline-block;
+	background-color: var(--NarListBack);
+	border-style: none;
+	border-bottom-color: var(--NarDarkHighlight);
+	border-bottom-style: solid;
+	border-bottom-width: thin;
+	font-weight: lighter;
+	margin: 0px;
+	padding: 0px;
+	top: 0px;
+	bottom: 0px;
+}
+
+.accountlistitem:hover 
+{
+	background-color: var(--NarListHoover);
+}
+
+.accountlistname 
+{	
+	position: relative;
+	color: var(--NarBotBar);
+	font-size: 20px;
+	display: inline-block;
+	left:5px;
+	width: 180px;
+	top:0px;
+}
+
+.accountlistbalance 
+{	
+	position:relative;
+	text-align: right;
+	color: var(--NarBotBar);
+	font-weight: bolder;
+	font-size: 20px;
+	display: inline-block;
+	width: 200px;
+	left: 0px;
+	top:8px;
+}
+
+.accountlistcomment 
+{	
+	position:relative;
+	display: inline-block;
+	width: 300px;
+	top:-5px;
+	left:5px;
+	font-size: 12px;
+	
+}

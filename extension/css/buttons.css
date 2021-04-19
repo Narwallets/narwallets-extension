@@ -1,0 +1,29 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* ALL BUTTONS */
+
+
+	.button {
+	  right:0;
+	  margin: 8px;
+	  width: 32px;
+	  height: 32px;
+	  display:inline-block;
+	  border-radius: 17px;
+	  border-style: solid;
+	  border-width: 1px;
+	  background-color: var(--NarMidBar );
+	  border-color: white;
+	}
+
+	.button:hover {
+
+	  background-color: white;
+	  border-color: var(--NarMidBar );
+	  color:white;		
+	}
+
+
+
+

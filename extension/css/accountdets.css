@@ -1,0 +1,231 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+
+/*Top Area             ------------------------------------------------------------*/
+
+.accountdetstopleft
+{
+	position:absolute;
+	top:41px;
+	left:0px;
+	width:48px;
+	height:200px;
+}
+
+.accountdetstopright
+{
+	position:absolute;
+	top:41px;
+	left:352px;
+	width:48px;
+	height:200px;	
+}
+
+.accountdetstopcenter
+{
+	position:absolute;
+	top:41px;
+	left:49px;
+	width:303px;
+	height:210px
+}
+
+.accountdetsmidbar
+{
+	position:absolute;
+	top:241px;
+	left:0px;
+	width:400px;
+	height:52px;
+	background-color: var(--NarMidBar);		
+	display: inline-flex;
+	justify-content:center;
+}
+
+
+
+/*Scroll area and items   ---------------------------------------------------------*/
+
+.accountdetsscroll
+{
+	position:absolute;
+	top:300px;
+	left:0px;
+	width:400px;
+	height:312px;
+	max-height: 300px;
+	overflow-y: scroll;	
+}
+
+.accountdetsassets
+{
+	width: 400px;
+	height: 52px;
+	display: inline-block;
+	background-color: var(--NarListBack);
+	border-style: none;
+	font-weight: lighter;
+	margin: 0px;
+	padding: 0px;
+	top: 0px;
+	bottom: 0px;
+}
+
+.accountdetsassets:hover
+{
+	background-color: var(--NarListHoover);
+}
+
+
+.accountassetcoin
+{
+	position:relative;
+	border-style: none;
+	display: inline-block;
+	border-right-style: solid;
+	border-right-color: var(--NarDarkHighlight);
+	border-bottom-width: thin;
+	top:0px;	
+	left:0px;
+	width: 48px;	
+	heigh: 48px;
+}
+
+.accountassettoken
+{
+	position:relative;
+	border-style: none;
+	display: inline-block;
+	font-size: 16px;		
+	top:1px;	
+	left:0px;
+	width: auto;
+}
+
+.accountassetbalance
+{
+	position:relative;
+	display: inline-block;
+	border-style: none;
+	font-weight: bold;
+	color:var(--NarBotBar);
+	font-size: 24px;		
+	top:-0px;	
+	left:4px;
+	width:170px;
+	text-align: right;
+	
+}
+
+.accountassetfiat
+{
+	position:relative;
+	display: inline-block;
+	border-style: none;
+	color:black;
+	font-size:12px;		
+	top:-6px;	
+	left:210px;
+	width:170px;
+	text-align: right;
+}
+
+.accountdetscuenta
+{
+	text-align: center;
+	font-size:24px;
+	color:var(--NarMidBar);	
+}
+
+.accountdetscomment
+{
+	text-align: center;
+	font-weight: lighter;
+	font-size:18px;
+}
+
+.accountdetscoin
+{
+	text-align: center;
+	font-weight: lighter;
+	font-size:18px;
+}
+
+.accountdetsbalance
+{
+	text-align: center;
+	font-size:40px;
+	color:var(--NarBotBar);
+}
+
+.accountdetsfiat
+{
+	text-align: center;
+	font-size:20px;
+	color:black;
+}
+
+
+.assethistoryline
+{
+	width: 400px;
+	height: 50px;
+	display: inline-flex;
+	background-color: var(--NarListBack);
+	border-style: none;
+	font-weight: lighter;
+	margin: 0px;
+	padding: 0px;
+	top: 0px;
+	bottom: 0px;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	
+}
+
+.assethisttype
+{
+	position:relative;
+	top:0;
+	left:0;
+	width: 48px;
+	height: 48px;
+	
+}
+
+.assethistaccount
+{
+	position:relative;
+	left:-80px;
+	top:0px;
+	width:100px;
+	height:20px;
+}
+
+
+
+.assethistdate
+{
+	position:relative;
+	left:10px;
+	top:-30px;	
+	width: 100px;
+	height:20px;	
+}
+
+.assethistammount
+{
+	text-align: right;
+	position:relative;
+	left:-10px;
+	top:5px;	
+	font-size: 24px;
+	font-color:var(--NarMidBar);	
+	font-weight: bold;
+	width: 180px;
+	height:20px;	
+}
+
+

@@ -1,0 +1,28 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+:root {
+	  /*--NarBackground: rgb(190,190,190);*/
+	    --NarBackground:white;
+	  --NarTope: rgb(160,160,160);
+	  --NarListBack: white;
+	  --NarListHoover: rgb(160, 160, 160);
+	  --NarDarkHighlight: rgb(155, 155, 155);
+	  --NarMidBar: #1994E6;
+	  --NarBotBar: #22618A;	
+	  --NarTextoNormal: black;
+	  --NarTextoResaltado: #1B64B7;
+	  --NarLightText: white;
+	  --NarTopeHighLight:rgb(140,140,140);
+	}
+
+::-webkit-scrollbar {
+	  display: none;
+	}
+
+
+body {
+		font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif"
+	}
+
