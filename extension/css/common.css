@@ -40,7 +40,7 @@
 	  border-top-width: 1px;
 	  display: inline-flex;
 	  justify-content:flex-end;
-	  background-color: lightgray;
+	  background-color: var(--NarTope);
 	}
 
 
@@ -129,7 +129,7 @@
 	left: 359px;
 	margin: 0px;
 	padding: 0px;
-	background-image: url("images/hamb.png");
+	background-image: url("../images/hamb.png");
 }
 
 .topbarhamburguer:hover

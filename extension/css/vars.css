@@ -4,8 +4,8 @@
 
 :root {
 	  /*--NarBackground: rgb(190,190,190);*/
-	    --NarBackground:white;
-	  --NarTope: rgb(160,160,160);
+	   --NarBackground:white;
+	  --NarTope: rgb(200,200,200);
 	  --NarListBack: white;
 	  --NarListHoover: rgb(160, 160, 160);
 	  --NarDarkHighlight: rgb(155, 155, 155);
@@ -24,7 +24,10 @@
 
 body {
 		font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
-		width: 380px;
-		height: 600px;
+		width: 399px;
+		height: 599px;
+	    overflow-y:hidden;
+		margin: 0px;
+		padding: 0px;
 	}
 
