@@ -23,6 +23,8 @@
 
 
 body {
-		font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif"
+		font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+		width: 380px;
+		height: 600px;
 	}
 
