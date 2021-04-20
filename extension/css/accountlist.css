@@ -19,18 +19,19 @@
 .accountlistitem
 {
 	width: 100%;
-	height: 46px;
+	height: 48px;
 	display: inline-block;
 	background-color: var(--NarListBack);
 	border-style: none;
 	border-bottom-color: var(--NarListHoover);
 	border-bottom-style: solid;
-	border-bottom-width: thin;
+	border-bottom-width: 1px;
 	font-weight: lighter;
 	margin: 0px;
 	padding: 0px;
 	top: 0px;
 	bottom: 0px;
+	overflow: hidden;
 }
 
 .accountlistitem:hover 
@@ -40,13 +41,16 @@
 
 .accountlistname 
 {
-	position: relative;
-	color: var(--NarBotBar);
-	font-size: 20px;
+	position:relative;
+	color: var(--NarDarkHighlight);
+	font-size: 15px;
+	overflow:auto;
 	display: inline-block;
-	left: 10px;
-	width: 180px;
+	left: 3px;
+	width: 360px;
+	height:18px;
 	top:0px;
+
 }
 
 .accountlistbalance 
@@ -56,18 +60,22 @@
 	color: var(--NarBotBar);
 	font-weight: bolder;
 	font-size: 20px;
-	display: inline-block;
+	display: block;
 	width: 188px;
-	left: 0px;
-	top:8px;
+	left: 188px;
+	height: 25px;
+	top:-4px;
+
 }
 
 .accountlistcomment 
 {
 	position:relative;
 	display: inline-block;
-	width: 300px;
-	top:-5px;
-	left: 10px;
+	width: 100px;
+	height:16px;
+	top: -22px;
+	left:2px;
 	font-size: 12px;
+
 }

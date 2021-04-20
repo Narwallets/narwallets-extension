@@ -1,0 +1,12 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+.loginface
+{
+	background-color: beige;
+	display: inline-block;
+	width:400px;
+	justify-content: center;
+	
+}
