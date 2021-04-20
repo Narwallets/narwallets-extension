@@ -32,6 +32,18 @@
 }
 
 
+
+.logo-128 {
+    padding: 20px;
+    width: 130px;
+    height: 130px;
+	display: inline-block;
+    background-image: url(../icons/logo.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+	margin:5px;
+  }
+
 /* Bottom Bar ---------------------------------------------------------------------*/
 
 .bottombar {

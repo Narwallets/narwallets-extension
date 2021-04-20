@@ -4,9 +4,43 @@
 
 .loginface
 {
-	background-color: beige;
 	display: inline-block;
-	width:400px;
-	justify-content: center;
+	width:380px;
+	align-content: center;
+	text-align: center;
+}
+
+.loginface input
+{
+	display:inline-block;
+	width:200px;
+	height:25px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: lightgray;
+	margin:10px;
+	border-radius: 5px;
+}
+
+.loginface label
+{
+	color:darkgray;
 	
 }
+
+.loginface h1
+{ 
+	color: var(--NarMidBar);
+	font-weight: lighter;
+
+}
+
+.loginface h3
+{
+	color: var(--NarDarkText);
+	font-weight: lighter;
+	display:inline-block;
+	width:250px;
+
+}
+

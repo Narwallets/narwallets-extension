@@ -15,6 +15,7 @@
 	  --NarTextoResaltado: #1B64B7;
 	  --NarLightText: white;
 	  --NarTopeHighLight:rgb(140,140,140);
+	  --NarDarkText:rgb(80,80,80);
 	}
 
 ::-webkit-scrollbar {

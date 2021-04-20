@@ -240,24 +240,33 @@
 
 <!-- Existing user, unlock-->
 <div id="unlock" class="appface visible">
-	<div class="logo-128"></div>
-	<h1>Welcome Back!</h1>
-	<h3>Please enter user and password to unlock this wallet</h3>
-	<div class="enter-pass">
-		<div class="form-field-label">
-			<label for="email">Your e-mail</label>
-			<div class="form-control">
-				<input type="text" tabindex="0" autocomplete="email" id="unlock-email">
+	
+	<div class="loginface">
+		
+		<div class="logo-128"></div>
+
+		<h1>Welcome Back!</h1>
+		<h3>Please enter user and password to unlock this wallet</h3>
+
+		<div class="enter-pass">
+			<div class="form-field-label">
+				<label for="email">Your e-mail</label>
+				<div class="form-control">
+					<input type="text" tabindex="0" autocomplete="email" id="unlock-email">
+				</div>
+			</div>
+			<div class="form-field-label">
+				<label for="unlock-pass">Password</label>
+				<div class="form-control">
+					<input autocomplete="new-password" id="unlock-pass" type="password">
+				</div>
 			</div>
 		</div>
-		<div class="form-field-label">
-			<label for="unlock-pass">Password</label>
-			<div class="form-control">
-				<input autocomplete="new-password" id="unlock-pass" type="password">
-			</div>
-		</div>
+
+		<button id="unlock" class="button btn-primary ultrabig">Unlock</button>
+		
 	</div>
-	<button id="unlock" class="button btn-primary ultrabig">Unlock</button>
+	
 </div>
 
 
