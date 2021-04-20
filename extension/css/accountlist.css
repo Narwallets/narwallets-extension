@@ -7,8 +7,7 @@
 {
 	position:absolute;
 	width: 380px;
-	height: 510px;
-	max-height: 510px;
+	height: 514px;
 	top: 0px;
 	left: 0px;
 	display: block;
@@ -24,7 +23,7 @@
 	display: inline-block;
 	background-color: var(--NarListBack);
 	border-style: none;
-	border-bottom-color: var(--NarDarkHighlight);
+	border-bottom-color: var(--NarListHoover);
 	border-bottom-style: solid;
 	border-bottom-width: thin;
 	font-weight: lighter;

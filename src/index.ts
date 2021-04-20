@@ -212,8 +212,6 @@ async function initPopup() {
   });
 
   d.onClickId(SELECT_NETWORK, selectNetworkClicked);
-  d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
-  d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
 
   //aside
   d.qs("aside #lock").onClick(asideLock);
@@ -229,9 +227,12 @@ async function initPopup() {
   d.populateUL("network-items", "network-item-template", NetworkList)
 
   //--init other pages
-  CreateUser_addListeners();
-  ImportOrCreate_addListeners();
-  Import_addListeners();
+  //lala_design temp commented
+  // d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
+  // d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
+  //CreateUser_addListeners();
+  //ImportOrCreate_addListeners();
+  //Import_addListeners();
 
   //update network indicator visual state
   const info = await askBackgroundGetNetworkInfo()

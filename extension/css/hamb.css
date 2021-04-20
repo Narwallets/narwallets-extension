@@ -98,9 +98,10 @@ aside>nav{
 
 aside>nav>li {
     flex: 1 1;
-    width: 100%;
+    width: 349px;
     text-align: right;
-    padding:5px 2em;
+    padding: 5px 1.5em;
+    padding-left: 0px;
     line-height: 2.2em;
     font-size: 1.7em;
     font-weight: 250;
@@ -134,6 +135,15 @@ aside .logo-128{
     z-index: 94;
 }
 
+.logo-128 {
+    padding: 20px;
+    width: 130px;
+    height: 130px;
+    background-image: url(../icons/logo.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
 /* 
 ----------------------
 NETWORK selection drop-down
@@ -143,7 +153,7 @@ NETWORK selection drop-down
 .network-component.pointer {
     border: 2px solid #bbc0c5;
     border-radius: 18px;
-    padding: 6px 6px;
+    padding: 3px;
     flex: 0 0 auto;
     display: flex;
 }
@@ -152,11 +162,19 @@ NETWORK selection drop-down
     display: flex;
     align-items: center;
     font-size: 14px;
-    color: black;
+    color: #000000bf;
+    font-weight: 400;
+    flex-flow: row nowrap;
 }
 
 li {
     list-style-type: none;
+    overflow-x:hidden;
+    white-space: nowrap;
+}
+
+li#current-network-display-name {
+    max-height: 20px;
 }
 
 .circle:before {
@@ -204,7 +222,7 @@ li {
 .networks-list-box.open {
     max-height: 700px;
     opacity: 0.9;
-    top: 52px;
+    top: 40px;
 }
 
 .networks-list-content {

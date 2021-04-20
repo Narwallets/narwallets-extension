@@ -33,31 +33,63 @@
 
 	</div>	
 
-        <aside>
-            <div class="logo-128"></div>
-            <nav>
+    <!-- 
+    Networks Dropdown 
+    -->
+    <div id="networks-list" class="networks-list-box">
+        <div class="networks-list-content">
+            <div class="network-box-header">
+                <div class="title">Networks</div>
                 <hr>
-                <li id="lock">Lock</li>
-                <hr>
-                <!--<li id="expand">Expand</li>
-                <hr>
-                -->
-                <li id="accounts">Accounts</li>
-                <hr>
-                <li id="add-account">Add Account</li>
-                <hr>
-                <!--<li id="change-password">Change your password</li>
-                <hr>-->
-                <li id="create-user">Create a new User</li>
-                <hr>
-                <li id="options">Options</li>
-                <hr>
-                <li id="contact">Contact</li>
-                <hr>
-                <li id="about">About</li>
-                <hr>
-            </nav>
-        </aside>
+                <div class="messsage"></div>
+            </div>
+            <div id="network-items">
+            </div>
+        </div>
+    </div>
+
+    <!-- Network Item Template -->
+    <div id="network-item-template" class="hidden">
+        <div data-code="{name}" class="circle {color}">{displayName}</div>
+    </div>
+
+    <!-- -->
+    <div id="err-div"></div>
+    <!-- -->
+    <div id="wait">
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+	<aside>
+		<div class="logo-128"></div>
+		<nav>
+			<hr>
+			<li id="lock">Lock</li>
+			<hr>
+			<!--<li id="expand">Expand</li>
+			<hr>
+			-->
+			<li id="accounts">Accounts</li>
+			<hr>
+			<li id="add-account">Add Account</li>
+			<hr>
+			<!--<li id="change-password">Change your password</li>
+			<hr>-->
+			<li id="create-user">Create a new User</li>
+			<hr>
+			<li id="options">Options</li>
+			<hr>
+			<li id="contact">Contact</li>
+			<hr>
+			<li id="about">About</li>
+			<hr>
+		</nav>
+	</aside>
 
 
 <div class="appface slide-hide" id="AccountDetail">  
@@ -174,106 +206,58 @@
 </div>
 	
 	
-<div class="appface show" id="AccountList">
+<!-- All Accounts page, Account Item Template -->
+<div class="appface show" id="account-list-main">
    	
 	<div class="accountlistscrollarea">
 		
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-		
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
+		<div id="accounts-list">
 		</div>
 
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>		
-
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
+		<div id="account-item-template" class="hidden account-item" data-id="{name}">
+			<div class="accountlistitem">
+				<div class="accountlistname">{name}</div>
+				<div class="accountlistbalance balance">{total}</div>
+				<div class="accountlistcomment">{note}</div>
+			</div>
+		</div>
+			
+		<div class="total-row accountlistitem">
+			<div class="account-item-group">
+				<div class="accountlistname">Total</div>
+				<div class="accountlistbalance balance total"></div>
+				<div class="accountlistcomment"></div>
+			</div>
 		</div>
 
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-		
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-		
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>		
-
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-		
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-		
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>		
-
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>
-
-		<div class="accountlistitem">
-			<div class="accountlistname">tester</div>
-			<div class="accountlistbalance">1000000.000 Ⓝ</div>
-			<div class="accountlistcomment">asdadasd</div>
-		</div>		
 	</div>	
 
-	
     <div class="bottombar">
 		<div class="button"></div>
     </div>
 
+</div>
+
+<!-- Existing user, unlock-->
+<div id="unlock" class="appface slide-hide">
+	<div class="logo-128"></div>
+	<h1>Welcome Back!</h1>
+	<h3>Please enter user and password to unlock this wallet</h3>
+	<div class="enter-pass">
+		<div class="form-field-label">
+			<label for="email">Your e-mail</label>
+			<div class="form-control">
+				<input type="text" tabindex="0" autocomplete="email" id="unlock-email">
+			</div>
+		</div>
+		<div class="form-field-label">
+			<label for="unlock-pass">Password</label>
+			<div class="form-control">
+				<input autocomplete="new-password" id="unlock-pass" type="password">
+			</div>
+		</div>
+	</div>
+	<button id="unlock" class="button btn-primary ultrabig">Unlock</button>
 </div>
 
 

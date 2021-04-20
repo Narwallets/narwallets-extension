@@ -3,22 +3,13 @@
 	
 .appface 
 {
-	
-position:absolute;
-	
-left: 0px;
-	
-top:41px;
-	
-width: 350px;
-	
-height: 560px;
-	
-background-color: var(--NarBackground);
-	
-border-style:none;
-	
-padding: 10px;
+	position:absolute;
+	left: 0px;
+	top: 40px;
+	width: 380px;
+	height: 514px;
+	background-color: var(--NarBackground);
+	border-style:none;
 }
 
 .appface.show {
@@ -100,14 +91,14 @@ padding: 10px;
 .topbarcaption
 {
 	position:absolute;
-	color: white;
+	color: black;
 	font-weight:lighter;
 	width: 150px;
 	height: 16px;
 	display: inline-flex;
 	/* background-color: var(--NarTope); */
 	top: 8px;
-	left: 40px;
+	left: 46px;
 	margin-left: 0px;
 	padding: 0px;
 	font-size: 16px;
@@ -122,11 +113,10 @@ padding: 10px;
 	width: 148px;
 	height: 40px;
 	display: inline-block;
-	top: 2px;
+	top: 5px;
 	left: 190px;
 	margin: 0px;
 	padding: 0px;
-	
 }
 
 .topbarhamburguer
@@ -164,3 +154,10 @@ padding: 10px;
 	border-bottom-width: thin;
 	font-size:12px;
 }
+
+/* add (N) */
+.balance:after {
+	content: "\24c3";
+	padding-left: 0.15em;
+}
+  

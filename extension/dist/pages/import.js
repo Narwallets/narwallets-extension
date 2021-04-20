@@ -10,14 +10,14 @@ const NET_ROOT = "net-root";
 const IMPORT_OR_CREATE = "import-or-create";
 const IMPORT_ACCOUNT = "import-account";
 //const accountName = new d.El("input#account-name");
-const messageLine = new d.El("#account-get-message-line");
-const searchButton = new d.El("button#search");
-const importButton = new d.El("button#import");
-//const accountInfoName = new d.El("#account-info-name");
-const accountSearchResults = new d.El("#account-search-results");
-const searchedAccountInfo = new d.El("#searched-account-info");
-const searchedLockupInfo = new d.El("#searched-lockup-account-info");
-const accountGetMessage = new d.El("#account-get-message");
+let messageLine;
+let searchButton;
+let importButton;
+//let accountInfoName = new d.El("#account-info-name");
+let accountSearchResults;
+let searchedAccountInfo;
+let searchedLockupInfo;
+let accountGetMessage;
 class SearchResult {
     constructor() {
         this.mainAccountName = "";
@@ -196,6 +196,15 @@ function createAccountClicked(ev) {
 }
 // on document load
 export async function addListeners() {
+    //const accountName = new d.El("input#account-name");
+    messageLine = new d.El("#account-get-message-line");
+    searchButton = new d.El("button#search");
+    importButton = new d.El("button#import");
+    //accountInfoName = new d.El("#account-info-name");
+    accountSearchResults = new d.El("#account-search-results");
+    searchedAccountInfo = new d.El("#searched-account-info");
+    searchedLockupInfo = new d.El("#searched-lockup-account-info");
+    accountGetMessage = new d.El("#account-get-message");
     d.onClickId("option-import", importExistingAccount);
     d.onClickId("option-create", createAccountClicked);
     //accountName.onInput(accountNameInput);

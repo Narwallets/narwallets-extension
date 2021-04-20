@@ -133,6 +133,7 @@ export async function show() {
         //
         //show the logged-in & unlocked user their accounts
         //
+        d.qs(".topbarcaption").innerText = "Accounts";
         d.clearContainer(ACCOUNTS_LIST);
         //get accounts, sort by accountInfo.order and show as LI
         const accountsRecord = await askBackgroundAllNetworkAccounts();
@@ -174,12 +175,14 @@ export async function show() {
         totalEl.innerText = c.toStringDec(total);
         d.qs("#account-list-main .total-row").el.addEventListener("dragover", total_dragOver);
         d.onClickId(ADD_ACCOUNT, addAccountClicked);
-        const disconnectButton = d.qs("#disconnect-from-web-page");
-        disconnectButton.onClick(disconnectFromWepPageClicked);
+        //lala_design temp commented
+        //const disconnectButton = d.qs("#disconnect-from-web-page")
+        //disconnectButton.onClick(disconnectFromWepPageClicked);
         d.showPage(ACCOUNT_LIST_MAIN);
-        d.qs("#disconnect-line").hide();
-        const isConnected = await askBackground({ code: "isConnected" });
-        d.qs("#disconnect-line").showIf(isConnected);
+        //lala_design temp commented
+        //d.qs("#disconnect-line").hide();
+        //const isConnected = await askBackground({code:"isConnected"})
+        //d.qs("#disconnect-line").showIf(isConnected);
         await tryReposition();
     }
     catch (ex) {
