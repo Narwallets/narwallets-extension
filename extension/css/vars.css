@@ -1,6 +1,7 @@
 @charset "utf-8";
 /* CSS Document */
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 :root {
 	  /*--NarBackground: rgb(190,190,190);*/
@@ -24,7 +25,8 @@
 
 
 body {
-		font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+		/*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
+		font-family: 'Noto Sans', sans-serif;
 		width: 380px;
 		height: 600px;
 		margin: 0px;
