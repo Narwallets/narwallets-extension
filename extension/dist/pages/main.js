@@ -147,7 +147,7 @@ export async function show() {
         d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list);
         let total = 0;
         //connect all item to accountItemClicked
-        document.querySelectorAll("#accounts-list .account-item")
+        document.querySelectorAll(".accountlistitem")
             .forEach((item) => {
             item.addEventListener("click", accountItemClicked);
             //item.addEventListener("dragstart", accountItem_dragStart)
@@ -231,4 +231,3 @@ export function accountItemClicked(ev) {
         }
     }
 }
-//# sourceMappingURL=main.js.map

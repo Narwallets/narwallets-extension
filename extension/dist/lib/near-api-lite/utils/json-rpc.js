@@ -146,4 +146,3 @@ export async function jsonRpcQuery(queryWhat, params) {
     let queryParams = [queryWhat, params || ""]; //params for the fn call - something - the jsonrpc call fail if there's a single item in the array
     return await jsonRpc("query", queryParams);
 }
-//# sourceMappingURL=json-rpc.js.map

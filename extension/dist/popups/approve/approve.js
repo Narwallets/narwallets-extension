@@ -125,4 +125,3 @@ async function initFromBgPage() {
 //--- INIT
 d.onClickId("approve-cancel", cancelOkClicked);
 initFromBgPage();
-//# sourceMappingURL=approve.js.map

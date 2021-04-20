@@ -168,4 +168,3 @@ export const SCHEMA = new Map([
 export function createTransaction(signerId, publicKey, receiverId, nonce, actions, blockHash) {
     return new Transaction({ signerId, publicKey, nonce, receiverId, actions, blockHash });
 }
-//# sourceMappingURL=transaction.js.map

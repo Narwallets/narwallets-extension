@@ -53,4 +53,3 @@ export function decodeHex(hexString) {
         b[i] = parseInt(hexString.slice(i, i + 2), 16);
     return b;
 }
-//# sourceMappingURL=encode.js.map

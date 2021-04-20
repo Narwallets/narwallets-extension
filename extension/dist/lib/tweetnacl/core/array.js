@@ -20,4 +20,3 @@ export function checkArrayTypes(...arrays) {
         }
     }
 }
-//# sourceMappingURL=array.js.map

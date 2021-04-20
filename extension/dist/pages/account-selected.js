@@ -38,6 +38,7 @@ let okCancelRow;
 let confirmBtn;
 let cancelBtn;
 function initPage() {
+    return;
     //accountAmount.onInput(amountInput);
     removeButton = new d.El("button#remove");
     refreshButton = new d.El("button#refresh");
@@ -1075,4 +1076,3 @@ async function refreshClicked(ev) {
         d.hideWait();
     }
 }
-//# sourceMappingURL=account-selected.js.map

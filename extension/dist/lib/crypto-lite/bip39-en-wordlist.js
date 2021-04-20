@@ -2047,4 +2047,3 @@ export const wordlist = ["abandon",
     "zone",
     "zoo"
 ];
-//# sourceMappingURL=bip39-en-wordlist.js.map

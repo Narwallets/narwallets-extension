@@ -8,4 +8,3 @@ export async function getFee(stakingPool) {
     return rewardFeeFraction.numerator * 100 / rewardFeeFraction.denominator;
 }
 ;
-//# sourceMappingURL=staking-pool.js.map

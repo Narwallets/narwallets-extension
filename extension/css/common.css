@@ -105,7 +105,7 @@
 {
 	position:absolute;
 	color: black;
-	font-weight:lighter;
+	font-weight:300;
 	width: 150px;
 	height: 16px;
 	display: inline-flex;
@@ -171,6 +171,10 @@
 /* add (N) */
 .balance:after {
 	content: "\24c3";
+	/*content: "©";*/
 	padding-left: 0.15em;
+	font-size: 12px;
+	position: relative;
+	top: -2px;
 }
   

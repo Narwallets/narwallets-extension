@@ -166,7 +166,7 @@ export async function show() {
 
     let total = 0;
     //connect all item to accountItemClicked
-    document.querySelectorAll("#accounts-list .account-item")
+    document.querySelectorAll(".accountlistitem")
     .forEach((item) => {
       item.addEventListener("click", accountItemClicked)
       //item.addEventListener("dragstart", accountItem_dragStart)

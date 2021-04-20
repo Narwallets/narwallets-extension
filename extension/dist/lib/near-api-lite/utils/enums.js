@@ -17,4 +17,3 @@ export class Assignable {
         });
     }
 }
-//# sourceMappingURL=enums.js.map

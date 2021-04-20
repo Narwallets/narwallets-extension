@@ -1,7 +1,19 @@
 @charset "utf-8";
 /* CSS Document */
 
+/*
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
+body { font-family: 'Noto Sans', sans-serif; }
+@supports (font-variation-settings: normal) {
+  body { font-family: 'Noto Sans', sans-serif;}
+}
+*/
+
+@import url('https://rsms.me/inter/inter.css');
+body { font-family: 'Inter', sans-serif; !important }
+@supports (font-variation-settings: normal) {
+  body { font-family: 'Inter var', sans-serif; !important }
+}
 
 :root {
 	  /*--NarBackground: rgb(190,190,190);*/
@@ -26,7 +38,6 @@
 
 body {
 		/*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-		font-family: 'Noto Sans', sans-serif;
 		width: 380px;
 		height: 600px;
 		margin: 0px;

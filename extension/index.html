@@ -116,6 +116,46 @@
 		<div class="button"></div>
 	</div>
 	
+	<!-- Template -->
+	<div id="selected-account-template" class="hidden">
+		<div class="single-account-item-group">
+			<label>{typeFull}</label><br>
+			<div class="access-status">{accessStatus}</div>
+		</div>
+		<div class="single-account-item-group">
+			<div class="name">{name}</div>
+		</div>
+		<div id="owner-id-info-line" class="hidden single-account-item-group small-labels">
+			<label>Owner</label>
+			<div>{accountInfo.ownerId}</div>
+		</div>
+		<div id="locked-others-line" class="hidden single-account-item-group small-labels">
+			<label>Locked</label>
+			<div class="balance">{accountInfo.lockedOther}</div>
+			<label>Unlocked</label>
+			<div class="balance">{unlockedOther}</div>
+		</div>
+		<div id="staking-pool-info-line" class="hidden single-account-item-group small-labels">
+			<label>Staking Pool</label>
+			<div>{accountInfo.stakingPool} ({accountInfo.stakingPoolPct}%)</div>
+			<label>Rewards</label>
+			<div class="balance">{accountInfo.rewards}</div>
+		</div>
+		<div id="staking-pool-balance-line" class="hidden single-account-item-group staked small-labels">
+			<label>Staked</label>
+			<div class="balance">{accountInfo.staked}</div>
+			<label>Unstaked</label>
+			<div class="balance">{accountInfo.unstaked}</div>
+		</div>
+		<div class="single-account-item-group small-labels">
+			<label>Balance</label>
+			<div class="total balance">{accountInfo.lastBalance}</div>
+			<label>Available</label>
+			<div class="balance">{available}</div>
+		</div>
+	</div>
+
+
 	<div class="accountdetsscroll">
 		
 		<div class="accountdetsassets">

@@ -42,7 +42,7 @@
 .accountlistname 
 {
 	position:relative;
-	color: var(--NarDarkHighlight);
+	color: var(--NarDarkText);
 	font-size: 15px;
 	overflow:auto;
 	display: inline-block;
@@ -50,7 +50,7 @@
 	width: 360px;
 	height:18px;
 	top:0px;
-
+	font-weight: normal;
 }
 
 .accountlistbalance 
@@ -77,5 +77,6 @@
 	top: -22px;
 	left:2px;
 	font-size: 12px;
-
+	color: var(--NarDarkText);
+	font-weight: normal;
 }

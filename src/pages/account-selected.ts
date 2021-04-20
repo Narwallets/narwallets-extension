@@ -54,6 +54,8 @@ let cancelBtn:d.El
 
 function initPage() {
 
+    return;
+    
     //accountAmount.onInput(amountInput);
 
     removeButton = new d.El("button#remove");

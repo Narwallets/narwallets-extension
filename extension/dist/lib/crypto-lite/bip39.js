@@ -135,4 +135,3 @@ export function validateMnemonic(
   return true;
 }
 */
-//# sourceMappingURL=bip39.js.map

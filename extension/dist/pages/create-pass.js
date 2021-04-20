@@ -38,4 +38,3 @@ export function addListeners() {
     d.onClickId(AGREE_CHECK, agreeCheckboxClicked);
     d.onClickId(CREATE_USER, createClicked);
 }
-//# sourceMappingURL=create-pass.js.map

@@ -85,4 +85,3 @@ export async function derivePathAsync(path, seed) {
     return keys;
 }
 ;
-//# sourceMappingURL=near-hd-key.js.map
