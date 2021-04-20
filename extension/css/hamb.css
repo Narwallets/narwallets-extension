@@ -15,8 +15,8 @@ svg line {
 
 .hamb {
     position: absolute;
-    top: 10px;
-    right :10px;
+    top: 4px;
+    right: 23px;
     border-radius:6px;
     max-width: 40px;
     padding: 5px;
@@ -65,7 +65,7 @@ aside {
 }
 
 aside.open {
-    transform: translate(-450px,0);
+    transform: translate(-380px,0);
 }
 
 .backblur{
@@ -132,4 +132,133 @@ aside .logo-128{
     top: 10px;
     left: 10px;
     z-index: 94;
+}
+
+/* 
+----------------------
+NETWORK selection drop-down
+----------------------
+*/
+
+.network-component.pointer {
+    border: 2px solid #bbc0c5;
+    border-radius: 18px;
+    padding: 6px 6px;
+    flex: 0 0 auto;
+    display: flex;
+}
+
+.network-indicator {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: black;
+}
+
+li {
+    list-style-type: none;
+}
+
+.circle:before {
+    display: inline-block;
+    content: "";
+    border: 2px solid #7f8186bd;
+    margin: 0 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 7px;
+}
+
+.circle.green:before {
+    background-color: #33ed4b;
+}
+
+.circle.cyan:before {
+    background-color: #3cc8c8;
+}
+
+.circle.yellow:before {
+    background-color: #c7b737;
+}
+
+.circle.violet:before {
+    background-color: #7c45ac;
+}
+
+.circle.red:before {
+    background-color: #da0a0ab5;
+}
+
+.networks-list-box {
+    position: absolute;
+    top: 46px;
+    left: auto;
+    z-index: 55;
+    right: 12px;
+    max-height: 0px;
+    overflow: hidden;
+    opacity: .25;
+    transition: top 0.25s ease-in-out, max-height 0.25s ease-in-out, opacity 0.45s ease-in-out;
+}
+
+.networks-list-box.open {
+    max-height: 700px;
+    opacity: 0.9;
+    top: 52px;
+}
+
+.networks-list-content {
+    border-radius: 4px;
+    padding: 18px 8px;
+    background: rgb(16 16 16);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 2px 2px;
+}
+
+.network-box-header .title {
+    color: whitesmoke;
+    font-size: 14pt;
+    padding-bottom: 5px;
+}
+
+.down-arrow {
+    background-image: url(../icons/down-chevron.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: 0.6em;
+    min-width: 10px;
+    min-height: 10px;
+    margin: 0 8px;
+    min-width: 10px;
+    min-height: 10px;
+}
+
+.network-box-header hr {
+    border-color: #7090ab;
+    width: 90%;
+}
+
+.networks-list-content li:hover {
+    background-color: rgb(64 64 64);
+    border-radius: 4px;
+    opacity: 1;
+}
+
+.networks-list-content li {
+    color: rgb(185, 185, 185);
+    list-style: none;
+    padding: 5px 22px 5px 1px;
+    font-size: 16px;
+    font-style: normal;
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: white;
+    line-height: 20px;
+    border-color: rgb(3, 135, 137);
+}
+
+.networks-list-content li span {
+    padding-left: 7px;
 }

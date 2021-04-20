@@ -64,6 +64,13 @@ body {
     padding-top: 1px;
 }
 
+.form {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
+
 .network-component.pointer {
     border: 2px solid #bbc0c5;
     border-radius: 18px;
@@ -80,12 +87,6 @@ body {
 
 li {
     list-style-type: none;
-}
-
-.form {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
 }
 
 .circle:before {

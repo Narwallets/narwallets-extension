@@ -9,18 +9,58 @@
 	
 	<div class="topbar">
 		<div class="topbarleft"></div>
-		<div class="topbarcaption">Account Details</div>
+		<div class="topbarcaption"></div>
 		<div class="topbarpulldown">
-			<select class="serverpulldown">
-				<option value="value1">Server 1</option>
-  				<option value="value2" selected>Server 2</option>
-  				<option value="value3">Server 3</option>
-			</select> 
+			<div class="app-header-network-component-wrapper">
+				<div id="select-network" class="network-component pointer" title="Active Network">
+					<div class="network-indicator">
+						<li id="current-network-display-name" class="circle yellow">NEAR Testnet</li>
+						<div class="down-arrow"></div>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="topbarhamburguer"></div>
-    </div>	
+		
+		<!--<div class="topbarhamburguer"></div>-->
 
-<div class="appface hidden" id="AccountDetail">  
+        <div class="hamb">
+            <svg width=24 height=28>
+                <line id="top" x1=0 y1=2 x2=24 y2=2 />
+                <line id="middle" x1=0 y1=12 x2=24 y2=12 />
+                <line id="bottom" x1=0 y1=22 x2=24 y2=22 />
+            </svg>
+        </div>
+
+	</div>	
+
+        <aside>
+            <div class="logo-128"></div>
+            <nav>
+                <hr>
+                <li id="lock">Lock</li>
+                <hr>
+                <!--<li id="expand">Expand</li>
+                <hr>
+                -->
+                <li id="accounts">Accounts</li>
+                <hr>
+                <li id="add-account">Add Account</li>
+                <hr>
+                <!--<li id="change-password">Change your password</li>
+                <hr>-->
+                <li id="create-user">Create a new User</li>
+                <hr>
+                <li id="options">Options</li>
+                <hr>
+                <li id="contact">Contact</li>
+                <hr>
+                <li id="about">About</li>
+                <hr>
+            </nav>
+        </aside>
+
+
+<div class="appface slide-hide" id="AccountDetail">  
 		
 	<div class="accountdetstopleft">
 		<div class="button"></div>
@@ -134,7 +174,7 @@
 </div>
 	
 	
-<div class="appface visible" id="AccountList">
+<div class="appface show" id="AccountList">
    	
 	<div class="accountlistscrollarea">
 		
@@ -238,7 +278,7 @@
 
 
 
-<div class="appface hidden" id="AccountAssetDetail" >  
+<div class="appface slide-hide" id="AccountAssetDetail" >  
 	
 	<div class="accountdetstopleft"><div class="button"></div></div>
 	<div class="accountdetstopcenter">

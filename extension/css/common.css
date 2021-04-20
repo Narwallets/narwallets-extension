@@ -3,17 +3,25 @@
 	
 .appface 
 {
-	
-	position:absolute;
-	left:0px;
-	top:41px;
-	width: 400px;
-	height: 560px;
-	background-color: var(--NarBackground);
-	border-style:none;
-	border-size:1px;
+	position:absolute;
+	left: 0px;
+	top:41px;
+	width: 350px;
+	height: 560px;
+	background-color: var(--NarBackground);
+	border-style:none;
+	padding: 10px;
 }
 
+.appface.show {
+	left:0px
+}
+
+.appface.slide-hide {
+	left:-600px
+}
+
+	
 .hidden
 {
 	display: none;
@@ -29,7 +37,7 @@
 
 .bottombar {
 	  position:absolute;
-	  width: 400px;
+	  width: 380px;
 	  height: 48px;
 	  max-height: 48px;
 	  display: inline-block;
@@ -49,7 +57,7 @@
 .topbar 
 {
 	position:absolute;
-	color: white;
+	color: black;
 	font-weight:lighter;
 	font-size: 12px;
 	width: 400px;
@@ -69,17 +77,16 @@
 	width: 40px;
 	height: 40px;
 	display: inline-block;
-	background-color: var(--NarTope);
+	/* background-color: var(--NarTope); */
 	top: 0px;
-	left: 0px;
+	left: 4px;
 	margin-left: 0px;
 	padding: 0px;
 	background-image: url("../images/logo_48.png");
 	background-repeat: no-repeat;
 	background-size: 32px;
 	background-position:left;
-	background-position: (15% 1%)
-	
+	background-position: (15% 1%);
 }
 
 .topbarcaption
@@ -87,16 +94,14 @@
 	position:absolute;
 	color: white;
 	font-weight:lighter;
-	font-size: 10px;
 	width: 150px;
 	height: 16px;
 	display: inline-flex;
-	background-color: var(--NarTope);
+	/* background-color: var(--NarTope); */
 	top: 8px;
 	left: 40px;
 	margin-left: 0px;
 	padding: 0px;
-	font-weight:lighter;
 	font-size: 16px;
 }
 
@@ -106,14 +111,13 @@
 	color: white;
 	font-weight:lighter;
 	font-size: 12px;
-	width: 167px;
+	width: 148px;
 	height: 40px;
 	display: inline-block;
-	top: 0px;
+	top: 2px;
 	left: 190px;
 	margin: 0px;
 	padding: 0px;
-	
 }
 
 .topbarhamburguer

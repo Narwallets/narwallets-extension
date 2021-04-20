@@ -6,21 +6,20 @@
 .accountlistscrollarea
 {
 	position:absolute;
-	width: 400px;
+	width: 380px;
 	height: 510px;
 	max-height: 510px;
-	top: 0px;;
+	top: 0px;
 	left: 0px;
 	display: block;
 	margin:0px;
 	padding: 0px;
 	overflow-y: scroll;
-		
 }
 
 .accountlistitem
 {
-	width: 400px;
+	width: 100%;
 	height: 46px;
 	display: inline-block;
 	background-color: var(--NarListBack);
@@ -41,36 +40,35 @@
 }
 
 .accountlistname 
-{	
+{
 	position: relative;
 	color: var(--NarBotBar);
 	font-size: 20px;
 	display: inline-block;
-	left:5px;
+	left: 10px;
 	width: 180px;
 	top:0px;
 }
 
 .accountlistbalance 
-{	
+{
 	position:relative;
 	text-align: right;
 	color: var(--NarBotBar);
 	font-weight: bolder;
 	font-size: 20px;
 	display: inline-block;
-	width: 200px;
+	width: 188px;
 	left: 0px;
 	top:8px;
 }
 
 .accountlistcomment 
-{	
+{
 	position:relative;
 	display: inline-block;
 	width: 300px;
 	top:-5px;
-	left:5px;
+	left: 10px;
 	font-size: 12px;
-	
 }

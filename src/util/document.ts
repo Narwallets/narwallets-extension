@@ -142,12 +142,12 @@ export function showByClass(id:string, className:string) {
 }
 /**
 * showByClass(id)
-* removes class=hidden from a DIV with id=id & class="page"
+* removes class=hidden from a DIV with id=id & class="appface"
 * @param id
 */
 export function showPage(id:string) {
   activePage=id;
-  showByClass(id, "page");
+  showByClass(id, "appface");
 }
 export function showSubPage(id:string) {
   showByClass(id, "subpage");
