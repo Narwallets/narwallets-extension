@@ -3,14 +3,22 @@
 	
 .appface 
 {
-	position:absolute;
-	left: 0px;
-	top:41px;
-	width: 350px;
-	height: 560px;
-	background-color: var(--NarBackground);
-	border-style:none;
-	padding: 10px;
+	
+position:absolute;
+	
+left: 0px;
+	
+top:41px;
+	
+width: 350px;
+	
+height: 560px;
+	
+background-color: var(--NarBackground);
+	
+border-style:none;
+	
+padding: 10px;
 }
 
 .appface.show {
@@ -48,7 +56,7 @@
 	  border-top-width: 1px;
 	  display: inline-flex;
 	  justify-content:flex-end;
-	  background-color: lightgray;
+	  background-color: var(--NarTope);
 	}
 
 
@@ -118,6 +126,7 @@
 	left: 190px;
 	margin: 0px;
 	padding: 0px;
+	
 }
 
 .topbarhamburguer
@@ -133,7 +142,7 @@
 	left: 359px;
 	margin: 0px;
 	padding: 0px;
-	background-image: url("images/hamb.png");
+	background-image: url("../images/hamb.png");
 }
 
 .topbarhamburguer:hover
