@@ -41,7 +41,8 @@
     background-image: url(../icons/logo.svg);
     background-repeat: no-repeat;
     background-position: center;
-	margin:5px;
+	margin:1px;
+	margin-top: 15px;
   }
 
 /* Bottom Bar ---------------------------------------------------------------------*/
