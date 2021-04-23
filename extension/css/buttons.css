@@ -4,28 +4,124 @@
 /* ALL BUTTONS */
 
 
-	.button {
+.button 
+{
 	  right:0;
-	  margin: 0px;
-	  width: 40px;
-	  height: 40px;
+  	  width: 32px;
+	  height: 48px;
 	  display:inline-block;
-	  border-radius: 22px;
-	  border-style: solid;
-	  border-width: 1px;
-	  background-color: var(--NarMidBar );
-	  border-color: white;
 	  margin:5px;
-	}
-
-	.button:hover {
-
-	  background-color: white;
-	  border-color: var(--NarMidBar );
-	  color:white;		
-	  font-color:var(--NarMidBar);
-	}
+	  background-repeat:no-repeat; 
+	  color:white;
+	  padding-top: 33px;
+	  font-size:10px;
+	  text-align: center;
+}
 
 
+/*buttons that appear in light background*/
+
+.edit 
+{	
+	margin-top: 5px;
+	background-image: url("../icons/SVG/edit_dark.svg");	
+	height:32px;
+	padding-top: 0px;
+}
+
+.edit:hover
+{	  
+	background-image: url("../icons/SVG/edit.svg");
+}
+
+.more 
+{	
+	background-image: url("../icons/SVG/more_dark.svg");	
+	height:32px;
+	padding-top: 0px;
+}
+
+.more:hover
+{	  
+	background-image: url("../icons/SVG/more.svg");
+}
+
+
+.back 
+{	
+	margin-top: 5px;
+	width:16px;
+	background-image: url("../icons/SVG/back_dark.svg");	
+}
+
+.back:hover
+{	  
+	background-image: url("../icons/SVG/back.svg");
+}
+
+/*buttons that appear in dark background*/
+
+
+.receive 
+{	
+	margin-top: 5px;
+	margin-left: 15px;
+	margin-right: 15px;
+	background-image: url("../icons/SVG/send.svg");	
+	width:32px;
+	height:40px;
+	
+}
+
+.receive:hover
+{	
+	background-image: url("../icons/SVG/send_dark.svg");	
+
+}
+
+.send 
+{	
+	margin-top: 5px;
+	margin-left: 15px;
+	margin-right: 15px;
+	background-image: url("../icons/SVG/receive.svg");	
+	width:32px;
+	height:40px;
+}
+
+.send:hover
+{	
+	background-image: url("../icons/SVG/receive_dark.svg");	
+}
+
+.stake 
+{	
+	margin-top: 5px;
+	margin-left: 15px;
+	margin-right: 15px;
+	background-image: url("../icons/SVG/stack.svg");	
+	width:32px;
+	height:40px;
+}
+
+.stake:hover
+{	
+	background-image: url("../icons/SVG/stack_dark.svg");	
+}
+
+.add 
+{	
+	margin-top: 5px;
+	margin-left: 15px;
+	margin-right: 15px;
+	background-image: url("../icons/SVG/mas.svg");	
+	width:32px;
+	height:40px;
+}
+
+.add:hover
+{	
+	background-image: url("../icons/SVG/mas_dark.svg");	
+}
 
 

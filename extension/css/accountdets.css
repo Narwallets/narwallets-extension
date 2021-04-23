@@ -12,11 +12,13 @@
 	left:0px;
 	width:48px;
 	height:200px;
+	margin-top:6px;
 }
 
 .accountdetstopright
 {
 	position:absolute;
+	margin-top:6px;
 	top:0px;
 	left:332px;
 	width:48px;
