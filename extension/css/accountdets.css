@@ -66,6 +66,7 @@
 
 .accountdetsassets
 {
+	position: relative;
 	width: 359px;
 	height: 64px;
 	display: block;
@@ -93,33 +94,33 @@
 	position:relative;
 	border-style: none;
 	display: inline-block;
-	top:0px;	
-	left:0px;
+	top:0;
+	left:0;
 	width: 30px;	
 	height: 58px;
 }
 
 .accountassettoken
 {
-	position:relative;
+	position:absolute;
 	border-style: none;
 	display: block;
 	font-size: 16px;		
-	top:-64px;	
-	left:48px;
+	top:1px;	
+	left:35px;
 	width: 300px;
 }
 
 .accountassetbalance
 {
-	position:relative;
+	position:absolute;
 	display: block;
 	border-style: none;
 	font-weight: 400;
 	color:var(--NarBotBar);
 	font-size: 25px;		
-	top:-67px;	
-	left:-8px;
+	top:20px;	
+	right:5px;
 	width:359px;
 	text-align: right;
 	margin:0px;
@@ -130,14 +131,14 @@
 
 .accountassetfiat
 {
-	position:relative;
+	position:absolute;
 	display: block;
 	border-style: none;
 	color:black;
 	font-size:12px;		
 	font-weight: 500;
-	top:-68px;	
-	left:150px;
+	top:45px;	
+	right:5px;
 	width:200px;
 	text-align: right;
 }
@@ -207,9 +208,10 @@
 
 .assethistoryline
 {
+	position:relative;
 	width: 359px;
-	height: 59px;
-	display: inline-flex;
+	height: 58px;
+	display: block;
 	background-color: var(--NarListBack);
 	margin: 0px;
 	padding: 0px;
@@ -222,48 +224,48 @@
 
 .assethisttype
 {
-	position:relative;
+	position:absolute;
 	display: inline-block;
 	top:0px;
 	left:5px;
 	width: 60px;
-	height: 30px;
+	height: 20px;
 	
 }
 
 .assethistaccount
 {
-	position:relative;
+	position:absolute;
 	display:inline-block;
-	left:-58px;
+	left:48px;
 	top:0px;
 	width:300px;
-	height:20px;
+	height:10px;
 	color:blue;
 	font-weight: 200;
 }
 
 .assethistdate
 {
-	position:relative;
+	position:absolute;
 	display: inline-block;
-	left:26px;
-	top:20px;	
+	left:48px;
+	top:18px;	
 	width: 100px;
 	height:20px;	
 }
 
 .assethistammount
 {
-	text-align: right;
-	position:relative;
-	left:-5px;
+	position:absolute;	
 	top:21px;	
+	right:5px;
+	text-align: right;	
 	font-size: 24px;
 	font-color:var(--NarMidBar);	
-	font-weight: bold;
+	font-weight: 200;
 	width: 400px;
-	height:30px;	
+	height:20px;	
 }
 
 
