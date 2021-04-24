@@ -5,10 +5,11 @@
 .loginface
 {
 	display: inline-block;
-	width:380px;
+	width:359px;
 	align-content: center;
 	text-align: center;
 	margin:0px;
+	padding: 0px;
 }
 
 .loginface input
@@ -27,14 +28,13 @@
 {
 	color:darkgray;
 	
-	
 }
 
 .loginface h1
 { 
 	color: var(--NarMidBar);
 	font-weight: lighter;
-
+	margin-bottom: -10px;
 }
 
 .loginface h3
@@ -43,6 +43,5 @@
 	font-weight:normal;
 	display:inline-block;
 	width:280px;
-
 }
 

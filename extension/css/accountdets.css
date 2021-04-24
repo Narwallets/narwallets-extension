@@ -20,7 +20,7 @@
 	position:absolute;
 	margin-top:6px;
 	top:0px;
-	left:332px;
+	left:312px;
 	width:48px;
 	height:200px;	
 }
@@ -29,8 +29,8 @@
 {
 	position:absolute;
 	top:0px;
-	left:49px;
-	width:284px;
+	left:40px;
+	width:274px;
 	height:210px;
 	
 }
@@ -40,7 +40,7 @@
 	position:absolute;
 	top:170px;
 	left:0px;
-	width:379px;
+	width:359px;
 	height:60px;
 	padding-top: 5px;
 	background-color: var(--NarMidBar);		
@@ -57,17 +57,18 @@
 	position:absolute;
 	top:242px;
 	left:0px;
-	width:379px;
-	height:312px;
+	width:359px;
+	height:279px;
 	max-height: 300px;
 	overflow-y: scroll;	
+	background-color: blue;
 }
 
 .accountdetsassets
 {
-	width: 380px;
-	height: 72px;
-	display: inline-block;
+	width: 359px;
+	height: 64px;
+	display: block;
 	background-color: var(--NarListBack);
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
@@ -78,6 +79,7 @@
 	top: 0px;
 	bottom: 0px;
 	overflow: hidden;
+	
 }
 
 .accountdetsassets:hover
@@ -105,7 +107,7 @@
 	font-size: 16px;		
 	top:-64px;	
 	left:48px;
-	width: 318px;
+	width: 300px;
 }
 
 .accountassetbalance
@@ -113,13 +115,15 @@
 	position:relative;
 	display: block;
 	border-style: none;
-	font-weight: bold;
+	font-weight: 400;
 	color:var(--NarBotBar);
-	font-size: 30px;		
-	top:-68px;	
-	left:04px;
+	font-size: 25px;		
+	top:-67px;	
+	left:-8px;
 	width:359px;
 	text-align: right;
+	margin:0px;
+	padding: 0px;
 
 	
 }
@@ -132,11 +136,13 @@
 	color:black;
 	font-size:12px;		
 	font-weight: 500;
-	top:-72px;	
-	left:164px;
+	top:-68px;	
+	left:150px;
 	width:200px;
 	text-align: right;
 }
+
+/* top info */
 
 .accountdetscuenta
 {
@@ -144,19 +150,20 @@
 	font-size:20px;
 	color:var(--NarMidBar);	
 	margin:5px;
+	font-weight: 500;
 }
 
 .accountdetscomment
 {
 	text-align: center;
-	font-weight: lighter;
-	font-size:18px;
+	font-weight: 100;
+	font-size:15px;
 }
 
 .accountdetscoin
 {
 	text-align: center;
-	font-weight: lighter;
+	font-weight: 200;
 	font-size:18px;
 }
 
@@ -167,6 +174,7 @@
 	color:var(--NarBotBar);
 	font-weight: 800;
 	margin:15px;
+	
 }
 
 .accountdetsfiat
@@ -177,6 +185,7 @@
 	margin:15px;
 }
 
+/* for asset history */
 
 .assethistoryline
 {
