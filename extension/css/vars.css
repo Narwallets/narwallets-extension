@@ -23,6 +23,7 @@ body { font-family: 'Inter', sans-serif; !important }
 	  --NarListHoover: rgb(226 226 226);
 	  --NarDarkHighlight: rgb(155, 155, 155);
 	  --NarMidBar: #1994E6;
+	  --NarMidBarhighlight: #74b6e2;
 	  --NarBotBar: #22618A;
 	  --NarTextoNormal: black;
 	  --NarTextoResaltado: #1B64B7;
@@ -38,8 +39,9 @@ body { font-family: 'Inter', sans-serif; !important }
 
 body {
 		/*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-		width: 380px;
-		height: 600px;
+		width: 361px;
+		height: 560px;
 		margin: 0px;
+		overflow: hidden;
 	}
 

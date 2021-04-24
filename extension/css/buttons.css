@@ -18,6 +18,27 @@
 	  text-align: center;
 }
 
+.big
+{
+	border-radius: 5px;
+	width:300px;
+	height:35px;
+	margin:0px;
+	padding:0px;
+	padding-top: 15px;
+	font-size: 15px;
+	font-weight: 200;
+	background-color: var(--NarMidBar);
+	display: inline-flex;
+	justify-content: center;
+	align-content: center;
+	
+}
+
+.big:hover
+{
+	background-color: var(--NarMidBarhighlight);
+}
 
 /*buttons that appear in light background*/
 
@@ -52,6 +73,7 @@
 	margin-top: 5px;
 	width:16px;
 	background-image: url("../icons/SVG/back_dark.svg");	
+	background-repeat: no-repeat;
 }
 
 .back:hover

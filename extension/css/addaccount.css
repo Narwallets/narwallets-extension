@@ -1,0 +1,65 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+.addaccount_face
+{
+	display:inline-grid;
+	width:359px;
+	height:510px;
+	overflow: hidden;
+	grid-template-columns: 20px 339px;
+	grid-template-rows:repeat(7,auto);
+	justify-items: center;
+}
+
+.addaccount_face h1
+{
+	font-size: 25px;	
+	font-weight:200;
+	color:var(--NarMidBar);
+
+}
+
+.addaccount_face h2
+{
+	font-size: 18px;
+	font-weight: 200;
+}
+
+.addaccount_face h3
+{
+	font-size:10px;
+	font-weight: 200;
+}
+
+.backarea
+{
+	padding-top:13px;
+	text-align: center;
+	height: 40px;
+	width: 20px;;
+
+}
+
+.titulo
+{
+	text-align: center;
+	height: 50px;
+	
+}
+
+.descri
+{
+	grid-column:  span 2;
+	text-align: center;
+	height: auto;
+	width: 80%;
+}
+
+.in 
+{
+	grid-column:  span 2;
+	height:70px;
+	width:auto;
+}
