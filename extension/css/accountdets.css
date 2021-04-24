@@ -187,49 +187,68 @@
 
 /* for asset history */
 
+.histreceive 
+{	
+	background-image: url("../icons/SVG/receive_dark_fix.svg");	
+	height:50px;
+	width: 32px;	
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.histsend
+{	
+	background-image: url("../icons/SVG/send_dark_fix.svg");	
+	height:50px;
+	width: 32px;	
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
 .assethistoryline
 {
-	width: 400px;
-	height: 70px;
+	width: 359px;
+	height: 59px;
 	display: inline-flex;
 	background-color: var(--NarListBack);
-	border-style: none;
-	font-weight: lighter;
 	margin: 0px;
 	padding: 0px;
 	top: 0px;
 	bottom: 0px;
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
-	
+	overflow: hidden;
 }
 
 .assethisttype
 {
 	position:relative;
-	top:0;
-	left:0;
-	width: 48px;
-	height: 48px;
+	display: inline-block;
+	top:0px;
+	left:5px;
+	width: 60px;
+	height: 30px;
 	
 }
 
 .assethistaccount
 {
 	position:relative;
-	left:-80px;
+	display:inline-block;
+	left:-58px;
 	top:0px;
-	width:100px;
+	width:300px;
 	height:20px;
+	color:blue;
+	font-weight: 200;
 }
-
-
 
 .assethistdate
 {
 	position:relative;
-	left:10px;
-	top:-30px;	
+	display: inline-block;
+	left:26px;
+	top:20px;	
 	width: 100px;
 	height:20px;	
 }
@@ -238,13 +257,13 @@
 {
 	text-align: right;
 	position:relative;
-	left:-10px;
-	top:5px;	
+	left:-5px;
+	top:21px;	
 	font-size: 24px;
 	font-color:var(--NarMidBar);	
 	font-weight: bold;
-	width: 180px;
-	height:20px;	
+	width: 400px;
+	height:30px;	
 }
 
 

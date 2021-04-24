@@ -167,3 +167,21 @@
 	background-image: url("../icons/SVG/key_dark.svg");
 	
 }
+
+
+.remove 
+{	
+	margin-top: 5px;
+	margin-left: 15px;
+	margin-right: 15px;
+	background-image: url("../icons/SVG/minus_light.svg");	
+	width:32px;
+	height:40px;
+}
+
+.remove:hover
+{
+	background-image: url("../icons/SVG/minus_dark.svg");
+	
+}
+
