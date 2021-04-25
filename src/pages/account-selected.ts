@@ -54,6 +54,10 @@ let cancelBtn:d.El
 
 function initPage() {
 
+    const backLink = new d.El("#account-selected.appface .button.back");
+    backLink.onClick(Pages.backToAccountsList);
+
+    //lala_redesign
     return;
     
     //accountAmount.onInput(amountInput);
@@ -66,9 +70,6 @@ function initPage() {
     cancelBtn = new d.El("#account-selected-action-cancel")
 
     seedTextElem = new d.El("#seed-phrase")
-
-    const backLink = new d.El("#account-selected.page .back-link");
-    backLink.onClick(Pages.backToAccountsList);
 
     d.onClickId("send", sendClicked);
     d.onClickId("stake", stakeClicked);
