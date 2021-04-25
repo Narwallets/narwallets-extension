@@ -146,7 +146,9 @@ function showSelectedAccount() {
     d.clearContainer(SELECTED_ACCOUNT)
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData)
 
+    /* lala_design
     accountInfoName = new d.El(".selected-account-info .name");
+
     accountBalance = new d.El(".selected-account-info .total.balance");
 
     if (selectedAccountData.accountInfo.ownerId) {
@@ -161,8 +163,9 @@ function showSelectedAccount() {
         d.qs(".selected-account-info #staking-pool-info-line").show()
         d.qs(".selected-account-info #staking-pool-balance-line").show()
     }
-
+    
     d.onClickSelector(".selected-account-info .access-status", accessLabelClicked)
+    */
 }
 
 

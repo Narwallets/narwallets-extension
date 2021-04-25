@@ -65,3 +65,4 @@ export async function searchAccount(accName) {
     await asyncRefreshAccountInfo(accName, result);
     return result;
 }
+//# sourceMappingURL=search-accounts.js.map

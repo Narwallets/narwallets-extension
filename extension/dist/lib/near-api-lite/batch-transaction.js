@@ -40,3 +40,4 @@ export class DeleteAccountToBeneficiary extends BatchAction {
         this.beneficiaryAccountId = beneficiaryAccountId;
     }
 }
+//# sourceMappingURL=batch-transaction.js.map

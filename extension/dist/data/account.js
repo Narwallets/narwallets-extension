@@ -43,7 +43,9 @@ export class ExtendedAccountData {
             this.available = Math.max(0, this.available - 36);
         }
         this.total = this.accountInfo.lastBalance + this.inThePool;
+        this.totalUSD = this.total * 4.70;
     }
     get isReadOnly() { return !this.accountInfo.privateKey; }
     get isFullAccess() { return !this.isReadOnly; }
 }
+//# sourceMappingURL=account.js.map

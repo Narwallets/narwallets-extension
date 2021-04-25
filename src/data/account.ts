@@ -27,6 +27,7 @@ export class Account {
     typeFull:string //full-type + note
     accountInfo:Account
     total:number //lastBalance+inThePool
+    totalUSD:number //lastBalance+inThePool * NEAR price
     unlockedOther:number
     available:number
     inThePool:number
@@ -63,6 +64,7 @@ export class Account {
         }
 
         this.total = this.accountInfo.lastBalance + this.inThePool
+        this.totalUSD = this.total * 4.70
 
     }
 

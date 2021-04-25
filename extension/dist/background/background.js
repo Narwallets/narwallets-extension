@@ -610,3 +610,4 @@ async function onLoad() {
     if (!_bgDataRecovered)
         await retrieveBgInfoFromStorage();
 }
+//# sourceMappingURL=background.js.map

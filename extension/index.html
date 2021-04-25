@@ -92,18 +92,16 @@
 	</aside>
 
 
-<div class="appface slide-hide" id="AccountDetail">  
+<div class="appface slide-hide" id="account-selected">  
 		
 	<div class="accountdetstopleft">
 		<div class="button"></div>
 	</div>
-	<div class="accountdetstopcenter">
-		<div class="accountdetscuenta">cuenta.sadasda.asd.ar</div>
-		<div class="accountdetscomment">(Comentario)</div>
-		<div class="accountdetscoin">Native</div>
-		<div class="accountdetsbalance">1,000,000.000 Ⓝ</div>
-		<div class="accountdetsfiat">1,000,000.000 usd</div>
+
+	<div class="accountdetstopcenter" id="selected-account">
+		<!-- filled with the template-->
 	</div>
+
 	<div class="accountdetstopright">
 		<div class="button"></div>
 		<div class="button"></div>
@@ -118,41 +116,11 @@
 	
 	<!-- Template -->
 	<div id="selected-account-template" class="hidden">
-		<div class="single-account-item-group">
-			<label>{typeFull}</label><br>
-			<div class="access-status">{accessStatus}</div>
-		</div>
-		<div class="single-account-item-group">
-			<div class="name">{name}</div>
-		</div>
-		<div id="owner-id-info-line" class="hidden single-account-item-group small-labels">
-			<label>Owner</label>
-			<div>{accountInfo.ownerId}</div>
-		</div>
-		<div id="locked-others-line" class="hidden single-account-item-group small-labels">
-			<label>Locked</label>
-			<div class="balance">{accountInfo.lockedOther}</div>
-			<label>Unlocked</label>
-			<div class="balance">{unlockedOther}</div>
-		</div>
-		<div id="staking-pool-info-line" class="hidden single-account-item-group small-labels">
-			<label>Staking Pool</label>
-			<div>{accountInfo.stakingPool} ({accountInfo.stakingPoolPct}%)</div>
-			<label>Rewards</label>
-			<div class="balance">{accountInfo.rewards}</div>
-		</div>
-		<div id="staking-pool-balance-line" class="hidden single-account-item-group staked small-labels">
-			<label>Staked</label>
-			<div class="balance">{accountInfo.staked}</div>
-			<label>Unstaked</label>
-			<div class="balance">{accountInfo.unstaked}</div>
-		</div>
-		<div class="single-account-item-group small-labels">
-			<label>Balance</label>
-			<div class="total balance">{accountInfo.lastBalance}</div>
-			<label>Available</label>
-			<div class="balance">{available}</div>
-		</div>
+		<div class="accountdetscuenta">{name}</div>
+		<div class="accountdetscomment">{accountInfo.note}</div>
+		<div class="accountdetscoin">NEAR</div>
+		<div class="accountdetsbalance balance">{total}</div>
+		<div class="accountdetsfiat">{totalUSD} usd</div>
 	</div>
 
 

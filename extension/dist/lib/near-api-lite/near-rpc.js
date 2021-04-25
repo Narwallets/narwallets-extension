@@ -187,3 +187,4 @@ export function delete_account(accountToDelete, privateKey, beneficiary) {
     const actions = [TX.deleteAccount(beneficiary)];
     return broadcast_tx_commit_actions(actions, accountToDelete, accountToDelete, privateKey);
 }
+//# sourceMappingURL=near-rpc.js.map

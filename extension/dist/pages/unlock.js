@@ -35,3 +35,4 @@ export async function show() {
     const state = await askBackgroundGetState();
     d.inputById("unlock-email").value = state.currentUser;
 }
+//# sourceMappingURL=unlock.js.map

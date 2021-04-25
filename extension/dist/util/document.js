@@ -446,3 +446,4 @@ export class All {
     onClick(clickHandler) { this.addEventListener(CLICK, clickHandler); }
     onInput(inputHandler) { this.addEventListener(INPUT, inputHandler); }
 }
+//# sourceMappingURL=document.js.map
