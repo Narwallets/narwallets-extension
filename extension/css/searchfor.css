@@ -1,0 +1,153 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+/*
+
+		<div class="search_face">
+
+			<div class="backarea"><div class="button back"></div></div>
+			<div class="titulo"><h1>Stake</h1></div>		
+			<div class="searcharea">
+				<h1>Usuario.asdasdasdsad.adasdas</h1>
+				<h2>(Comentario)</h2>
+				<div class="searchbox">
+					<input type="Text">
+					<input type="button">
+				</div>
+			<div class="resultarea">
+				<div class="resultline">sdasdasdasdasdasda</div>
+				<div class="resultline">sdasdasdasdasdasda</div>
+				<div class="resultline">sdasdasdasdasdasda</div>
+				<div class="resultline">sdasdasdasdasdasda</div>
+			</div>
+			
+			</div>
+	
+		</div>
+
+*/
+
+.search_face
+{
+	display:inline-grid;
+	width:359px;
+	height:510px;
+	overflow: hidden;
+	grid-template-columns: 20px 339px;
+	grid-template-rows:70px 400px;
+}
+
+.search_face h1
+{
+	font-size: 25px;	
+	font-weight:200;
+	color:var(--NarMidBar);
+
+}
+
+.searcharea
+{
+	position:absolute;
+	top:70px;
+	left:0px;
+	width: 359px;
+	height: 180px;
+	text-align: center;
+
+}
+
+.searcharea h1
+{
+	font-size: 24px;
+	line-height: 20px;
+	font-weight: 300;
+	width:330px;
+	margin:10px;
+	text-align: center;
+	color:black;
+	overflow: hidden;
+	
+	
+}
+
+.searcharea h2
+{
+	font-size:15px;
+	line-height: 30px;
+	color:black;
+	font-weight: 200;
+	
+}
+
+.searcharea h3
+{
+	font-size:10px;
+	line-height: 10px;
+	color:var(--NarMidBar);
+		
+}
+
+.searchbox
+{
+	position: relative;
+	left:0px;
+	top:0px;
+}
+
+.searchboxtext
+{
+	position: absolute;
+	border-bottom-left-radius: 5px;
+	border-top-left-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
+	width: 200px;
+	height: 24px;
+	border-color: lightgray;
+	left:60px;
+	top:5px;
+}
+
+.searchboxbutton
+{
+	position: absolute;
+	border-bottom-right-radius: 5px;
+	border-top-right-radius: 5px;	
+	border-style: solid;
+	border-width: 1px;
+	width: 28px;
+	height: 28px;
+	left:262px;
+	top:5px;
+	background-color: var(--NarMidBar);
+
+}
+
+.searchboxbutton:hover
+{
+
+	background-color: lightblue;
+
+}
+
+
+/*salida de la busqueda */
+
+
+
+
+.resultarea
+{
+	position:absolute;
+	top:183px;
+	left:0px;
+	width: 359px;
+	height: 268px;
+	
+}
+
+.resulline
+{
+	
+}

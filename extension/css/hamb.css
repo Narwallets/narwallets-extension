@@ -16,7 +16,7 @@ svg line {
 .hamb {
     position: absolute;
     top: 4px;
-    right: 23px;
+    right: 0px;
     border-radius:6px;
     max-width: 40px;
     padding: 5px;

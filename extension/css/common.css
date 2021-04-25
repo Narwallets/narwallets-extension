@@ -6,10 +6,13 @@
 	position:absolute;
 	left: 0px;
 	top: 40px;
-	width: 380px;
-	height: 514px;
+	width: 359px;
+	height: 520px;
 	background-color: var(--NarBackground);
 	border-style:none;
+	border-style: solid;
+	border-color: gray;
+	border-width: 1px;
 }
 
 .appface.show {
@@ -49,12 +52,13 @@
 
 .bottombar {
 	  position:absolute;
-	  width: 380px;
+	  width: 359px;
 	  height: 48px;
 	  max-height: 48px;
 	  display: inline-block;
-	  top: 514px;
+	  top: 465px;
 	  left: 0px;
+	  padding-top:4px;
 	  border-top-color: var(--NarDarkHighlight);
 	  border-top-style: solid;
 	  border-top-width: 1px;
@@ -72,7 +76,7 @@
 	color: black;
 	font-weight:lighter;
 	font-size: 12px;
-	width: 400px;
+	width: 359px;
 	height: 40px;
 	display: inline-block;
 	background-color: var(--NarTope);
@@ -127,7 +131,7 @@
 	height: 40px;
 	display: inline-block;
 	top: 5px;
-	left: 190px;
+	left: 170px;
 	margin: 0px;
 	padding: 0px;
 }

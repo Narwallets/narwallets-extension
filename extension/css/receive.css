@@ -1,0 +1,70 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+.receive_face
+{
+	display:inline-grid;
+	width:359px;
+	height:510px;
+	overflow: hidden;
+	grid-template-columns: 20px 339px;
+	grid-template-rows:70px 400px;
+	
+	justify-items: center;
+}
+
+.receive_face h1
+{
+	font-size: 25px;	
+	font-weight:200;
+	color:var(--NarMidBar);
+
+}
+
+.receive_face h2
+{
+	
+	font-size: 18px;
+	line-height: 2px;
+	font-weight: 200;
+	margin-top: 20px;
+	top:0px;
+}
+
+.receive_face h3
+{
+	position: relative;
+	top: 50px;
+	font-size:20px;
+	font-weight: 300;
+	line-height: 2px;
+	
+}
+
+.descri
+{
+	position: relative;
+	top:80px;
+	left:0px;
+	display:contents;
+	text-align: center;
+	align-content: center;
+	width:300px;
+}
+
+.backarea
+{
+	padding-top:13px;
+	text-align: center;
+	height: 40px;
+	width: 20px;;
+
+}
+
+.titulo
+{
+	text-align: center;
+	height: 50px;
+	
+}
