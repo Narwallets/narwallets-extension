@@ -38,6 +38,9 @@ let okCancelRow;
 let confirmBtn;
 let cancelBtn;
 function initPage() {
+    const backLink = new d.El("#account-selected.appface .button.back");
+    backLink.onClick(Pages.backToAccountsList);
+    //lala_redesign
     return;
     //accountAmount.onInput(amountInput);
     removeButton = new d.El("button#remove");
@@ -46,8 +49,6 @@ function initPage() {
     confirmBtn = new d.El("#account-selected-action-confirm");
     cancelBtn = new d.El("#account-selected-action-cancel");
     seedTextElem = new d.El("#seed-phrase");
-    const backLink = new d.El("#account-selected.page .back-link");
-    backLink.onClick(Pages.backToAccountsList);
     d.onClickId("send", sendClicked);
     d.onClickId("stake", stakeClicked);
     d.onClickId("unstake", unstakeClicked);
@@ -107,21 +108,26 @@ function showSelectedAccount() {
     const SELECTED_ACCOUNT = "selected-account";
     d.clearContainer(SELECTED_ACCOUNT);
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
+    /* lala_design
     accountInfoName = new d.El(".selected-account-info .name");
+
     accountBalance = new d.El(".selected-account-info .total.balance");
+
     if (selectedAccountData.accountInfo.ownerId) {
         const oiLine = new d.El(".selected-account-info #owner-id-info-line");
-        oiLine.show();
+        oiLine.show()
     }
     if (selectedAccountData.accountInfo.lockedOther) {
         const lockedOthLine = new d.El(".selected-account-info #locked-others-line");
-        lockedOthLine.show();
+        lockedOthLine.show()
     }
     if (selectedAccountData.accountInfo.stakingPool) {
-        d.qs(".selected-account-info #staking-pool-info-line").show();
-        d.qs(".selected-account-info #staking-pool-balance-line").show();
+        d.qs(".selected-account-info #staking-pool-info-line").show()
+        d.qs(".selected-account-info #staking-pool-balance-line").show()
     }
-    d.onClickSelector(".selected-account-info .access-status", accessLabelClicked);
+    
+    d.onClickSelector(".selected-account-info .access-status", accessLabelClicked)
+    */
 }
 function listPoolsClicked() {
     d.inputById("stake-with-staking-pool").value = "";
@@ -1076,3 +1082,4 @@ async function refreshClicked(ev) {
         d.hideWait();
     }
 }
+//# sourceMappingURL=account-selected.js.map

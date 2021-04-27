@@ -22,3 +22,4 @@ export async function parseSeedPhraseAsync(seedPhrase) {
     const secretKey = 'ed25519:' + bs58.encode(keyPair.secretKey);
     return { seedPhrase, secretKey, publicKey };
 }
+//# sourceMappingURL=seed-phrase.js.map

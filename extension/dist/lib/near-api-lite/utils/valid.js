@@ -46,3 +46,4 @@ export function isValidEmail(email) {
     }
     return true;
 }
+//# sourceMappingURL=valid.js.map

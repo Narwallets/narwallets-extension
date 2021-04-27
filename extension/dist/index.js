@@ -220,3 +220,4 @@ chrome.runtime.getBackgroundPage((bgpage) => {
         //will reply with "can-init-popup" after retrieving data from localStorage
     }
 });
+//# sourceMappingURL=index.js.map

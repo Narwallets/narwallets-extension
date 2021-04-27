@@ -193,3 +193,4 @@ export class LockupContract {
         return this.call_method("deposit_and_stake", { amount: c.ntoy(amountNear) }, c.TGas(BASE_GAS * 5));
     }
 }
+//# sourceMappingURL=LockupContract.js.map

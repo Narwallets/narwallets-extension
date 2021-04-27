@@ -66,3 +66,4 @@ export function askBackgroundApplyTxAction(receiverId, action, signerId) {
 export function askBackgroundApplyBatchTx(signerId, batchTx) {
     return askBackground({ code: "apply", signerId: signerId, tx: batchTx });
 }
+//# sourceMappingURL=askBackground.js.map
