@@ -10,9 +10,10 @@
 	height: 520px;
 	background-color: var(--NarBackground);
 	border-style:none;
-	border-style: solid;
+	/*border-style: solid;*/
 	border-color: gray;
 	border-width: 1px;
+	overflow-y: hidden;
 }
 
 .appface.show {
@@ -53,8 +54,8 @@
 .bottombar {
 	  position:absolute;
 	  width: 359px;
-	  height: 48px;
-	  max-height: 48px;
+	  height: 55px;
+	  max-height: 55px;
 	  display: inline-block;
 	  top: 465px;
 	  left: 0px;

@@ -55,10 +55,10 @@
 .accountdetsscroll
 {
 	position:absolute;
-	top:242px;
+	top:235px;
 	left:0px;
 	width:359px;
-	height:279px;
+	height:283px;
 	max-height: 300px;
 	overflow-y: scroll;	
 	background-color: blue;
@@ -148,42 +148,52 @@
 .accountdetscuenta
 {
 	text-align: center;
+	position: absolute;
 	font-size:20px;
 	color:var(--NarMidBar);	
-	margin:5px;
+	display: block;
+	top:5px;
+	width:260px;
+	height: auto;
+	max-height: 75px;
 	font-weight: 500;
+	overflow-wrap: break-word;	
+	overflow-y: hidden;
 }
 
 .accountdetscomment
 {
+	position:absolute;
+	width:260px;
+	top:80px;
 	text-align: center;
 	font-weight: 100;
 	font-size:15px;
 }
 
-.accountdetscoin
-{
-	text-align: center;
-	font-weight: 200;
-	font-size:18px;
-}
 
 .accountdetsbalance
 {
+	position:absolute;
+	top:100px;
+	width:260px;
 	text-align: center;
 	font-size:25px;
 	color:var(--NarBotBar);
 	font-weight: 800;
-	margin:15px;
+
 	
 }
 
 .accountdetsfiat
 {
+	position: absolute;
+	top:130px;	
 	text-align: center;
+	width:260px;
 	font-size:16px;
 	color:black;
-	margin:15px;
+
 }
 
 /* for asset history */
