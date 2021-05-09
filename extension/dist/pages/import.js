@@ -43,10 +43,10 @@ function importExistingAccount() {
 function displayAccountInfoAt(containerId, templateId, extendedAccountData) {
     d.clearContainer(containerId);
     d.appendTemplate("DIV", containerId, templateId, extendedAccountData);
-    const container = new d.El("#" + containerId);
-    if (extendedAccountData.accountInfo.stakingPool) {
-        container.sub("#staking-pool-info-line").show();
-    }
+    // const container = new d.El("#" + containerId);
+    // if (extendedAccountData.accountInfo.stakingPool) {
+    //   container.sub("#staking-pool-info-line").show();
+    // }
 }
 async function searchTheAccountName(accName) {
     lastSearchResult = new SearchResult();
@@ -98,14 +98,14 @@ async function importIfNew(accType, accName, accountInfo, order) {
     if (networkAccounts && networkAccounts[accName]) {
         d.showErr(`${accType} ${accName} is already in the wallet`);
         //repair: if we found staking pool info and the account in the wallet has no pool associated, we update that info
-        const walletInfo = networkAccounts[accName];
-        if (!walletInfo.stakingPool && accountInfo.stakingPool) {
-            walletInfo.stakingPool = accountInfo.stakingPool;
-            walletInfo.staked = accountInfo.staked;
-            walletInfo.unstaked = accountInfo.unstaked;
-            walletInfo.stakingPoolPct = accountInfo.stakingPoolPct;
-            await askBackgroundSetAccount(accName, walletInfo);
-        }
+        // const walletInfo = networkAccounts[accName].assets[0];
+        // if (!walletInfo.stakingPool && accountInfo.stakingPool) {
+        //   walletInfo.stakingPool = accountInfo.stakingPool;
+        //   walletInfo.staked = accountInfo.staked;
+        //   walletInfo.unstaked = accountInfo.unstaked;
+        //   walletInfo.stakingPoolPct = accountInfo.stakingPoolPct;
+        //   await askBackgroundSetAccount(accName, walletInfo);
+        // }
         return false;
     }
     else {

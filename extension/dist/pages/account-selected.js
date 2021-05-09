@@ -7,7 +7,7 @@ import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/val
 import { checkSeedPhrase, parseSeedPhraseAsync, } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { KeyPairEd25519, } from "../lib/near-api-lite/utils/key-pair.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { ExtendedAccountData } from "../data/account.js";
+import { assetIsStakingPool, ExtendedAccountData, StakingPoolAsset, } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount, } from "../background/askBackground.js";
 import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
@@ -26,7 +26,7 @@ export async function show(accName, reposition) {
     if (reposition) {
         switch (reposition) {
             case "stake": {
-                stakeClicked();
+                // stakeClicked();
                 break;
             }
         }
@@ -48,8 +48,8 @@ function initPage() {
     const backLink = new d.El("#account-selected.page .back-link");
     backLink.onClick(Pages.backToAccountsList);
     d.onClickId("send", sendClicked);
-    d.onClickId("stake", stakeClicked);
-    d.onClickId("unstake", unstakeClicked);
+    // d.onClickId("stake", stakeClicked);
+    // d.onClickId("unstake", unstakeClicked);
     d.onClickId("list-pools", listPoolsClicked);
     d.onClickId("receive", receiveClicked);
     d.onClickId("acc-connect-to-page", connectToWebAppClicked);
@@ -123,9 +123,9 @@ function showSelectedAccount() {
         const lockedOthLine = new d.El(".selected-account-info #locked-others-line");
         lockedOthLine.show();
     }
-    if (selectedAccountData.accountInfo.stakingPool) {
+    if (assetIsStakingPool(selectedAccountData.accountInfo.assets[0])) {
         d.qs(".selected-account-info #staking-pool-info-line").show();
-        d.qs(".selected-account-info #staking-pool-balance-line").show();
+        // d.qs(".selected-account-info #staking-pool-balance-line").show();
     }
     d.onClickSelector(".selected-account-info .access-status", accessLabelClicked);
 }
@@ -352,239 +352,250 @@ async function performLockupContractSend() {
     }
 }
 //----------------------
-async function stakeClicked() {
-    try {
-        const info = selectedAccountData.accountInfo;
-        const stakeAmountBox = d.inputById("stake-amount");
-        let performer = performStake; //default
-        let amountToStake;
-        if (info.unstaked > 0) {
-            amountToStake = info.unstaked;
-        }
-        else {
-            amountToStake = info.unstaked + info.lastBalance - 2;
-            if (info.type == "lock.c")
-                amountToStake -= 34;
-        }
-        if (info.type == "lock.c") {
-            await checkOwnerAccessThrows("stake");
-            performer = performLockupContractStake;
-            stakeAmountBox.disabled = true;
-            stakeAmountBox.classList.add("bg-lightblue");
-        }
-        else {
-            stakeAmountBox.disabled = false;
-            stakeAmountBox.classList.remove("bg-lightblue");
-        }
-        if (amountToStake < 0)
-            amountToStake = 0;
-        await fullAccessSubPage("account-selected-stake", performer);
-        d.inputById("stake-with-staking-pool").value =
-            selectedAccountData.accountInfo.stakingPool || "";
-        d.byId("max-stake-amount").innerText = c.toStringDec(amountToStake);
-        //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
-        if (info.type == "lock.c")
-            stakeAmountBox.value = c.toStringDec(amountToStake);
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-}
+// async function stakeClicked() {
+//   try {
+//     const info = selectedAccountData.accountInfo;
+//     const stakeAmountBox = d.inputById("stake-amount");
+//     let performer = performStake; //default
+//     let amountToStake;
+//     if (info.unstaked > 0) {
+//       amountToStake = info.unstaked;
+//     } else {
+//       amountToStake = info.unstaked + info.lastBalance - 2;
+//       if (info.type == "lock.c") amountToStake -= 34;
+//     }
+//     if (info.type == "lock.c") {
+//       await checkOwnerAccessThrows("stake");
+//       performer = performLockupContractStake;
+//       stakeAmountBox.disabled = true;
+//       stakeAmountBox.classList.add("bg-lightblue");
+//     } else {
+//       stakeAmountBox.disabled = false;
+//       stakeAmountBox.classList.remove("bg-lightblue");
+//     }
+//     if (amountToStake < 0) amountToStake = 0;
+//     await fullAccessSubPage("account-selected-stake", performer);
+//     d.inputById("stake-with-staking-pool").value =
+//       selectedAccountData.accountInfo.stakingPool || "";
+//     d.byId("max-stake-amount").innerText = c.toStringDec(amountToStake);
+//     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
+//     if (info.type == "lock.c")
+//       stakeAmountBox.value = c.toStringDec(amountToStake);
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   }
+// }
 async function saveSelectedAccount() {
     return askBackgroundSetAccount(selectedAccountData.name, selectedAccountData.accountInfo);
 }
 //----------------------
-async function performStake() {
-    //normal accounts
-    disableOKCancel();
-    d.showWait();
-    try {
-        const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
-        if (!isValidAccountID(newStakingPool))
-            throw Error("Staking pool Account Id is invalid");
-        if (!selectedAccountData.isFullAccess)
-            throw Error("you need full access on " + selectedAccountData.name);
-        //const amountToStake = info.lastBalance - info.staked - 36
-        const amountToStake = c.toNum(d.inputById("stake-amount").value);
-        if (!isValidAmount(amountToStake))
-            throw Error("Amount should be a positive integer");
-        if (amountToStake < 5)
-            throw Error("Stake at least 5 Near");
-        //refresh status
-        // if there's an error during "refresh" still continue
-        //maybe current staking pool does not exists
-        try {
-            await refreshSaveSelectedAccount();
-        }
-        catch (ex) {
-            d.showErr(ex.message);
-        }
-        let actualSP = selectedAccountData.accountInfo.stakingPool;
-        let poolAccInfo = {
-            //empty info
-            account_id: "",
-            unstaked_balance: "0",
-            staked_balance: "0",
-            can_withdraw: false,
-        };
-        if (actualSP) {
-            //there's a selected SP
-            //ask the actual SP how much is staked
-            poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
-            if (actualSP != newStakingPool) {
-                //requesting a change of SP
-                if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
-                    c.yton(poolAccInfo.staked_balance) >= 0.005) {
-                    const staked = c.yton(poolAccInfo.staked_balance);
-                    const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
-                    throw Error(`Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(staked)}`);
-                    //----------------------
-                }
-                //if ZERO in the pool, remove current staking pool ref
-                actualSP = "";
-                selectedAccountData.accountInfo.stakingPool = "";
-            }
-        }
-        if (!actualSP) {
-            //1st check the pool exists
-            poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, newStakingPool);
-            //2nd select the new staking pool. ONLY if the pool exists
-            selectedAccountData.accountInfo.stakingPool = newStakingPool;
-        }
-        if (c.yton(poolAccInfo.unstaked_balance) >= 10) {
-            //at least 10 deposited but unstaked, stake that
-            //just re-stake (maybe the user asked unstaking but now regrets it)
-            const amountToStakeY = fixUserAmountInY(amountToStake, poolAccInfo.unstaked_balance);
-            if (amountToStakeY == poolAccInfo.unstaked_balance) {
-                await askBackgroundCallMethod(newStakingPool, "stake_all", {}, selectedAccountData.name);
-            }
-            else {
-                await askBackgroundCallMethod(newStakingPool, "stake", { amount: amountToStakeY }, selectedAccountData.name);
-                //await near.call_method(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
-            }
-        }
-        else {
-            //no unstaked funds
-            //deposit and stake
-            await askBackgroundCallMethod(newStakingPool, "deposit_and_stake", {}, selectedAccountData.name, c.TGas(75), c.ntoy(amountToStake));
-            // await near.call_method(newStakingPool, "deposit_and_stake", {},
-            //     selectedAccountData.name,
-            //     selectedAccountData.accountInfo.privateKey,
-            //     near.ONE_TGAS.muln(125),
-            //     amountToStake
-            // )
-        }
-        //update staked to avoid incorrect "rewards" calculations on refresh
-        selectedAccountData.accountInfo.staked += amountToStake;
-        //refresh status & save
-        await refreshSaveSelectedAccount();
-        d.showSuccess("Success");
-        showButtons();
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-    finally {
-        d.hideWait();
-        enableOKCancel();
-    }
-}
+// async function performStake() {
+//   //normal accounts
+//   disableOKCancel();
+//   d.showWait();
+//   try {
+//     const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+//     if (!isValidAccountID(newStakingPool))
+//       throw Error("Staking pool Account Id is invalid");
+//     if (!selectedAccountData.isFullAccess)
+//       throw Error("you need full access on " + selectedAccountData.name);
+//     //const amountToStake = info.lastBalance - info.staked - 36
+//     const amountToStake = c.toNum(d.inputById("stake-amount").value);
+//     if (!isValidAmount(amountToStake))
+//       throw Error("Amount should be a positive integer");
+//     if (amountToStake < 5) throw Error("Stake at least 5 Near");
+//     //refresh status
+//     // if there's an error during "refresh" still continue
+//     //maybe current staking pool does not exists
+//     try {
+//       await refreshSaveSelectedAccount();
+//     } catch (ex) {
+//       d.showErr(ex.message);
+//     }
+//     let actualSP = selectedAccountData.accountInfo.assets;
+//     let poolAccInfo = {
+//       //empty info
+//       account_id: "",
+//       unstaked_balance: "0",
+//       staked_balance: "0",
+//       can_withdraw: false,
+//     };
+//     if (actualSP) {
+//       //there's a selected SP
+//       //ask the actual SP how much is staked
+//       poolAccInfo = await StakingPool.getAccInfo(
+//         selectedAccountData.name,
+//         actualSP
+//       );
+//       if (actualSP != newStakingPool) {
+//         //requesting a change of SP
+//         if (
+//           c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
+//           c.yton(poolAccInfo.staked_balance) >= 0.005
+//         ) {
+//           const staked = c.yton(poolAccInfo.staked_balance);
+//           const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
+//           throw Error(
+//             `Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(
+//               staked
+//             )}`
+//           );
+//           //----------------------
+//         }
+//         //if ZERO in the pool, remove current staking pool ref
+//         actualSP = "";
+//         selectedAccountData.accountInfo.stakingPool = "";
+//       }
+//     }
+//     if (!actualSP) {
+//       //1st check the pool exists
+//       poolAccInfo = await StakingPool.getAccInfo(
+//         selectedAccountData.name,
+//         newStakingPool
+//       );
+//       //2nd select the new staking pool. ONLY if the pool exists
+//       selectedAccountData.accountInfo.stakingPool = newStakingPool;
+//     }
+//     if (c.yton(poolAccInfo.unstaked_balance) >= 10) {
+//       //at least 10 deposited but unstaked, stake that
+//       //just re-stake (maybe the user asked unstaking but now regrets it)
+//       const amountToStakeY = fixUserAmountInY(
+//         amountToStake,
+//         poolAccInfo.unstaked_balance
+//       );
+//       if (amountToStakeY == poolAccInfo.unstaked_balance) {
+//         await askBackgroundCallMethod(
+//           newStakingPool,
+//           "stake_all",
+//           {},
+//           selectedAccountData.name
+//         );
+//       } else {
+//         await askBackgroundCallMethod(
+//           newStakingPool,
+//           "stake",
+//           { amount: amountToStakeY },
+//           selectedAccountData.name
+//         );
+//         //await near.call_method(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
+//       }
+//     } else {
+//       //no unstaked funds
+//       //deposit and stake
+//       await askBackgroundCallMethod(
+//         newStakingPool,
+//         "deposit_and_stake",
+//         {},
+//         selectedAccountData.name,
+//         c.TGas(75),
+//         c.ntoy(amountToStake)
+//       );
+//       // await near.call_method(newStakingPool, "deposit_and_stake", {},
+//       //     selectedAccountData.name,
+//       //     selectedAccountData.accountInfo.privateKey,
+//       //     near.ONE_TGAS.muln(125),
+//       //     amountToStake
+//       // )
+//     }
+//     //update staked to avoid incorrect "rewards" calculations on refresh
+//     selectedAccountData.accountInfo.staked += amountToStake;
+//     //refresh status & save
+//     await refreshSaveSelectedAccount();
+//     d.showSuccess("Success");
+//     showButtons();
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     d.hideWait();
+//     enableOKCancel();
+//   }
+// }
 //----------------------
-async function performLockupContractStake() {
-    try {
-        disableOKCancel();
-        d.showWait();
-        const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
-        if (!isValidAccountID(newStakingPool))
-            throw Error("Staking pool Account Id is invalid");
-        const info = selectedAccountData.accountInfo;
-        if (!info.ownerId)
-            throw Error("unknown ownerId");
-        const owner = await getAccountRecord(info.ownerId);
-        if (!owner.privateKey)
-            throw Error("you need full access on " + info.ownerId);
-        //const amountToStake = info.lastBalance - info.staked - 36
-        const amountToStake = c.toNum(d.inputById("stake-amount").value);
-        if (!isValidAmount(amountToStake))
-            throw Error("Amount should be a positive integer");
-        if (amountToStake < 5)
-            throw Error("Stake at least 5 NEAR");
-        const lc = new LockupContract(info);
-        await lc.computeContractAccount();
-        await lc.stakeWith(newStakingPool, amountToStake);
-        //store updated lc state
-        await askBackgroundSetAccount(lc.contractAccount, lc.accountInfo);
-        //refresh status
-        await refreshSaveSelectedAccount();
-        d.showSuccess("Success");
-        showButtons();
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-    finally {
-        d.hideWait();
-        enableOKCancel();
-    }
-}
+// async function performLockupContractStake() {
+//   try {
+//     disableOKCancel();
+//     d.showWait();
+//     const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+//     if (!isValidAccountID(newStakingPool))
+//       throw Error("Staking pool Account Id is invalid");
+//     const info = selectedAccountData.accountInfo;
+//     if (!info.ownerId) throw Error("unknown ownerId");
+//     const owner = await getAccountRecord(info.ownerId);
+//     if (!owner.privateKey)
+//       throw Error("you need full access on " + info.ownerId);
+//     //const amountToStake = info.lastBalance - info.staked - 36
+//     const amountToStake = c.toNum(d.inputById("stake-amount").value);
+//     if (!isValidAmount(amountToStake))
+//       throw Error("Amount should be a positive integer");
+//     if (amountToStake < 5) throw Error("Stake at least 5 NEAR");
+//     const lc = new LockupContract(info);
+//     await lc.computeContractAccount();
+//     await lc.stakeWith(newStakingPool, amountToStake);
+//     //store updated lc state
+//     await askBackgroundSetAccount(lc.contractAccount, lc.accountInfo);
+//     //refresh status
+//     await refreshSaveSelectedAccount();
+//     d.showSuccess("Success");
+//     showButtons();
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     d.hideWait();
+//     enableOKCancel();
+//   }
+// }
 //-------------------------------------
-async function unstakeClicked() {
-    try {
-        d.showWait();
-        const info = selectedAccountData.accountInfo;
-        let performer = performUnstake; //default
-        const amountBox = d.inputById("unstake-amount");
-        const optionWU = d.qs("#option-unstake-withdraw");
-        d.byId("unstake-from-staking-pool").innerText = "";
-        optionWU.hide();
-        if (info.type == "lock.c") {
-            //lockup - allways full amount
-            d.qs("#unstake-ALL-label").show();
-            await checkOwnerAccessThrows("unstake");
-            performer = performLockupContractUnstake;
-            amountBox.disabled = true;
-            amountBox.classList.add("bg-lightblue");
-        }
-        else {
-            //normal account can choose amounts
-            d.qs("#unstake-ALL-label").hide();
-            amountBox.disabled = false;
-            amountBox.classList.remove("bg-lightblue");
-        }
-        fullAccessSubPage("account-selected-unstake", performer);
-        disableOKCancel();
-        //---refresh first
-        await refreshSaveSelectedAccount();
-        if (!selectedAccountData.accountInfo.stakingPool) {
-            showButtons();
-            throw Error("No staking pool associated whit this account. Stake first");
-        }
-        let amountForTheField;
-        const amountToWithdraw = selectedAccountData.accountInfo.unstaked;
-        if (amountToWithdraw > 0) {
-            d.inputById("radio-withdraw").checked = true;
-            amountForTheField = amountToWithdraw;
-        }
-        else {
-            d.inputById("radio-unstake").checked = true;
-            amountForTheField = selectedAccountData.accountInfo.staked;
-            if (amountForTheField == 0)
-                throw Error("No funds on the pool");
-        }
-        if (info.type != "lock.c")
-            optionWU.show();
-        d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
-        d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
-        enableOKCancel();
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-    finally {
-        d.hideWait();
-        enableOKCancel();
-    }
-}
+// async function unstakeClicked() {
+//   try {
+//     d.showWait();
+//     const info = selectedAccountData.accountInfo;
+//     let performer = performUnstake; //default
+//     const amountBox = d.inputById("unstake-amount");
+//     const optionWU = d.qs("#option-unstake-withdraw");
+//     d.byId("unstake-from-staking-pool").innerText = "";
+//     optionWU.hide();
+//     if (info.type == "lock.c") {
+//       //lockup - allways full amount
+//       d.qs("#unstake-ALL-label").show();
+//       await checkOwnerAccessThrows("unstake");
+//       performer = performLockupContractUnstake;
+//       amountBox.disabled = true;
+//       amountBox.classList.add("bg-lightblue");
+//     } else {
+//       //normal account can choose amounts
+//       d.qs("#unstake-ALL-label").hide();
+//       amountBox.disabled = false;
+//       amountBox.classList.remove("bg-lightblue");
+//     }
+//     fullAccessSubPage("account-selected-unstake", performer);
+//     disableOKCancel();
+//     //---refresh first
+//     await refreshSaveSelectedAccount();
+//     if (!selectedAccountData.accountInfo.stakingPool) {
+//       showButtons();
+//       throw Error("No staking pool associated whit this account. Stake first");
+//     }
+//     let amountForTheField;
+//     const amountToWithdraw = selectedAccountData.accountInfo.unstaked;
+//     if (amountToWithdraw > 0) {
+//       d.inputById("radio-withdraw").checked = true;
+//       amountForTheField = amountToWithdraw;
+//     } else {
+//       d.inputById("radio-unstake").checked = true;
+//       amountForTheField = selectedAccountData.accountInfo.staked;
+//       if (amountForTheField == 0) throw Error("No funds on the pool");
+//     }
+//     if (info.type != "lock.c") optionWU.show();
+//     d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
+//     d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
+//     enableOKCancel();
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     d.hideWait();
+//     enableOKCancel();
+//   }
+// }
 //-----------------------
 function fixUserAmountInY(amount, yoctosMax) {
     let yoctosResult = yoctosMax; //default => all
@@ -598,90 +609,114 @@ function fixUserAmountInY(amount, yoctosMax) {
     }
     return yoctosResult;
 }
-async function performUnstake() {
-    //normal accounts
-    try {
-        disableOKCancel();
-        d.showWait();
-        const modeWithraw = d.inputById("radio-withdraw").checked;
-        const modeUnstake = !modeWithraw;
-        const amount = c.toNum(d.inputById("unstake-amount").value);
-        if (!isValidAmount(amount))
-            throw Error("Amount is not valid");
-        if (!selectedAccountData.isFullAccess)
-            throw Error("you need full access on " + selectedAccountData.name);
-        const actualSP = selectedAccountData.accountInfo.stakingPool;
-        if (!actualSP)
-            throw Error("No staking pool selected in this account");
-        //check if it's staked or just in the pool but unstaked
-        const poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
-        if (modeWithraw) {
-            if (poolAccInfo.unstaked_balance == "0")
-                throw Error("No funds unstaked to withdraw");
-            //if (!poolAccInfo.can_withdraw) throw Error("Funds are unstaked but you must wait (36-48hs) after unstaking to withdraw")
-            //ok we've unstaked funds we can withdraw
-            let yoctosToWithdraw = fixUserAmountInY(amount, poolAccInfo.unstaked_balance); // round user amount
-            if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
-                await askBackgroundCallMethod(actualSP, "withdraw_all", {}, selectedAccountData.name);
-            }
-            else {
-                await askBackgroundCallMethod(actualSP, "withdraw", { amount: yoctosToWithdraw }, selectedAccountData.name);
-            }
-            d.showSuccess(c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool");
-            //----------------
-        }
-        else {
-            //mode unstake
-            //here we've staked balance in the pool, call unstake
-            if (poolAccInfo.staked_balance == "0")
-                throw Error("No funds staked to unstake");
-            let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
-            if (yoctosToUnstake == poolAccInfo.staked_balance) {
-                await askBackgroundCallMethod(actualSP, "unstake_all", {}, selectedAccountData.name);
-            }
-            else {
-                await askBackgroundCallMethod(actualSP, "unstake", { amount: yoctosToUnstake }, selectedAccountData.name);
-            }
-            d.showSuccess("Unstake requested, you must wait (36-48hs) to withdraw");
-        }
-        //refresh status
-        await refreshSaveSelectedAccount();
-        showButtons();
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-    finally {
-        d.hideWait();
-        enableOKCancel();
-    }
-}
-async function performLockupContractUnstake() {
-    try {
-        disableOKCancel();
-        d.showWait();
-        const info = selectedAccountData.accountInfo;
-        if (!info.ownerId)
-            throw Error("unknown ownerId");
-        const owner = await getAccountRecord(info.ownerId);
-        if (!owner.privateKey)
-            throw Error("you need full access on " + info.ownerId);
-        const lc = new LockupContract(info);
-        await lc.computeContractAccount();
-        const message = await lc.unstakeAndWithdrawAll(info.ownerId, owner.privateKey);
-        d.showSuccess(message);
-        //refresh status
-        await refreshSaveSelectedAccount();
-        showButtons();
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-    finally {
-        d.hideWait();
-        enableOKCancel();
-    }
-}
+// async function performUnstake() {
+//   //normal accounts
+//   try {
+//     disableOKCancel();
+//     d.showWait();
+//     const modeWithraw = d.inputById("radio-withdraw").checked;
+//     const modeUnstake = !modeWithraw;
+//     const amount = c.toNum(d.inputById("unstake-amount").value);
+//     if (!isValidAmount(amount)) throw Error("Amount is not valid");
+//     if (!selectedAccountData.isFullAccess)
+//       throw Error("you need full access on " + selectedAccountData.name);
+//     const actualSP = selectedAccountData.accountInfo.stakingPool;
+//     if (!actualSP) throw Error("No staking pool selected in this account");
+//     //check if it's staked or just in the pool but unstaked
+//     const poolAccInfo = await StakingPool.getAccInfo(
+//       selectedAccountData.name,
+//       actualSP
+//     );
+//     if (modeWithraw) {
+//       if (poolAccInfo.unstaked_balance == "0")
+//         throw Error("No funds unstaked to withdraw");
+//       //if (!poolAccInfo.can_withdraw) throw Error("Funds are unstaked but you must wait (36-48hs) after unstaking to withdraw")
+//       //ok we've unstaked funds we can withdraw
+//       let yoctosToWithdraw = fixUserAmountInY(
+//         amount,
+//         poolAccInfo.unstaked_balance
+//       ); // round user amount
+//       if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
+//         await askBackgroundCallMethod(
+//           actualSP,
+//           "withdraw_all",
+//           {},
+//           selectedAccountData.name
+//         );
+//       } else {
+//         await askBackgroundCallMethod(
+//           actualSP,
+//           "withdraw",
+//           { amount: yoctosToWithdraw },
+//           selectedAccountData.name
+//         );
+//       }
+//       d.showSuccess(
+//         c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
+//       );
+//       //----------------
+//     } else {
+//       //mode unstake
+//       //here we've staked balance in the pool, call unstake
+//       if (poolAccInfo.staked_balance == "0")
+//         throw Error("No funds staked to unstake");
+//       let yoctosToUnstake = fixUserAmountInY(
+//         amount,
+//         poolAccInfo.staked_balance
+//       ); // round user amount
+//       if (yoctosToUnstake == poolAccInfo.staked_balance) {
+//         await askBackgroundCallMethod(
+//           actualSP,
+//           "unstake_all",
+//           {},
+//           selectedAccountData.name
+//         );
+//       } else {
+//         await askBackgroundCallMethod(
+//           actualSP,
+//           "unstake",
+//           { amount: yoctosToUnstake },
+//           selectedAccountData.name
+//         );
+//       }
+//       d.showSuccess("Unstake requested, you must wait (36-48hs) to withdraw");
+//     }
+//     //refresh status
+//     await refreshSaveSelectedAccount();
+//     showButtons();
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     d.hideWait();
+//     enableOKCancel();
+//   }
+// }
+// async function performLockupContractUnstake() {
+//   try {
+//     disableOKCancel();
+//     d.showWait();
+//     const info = selectedAccountData.accountInfo;
+//     if (!info.ownerId) throw Error("unknown ownerId");
+//     const owner = await getAccountRecord(info.ownerId);
+//     if (!owner.privateKey)
+//       throw Error("you need full access on " + info.ownerId);
+//     const lc = new LockupContract(info);
+//     await lc.computeContractAccount();
+//     const message = await lc.unstakeAndWithdrawAll(
+//       info.ownerId,
+//       owner.privateKey
+//     );
+//     d.showSuccess(message);
+//     //refresh status
+//     await refreshSaveSelectedAccount();
+//     showButtons();
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     d.hideWait();
+//     enableOKCancel();
+//   }
+// }
 function displayReflectTransfer(amountNear) {
     //sender and receiver .accountInfo.lastBalance are asnyc updated and saved by background.ts function reflectTransfer()
     //here we only refresh displayed account data
@@ -776,12 +811,13 @@ export async function searchThePools(exAccData) {
                         d.showSuccess(`Found! ${c.toStringDec(amount)} on ${pool.account_id}`);
                         if (amount > lastAmountFound) {
                             //save only one
-                            exAccData.accountInfo.stakingPool = pool.account_id;
-                            exAccData.accountInfo.staked = c.yton(poolAccInfo.staked_balance);
-                            exAccData.accountInfo.unstaked = c.yton(poolAccInfo.unstaked_balance);
-                            exAccData.inThePool =
-                                exAccData.accountInfo.staked + exAccData.accountInfo.unstaked;
-                            exAccData.accountInfo.stakingPoolPct = await StakingPool.getFee(pool.account_id);
+                            const stakingPool = new StakingPoolAsset();
+                            stakingPool.stakingPool = pool.account_id;
+                            stakingPool.staked = c.yton(poolAccInfo.staked_balance);
+                            stakingPool.unstaked = c.yton(poolAccInfo.unstaked_balance);
+                            exAccData.inThePool = stakingPool.staked + stakingPool.unstaked;
+                            stakingPool.stakingPoolPct = await StakingPool.getFee(pool.account_id);
+                            exAccData.accountInfo.assets.push(stakingPool);
                             lastAmountFound = amount;
                         }
                     }

@@ -6,7 +6,7 @@ import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js";
 //import * as near from "../api/near-rpc.js";
 import * as StakingPool from "./staking-pool.js";
 //import * as TX from "../api/transaction.js";
-import { Account } from "../data/account.js";
+import { Account, StakingPoolAsset } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -93,24 +93,9 @@ export class LockupContract {
       const contractKnownPoolDeposited = await this.getAmount(
         "get_known_deposited_balance"
       );
-      this.accountInfo.stakingPool = await askBackgroundViewMethod(
-        this.contractAccount,
-        "get_staking_pool_account_id",
-        {}
-      );
-      if (this.accountInfo.stakingPool) {
-        //get total amount in the staking pool to compute staking rewards
-        const poolAcc = await this.getStakingPoolAccInfo();
-        this.accountInfo.staked = c.yton(poolAcc.staked_balance);
-        this.accountInfo.unstaked = c.yton(poolAcc.unstaked_balance);
-        const inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
-        this.accountInfo.rewards =
-          this.accountInfo.staked +
-          this.accountInfo.unstaked -
-          contractKnownPoolDeposited;
-        this.accountInfo.stakingPoolPct = await StakingPool.getFee(
-          this.accountInfo.stakingPool
-        );
+      const asset = await this.setStakingPoolInfo(contractKnownPoolDeposited);
+      if (asset) {
+        this.accountInfo.assets.push(asset);
       }
 
       return true;
@@ -118,6 +103,29 @@ export class LockupContract {
       //console.log("INFO", "retrieving lockupcontract ", ex.message);
       if (firstOneOK) d.showErr("lockup.c search error: " + ex.message); //another error
       return false;
+    }
+  }
+
+  private async setStakingPoolInfo(
+    contractKnownPoolDeposited: number
+  ): Promise<StakingPoolAsset | null> {
+    const stakingPoolName = await askBackgroundViewMethod(
+      this.contractAccount,
+      "get_staking_pool_account_id",
+      {}
+    );
+    if (stakingPoolName) {
+      const stakingPool = new StakingPoolAsset();
+      //get total amount in the staking pool to compute staking rewards
+      const poolAcc = await this.getStakingPoolAccInfo(stakingPoolName);
+      stakingPool.staked = c.yton(poolAcc.staked_balance);
+      stakingPool.unstaked = c.yton(poolAcc.unstaked_balance);
+      stakingPool.rewards =
+        stakingPool.staked + stakingPool.unstaked - contractKnownPoolDeposited;
+      stakingPool.stakingPoolPct = await StakingPool.getFee(stakingPoolName);
+      return stakingPool;
+    } else {
+      return null;
     }
   }
 
@@ -140,89 +148,89 @@ export class LockupContract {
   //-------------------------------------------
   //owner calls
   //-------------------------------------------
-  async stakeWith(newStakingPool: string, amountNear: number): Promise<any> {
-    if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount");
+  // async stakeWith(newStakingPool: string, amountNear: number): Promise<any> {
+  //   if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount");
 
-    //refresh lockup acc info - get staking pool and balances
-    if (!(await this.tryRetrieveInfo()))
-      throw Error("Error refreshing lockup contract info");
+  //   //refresh lockup acc info - get staking pool and balances
+  //   if (!(await this.tryRetrieveInfo()))
+  //     throw Error("Error refreshing lockup contract info");
 
-    let actualSP = this.accountInfo.stakingPool;
-    let poolAccInfo = {
-      //empty info
-      account_id: "",
-      unstaked_balance: "0",
-      staked_balance: "0",
-      can_withdraw: false,
-    };
+  //   let actualSP = this.accountInfo.stakingPool;
+  //   let poolAccInfo = {
+  //     //empty info
+  //     account_id: "",
+  //     unstaked_balance: "0",
+  //     staked_balance: "0",
+  //     can_withdraw: false,
+  //   };
 
-    if (actualSP) {
-      //there's a selected SP
+  //   if (actualSP) {
+  //     //there's a selected SP
 
-      //ask the actual SP how much is staked
-      poolAccInfo = await this.getStakingPoolAccInfo();
+  //     //ask the actual SP how much is staked
+  //     poolAccInfo = await this.getStakingPoolAccInfo();
 
-      if (actualSP != newStakingPool) {
-        //requesting a change of SP
+  //     if (actualSP != newStakingPool) {
+  //       //requesting a change of SP
 
-        if (
-          c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
-          c.yton(poolAccInfo.staked_balance) >= 0.005
-        ) {
-          const staked = c.yton(poolAccInfo.staked_balance);
-          const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
-          throw Error(
-            `Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(
-              staked
-            )}`
-          );
-          //----------------------
-        }
+  //       if (
+  //         c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
+  //         c.yton(poolAccInfo.staked_balance) >= 0.005
+  //       ) {
+  //         const staked = c.yton(poolAccInfo.staked_balance);
+  //         const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
+  //         throw Error(
+  //           `Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(
+  //             staked
+  //           )}`
+  //         );
+  //         //----------------------
+  //       }
 
-        //if ZERO in the pool, unselect current staking pool
-        await this.call_method(
-          "unselect_staking_pool",
-          {},
-          c.TGas(BASE_GAS * 3)
-        );
+  //       //if ZERO in the pool, unselect current staking pool
+  //       await this.call_method(
+  //         "unselect_staking_pool",
+  //         {},
+  //         c.TGas(BASE_GAS * 3)
+  //       );
 
-        actualSP = "";
-        this.accountInfo.stakingPool = "";
-      }
-    }
+  //       actualSP = "";
+  //       this.accountInfo.stakingPool = "";
+  //     }
+  //   }
 
-    if (!actualSP) {
-      //select the new staking pool
-      await this.call_method(
-        "select_staking_pool",
-        { staking_pool_account_id: newStakingPool },
-        c.TGas(BASE_GAS * 3)
-      );
+  //   if (!actualSP) {
+  //     //select the new staking pool
+  //     await this.call_method(
+  //       "select_staking_pool",
+  //       { staking_pool_account_id: newStakingPool },
+  //       c.TGas(BASE_GAS * 3)
+  //     );
 
-      this.accountInfo.stakingPool = newStakingPool;
-      poolAccInfo = await this.getStakingPoolAccInfo(); //refresh info
-    }
+  //     this.accountInfo.stakingPool = newStakingPool;
+  //     poolAccInfo = await this.getStakingPoolAccInfo(); //refresh info
+  //   }
 
-    if (
-      poolAccInfo.unstaked_balance != "0" &&
-      poolAccInfo.staked_balance == "0"
-    ) {
-      //deposited but unstaked, stake
-      //just re-stake (maybe the user asked unstaking but now regrets it)
-      await this.call_method(
-        "stake",
-        { amount: poolAccInfo.unstaked_balance },
-        c.TGas(BASE_GAS * 5)
-      );
-    } else {
-      //deposit and stake
-      await this.call_method(
-        "deposit_and_stake",
-        { amount: c.ntoy(amountNear) },
-        c.TGas(BASE_GAS * 5)
-      );
-    }
-  }
+  //   if (
+  //     poolAccInfo.unstaked_balance != "0" &&
+  //     poolAccInfo.staked_balance == "0"
+  //   ) {
+  //     //deposited but unstaked, stake
+  //     //just re-stake (maybe the user asked unstaking but now regrets it)
+  //     await this.call_method(
+  //       "stake",
+  //       { amount: poolAccInfo.unstaked_balance },
+  //       c.TGas(BASE_GAS * 5)
+  //     );
+  //   } else {
+  //     //deposit and stake
+  //     await this.call_method(
+  //       "deposit_and_stake",
+  //       { amount: c.ntoy(amountNear) },
+  //       c.TGas(BASE_GAS * 5)
+  //     );
+  //   }
+  // }
 
   //-------------------------------
   async transfer(amountNear: number, receiverId: string): Promise<any> {
@@ -239,98 +247,97 @@ export class LockupContract {
   }
 
   //-------------------------------------------
-  async getStakingPoolAccInfo() /*Promise<StakingPoolAccountInfoResult>*/ {
-    if (!this.accountInfo.stakingPool) throw Error("no staking pool informed");
-    return StakingPool.getAccInfo(
-      this.contractAccount,
-      this.accountInfo.stakingPool
-    );
+  async getStakingPoolAccInfo(
+    stackingPoolName: string | undefined
+  ) /*Promise<StakingPoolAccountInfoResult>*/ {
+    if (!stackingPoolName) throw Error("no staking pool informed");
+    return StakingPool.getAccInfo(this.contractAccount, stackingPoolName);
   }
 
   //---------------------------------------------------
-  async unstakeAndWithdrawAll(
-    signer: string,
-    privateKey: string
-  ): Promise<string> {
-    //refresh lockup acc info - get staking pool and balances
-    if (!(await this.tryRetrieveInfo()))
-      throw Error("Error refreshing account info");
+  // async unstakeAndWithdrawAll(
+  //   signer: string,
+  //   privateKey: string
+  // ): Promise<string> {
+  //   //refresh lockup acc info - get staking pool and balances
+  //   if (!(await this.tryRetrieveInfo()))
+  //     throw Error("Error refreshing account info");
 
-    const actualSP = await this.get_staking_pool_account_id();
-    if (!actualSP)
-      throw Error("No staking pool selected in this lockup contract");
+  //   const actualSP = await this.get_staking_pool_account_id();
+  //   if (!actualSP)
+  //     throw Error("No staking pool selected in this lockup contract");
 
-    //check if it's staked or just in the pool but unstaked
-    const poolAccInfo = await this.getStakingPoolAccInfo();
+  //   //check if it's staked or just in the pool but unstaked
+  //   const poolAccInfo = await this.getStakingPoolAccInfo();
 
-    if (poolAccInfo.staked_balance == "0") {
-      //nothing staked, maybe waiting to withdrawal
+  //   if (poolAccInfo.staked_balance == "0") {
+  //     //nothing staked, maybe waiting to withdrawal
 
-      if (poolAccInfo.unstaked_balance == "0") {
-        //nothing to withdraw either! unselect the staking pool
-        await this.call_method("unselect_staking_pool", {}, c.TGas(BASE_GAS));
-        return "No funds left in the pool. Clearing pool selection";
-        //----------------
-      }
+  //     if (poolAccInfo.unstaked_balance == "0") {
+  //       //nothing to withdraw either! unselect the staking pool
+  //       await this.call_method("unselect_staking_pool", {}, c.TGas(BASE_GAS));
+  //       return "No funds left in the pool. Clearing pool selection";
+  //       //----------------
+  //     }
 
-      //something to withdraw
-      if (!poolAccInfo.can_withdraw) {
-        throw Error(
-          "Funds are unstaked but you must wait (36-48hs) to withdraw"
-        );
-        //----------------
-      }
+  //     //something to withdraw
+  //     if (!poolAccInfo.can_withdraw) {
+  //       throw Error(
+  //         "Funds are unstaked but you must wait (36-48hs) to withdraw"
+  //       );
+  //       //----------------
+  //     }
 
-      //ok we've unstaked funds and can withdraw
-      await this.call_method(
-        "withdraw_all_from_staking_pool",
-        {},
-        c.TGas(BASE_GAS * 8)
-      );
-      return "Withdrawing all from the pool";
-      //----------------
-    }
+  //     //ok we've unstaked funds and can withdraw
+  //     await this.call_method(
+  //       "withdraw_all_from_staking_pool",
+  //       {},
+  //       c.TGas(BASE_GAS * 8)
+  //     );
+  //     return "Withdrawing all from the pool";
+  //     //----------------
+  //   }
 
-    //here we've staked balance in the pool, call unstake
-    await this.call_method("unstake_all", {}, c.TGas(BASE_GAS * 5));
+  //   //here we've staked balance in the pool, call unstake
+  //   await this.call_method("unstake_all", {}, c.TGas(BASE_GAS * 5));
 
-    return "Unstake requested, you must wait (36-48hs) to withdraw";
-  }
+  //   return "Unstake requested, you must wait (36-48hs) to withdraw";
+  // }
 
-  //-------------------------------------------
-  get_staking_pool_account_id(): Promise<string> {
-    return askBackgroundViewMethod(
-      this.contractAccount,
-      "get_staking_pool_account_id",
-      {}
-    );
-  }
+  // //-------------------------------------------
+  // get_staking_pool_account_id(): Promise<string> {
+  //   return askBackgroundViewMethod(
+  //     this.contractAccount,
+  //     "get_staking_pool_account_id",
+  //     {}
+  //   );
+  // }
 
-  //-------------------------------------------
-  async select_staking_pool(
-    signer: string,
-    stakingPool: string,
-    privateKey: string
-  ): Promise<any> {
-    return this.call_method(
-      "select_staking_pool",
-      { staking_pool_account_id: stakingPool },
-      c.TGas(BASE_GAS * 3)
-    );
-  }
+  // //-------------------------------------------
+  // async select_staking_pool(
+  //   signer: string,
+  //   stakingPool: string,
+  //   privateKey: string
+  // ): Promise<any> {
+  //   return this.call_method(
+  //     "select_staking_pool",
+  //     { staking_pool_account_id: stakingPool },
+  //     c.TGas(BASE_GAS * 3)
+  //   );
+  // }
 
-  //-------------------------------------------
-  async deposit_and_stake(
-    signer: string,
-    amountNear: number,
-    privateKey: string
-  ): Promise<any> {
-    if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount");
+  // //-------------------------------------------
+  // async deposit_and_stake(
+  //   signer: string,
+  //   amountNear: number,
+  //   privateKey: string
+  // ): Promise<any> {
+  //   if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount");
 
-    return this.call_method(
-      "deposit_and_stake",
-      { amount: c.ntoy(amountNear) },
-      c.TGas(BASE_GAS * 5)
-    );
-  }
+  //   return this.call_method(
+  //     "deposit_and_stake",
+  //     { amount: c.ntoy(amountNear) },
+  //     c.TGas(BASE_GAS * 5)
+  //   );
+  // }
 }

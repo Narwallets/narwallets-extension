@@ -2,7 +2,11 @@ import * as c from "./conversions.js";
 
 import * as StakingPool from "../contracts/staking-pool.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { Account } from "../data/account.js";
+import {
+  Account,
+  assetIsStakingPool,
+  StakingPoolAsset,
+} from "../data/account.js";
 import { askBackground } from "../background/askBackground.js";
 
 async function checkNotLockup(accName: string) {
@@ -50,22 +54,37 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
     }
 
     info.lastBalance = c.yton(stateResultYoctos.amount);
-    if (info.stakingPool) {
-      const previnThePool = info.staked + info.unstaked;
-      const stakingInfo = await StakingPool.getAccInfo(
-        accName,
-        info.stakingPool
-      );
-      info.staked = c.yton(stakingInfo.staked_balance);
-      info.unstaked = c.yton(stakingInfo.unstaked_balance);
-      info.rewards =
-        previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
-      if (info.rewards < 0) info.rewards = 0;
-      info.stakingPoolPct = await StakingPool.getFee(info.stakingPool);
-    } else {
-      info.staked = 0;
-      info.unstaked = 0;
-    }
+    info.assets.forEach(async (asset) => {
+      if (assetIsStakingPool(asset) && asset.stakingPool) {
+        const previnThePool = asset.staked + asset.unstaked;
+        const stakingInfo = await StakingPool.getAccInfo(
+          accName,
+          asset.stakingPool
+        );
+        asset.staked = c.yton(stakingInfo.staked_balance);
+        asset.unstaked = c.yton(stakingInfo.unstaked_balance);
+        asset.rewards =
+          previnThePool > 0 ? asset.staked + asset.unstaked - previnThePool : 0;
+        if (asset.rewards < 0) asset.rewards = 0;
+        asset.stakingPoolPct = await StakingPool.getFee(asset.stakingPool);
+      }
+    });
+    // if (info.stakingPool) {
+    //   const previnThePool = info.staked + info.unstaked;
+    //   const stakingInfo = await StakingPool.getAccInfo(
+    //     accName,
+    //     info.stakingPool
+    //   );
+    //   info.staked = c.yton(stakingInfo.staked_balance);
+    //   info.unstaked = c.yton(stakingInfo.unstaked_balance);
+    //   info.rewards =
+    //     previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
+    //   if (info.rewards < 0) info.rewards = 0;
+    //   info.stakingPoolPct = await StakingPool.getFee(info.stakingPool);
+    // } else {
+    //   info.staked = 0;
+    //   info.unstaked = 0;
+    // }
   }
 }
 

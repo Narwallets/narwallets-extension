@@ -1,17 +1,46 @@
 //user NEAR accounts info type
+export var AssetTypes;
+(function (AssetTypes) {
+    AssetTypes["StakingPool"] = "stakingPool";
+    AssetTypes["OtherPool"] = "other";
+})(AssetTypes || (AssetTypes = {}));
+export function assetIsStakingPool(asset) {
+    return asset.type === AssetTypes.StakingPool;
+}
+export class StakingPoolAsset {
+    constructor() {
+        this.staked = 0; // in the pool & staked
+        this.unstaked = 0; // in the pool & unstaked (maybe can withdraw)
+        this.rewards = 0; //Stakingpool rewards (initial staking - (staked+unstaked))
+        this.type = AssetTypes.StakingPool;
+    }
+    get contractName() {
+        return this.stakingPool
+            ? `${this.stakingPool} (${this.stakingPoolPct}%)`
+            : "unnamed staking pool";
+    }
+    get balance() {
+        return this.staked + this.unstaked;
+    }
+}
+export class OtherAsset {
+    constructor() {
+        this.type = AssetTypes.OtherPool;
+        this.contractName = "unnamed other asset";
+        this.balance = 0;
+    }
+}
 export class Account {
     constructor() {
         this.order = 0;
         this.type = "acc";
         this.note = "";
         this.lastBalance = 0; // native balance from rpc:query/account & near state
-        this.staked = 0; // in the pool & staked
-        this.unstaked = 0; // in the pool & unstaked (maybe can withdraw)
-        this.rewards = 0; //Stakingpool rewards (initial staking - (staked+unstaked))
         this.lockedOther = 0; //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
+        this.assets = [];
     }
     get totalInThePool() {
-        return this.staked + this.unstaked;
+        return this.assets.reduce((acc, asset) => asset.balance + acc, 0);
     }
 }
 export class ExtendedAccountData {
@@ -30,11 +59,7 @@ export class ExtendedAccountData {
             this.typeFull += formattedNote;
         }
         this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
-        if (!this.accountInfo.staked)
-            this.accountInfo.staked = 0;
-        if (!this.accountInfo.unstaked)
-            this.accountInfo.unstaked = 0;
-        this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
+        this.inThePool = 0;
         if (!this.accountInfo.lockedOther)
             this.accountInfo.lockedOther = 0;
         this.unlockedOther =
