@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         sendResponse({ code: "pong" });
         return;
     }
-    if (msg.dest = "page") {
+    if ((msg.dest = "page")) {
         window.postMessage(msg, "*");
     }
 });
@@ -25,7 +25,7 @@ window.addEventListener("message", function (event) {
         return;
     if (event.data.dest == "ext") {
         //console.log("Content script received msg to ext: ", event.data);
-        //send to background.js 
+        //send to background.js
         try {
             chrome.runtime.sendMessage(event.data); //chrome.runtime.sendMessage includes origin(sender)
         }
@@ -33,7 +33,12 @@ window.addEventListener("message", function (event) {
             //maybe disconnected
             console.log(ex);
             if (event.data.requestId) {
-                window.postMessage({ dest: "page", code: "request-resolved", requestId: event.data.requestId, err: ex.message }, "*");
+                window.postMessage({
+                    dest: "page",
+                    code: "request-resolved",
+                    requestId: event.data.requestId,
+                    err: ex.message,
+                }, "*");
             }
             //disconnect web-page
             window.postMessage({ dest: "page", code: "disconnect" }, "*");

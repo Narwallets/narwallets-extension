@@ -1,4 +1,4 @@
-const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 let i = 0;
 let ALPHABET_MAP = {};
 while (i < ALPHABET.length) {
@@ -8,7 +8,7 @@ while (i < ALPHABET.length) {
 export function encode(buffer) {
     var carry, digits, j;
     if (buffer.length === 0) {
-        return '';
+        return "";
     }
     i = 0;
     j = 0;
@@ -45,12 +45,11 @@ export function encode(buffer) {
         .map(function (digit) {
         return ALPHABET[digit];
     })
-        .join('');
+        .join("");
 }
-;
 export function decode(str) {
     if (str === undefined) {
-        str = '';
+        str = "";
     }
     var bytes, c, carry, j;
     if (str.length === 0) {
@@ -63,7 +62,9 @@ export function decode(str) {
     while (i < str.length) {
         c = str[i];
         if (!(c in ALPHABET_MAP)) {
-            throw new Error("Base58.decode received unacceptable input. Character '" + c + "' is not in the Base58 alphabet.");
+            throw new Error("Base58.decode received unacceptable input. Character '" +
+                c +
+                "' is not in the Base58 alphabet.");
         }
         j = 0;
         while (j < bytes.length) {
@@ -86,11 +87,10 @@ export function decode(str) {
         i++;
     }
     i = 0;
-    while (str[i] === '1' && i < str.length - 1) {
+    while (str[i] === "1" && i < str.length - 1) {
         bytes.push(0);
         i++;
     }
     return new Uint8Array(bytes.reverse());
 }
-;
 //# sourceMappingURL=bs58.js.map

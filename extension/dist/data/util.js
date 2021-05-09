@@ -15,7 +15,8 @@ export async function localStorageGet(code) {
             console.log("CRITICAL. localStorageGet('" + code + "') failed", err.message);
             reject();
         }
-        finally { }
+        finally {
+        }
     });
 }
 // get & remove for simpler items
@@ -44,7 +45,7 @@ export async function recoverFromLocalStorage(title, code, defaultValue) {
                 if (chrome.runtime.lastError) {
                     console.log(JSON.stringify(chrome.runtime.lastError));
                 }
-                let result = (keys[code] || {});
+                let result = keys[code] || {};
                 if (Object.keys(result).length == 0)
                     Object.assign(result, defaultValue);
                 return resolve(result);
@@ -64,7 +65,8 @@ export async function recoverFromLocalStorage(title, code, defaultValue) {
             console.log("CRITICAL. Can't recover " + title, err.message);
             reject();
         }
-        finally { }
+        finally {
+        }
     });
 }
 export function localStorageSave(title, code, value) {
@@ -72,7 +74,12 @@ export function localStorageSave(title, code, value) {
     payload[code] = value;
     chrome.storage.local.set(payload, () => {
         if (chrome.runtime.lastError)
-            console.error("ERR saving " + title + " chrome.storage.local.set{" + code + ":...} " + chrome.runtime.lastError.message);
+            console.error(("ERR saving " +
+                title +
+                " chrome.storage.local.set{" +
+                code +
+                ":...} " +
+                chrome.runtime.lastError.message));
     });
 }
 //# sourceMappingURL=util.js.map

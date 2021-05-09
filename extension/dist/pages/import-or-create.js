@@ -1,8 +1,8 @@
 import * as d from "../util/document.js";
-import { askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../background/askBackground.js";
+import { askBackgroundGetNetworkInfo, askBackgroundSetAccount, } from "../background/askBackground.js";
 import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
-import * as bs58 from '../lib/crypto-lite/bs58.js';
-import { show as AccountPage_show } from "./account-selected.js";
+import * as bs58 from "../lib/crypto-lite/bs58.js";
+import { show as AccountPage_show, } from "./account-selected.js";
 import { Account } from "../data/account.js";
 import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { backToAccountsList } from "./main.js";
@@ -12,7 +12,7 @@ async function createAccountClicked(ev) {
     const netInfo = await askBackgroundGetNetworkInfo();
     chrome.windows.create({
         url: netInfo.NearWebWalletUrl + "create",
-        state: "maximized"
+        state: "maximized",
     });
 }
 function importAccountClicked(ev) {

@@ -6,7 +6,7 @@ import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-c
 import { addListeners as Import_addListeners } from "./pages/import.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { localStorageSet } from "./data/util.js";
-import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork } from "./background/askBackground.js";
+import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork, } from "./background/askBackground.js";
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 //--- content sections at MAIN popup.html
 const IMPORT_OR_CREATE = "import-or-create";
@@ -36,7 +36,7 @@ async function networkItemClicked(e) {
         if (!networkName)
             return;
         //close dropdown
-        closeDropDown(NETWORKS_LIST); //close 
+        closeDropDown(NETWORKS_LIST); //close
         //update global state (background)
         const info = await askBackgroundSetNetwork(networkName);
         //update indicator visual state
@@ -80,7 +80,7 @@ async function asideLock() {
 function asideExpand() {
     chrome.windows.create({
         url: chrome.runtime.getURL("index.html"),
-        state: "maximized"
+        state: "maximized",
     });
 }
 function asideAccounts() {
@@ -116,7 +116,11 @@ async function saveSecurityOptions(ev) {
         const aulSecs = Number(d.inputById("auto-unlock-seconds").value);
         if (isNaN(aulSecs))
             throw Error("Invalid auto unlock seconds");
-        await askBackground({ code: "set-options", autoUnlockSeconds: aulSecs, advancedMode: checkElem.checked });
+        await askBackground({
+            code: "set-options",
+            autoUnlockSeconds: aulSecs,
+            advancedMode: checkElem.checked,
+        });
         Pages.show();
         d.showSuccess("Options saved");
     }
@@ -127,13 +131,13 @@ async function saveSecurityOptions(ev) {
 function asideContact() {
     chrome.windows.create({
         url: "https://narwallets.com/contact.html",
-        state: "maximized"
+        state: "maximized",
     });
 }
 function asideAbout() {
     chrome.windows.create({
         url: "https://narwallets.com",
-        state: "maximized"
+        state: "maximized",
     });
 }
 async function asideOptions() {
@@ -190,9 +194,12 @@ async function initPopup() {
     return Pages.show();
 }
 function openTermsOfUseOnNewWindow() {
-    localStorageSet({ reposition: "create-user", email: d.inputById("email").value });
+    localStorageSet({
+        reposition: "create-user",
+        email: d.inputById("email").value,
+    });
     chrome.windows.create({
-        url: 'https://narwallets.com/terms.html'
+        url: "https://narwallets.com/terms.html",
     });
     return false;
 }

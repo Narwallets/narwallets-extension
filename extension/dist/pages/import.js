@@ -4,7 +4,7 @@ import { isValidAccountID } from "../lib/near-api-lite/utils/valid.js";
 import * as Pages from "../pages/main.js";
 import { Account, ExtendedAccountData } from "../data/account.js";
 import { searchThePools } from "./account-selected.js";
-import { askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../background/askBackground.js";
+import { askBackgroundAllNetworkAccounts, askBackgroundGetNetworkInfo, askBackgroundSetAccount, } from "../background/askBackground.js";
 const NET_NAME = "net-name";
 const NET_ROOT = "net-root";
 const IMPORT_OR_CREATE = "import-or-create";
@@ -121,7 +121,9 @@ async function importClicked(ev) {
     if (!lastSearchResult.mainAccount || !lastSearchResult.mainAccountName)
         return;
     const networkAccounts = await askBackgroundAllNetworkAccounts();
-    let accountOrder = networkAccounts ? Object.keys(networkAccounts).length + 1 : 0;
+    let accountOrder = networkAccounts
+        ? Object.keys(networkAccounts).length + 1
+        : 0;
     let couldNotImport = false;
     const importedMain = await importIfNew("Account", lastSearchResult.mainAccountName, lastSearchResult.mainAccount, accountOrder);
     if (!importedMain)
@@ -150,10 +152,10 @@ async function searchClicked(ev) {
     let accName = input.value.trim().toLowerCase();
     const netInfo = await askBackgroundGetNetworkInfo();
     const root = netInfo.rootAccount;
-    if (accName
-        && accName.length < 60
-        && !accName.endsWith(root)
-        && !(netInfo.name == 'testnet' && /dev-[0-9]{13}-[0-9]{7}/.test(accName))) {
+    if (accName &&
+        accName.length < 60 &&
+        !accName.endsWith(root) &&
+        !(netInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))) {
         accName = accName + "." + root;
     }
     if (!accName) {

@@ -1,7 +1,7 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../background/askBackground.js";
+import { askBackgroundGetNetworkInfo, askBackgroundGetValidators, } from "../background/askBackground.js";
 function sortCompare(a, b) {
     if (a.stakeY > b.stakeY)
         return -1;
@@ -27,7 +27,7 @@ async function displayStakingPools() {
                 slashed: item.is_slashed ? "yes" : "no",
                 stake: c.ytonString(item.stake),
                 stakeY: item.stake.padStart(50, "0"),
-                uptime: Math.round(item.num_produced_blocks / item.num_expected_blocks * 100)
+                uptime: Math.round((item.num_produced_blocks / item.num_expected_blocks) * 100),
             });
         }
         list.sort(sortCompare);
@@ -42,7 +42,7 @@ async function displayStakingPools() {
                 }
                 const elem = d.byId(item.account_id);
                 if (fee >= 50)
-                    elem.classList.add("hidden"); //bye bye 
+                    elem.classList.add("hidden"); //bye bye
                 const feeSpan = d.byId(item.account_id + "-fee");
                 feeSpan.innerText = fee.toString();
                 const feeBox = feeSpan.parentElement;
@@ -57,7 +57,9 @@ async function displayStakingPools() {
                 if (fee > 0 && fee < 50) {
                     const button = elem.querySelector("button");
                     if (button) {
-                        button.addEventListener("click", () => { clicked(item.account_id); });
+                        button.addEventListener("click", () => {
+                            clicked(item.account_id);
+                        });
                         button.classList.remove("hidden");
                     }
                 }
@@ -66,7 +68,7 @@ async function displayStakingPools() {
                 console.log(ex);
                 //no contract on account_id
                 const elem = d.byId(item.account_id);
-                elem.classList.add("hidden"); //bye bye 
+                elem.classList.add("hidden"); //bye bye
             });
         }
     }
@@ -89,5 +91,5 @@ async function init() {
         d.showErr(ex.message);
     }
 }
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener("DOMContentLoaded", init);
 //# sourceMappingURL=list-pools.js.map

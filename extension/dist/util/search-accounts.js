@@ -36,7 +36,10 @@ export async function asyncRefreshAccountInfo(accName, info) {
         //normal account
         let stateResultYoctos;
         try {
-            stateResultYoctos = await askBackground({ code: "query-near-account", accountId: accName });
+            stateResultYoctos = await askBackground({
+                code: "query-near-account",
+                accountId: accName,
+            });
         }
         catch (ex) {
             const reason = ex.message.replace("while viewing", "");
@@ -48,7 +51,8 @@ export async function asyncRefreshAccountInfo(accName, info) {
             const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool);
             info.staked = c.yton(stakingInfo.staked_balance);
             info.unstaked = c.yton(stakingInfo.unstaked_balance);
-            info.rewards = previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
+            info.rewards =
+                previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
             if (info.rewards < 0)
                 info.rewards = 0;
             info.stakingPoolPct = await StakingPool.getFee(info.stakingPool);

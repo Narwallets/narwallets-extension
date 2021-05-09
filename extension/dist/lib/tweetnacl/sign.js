@@ -1,13 +1,13 @@
-import { ByteArray, NumArray, checkArrayTypes } from './core/array.js';
-import { _verify_32 } from './core/verify.js';
-import { gf, gf0, gf1, D2, A, D, S, M, X, Y, Z, I } from './core/core.js';
-import { _randomBytes } from './core/random.js';
-import { set25519, sel25519, inv25519, pack25519, unpack25519, par25519, neq25519 } from './core/curve25519.js';
-import { _hash } from './core/hash.js';
+import { ByteArray, NumArray, checkArrayTypes } from "./core/array.js";
+import { _verify_32 } from "./core/verify.js";
+import { gf, gf0, gf1, D2, A, D, S, M, X, Y, Z, I } from "./core/core.js";
+import { _randomBytes } from "./core/random.js";
+import { set25519, sel25519, inv25519, pack25519, unpack25519, par25519, neq25519, } from "./core/curve25519.js";
+import { _hash } from "./core/hash.js";
 export function sign(msg, secretKey) {
     checkArrayTypes(msg, secretKey);
     if (secretKey.length !== 64 /* SecretKey */)
-        throw new Error('bad secret key size');
+        throw new Error("bad secret key size");
     const signedMsg = ByteArray(64 /* Signature */ + msg.length);
     _sign(signedMsg, msg, msg.length, secretKey);
     return signedMsg;
@@ -15,7 +15,7 @@ export function sign(msg, secretKey) {
 export function sign_open(signedMsg, publicKey) {
     checkArrayTypes(signedMsg, publicKey);
     if (publicKey.length !== 32 /* PublicKey */)
-        throw new Error('bad public key size');
+        throw new Error("bad public key size");
     const tmp = ByteArray(signedMsg.length);
     const mlen = _sign_open(tmp, signedMsg, signedMsg.length, publicKey);
     if (mlen < 0)
@@ -35,9 +35,9 @@ export function sign_detached(msg, secretKey) {
 export function sign_detached_verify(msg, sig, publicKey) {
     checkArrayTypes(msg, sig, publicKey);
     if (sig.length !== 64 /* Signature */)
-        throw new Error('bad signature size');
+        throw new Error("bad signature size");
     if (publicKey.length !== 32 /* PublicKey */)
-        throw new Error('bad public key size');
+        throw new Error("bad public key size");
     const sm = ByteArray(64 /* Signature */ + msg.length);
     const m = ByteArray(64 /* Signature */ + msg.length);
     let i;
@@ -56,7 +56,7 @@ export function sign_keyPair() {
 export function sign_keyPair_fromSecretKey(secretKey) {
     checkArrayTypes(secretKey);
     if (secretKey.length !== 64 /* SecretKey */)
-        throw new Error('bad secret key size');
+        throw new Error("bad secret key size");
     const pk = ByteArray(32 /* PublicKey */);
     for (let i = 0; i < pk.length; i++)
         pk[i] = secretKey[32 + i];
@@ -65,7 +65,7 @@ export function sign_keyPair_fromSecretKey(secretKey) {
 export function sign_keyPair_fromSeed(seed) {
     checkArrayTypes(seed);
     if (seed.length !== 32 /* Seed */)
-        throw new Error('bad seed size');
+        throw new Error("bad seed size");
     const pk = ByteArray(32 /* PublicKey */);
     const sk = ByteArray(64 /* SecretKey */);
     for (let i = 0; i < 32; i++)
@@ -209,7 +209,7 @@ function unpackneg(r, p) {
     M(chk, chk, den);
     if (neq25519(chk, num))
         return -1;
-    if (par25519(r[0]) === (p[31] >> 7))
+    if (par25519(r[0]) === p[31] >> 7)
         Z(r[0], gf0, r[0]);
     M(r[3], r[0], r[1]);
     return 0;
@@ -223,7 +223,40 @@ function reduce(r) {
         r[i] = 0;
     modL(r, x);
 }
-const L = NumArray([0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x10]);
+const L = NumArray([
+    0xed,
+    0xd3,
+    0xf5,
+    0x5c,
+    0x1a,
+    0x63,
+    0x12,
+    0x58,
+    0xd6,
+    0x9c,
+    0xf7,
+    0xa2,
+    0xde,
+    0xf9,
+    0xde,
+    0x14,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0x10,
+]);
 function modL(r, x) {
     let carry, i, j, k;
     for (i = 63; i >= 32; --i) {

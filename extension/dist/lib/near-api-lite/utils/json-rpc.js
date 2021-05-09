@@ -3,7 +3,9 @@ let rpcUrl = "https://rpc.mainnet.near.org/";
 export function setRpcUrl(newUrl) {
     rpcUrl = newUrl;
 }
-const fetchHeaders = { 'Content-type': 'application/json; charset=utf-8' };
+const fetchHeaders = {
+    "Content-type": "application/json; charset=utf-8",
+};
 export function addHeader(name, value) {
     fetchHeaders[name] = value;
 }
@@ -56,7 +58,7 @@ export async function jsonRpcInternal(payload) {
         const rpcOptions = {
             body: JSON.stringify(payload),
             method: "POST",
-            headers: { 'Content-type': 'application/json; charset=utf-8' }
+            headers: { "Content-type": "application/json; charset=utf-8" },
         };
         let timeoutRetries = 0;
         let accountDontExistsRetries = 0;
@@ -71,22 +73,24 @@ export async function jsonRpcInternal(payload) {
                     console.log("response.result.logs:", response.result.logs);
                 }
                 error = {
-                    message: response.result.error
+                    message: response.result.error,
                 };
             }
             if (error) {
                 const errorMessage = formatJSONErr(error);
-                if (error.data === 'Timeout' || errorMessage.indexOf('Timeout error') != -1) {
-                    const err = new Error('jsonRpc has timed out');
+                if (error.data === "Timeout" ||
+                    errorMessage.indexOf("Timeout error") != -1) {
+                    const err = new Error("jsonRpc has timed out");
                     if (timeoutRetries < 3) {
                         timeoutRetries++;
                         log(err.message, "RETRY #", timeoutRetries);
                         continue;
                     }
-                    err.name = 'TimeoutError';
+                    err.name = "TimeoutError";
                     throw err;
                 }
-                else if (rpcUrl.indexOf("mainnet") == -1 && errorMessage.indexOf("doesn't exist") != -1) {
+                else if (rpcUrl.indexOf("mainnet") == -1 &&
+                    errorMessage.indexOf("doesn't exist") != -1) {
                     //often in testnet there's failure searching existing accounts. Retry
                     if (accountDontExistsRetries < 2) {
                         accountDontExistsRetries++;
@@ -130,7 +134,7 @@ export function jsonRpc(method, jsonRpcParams) {
         method: method,
         params: jsonRpcParams,
         id: ++id,
-        jsonrpc: "2.0"
+        jsonrpc: "2.0",
     };
     return jsonRpcInternal(payload);
 }

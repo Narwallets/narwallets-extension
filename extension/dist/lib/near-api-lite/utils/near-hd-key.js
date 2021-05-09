@@ -1,12 +1,11 @@
 import { sign_keyPair_fromSeed } from "../../tweetnacl/sign.js";
-const ED25519_CURVE_SEED = 'ed25519 seed';
+const ED25519_CURVE_SEED = "ed25519 seed";
 const HARDENED_OFFSET = 0x80000000;
 //utils------------
 const pathRegex = new RegExp("^m(\\/[0-9]+')+$");
 function replaceDerive(val) {
-    return val.replace("'", '');
+    return val.replace("'", "");
 }
-;
 async function hmac_sha512_Async(seed, passwordSalt) {
     //equivalent to node-js 'crypto':
     // const hmac = createHmac('sha512', passwordSalt);
@@ -15,8 +14,9 @@ async function hmac_sha512_Async(seed, passwordSalt) {
     // return I
     const key = await window.crypto.subtle.importKey("raw", // raw format of the key - should be Uint8Array
     passwordSalt, {
+        // algorithm details
         name: "HMAC",
-        hash: { name: "SHA-512" }
+        hash: { name: "SHA-512" },
     }, false, // export = false
     ["sign", "verify"] // what this key can do
     );
@@ -33,7 +33,6 @@ export async function getMasterKeyFromSeed(seed) {
         chainCode: IR,
     };
 }
-;
 export async function CKDPrivAsync(k, index) {
     const indexBuffer = Buffer.allocUnsafe(4);
     indexBuffer.writeUInt32BE(index, 0);
@@ -47,36 +46,33 @@ export async function CKDPrivAsync(k, index) {
     };
     return result;
 }
-;
 export function getPublicKey(privateKey, withZeroByte = true) {
     const keyPair = sign_keyPair_fromSeed(privateKey);
     const signPk = keyPair.secretKey.subarray(32);
     const zero = Buffer.alloc(1, 0);
-    return withZeroByte ?
-        Buffer.concat([zero, Buffer.from(signPk)]) :
-        Buffer.from(signPk);
+    return withZeroByte
+        ? Buffer.concat([zero, Buffer.from(signPk)])
+        : Buffer.from(signPk);
 }
-;
 export function isValidPath(path) {
     if (!pathRegex.test(path)) {
         return false;
     }
-    for (let item of path.split('/').slice(1)) {
+    for (let item of path.split("/").slice(1)) {
         if (isNaN(Number(replaceDerive(item))))
             return false;
     }
     return true;
 }
-;
 export async function derivePathAsync(path, seed) {
     if (!isValidPath(path)) {
-        throw new Error('Invalid derivation path');
+        throw new Error("Invalid derivation path");
     }
     const segments = path
-        .split('/')
+        .split("/")
         .slice(1)
         .map(replaceDerive)
-        .map(el => parseInt(el, 10));
+        .map((el) => parseInt(el, 10));
     //derive
     let keys = await getMasterKeyFromSeed(seed);
     for (let n = 0; n < segments.length; n++) {
@@ -84,5 +80,4 @@ export async function derivePathAsync(path, seed) {
     }
     return keys;
 }
-;
 //# sourceMappingURL=near-hd-key.js.map

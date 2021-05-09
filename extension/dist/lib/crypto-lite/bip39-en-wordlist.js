@@ -1,4 +1,5 @@
-export const wordlist = ["abandon",
+export const wordlist = [
+    "abandon",
     "ability",
     "able",
     "about",
@@ -2045,6 +2046,6 @@ export const wordlist = ["abandon",
     "zebra",
     "zero",
     "zone",
-    "zoo"
+    "zoo",
 ];
 //# sourceMappingURL=bip39-en-wordlist.js.map

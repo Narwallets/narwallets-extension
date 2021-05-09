@@ -7,7 +7,6 @@ export function Uint8ArrayFromString(s) {
 export function stringFromUint8Array(u8arr) {
     return new TextDecoder().decode(u8arr);
 }
-;
 export function stringFromArray(arr) {
     let u8arr = new Uint8Array(arr.length);
     for (let i = 0; i < arr.length; i++)
@@ -17,20 +16,18 @@ export function stringFromArray(arr) {
     // for (let i = 0; i < arr.length; i++) s.push(String.fromCharCode(arr[i]));
     // return decodeURIComponent(escape(s.join('')));
 }
-;
 //--------- BASE 64 ------------------
 export function validateBase64(s) {
-    if (!(/^(?:[A-Za-z0-9+\/]{2}[A-Za-z0-9+\/]{2})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/.test(s))) {
-        throw new TypeError('invalid encoding');
+    if (!/^(?:[A-Za-z0-9+\/]{2}[A-Za-z0-9+\/]{2})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/.test(s)) {
+        throw new TypeError("invalid encoding");
     }
 }
 export function encodeBase64(arr) {
     let s = [], len = arr.length;
     for (let i = 0; i < len; i++)
         s.push(String.fromCharCode(arr[i]));
-    return btoa(s.join(''));
+    return btoa(s.join(""));
 }
-;
 export function decodeBase64(s) {
     validateBase64(s);
     let d = atob(s), b = new Uint8Array(d.length);
@@ -38,12 +35,9 @@ export function decodeBase64(s) {
         b[i] = d.charCodeAt(i);
     return b;
 }
-;
 //--------- HEX BASE 16 ------------------
 export function encodeHex(unit8Arr) {
-    return [...unit8Arr]
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
+    return [...unit8Arr].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 export function decodeHex(hexString) {
     if (hexString.slice(0, 2) == "0x")

@@ -1,6 +1,6 @@
-import { Assignable } from './enums.js';
-import * as nacl from '../../tweetnacl/sign.js';
-import * as bs58 from '../../crypto-lite/bs58.js';
+import { Assignable } from "./enums.js";
+import * as nacl from "../../tweetnacl/sign.js";
+import * as bs58 from "../../crypto-lite/bs58.js";
 /** All supported key types */
 export var KeyType;
 (function (KeyType) {
@@ -8,14 +8,18 @@ export var KeyType;
 })(KeyType || (KeyType = {}));
 function key_type_to_str(keyType) {
     switch (keyType) {
-        case KeyType.ED25519: return 'ed25519';
-        default: throw new Error(`Unknown key type ${keyType}`);
+        case KeyType.ED25519:
+            return "ed25519";
+        default:
+            throw new Error(`Unknown key type ${keyType}`);
     }
 }
 function str_to_key_type(keyType) {
     switch (keyType.toLowerCase()) {
-        case 'ed25519': return KeyType.ED25519;
-        default: throw new Error(`Unknown key type ${keyType}`);
+        case "ed25519":
+            return KeyType.ED25519;
+        default:
+            throw new Error(`Unknown key type ${keyType}`);
     }
 }
 /**
@@ -23,15 +27,22 @@ function str_to_key_type(keyType) {
  */
 export class CurveAndArrayKey extends Assignable {
     static fromString(encodedKey) {
-        const parts = encodedKey.split(':');
-        if (parts.length === 1) { //assume is all a ed25519 key
-            return new CurveAndArrayKey({ keyType: KeyType.ED25519, data: bs58.decode(parts[0]) });
+        const parts = encodedKey.split(":");
+        if (parts.length === 1) {
+            //assume is all a ed25519 key
+            return new CurveAndArrayKey({
+                keyType: KeyType.ED25519,
+                data: bs58.decode(parts[0]),
+            });
         }
         else if (parts.length === 2) {
-            return new CurveAndArrayKey({ keyType: str_to_key_type(parts[0]), data: bs58.decode(parts[1]) });
+            return new CurveAndArrayKey({
+                keyType: str_to_key_type(parts[0]),
+                data: bs58.decode(parts[1]),
+            });
         }
         else {
-            throw new Error('Invalid encoded key format, must be <curve>:<encoded key>');
+            throw new Error("Invalid encoded key format, must be <curve>:<encoded key>");
         }
     }
     toString() {
@@ -49,8 +60,10 @@ export class KeyPair {
      */
     static fromRandom(curve) {
         switch (curve.toUpperCase()) {
-            case 'ED25519': return KeyPairEd25519.fromRandom();
-            default: throw new Error(`Unknown curve ${curve}`);
+            case "ED25519":
+                return KeyPairEd25519.fromRandom();
+            default:
+                throw new Error(`Unknown curve ${curve}`);
         }
     }
 }
@@ -67,7 +80,10 @@ export class KeyPairEd25519 extends KeyPair {
     constructor(secretKey) {
         super();
         const keyPair = nacl.sign_keyPair_fromSecretKey(secretKey);
-        this.publicKey = new CurveAndArrayKey({ keyType: KeyType.ED25519, data: keyPair.publicKey });
+        this.publicKey = new CurveAndArrayKey({
+            keyType: KeyType.ED25519,
+            data: keyPair.publicKey,
+        });
         this.secretKey = secretKey;
     }
     /**

@@ -4,9 +4,9 @@ import { KeyPairEd25519 } from "./utils/key-pair.js";
 import { serialize } from "./utils/serialize.js";
 import * as TX from "./transaction.js";
 import * as bs58 from "../crypto-lite/bs58.js";
-import { sha256Async } from '../crypto-lite/crypto-primitives-browser.js';
+import { sha256Async } from "../crypto-lite/crypto-primitives-browser.js";
 import { log } from "../log.js";
-import { decodeBase64, stringFromArray, stringFromUint8Array } from "../crypto-lite/encode.js";
+import { decodeBase64, stringFromArray, stringFromUint8Array, } from "../crypto-lite/encode.js";
 //---------------------------
 //-- NEAR PROTOCOL RPC CALLS
 //---------------------------
@@ -60,7 +60,7 @@ result: {
 */
 export async function queryAccount(accountId) {
     try {
-        return await jsonRpcQuery("account/" + accountId);
+        return (await jsonRpcQuery("account/" + accountId));
     }
     catch (ex) {
         //intercept and make err message better for "account not found"
@@ -68,12 +68,10 @@ export async function queryAccount(accountId) {
         throw Error(reason);
     }
 }
-;
 //-------------------------------
 export function access_key(accountId, publicKey) {
     return jsonRpcQuery(`access_key/${accountId}/${publicKey}`);
 }
-;
 //-------------------------------
 export function viewRaw(contractId, method, params) {
     let encodedParams = undefined;
@@ -89,24 +87,22 @@ export async function view(contractId, method, params) {
 //---- VALIDATORS & STAKING POOLS -
 //---------------------------------
 export function getValidators() {
-    return jsonRpc('validators', [null]);
+    return jsonRpc("validators", [null]);
 }
-;
 //-------------------------------
 export function broadcast_tx_commit_signed(signedTransaction) {
     const borshEcoded = signedTransaction.encode();
-    const b64Encoded = Buffer.from(borshEcoded).toString('base64');
-    return jsonRpc('broadcast_tx_commit', [b64Encoded]);
+    const b64Encoded = Buffer.from(borshEcoded).toString("base64");
+    return jsonRpc("broadcast_tx_commit", [b64Encoded]);
 }
-;
 //-------------------------------
 export async function broadcast_tx_commit_actions(actions, signerId, receiver, privateKey) {
     const keyPair = KeyPairEd25519.fromString(privateKey);
     const publicKey = keyPair.getPublicKey();
     const accessKey = await access_key(signerId, publicKey.toString());
-    if (accessKey.permission !== 'FullAccess')
+    if (accessKey.permission !== "FullAccess")
         throw Error(`The key is not full access for account '${signerId}'`);
-    // converts a recent block hash into an array of bytes 
+    // converts a recent block hash into an array of bytes
     // this hash was retrieved earlier when creating the accessKey (Line 26)
     // this is required to prove the tx was recently constructed (within 24hrs)
     recentBlockHash = bs58.decode(accessKey.block_hash);
@@ -121,8 +117,8 @@ export async function broadcast_tx_commit_actions(actions, signerId, receiver, p
         transaction: transaction,
         signature: new TX.Signature({
             keyType: transaction.publicKey.keyType,
-            data: signature.signature
-        })
+            data: signature.signature,
+        }),
     });
     const result = await broadcast_tx_commit_signed(signedTransaction);
     if (result.status && result.status.Failure) {
@@ -138,7 +134,8 @@ export async function broadcast_tx_commit_actions(actions, signerId, receiver, p
             throw Error(getLogsAndErrorsFromReceipts(result));
         }
         else if (sv == "null")
-            return ""; //I strongly prefer "" as alias to null (ORACLE style)
+            return "";
+        //I strongly prefer "" as alias to null (ORACLE style)
         else {
             try {
                 return JSON.parse(sv); //result from fn_call
@@ -170,7 +167,7 @@ function getLogsAndErrorsFromReceipts(txResult) {
         result.push("internal error parsing result outcome");
     }
     finally {
-        return result.join('\n');
+        return result.join("\n");
     }
 }
 //-------------------------------

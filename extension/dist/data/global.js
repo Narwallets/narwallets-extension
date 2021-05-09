@@ -1,9 +1,9 @@
 import * as secret from "../lib/naclfast-secret-box/nacl-fast.js";
 import * as Network from "../lib/near-api-lite/network.js";
-import { recoverFromLocalStorage, localStorageSave, localStorageGet } from "./util.js";
+import { recoverFromLocalStorage, localStorageSave, localStorageGet, } from "./util.js";
 import { log } from "../lib/log.js";
 import * as clite from "../lib/crypto-lite/crypto-primitives-browser.js";
-import { encodeBase64, decodeBase64, stringFromUint8Array, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
+import { encodeBase64, decodeBase64, stringFromUint8Array, Uint8ArrayFromString, } from "../lib/crypto-lite/encode.js";
 const DATA_VERSION = "0.1";
 const INVALID_USER_OR_PASS = "Invalid User or Password";
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
@@ -21,7 +21,7 @@ const EmptySecureState = {
     hashedPass: undefined,
     autoUnlockSeconds: 1800,
     advancedMode: false,
-    accounts: {}
+    accounts: {},
 };
 export var SecureState = Object.assign({}, EmptySecureState);
 export function clearState() {
@@ -154,7 +154,8 @@ export function saveAccount(accName, accountInfo) {
         return;
     }
     let accountsForCurrentNetwork = SecureState.accounts[Network.current];
-    if (accountsForCurrentNetwork == undefined) { //no accounts yet
+    if (accountsForCurrentNetwork == undefined) {
+        //no accounts yet
         accountsForCurrentNetwork = {}; //create empty object
         SecureState.accounts[Network.current] = accountsForCurrentNetwork;
     }

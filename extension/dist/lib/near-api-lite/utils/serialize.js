@@ -4,7 +4,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { fromBE, toBufferLE } from '../../crypto-lite/bigint-buffer.js';
+import { fromBE, toBufferLE } from "../../crypto-lite/bigint-buffer.js";
 const INITIAL_LENGTH = 1024;
 export class BorshError extends Error {
     constructor(message) {
@@ -15,7 +15,7 @@ export class BorshError extends Error {
     addToFieldPath(fieldName) {
         this.fieldPath.splice(0, 0, fieldName);
         // NOTE: Modifying message directly as jest doesn't use .toString()
-        this.message = this.originalMessage + ': ' + this.fieldPath.join('.');
+        this.message = this.originalMessage + ": " + this.fieldPath.join(".");
     }
 }
 /// Binary encoder.
@@ -49,12 +49,16 @@ export class BinaryWriter {
     }
     write_buffer(buffer) {
         // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
-        this.buf = Buffer.concat([Buffer.from(this.buf.subarray(0, this.length)), buffer, Buffer.alloc(INITIAL_LENGTH)]);
+        this.buf = Buffer.concat([
+            Buffer.from(this.buf.subarray(0, this.length)),
+            buffer,
+            Buffer.alloc(INITIAL_LENGTH),
+        ]);
         this.length += buffer.length;
     }
     write_string(str) {
         this.maybe_resize();
-        const b = Buffer.from(str, 'utf8');
+        const b = Buffer.from(str, "utf8");
         this.write_u32(b.length);
         this.write_buffer(b);
     }
@@ -82,8 +86,8 @@ function handlingRangeError(target, propertyKey, propertyDescriptor) {
         catch (e) {
             if (e instanceof RangeError) {
                 const code = e.code;
-                if (['ERR_BUFFER_OUT_OF_BOUNDS', 'ERR_OUT_OF_RANGE'].indexOf(code) >= 0) {
-                    throw new BorshError('Reached the end of buffer when deserializing');
+                if (["ERR_BUFFER_OUT_OF_BOUNDS", "ERR_OUT_OF_RANGE"].indexOf(code) >= 0) {
+                    throw new BorshError("Reached the end of buffer when deserializing");
                 }
             }
             throw e;
@@ -114,7 +118,7 @@ export class BinaryReader {
         return fromBE(buf);
     }
     read_buffer(len) {
-        if ((this.offset + len) > this.buf.length) {
+        if (this.offset + len > this.buf.length) {
             throw new BorshError(`Expected buffer length ${len} isn't within bounds`);
         }
         const result = this.buf.slice(this.offset, this.offset + len);
@@ -167,23 +171,25 @@ __decorate([
 function serializeField(schema, fieldName, value, fieldType, writer) {
     try {
         // TODO: Handle missing values properly (make sure they never result in just skipped write)
-        if (typeof fieldType === 'string') {
+        if (typeof fieldType === "string") {
             writer[`write_${fieldType}`](value);
         }
         else if (fieldType instanceof Array) {
-            if (typeof fieldType[0] === 'number') {
+            if (typeof fieldType[0] === "number") {
                 if (value.length !== fieldType[0]) {
                     throw new BorshError(`Expecting byte array of length ${fieldType[0]}, but got ${value.length} bytes`);
                 }
                 writer.write_fixed_array(value);
             }
             else {
-                writer.write_array(value, (item) => { serializeField(schema, fieldName, item, fieldType[0], writer); });
+                writer.write_array(value, (item) => {
+                    serializeField(schema, fieldName, item, fieldType[0], writer);
+                });
             }
         }
         else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
-                case 'option': {
+                case "option": {
                     if (value === null) {
                         writer.write_u8(0);
                     }
@@ -193,7 +199,8 @@ function serializeField(schema, fieldName, value, fieldType, writer) {
                     }
                     break;
                 }
-                default: throw new BorshError(`FieldType ${fieldType} unrecognized`);
+                default:
+                    throw new BorshError(`FieldType ${fieldType} unrecognized`);
             }
         }
         else {
@@ -216,12 +223,12 @@ function serializeStruct(schema, obj, writer) {
     if (!structSchema) {
         throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
     }
-    if (structSchema.kind === 'struct') {
+    if (structSchema.kind === "struct") {
         structSchema.fields.map(([fieldName, fieldType]) => {
             serializeField(schema, fieldName, obj[fieldName], fieldType, writer);
         });
     }
-    else if (structSchema.kind === 'enum') {
+    else if (structSchema.kind === "enum") {
         const name = obj[structSchema.field];
         for (let idx = 0; idx < structSchema.values.length; ++idx) {
             const [fieldName, fieldType] = structSchema.values[idx];
@@ -245,12 +252,12 @@ export function serialize(schema, obj) {
 }
 function deserializeField(schema, fieldName, fieldType, reader) {
     try {
-        if (typeof fieldType === 'string') {
+        if (typeof fieldType === "string") {
             //@ts-ignore
             return reader[`read_${fieldType}`]();
         }
         if (fieldType instanceof Array) {
-            if (typeof fieldType[0] === 'number') {
+            if (typeof fieldType[0] === "number") {
                 return reader.read_fixed_array(fieldType[0]);
             }
             return reader.read_array(() => deserializeField(schema, fieldName, fieldType[0], reader));
@@ -269,14 +276,14 @@ function deserializeStruct(schema, classType, reader) {
     if (!structSchema) {
         throw new BorshError(`Class ${classType.name} is missing in schema`);
     }
-    if (structSchema.kind === 'struct') {
+    if (structSchema.kind === "struct") {
         const result = {};
         for (const [fieldName, fieldType] of schema.get(classType).fields) {
             result[fieldName] = deserializeField(schema, fieldName, fieldType, reader);
         }
         return new classType(result);
     }
-    if (structSchema.kind === 'enum') {
+    if (structSchema.kind === "enum") {
         const idx = reader.read_u8();
         if (idx >= structSchema.values.length) {
             throw new BorshError(`Enum index: ${idx} is out of range`);

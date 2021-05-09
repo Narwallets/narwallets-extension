@@ -16,7 +16,7 @@ export function NumArray(n) {
 export function checkArrayTypes(...arrays) {
     for (const array of arrays) {
         if (!(array instanceof Uint8Array)) {
-            throw new TypeError('unexpected type, use ByteArray');
+            throw new TypeError("unexpected type, use ByteArray");
         }
     }
 }

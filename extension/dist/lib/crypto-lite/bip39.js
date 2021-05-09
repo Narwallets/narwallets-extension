@@ -2,9 +2,9 @@
 // but:
 // normalize words to lowercase
 //
-import { pbkdf2_sha512_Async, sha256Async, getRandomValues } from './crypto-primitives-browser.js';
-import { wordlist } from './bip39-en-wordlist.js';
-const INVALID_ENTROPY = 'Invalid entropy';
+import { pbkdf2_sha512_Async, sha256Async, getRandomValues, } from "./crypto-primitives-browser.js";
+import { wordlist } from "./bip39-en-wordlist.js";
+const INVALID_ENTROPY = "Invalid entropy";
 export async function generateMnemonicAsync() {
     const strength = 128; //128 (12 words) - 256 (24 words)
     const entropy = getRandomValues(strength / 8);
@@ -13,7 +13,7 @@ export async function generateMnemonicAsync() {
 export async function mnemonicToSeedAsync(words, password) {
     if (!words || words.length < 12 || words.length > 24)
         throw Error("12-24 words expected");
-    const mnemonicString = words.join(' ').toLowerCase().normalize('NFKD');
+    const mnemonicString = words.join(" ").toLowerCase().normalize("NFKD");
     return pbkdf2_sha512_Async(mnemonicString, salt(password), 2048);
 }
 async function entropyToMnemonicAsync(entropy) {
@@ -33,7 +33,7 @@ async function entropyToMnemonicAsync(entropy) {
     return words;
 }
 function salt(password) {
-    return 'mnemonic' + (password ? password.normalize('NFKD') : '');
+    return "mnemonic" + (password ? password.normalize("NFKD") : "");
 }
 function lpad(str, padString, length) {
     return str.padStart(length, padString);
@@ -42,11 +42,11 @@ function binaryToByte(bin) {
     return parseInt(bin, 2);
 }
 function bytesToBinaryString(bytes) {
-    //for each item, convert to string, base 2, padLeft to 8 with zeroes, 
+    //for each item, convert to string, base 2, padLeft to 8 with zeroes,
     let result = [];
     for (let n = 0; n < bytes.byteLength; n++)
-        result.push(lpad(bytes[n].toString(2), '0', 8));
-    return result.join('');
+        result.push(lpad(bytes[n].toString(2), "0", 8));
+    return result.join("");
 }
 async function deriveChecksumBitsBinaryString(entropyBuffer) {
     const hash = await sha256Async(entropyBuffer);

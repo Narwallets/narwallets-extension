@@ -1,4 +1,4 @@
-import { askBackground, askBackgroundGetState } from "../background/askBackground.js";
+import { askBackground, askBackgroundGetState, } from "../background/askBackground.js";
 import * as d from "../util/document.js";
 const EMAIL = "email";
 const PASS = "pass";
@@ -26,7 +26,11 @@ async function createClicked(ev) {
             throw Error("Please agree to the Terms of Use");
         }
         //validate email,pwd,duplicates & Create SecureState store hashedPass
-        await askBackground({ code: "create-user", email: email, password: password });
+        await askBackground({
+            code: "create-user",
+            email: email,
+            password: password,
+        });
         d.showPage(IMPORT_OR_CREATE);
     }
     catch (ex) {

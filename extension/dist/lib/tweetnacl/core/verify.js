@@ -1,4 +1,4 @@
-import { checkArrayTypes } from './array.js';
+import { checkArrayTypes } from "./array.js";
 function vn(x, xi, y, yi, n) {
     let i, d = 0;
     for (i = 0; i < n; i++)
@@ -14,8 +14,9 @@ export function _verify_32(x, xi, y, yi) {
 export function verify(x, y) {
     checkArrayTypes(x, y);
     // Zero length arguments are considered not equal
-    return x.length > 0 && y.length > 0 &&
+    return (x.length > 0 &&
+        y.length > 0 &&
         x.length == y.length &&
-        vn(x, 0, y, 0, x.length) == 0;
+        vn(x, 0, y, 0, x.length) == 0);
 }
 //# sourceMappingURL=verify.js.map

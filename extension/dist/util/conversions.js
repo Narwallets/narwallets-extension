@@ -3,8 +3,9 @@
 //----------------------------------
 //BigInt scientific notation
 const base1e = BigInt(10);
-function b1e(n) { return base1e ** BigInt(n); }
-;
+function b1e(n) {
+    return base1e ** BigInt(n);
+}
 const b1e12 = b1e(12);
 const b1e24 = b1e(24);
 export function TGas(tgas) {
@@ -32,7 +33,7 @@ export function ytonStringMin(yoctos) {
 export function yton(yoctos) {
     try {
         const just5dec = ytonFull(yoctos).slice(0, -19);
-        return Number(just5dec); // truncated to 4 decimals 
+        return Number(just5dec); // truncated to 4 decimals
     }
     catch (ex) {
         console.log("ERR: yton(", yoctos, ")", ex);
@@ -45,13 +46,15 @@ export function yton(yoctos) {
  */
 function toStringDecSimple(n) {
     const decimals = 5;
-    const textNoDec = Math.round(n * 10 ** decimals).toString().padStart(decimals + 1, "0");
+    const textNoDec = Math.round(n * 10 ** decimals)
+        .toString()
+        .padStart(decimals + 1, "0");
     return textNoDec.slice(0, -decimals) + "." + textNoDec.slice(-decimals);
 }
 /**
-* Formats a number in NEAR to a string with commas and 5 decimal places
-* @param {number} n
-*/
+ * Formats a number in NEAR to a string with commas and 5 decimal places
+ * @param {number} n
+ */
 export function toStringDec(n) {
     return addCommas(toStringDecSimple(n));
 }
@@ -61,7 +64,7 @@ export function toStringDec(n) {
  * @param {number} n
  */
 export function removeDecZeroes(withDecPoint) {
-    let decPointPos = withDecPoint.indexOf('.');
+    let decPointPos = withDecPoint.indexOf(".");
     if (decPointPos <= 0)
         return withDecPoint;
     let decimals = withDecPoint.length - decPointPos - 1;

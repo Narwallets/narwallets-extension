@@ -6,51 +6,42 @@
 // by having this classes we can make typescript help with type-checking and code suggestions
 //
 
-const DEFAULT_GAS="200"+"0".repeat(12);
+const DEFAULT_GAS = "200" + "0".repeat(12);
 
 export class BatchTransaction {
-    items: BatchAction[] = []
-    constructor(
-        public receiver:string,
-    ){}
+  items: BatchAction[] = [];
+  constructor(public receiver: string) {}
 
-    addItem(item:BatchAction){
-        this.items.push(item)
-    }
+  addItem(item: BatchAction) {
+    this.items.push(item);
+  }
 }
 
 export class BatchAction {
-    constructor(
-        public action: string,
-        public attached: string="0",
-    ){}
+  constructor(public action: string, public attached: string = "0") {}
 }
 
-export class FunctionCall extends BatchAction{
-    public gas:string;
-    constructor(
-        public method:string,
-        public args: Record<string,any>,
-        gas?: string,
-        attached?: string
-    ){
-        super("call",attached)
-        this.gas = gas||DEFAULT_GAS;
-    }
+export class FunctionCall extends BatchAction {
+  public gas: string;
+  constructor(
+    public method: string,
+    public args: Record<string, any>,
+    gas?: string,
+    attached?: string
+  ) {
+    super("call", attached);
+    this.gas = gas || DEFAULT_GAS;
+  }
 }
 
-export class Transfer extends BatchAction{
-    constructor(attached:string){
-        super("transfer",attached
-        )
-    }
+export class Transfer extends BatchAction {
+  constructor(attached: string) {
+    super("transfer", attached);
+  }
 }
 
-export class DeleteAccountToBeneficiary extends BatchAction{
-    constructor(
-        public beneficiaryAccountId:string
-    ){
-        super("delete")
-    }
+export class DeleteAccountToBeneficiary extends BatchAction {
+  constructor(public beneficiaryAccountId: string) {
+    super("delete");
+  }
 }
-

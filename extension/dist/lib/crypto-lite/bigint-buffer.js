@@ -5,7 +5,7 @@
  * @returns A BigInt with the big-endian representation of buf.
  */
 export function fromBE(buf) {
-    const hex = buf.toString('hex');
+    const hex = buf.toString("hex");
     if (hex.length === 0)
         return 0n;
     return BigInt(`0x${hex}`);
@@ -26,7 +26,7 @@ export function fromLE(buf) {
  */
 export function toBufferBE(num, width) {
     const hex = num.toString(16);
-    const buf = Buffer.from(hex.padStart(width * 2, '0'), 'hex');
+    const buf = Buffer.from(hex.padStart(width * 2, "0"), "hex");
     if (buf.length != width)
         throw Error("int too big");
     return buf;

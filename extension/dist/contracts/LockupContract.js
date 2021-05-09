@@ -3,8 +3,8 @@ import * as d from "../util/document.js";
 import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js";
 //import * as near from "../api/near-rpc.js";
 import * as StakingPool from "./staking-pool.js";
-import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/valid.js";
-import { askBackground, askBackgroundApplyTxAction, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../background/askBackground.js";
+import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/valid.js";
+import { askBackground, askBackgroundApplyTxAction, askBackgroundGetNetworkInfo, askBackgroundViewMethod, } from "../background/askBackground.js";
 import { FunctionCall } from "../lib/near-api-lite/batch-transaction.js";
 import { encodeHex, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
 const BASE_GAS = 25;
@@ -26,7 +26,7 @@ export class LockupContract {
         const rootAccount = networkInfo.rootAccount;
         //HACK to test lockup contracts in testnet - until core devs provide a way to
         //create xxx.lockup.testnet accounts- we use .lockupy.testnet, that we created
-        const lockupSuffix = (rootAccount == "testnet" ? "lockupy" : "lockup");
+        const lockupSuffix = rootAccount == "testnet" ? "lockupy" : "lockup";
         return "." + lockupSuffix + "." + rootAccount;
     }
     async computeContractAccount() {
@@ -46,7 +46,10 @@ export class LockupContract {
     async tryRetrieveInfo() {
         let firstOneOK = false;
         try {
-            let stateResultYoctos = await askBackground({ code: "query-near-account", accountId: this.contractAccount });
+            let stateResultYoctos = await askBackground({
+                code: "query-near-account",
+                accountId: this.contractAccount,
+            });
             this.accountInfo.lastBalance = c.yton(stateResultYoctos.amount);
             firstOneOK = true;
             this.liquidBalance = await this.getAmount("get_liquid_owners_balance");
@@ -62,7 +65,10 @@ export class LockupContract {
                 this.accountInfo.staked = c.yton(poolAcc.staked_balance);
                 this.accountInfo.unstaked = c.yton(poolAcc.unstaked_balance);
                 const inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
-                this.accountInfo.rewards = this.accountInfo.staked + this.accountInfo.unstaked - contractKnownPoolDeposited;
+                this.accountInfo.rewards =
+                    this.accountInfo.staked +
+                        this.accountInfo.unstaked -
+                        contractKnownPoolDeposited;
                 this.accountInfo.stakingPoolPct = await StakingPool.getFee(this.accountInfo.stakingPool);
             }
             return true;
@@ -91,20 +97,24 @@ export class LockupContract {
         if (isNaN(amountNear) || amountNear <= 0)
             throw Error("invalid amount");
         //refresh lockup acc info - get staking pool and balances
-        if (!await this.tryRetrieveInfo())
+        if (!(await this.tryRetrieveInfo()))
             throw Error("Error refreshing lockup contract info");
         let actualSP = this.accountInfo.stakingPool;
         let poolAccInfo = {
-            account_id: '',
-            unstaked_balance: '0',
-            staked_balance: '0',
-            can_withdraw: false
+            //empty info
+            account_id: "",
+            unstaked_balance: "0",
+            staked_balance: "0",
+            can_withdraw: false,
         };
-        if (actualSP) { //there's a selected SP
+        if (actualSP) {
+            //there's a selected SP
             //ask the actual SP how much is staked
             poolAccInfo = await this.getStakingPoolAccInfo();
-            if (actualSP != newStakingPool) { //requesting a change of SP
-                if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 || c.yton(poolAccInfo.staked_balance) >= 0.005) {
+            if (actualSP != newStakingPool) {
+                //requesting a change of SP
+                if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
+                    c.yton(poolAccInfo.staked_balance) >= 0.005) {
                     const staked = c.yton(poolAccInfo.staked_balance);
                     const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
                     throw Error(`Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(staked)}`);
@@ -122,7 +132,9 @@ export class LockupContract {
             this.accountInfo.stakingPool = newStakingPool;
             poolAccInfo = await this.getStakingPoolAccInfo(); //refresh info
         }
-        if (poolAccInfo.unstaked_balance != "0" && poolAccInfo.staked_balance == "0") { //deposited but unstaked, stake
+        if (poolAccInfo.unstaked_balance != "0" &&
+            poolAccInfo.staked_balance == "0") {
+            //deposited but unstaked, stake
             //just re-stake (maybe the user asked unstaking but now regrets it)
             await this.call_method("stake", { amount: poolAccInfo.unstaked_balance }, c.TGas(BASE_GAS * 5));
         }
@@ -149,7 +161,7 @@ export class LockupContract {
     //---------------------------------------------------
     async unstakeAndWithdrawAll(signer, privateKey) {
         //refresh lockup acc info - get staking pool and balances
-        if (!await this.tryRetrieveInfo())
+        if (!(await this.tryRetrieveInfo()))
             throw Error("Error refreshing account info");
         const actualSP = await this.get_staking_pool_account_id();
         if (!actualSP)
@@ -169,7 +181,7 @@ export class LockupContract {
                 throw Error("Funds are unstaked but you must wait (36-48hs) to withdraw");
                 //----------------
             }
-            //ok we've unstaked funds and can withdraw 
+            //ok we've unstaked funds and can withdraw
             await this.call_method("withdraw_all_from_staking_pool", {}, c.TGas(BASE_GAS * 8));
             return "Withdrawing all from the pool";
             //----------------

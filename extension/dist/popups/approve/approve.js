@@ -12,7 +12,9 @@ async function approveOkClicked() {
         //response goes to initiating tab/page, another 5-min wating spinner is there
         chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg); //send resolution to original asking tab/page
         responseSent = true;
-        setTimeout(() => { window.close(); }, 100);
+        setTimeout(() => {
+            window.close();
+        }, 100);
     }
     catch (ex) {
         d.showErr(ex.message); //some error
@@ -29,9 +31,11 @@ function respondRejected() {
 }
 function cancelOkClicked() {
     respondRejected();
-    setTimeout(() => { window.close(); }, 200);
+    setTimeout(() => {
+        window.close();
+    }, 200);
 }
-window.addEventListener('beforeunload', function (event) {
+window.addEventListener("beforeunload", function (event) {
     if (!responseSent)
         respondRejected();
 });
@@ -73,7 +77,12 @@ function humanReadableCallArgs(args) {
 // ---------------------
 function displayTx(msg) {
     initialMsg = msg;
-    resolvedMsg = { dest: "page", code: "request-resolved", tabId: initialMsg.tabId, requestId: initialMsg.requestId };
+    resolvedMsg = {
+        dest: "page",
+        code: "request-resolved",
+        tabId: initialMsg.tabId,
+        requestId: initialMsg.requestId,
+    };
     try {
         d.byId("net-name").innerText = msg.network || "";
         d.byId("signer-id").innerText = msg.signerId || "";
@@ -83,8 +92,9 @@ function displayTx(msg) {
         for (let item of msg.tx.items) {
             let toAdd = {
                 action: item.action,
-                attached: (item.attached != "0" && item.attached != "1") ?
-                    `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
+                attached: item.attached != "0" && item.attached != "1"
+                    ? `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR`
+                    : "",
             };
             //explain action
             switch (item.action) {
