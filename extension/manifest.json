@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "Narwallets",
-  "description": "NEAR protocol multi-account wallets",
-  "version": "2.0.0", 
+  "description": "NEAR protocol wallet",
+  "version": "3.0.0", 
 
   "browser_action": {
     "default_popup": "index.html"
