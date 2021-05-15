@@ -67,6 +67,30 @@
 	background-image: url("../icons/SVG/more_light.svg");
 }
 
+.unlock 
+{	
+	background-image: url("../icons/SVG/key_light.svg");	
+	height:32px;
+	padding-top: 0px;
+}
+
+.unlock:hover
+{	  
+	background-image: url("../icons/SVG/key_dark.svg");
+}
+
+
+.lock 
+{	
+	background-image: url("../icons/SVG/lock_light.svg");	
+	height:32px;
+	padding-top: 0px;
+}
+
+.lock:hover
+{	  
+	background-image: url("../icons/SVG/lock_dark.svg");
+}
 
 .back 
 {	
