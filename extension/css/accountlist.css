@@ -25,9 +25,9 @@
 	display: inline-block;
 	background-color: var(--NarListBack);
 	border-style: none;
-	border-bottom-color: var(--NarListHoover);
-	border-bottom-style: solid;
-	border-bottom-width: 1px;
+	border-top-color: var(--NarListHoover);
+	border-top-style: solid;
+	border-top-width: 1px;
 	font-weight: lighter;
 	margin: 0px;
 	padding: 0px;

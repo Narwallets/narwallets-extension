@@ -130,24 +130,31 @@
 	background-color: lightblue;
 
 }
-
-
-/*salida de la busqueda */
-
-
-
-
 .resultarea
 {
 	position:absolute;
-	top:183px;
+	top:160px;
 	left:0px;
 	width: 359px;
-	height: 268px;
+	height: 298px;
+	overflow-y: scroll;
 	
 }
 
-.resulline
+.resultline
 {
-	
+	display: inline-block;
+	width: 360px;
+	height: 20px;
+	background-color: white;
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-color: var(--NarListHoover);
+
+}
+
+.resultline:hover
+{
+	background-color:var(--NarListHoover);
+	);
 }
