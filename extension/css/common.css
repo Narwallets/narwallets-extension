@@ -9,11 +9,12 @@
 	width: 359px;
 	height: 520px;
 	background-color: var(--NarBackground);
-	border-style:none;
-	/*border-style: solid;*/
-	border-color: gray;
-	border-width: 1px;
 	overflow-y: hidden;
+
+	border-style:solid;
+	border-color: black;
+	border-width: 1px;
+	
 }
 
 .appface.show {
@@ -183,3 +184,72 @@
 	top: -2px;
 }
   
+.backarea
+{
+    position: absolute;
+    left:0px;
+	top:0px;
+	text-align: center;
+    display: block;
+	height: 40px;
+	width: 40px;
+	margin:0px;
+	padding-top: 8px;
+}
+
+.titulo
+{
+	position: absolute;
+    display: inline-block;
+	top:0px;
+	left:40px;
+	width:318px;
+	text-align: center;
+	height: 40px;
+}
+
+.titulo h1
+{
+	font-size: 25px;	
+	font-weight:200;
+	color:var(--NarMidBar);
+	margin: 5px;
+}
+
+.resultsarea
+{
+	position: absolute;
+	display: inline-block;
+	left:0px;
+	top:41px;
+	width:359px;
+	height: 478px;
+	overflow-y: scroll;
+
+}
+
+.listitem
+{
+	position: relative;
+	display: inline-block;
+	background-color:var(--NarListBack);
+	width:359px;
+	height:40px;
+	border-bottom: lightgray;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+
+}
+
+.listitem h1
+{
+	margin-left: 10px;
+	font-size: 14px;
+	font-weight: 200;
+	color:  var(--NarDarkText);
+}
+
+.listitem:hover
+{
+	background-color: var(--NarListHoover);
+}

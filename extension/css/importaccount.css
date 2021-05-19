@@ -1,0 +1,37 @@
+
+.inputarea
+{
+    position:absolute;
+    display: inline-block;
+    top:90px;
+    left:0px;
+    width: 360px;
+    height:300px;
+
+}
+
+.inputarea h2
+{
+	font-size: 18px;	
+	font-weight: 200;
+	width: 300px;
+	text-align: center;
+	/*display: inline-block;*/
+	padding-left: 40px;
+}
+
+.inputarea h3
+{
+	font-size:10px;
+	font-weight: 200;
+	width: 300px;
+	text-align: center;
+	display: inline-block;	
+	padding-left: 40px;
+}
+
+.inputarea input
+{
+    width:30px;
+
+}
