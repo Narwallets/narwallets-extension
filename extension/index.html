@@ -78,7 +78,7 @@
 			-->
 			<li id="accounts">Accounts</li>
 			<hr>
-			<li id="add-account">Add Account</li>
+			<li id="add-account-side">Add Account</li>
 			<hr>
 			<!--<li id="change-password">Change your password</li>
 			<hr>-->
@@ -93,7 +93,7 @@
 		</nav>
 	</aside>
 
-	<div class="appface slide-hide">
+	<div class="appface slide-hide" id="import-or-create">
 
 		<div class="addaccount_face">
 			<div class="backarea">
@@ -104,16 +104,16 @@
 			</div>
 
 			<h2>Yes, I already have an account</h2>
-			<div class="button big in">Import existing account</div>
+			<div class="button big in" id="option-import">Import existing account</div>
 
 			<h2>No, create a free implicit Account</h2>
 			<h3>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h3>
-			<div class="button big in">Create implicit account</div>
+			<div class="button big in" id="option-create-implicit">Create implicit account</div>
 
 			<h2>No, create a new NAMED account</h2>
 			<h3>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
 					temporary account</b> to complete the account creation</h3>
-			<div class="button big in">Create named account</div>
+			<div class="button big in" id="option-create">Create named account</div>
 
 		</div>
 	</div>
@@ -130,13 +130,13 @@
 		</div>
 
 		<div class="accountdetstopright">
-			<div class="button unlock"></div>
+			<button class="button unlock" id="access"></button>
 			<div class="button more"></div>
 		</div>
 
 		<div class="accountdetsmidbar">
-			<div class="button receive">Receive</div>
-			<div class="button send">Send</div>
+			<div class="button receive" id="receive">Receive</div>
+			<div class="button send" id="send">Send</div>
 			<div class="button stake">Stake</div>
 			<div class="button add">Add</div>
 		</div>
@@ -150,7 +150,7 @@
 		</div>
 
 
-		<div class="accountdetsscroll">
+		<div class="accountdetsscroll subpage">
 
 			<div class="accountdetsassets">
 				<div class="accountassetcoin"></div>
@@ -237,6 +237,83 @@
 			</div>
 		</div>
 
+		<div id="account-selected-make-full-access" class="accountdetsscroll subpage hidden">
+			<div class="title">
+				<h2>Make Full Access</h2>
+			</div>
+			<div class="subtitle">
+				<h3>Enter the seed phrase (or private key)<br> for this account</h3>
+			</div>
+			<div class="seed-phrase-form">
+				<div class="form-field-label">
+					<label for="seed-phrase">
+						Seed Phrase
+					</label>
+					<div class="form-control">
+						<input autocomplete="off" placeholder="correct horse battery staple..." id="seed-phrase"
+							type="text">
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+
+	<!-- subpage RECEIVE -->
+	<div id="account-selected-receive" class="subpage hidden">
+		<div class="round-box bg-lightblue">
+			<div>Tell the other party to send to:</div>
+			<div id="account-selected-receive-name" class="important-label"></div>
+		</div>
+	</div>
+
+	<!-- subpage SEND -->
+	<div id="account-selected-send" class="subpage hidden">
+		<div class="title">
+			<h2>Send</h2>
+		</div>
+		<div class="send-form">
+			<div class="form-field-label">
+				<label for="send-to-account-name">
+					Send to Account Id
+				</label>
+				<div class="form-control">
+					<input id="send-to-account-name" type="text" dir="auto" value="">
+				</div>
+			</div>
+			<div class="form-field-label">
+				<label for="send-to-account-amount">
+					Amount in NEAR (Max. <span id="max-amount-send"></span>)
+				</label>
+				<div class="form-control">
+					<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- subpage SEND CONFIRMATION -->
+	<div id="account-selected-send-confirmation" class="subpage hidden">
+		<div class="title">
+			<h2>Confirm Send</h2>
+		</div>
+		<div class="send-form-confirmation">
+			<div class="subtitle">
+				<h3 class="warning">Send <span id="send-confirmation-amount"></span> NEAR
+					to <span id="send-confirmation-receiver"></span> ?</h3>
+			</div>
+			<br>
+		</div>
+	</div>
+
+
+	<!-- subpage is OK to grant access? -->
+	<div id="account-selected-ok-to-grant-access" class="subpage hidden">
+		<div class="round-box bg-lightblue">
+			<div>Grant full access to this account ?</div>
+			<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+		</div>
 	</div>
 
 
@@ -267,7 +344,7 @@
 		</div>
 
 		<div class="bottombar">
-			<div class="button add">Add</div>
+			<div class="button add" id="add-account">Add</div>
 		</div>
 
 	</div>
@@ -326,6 +403,85 @@
 		</div>
 
 	</div>
+
+	<div id="display-seed-phrase" class="appface slide-hide">
+		<div class="contents-header">
+			<h1>This is your Seed Phrase</h1>
+			<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed phrase owns the account.</b></h3>
+		</div>
+		<div class="contents-body">
+			<div class="round-box bg-yellow">
+				<h3>Your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
+				<div id="seed-phrase-show-box" class="seed-phrase"></div>
+			</div>
+			<div class="flex-row">
+				<button id="seed-phrase-continue" class="btn-primary">OK, I've written down the Seed Phrase</button>
+				<button id="seed-phrase-cancel" class="btn-cancel">Cancel</button>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="import-account" class="appface slide-hide">
+		<h1>Import existing account</h1>
+		<div class="form">
+			<div class="form-field-label">
+				<label for="search-account-name">Search Account Name</label>
+				<div class="form-control">
+					<input id="search-account-name" type="text" class="with-inside-button">
+					<button id="net-root" class="button inside-input normal-font" disabled="">.guildnet</button>
+				</div>
+			</div>
+			<div class="form-field-label">
+				<label for="yes-no-search-pools">
+					Have you staked from this account or its lockup?
+				</label>
+				<div class="form-control" id="yes-search-pools">
+					<input id="yes-search-the-pools" type="radio" name="search-the-pools" checked>
+					<label for="yes-search-the-pools">Yes, search the pools</label>
+				</div>
+				<div class="form-control">
+					<input id="no-search-the-pools" type="radio" name="search-the-pools">
+					<label for="no-search-the-pools">No, do not search the pools</label>
+				</div>
+			</div>
+
+			<button id="search" class="button btn-primary medium">
+				Search Account in&nbsp;<span id="net-name"></span>
+			</button>
+
+			<!-- IMPORT: SHOW DATA BEFORE IMPORT-->
+			<div id="account-search-results" class="hidden">
+				<div id="searched-account-info" class="hidden">
+				</div>
+				<div id="searched-lockup-account-info" class="hidden">
+				</div>
+				<div id="account-get-message-line" class="hidden flex-labeled-row">
+					<label>Msg</label>
+					<div id="account-get-message" class=""></div>
+				</div>
+			</div>
+
+
+			<!-- Template -->
+			<div id="search-info-account-template" class="hidden  account-info flex-labeled-container">
+				<div id="account-line" class="flex-labeled-row small-labels">
+					<div class="name">{name}</div>
+					<div class="balance">{accountInfo.lastBalance}</div>
+				</div>
+				<div id="staking-pool-info-line" class="flex-labeled-row small-labels hidden">
+					<div class="name">At Pool {accountInfo.stakingPool}</div>
+					<div class="balance">{inThePool}</div>
+				</div>
+			</div>
+
+			<button id="import" class="button btn-primary medium hidden">
+				Import Account into this Wallet
+			</button>
+		</div>
+	</div>
+
+
 
 	<!-- Existing user, unlock-->
 
@@ -456,180 +612,205 @@
 			</div>
 
 
-</div>
-
-<!-- EDIT COMMENT -->
-
-<div class="appface slide-hide"> 
-	
-	<div class="edit_face">
-
-		<div class="backarea"><div class="button back"></div></div>
-		<div class="titulo"><h1>Stake</h1></div>		
-
-	</div>
-
-</div>
-
-	
-<!-- STAKE -->
-
-<div class="appface slide-hide"> 
-	
-	<div class="search_face">
-
-		<div class="backarea"><div class="button back"></div></div>
-		<div class="titulo"><h1>Stake</h1></div>		
-		<div class="searcharea">
-			<h1>Usuario.asdasdasdsad.adasdas</h1>
-			<h2>(Comentario)</h2>
-			<h3>search for pool</h3>
-			<div class="searchbox">
-				<input class="searchboxtext" type="Text">
-				<input class="searchboxbutton" type="button">search</>
-			</div>
-		<div class="resultarea">
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-		</div>
-		
 		</div>
 
-	</div>
+		<!-- EDIT COMMENT -->
 
-</div>	
-	
-	
-<!-- add token -->
+		<div class="appface slide-hide">
 
+			<div class="edit_face">
 
-<div class="appface slide-hide">
-	
-	<div class="search_face">
-
-		<div class="backarea"><div class="button back"></div></div>
-		<div class="titulo"><h1>Add Token</h1></div>		
-		<div class="searcharea">
-			<h1>Usuario.asdasdasdsad.adasdas</h1>
-			<h2>(Comentario)</h2>
-			<h3>search for token</h3>
-			<div class="searchbox">
-				<input class="searchboxtext" type="Text">
-				<input class="searchboxbutton" type="button">search</>
-			</div>
-		<div class="resultarea">
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>		
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>
-			<div class="resultline">sdasdasdasdasdasda</div>							
-		</div>
-
-	</div>
-
-
-	<!-- add token -->
-
-
-	<div class="appface slide-hide">
-
-		<div class="search_face">
-
-			<div class="backarea">
-				<div class="button back"></div>
-			</div>
-			<div class="titulo">
-				<h1>Add Token</h1>
-			</div>
-			<div class="searcharea">
-				<h1>Usuario.asdasdasdsad.adasdas</h1>
-				<h2>(Comentario)</h2>
-				<h3>search for token</h3>
-				<div class="searchbox">
-					<input class="searchboxtext" type="Text">
-					<input class="searchboxbutton" type="button">search</>
+				<div class="backarea">
+					<div class="button back"></div>
 				</div>
-				<div class="resultarea">
-					<div class="resultline">sdasdasdasdasdasda</div>
-					<div class="resultline">sdasdasdasdasdasda</div>
-					<div class="resultline">sdasdasdasdasdasda</div>
-					<div class="resultline">sdasdasdasdasdasda</div>
+				<div class="titulo">
+					<h1>Stake</h1>
 				</div>
 
 			</div>
 
 		</div>
 
-	</div>
-
-</div>		
-
-<!-- Import Existing Account-->
-
-
-
-<!-- Search Results-->
-
-<div class="appface slide-hide">
-
-	<div class="backarea"><div class="button back"></div></div>
-	<div class="titulo"><h1>Search Results</h1></div>
-	<div class="resultsarea">
-		<div class="listitem">
-			<h1>adasda</h1>
+		<!-- OK CANCEL buttons common to all subpages -->
+		<div class="button-group ok-cancel">
+			<button id="account-selected-action-confirm" class="button btn-primary">
+				OK
+			</button>
+			<button id="account-selected-action-cancel" class="button btn-cancel">
+				Cancel
+			</button>
 		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>
-		<div class="listitem">
-			<h1>adasda</h1>
-		</div>																														
-	
-	</div>
 
-</div>
+		<!-- STAKE -->
 
-    <script src="bundled-libs.js"></script>
-    <script type="module" src="dist/index.js"></script>
+		<div class="appface slide-hide">
+
+			<div class="search_face">
+
+				<div class="backarea">
+					<div class="button back"></div>
+				</div>
+				<div class="titulo">
+					<h1>Stake</h1>
+				</div>
+				<div class="searcharea">
+					<h1>Usuario.asdasdasdsad.adasdas</h1>
+					<h2>(Comentario)</h2>
+					<h3>search for pool</h3>
+					<div class="searchbox">
+						<input class="searchboxtext" type="Text">
+						<input class="searchboxbutton" type="button">search</>
+					</div>
+					<div class="resultarea">
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+
+		<!-- add token -->
+
+
+		<div class="appface slide-hide">
+
+			<div class="search_face">
+
+				<div class="backarea">
+					<div class="button back"></div>
+				</div>
+				<div class="titulo">
+					<h1>Add Token</h1>
+				</div>
+				<div class="searcharea">
+					<h1>Usuario.asdasdasdsad.adasdas</h1>
+					<h2>(Comentario)</h2>
+					<h3>search for token</h3>
+					<div class="searchbox">
+						<input class="searchboxtext" type="Text">
+						<input class="searchboxbutton" type="button">search</>
+					</div>
+					<div class="resultarea">
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+						<div class="resultline">sdasdasdasdasdasda</div>
+					</div>
+
+				</div>
+
+
+				<!-- add token -->
+
+
+				<div class="appface slide-hide">
+
+					<div class="search_face">
+
+						<div class="backarea">
+							<div class="button back"></div>
+						</div>
+						<div class="titulo">
+							<h1>Add Token</h1>
+						</div>
+						<div class="searcharea">
+							<h1>Usuario.asdasdasdsad.adasdas</h1>
+							<h2>(Comentario)</h2>
+							<h3>search for token</h3>
+							<div class="searchbox">
+								<input class="searchboxtext" type="Text">
+								<input class="searchboxbutton" type="button">search</>
+							</div>
+							<div class="resultarea">
+								<div class="resultline">sdasdasdasdasdasda</div>
+								<div class="resultline">sdasdasdasdasdasda</div>
+								<div class="resultline">sdasdasdasdasdasda</div>
+								<div class="resultline">sdasdasdasdasdasda</div>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+			<!-- Import Existing Account-->
+
+
+
+			<!-- Search Results-->
+
+			<div class="appface slide-hide">
+
+				<div class="backarea">
+					<div class="button back"></div>
+				</div>
+				<div class="titulo">
+					<h1>Search Results</h1>
+				</div>
+				<div class="resultsarea">
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+					<div class="listitem">
+						<h1>adasda</h1>
+					</div>
+
+				</div>
+
+			</div>
+
+			<script src="bundled-libs.js"></script>
+			<script type="module" src="dist/index.js"></script>
 
 </body>

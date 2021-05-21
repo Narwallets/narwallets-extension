@@ -40,27 +40,27 @@ let cancelBtn;
 function initPage() {
     const backLink = new d.El("#account-selected.appface .button.back");
     backLink.onClick(Pages.backToAccountsList);
+    d.onClickId("access", changeAccessClicked);
+    d.onClickId("receive", receiveClicked);
+    d.onClickId("send", sendClicked);
+    seedTextElem = new d.El("#seed-phrase");
     //lala_redesign
+    confirmBtn = new d.El("#account-selected-action-confirm");
+    cancelBtn = new d.El("#account-selected-action-cancel");
+    okCancelRow = new d.El("#account-selected .ok-cancel");
     return;
     //accountAmount.onInput(amountInput);
     removeButton = new d.El("button#remove");
     refreshButton = new d.El("button#refresh");
-    okCancelRow = new d.El("#account-selected .ok-cancel");
-    confirmBtn = new d.El("#account-selected-action-confirm");
-    cancelBtn = new d.El("#account-selected-action-cancel");
-    seedTextElem = new d.El("#seed-phrase");
-    d.onClickId("send", sendClicked);
     d.onClickId("stake", stakeClicked);
     d.onClickId("unstake", unstakeClicked);
     d.onClickId("list-pools", listPoolsClicked);
-    d.onClickId("receive", receiveClicked);
     d.onClickId("acc-connect-to-page", connectToWebAppClicked);
     d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
     showButtons(); //2nd or third entry - always show the buttons
     refreshButton.onClick(refreshClicked);
     d.onClickId("moreless", moreLessClicked);
     d.onClickId("add-note", addNoteClicked);
-    d.onClickId("access", changeAccessClicked);
     d.onClickId("explore", exploreButtonClicked);
     d.onClickId("detailed-rewards", detailedRewardsClicked);
     d.onClickId("search-pools", searchPoolsButtonClicked);
@@ -204,6 +204,7 @@ function showOKToGrantAccess() {
     showOKCancel(changeAccessClicked);
 }
 function receiveClicked() {
+    console.log('ASDSA');
     d.showSubPage('account-selected-receive');
     d.byId("account-selected-receive-name").innerText = selectedAccountData.name;
     showOKCancel(showButtons);

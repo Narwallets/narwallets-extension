@@ -218,7 +218,7 @@ async function initPopup() {
   //d.qs("aside #expand").onClick(asideExpand);
   d.qs("aside #accounts").onClick(asideAccounts);
   d.qs("aside #create-user").onClick(asideCreateUserClicked);
-  d.qs("aside #add-account").onClick(asideAddAccount);
+  d.qs("aside #add-account-side").onClick(asideAddAccount);
   //d.qs("aside #change-password").onClick(asideChangePassword);
   d.qs("aside #options").onClick(asideOptions);
   d.qs("aside #contact").onClick(asideContact);
@@ -228,11 +228,12 @@ async function initPopup() {
 
   //--init other pages
   //lala_design temp commented
-  // d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
-  // d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
-  //CreateUser_addListeners();
-  //ImportOrCreate_addListeners();
-  //Import_addListeners();
+  d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
+  d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
+  CreateUser_addListeners();
+  ImportOrCreate_addListeners();
+  
+  Import_addListeners();
 
   //update network indicator visual state
   const info = await askBackgroundGetNetworkInfo()
