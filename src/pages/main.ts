@@ -165,6 +165,7 @@ export async function show() {
     d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list)
 
     let total = 0;
+    let semiTotal =0;
     //connect all item to accountItemClicked
     document.querySelectorAll(".accountlistitem")
     .forEach((item) => {
@@ -185,7 +186,7 @@ export async function show() {
       if (isNaN(balanceNum)) balanceNum = 0;
       total += balanceNum;
     });
-
+   
 
     //show total
     const totalEl = new d.El("#account-list-main .balance.total");

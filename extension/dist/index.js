@@ -1,6 +1,9 @@
 import * as d from "./util/document.js";
 import * as Pages from "./pages/main.js";
 import { NetworkList } from "./lib/near-api-lite/network.js";
+import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
+import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
+import { addListeners as Import_addListeners } from "./pages/import.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { localStorageSet } from "./data/util.js";
 import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork } from "./background/askBackground.js";
@@ -168,7 +171,7 @@ async function initPopup() {
     //d.qs("aside #expand").onClick(asideExpand);
     d.qs("aside #accounts").onClick(asideAccounts);
     d.qs("aside #create-user").onClick(asideCreateUserClicked);
-    d.qs("aside #add-account").onClick(asideAddAccount);
+    d.qs("aside #add-account-side").onClick(asideAddAccount);
     //d.qs("aside #change-password").onClick(asideChangePassword);
     d.qs("aside #options").onClick(asideOptions);
     d.qs("aside #contact").onClick(asideContact);
@@ -176,11 +179,11 @@ async function initPopup() {
     d.populateUL("network-items", "network-item-template", NetworkList);
     //--init other pages
     //lala_design temp commented
-    // d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
-    // d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
-    //CreateUser_addListeners();
-    //ImportOrCreate_addListeners();
-    //Import_addListeners();
+    d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
+    d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
+    CreateUser_addListeners();
+    ImportOrCreate_addListeners();
+    Import_addListeners();
     //update network indicator visual state
     const info = await askBackgroundGetNetworkInfo();
     updateNetworkIndicatorVisualState(info);

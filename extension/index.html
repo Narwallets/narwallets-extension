@@ -80,7 +80,7 @@
 				-->
 			<li id="accounts">Accounts</li>
 			<hr>
-			<li id="add-account">Add Account</li>
+			<li id="add-account-side">Add Account</li>
 			<hr>
 			<!--<li id="change-password">Change your password</li>
 				<hr>-->
@@ -110,6 +110,10 @@
 				<h1>Do you have an Account?</h1>
 			</div>
 
+			<h2>No, create a new NAMED account</h2>
+			<h3>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
+					temporary account</b> to complete the account creation</h3>
+			<div class="button big in" id="option-create">Create named account</div>
 
 			<h2>Yes, I already have an account</h2>
 			<button class="button big in">Import existing account</button>
@@ -134,7 +138,7 @@
 	<div class="appface slide-hide" id="account-selected">
 
 		<div class="accountdetstopleft">
-			<div class="button back"></div>
+			<button class="button back"></button>
 		</div>
 
 		<div class="accountdetstopcenter" id="selected-account">
@@ -219,6 +223,7 @@
 		<div class="bottombar">
 			<div class="button add">Add</div>
 		</div>
+	</div>
 
 	</div>
 
@@ -295,6 +300,10 @@
 
 		</div>
 
+			<button id="import" class="button btn-primary medium hidden">
+				Import Account into this Wallet
+			</button>
+		</div>
 	</div>
 
 	<!--#endregion -->
@@ -322,7 +331,59 @@
 
 		</div>
 
-	</div>
+		<div class="accountdetsmidbar">
+			<div class="button send">Send</div>
+			<div class="button receive">Receive</div>
+			<div class="button remove">Remove</div>
+		</div>
+
+		<div class="accountdetsscroll">
+
+			<div class="assethistoryline">
+				<div class="assethisttype">
+					<div class="histreceive"></div>
+				</div>
+				<div class="assethistdate">01/01/2021</div>
+				<div class="assethistaccount">sasdasdas</div>
+				<div class="assethistammount">100,000.000</div>
+			</div>
+
+			<div class="assethistoryline">
+				<div class="assethisttype">
+					<div class="histreceive"></div>
+				</div>
+				<div class="assethistdate">01/01/2021</div>
+				<div class="assethistaccount">sasdasdas</div>
+				<div class="assethistammount">100,000.000</div>
+			</div>
+
+			<div class="assethistoryline">
+				<div class="assethisttype">
+					<div class="histsend"></div>
+				</div>
+				<div class="assethistdate">01/01/2021</div>
+				<div class="assethistaccount">sasdasdas</div>
+				<div class="assethistammount">100,000.000</div>
+			</div>
+
+			<div class="assethistoryline">
+				<div class="assethisttype">
+					<div class="histreceive"></div>
+				</div>
+				<div class="assethistdate">01/01/2021</div>
+				<div class="assethistaccount">sasdasdas</div>
+				<div class="assethistammount">100,000.000</div>
+			</div>
+
+			<div class="assethistoryline">
+				<div class="assethisttype">
+					<div class="histsend"></div>
+				</div>
+				<div class="assethistdate">01/01/2021</div>
+				<div class="assethistaccount">sasdasdas</div>
+				<div class="assethistammount">100,000.000</div>
+			</div>
+
 
 	<!--#endregion -->
 
