@@ -1,17 +1,16 @@
 @charset "utf-8";
 /* Main div container -------------------------------------------------------------*/
-	
-.appface 
-{
-	position:absolute;
-	left: 0px;
-	top: 40px;
-	width: 359px;
-	height: 520px;
-	background-color: var(--NarBackground);
-	overflow-y: hidden;
 
-	/*
+.appface {
+  position: absolute;
+  left: 0px;
+  top: 40px;
+  width: 359px;
+  height: 520px;
+  background-color: var(--NarBackground);
+  overflow-y: hidden;
+
+  /*
 	border-style:solid;
 	border-color: black;
 	border-width: 1px;
@@ -19,253 +18,229 @@
 }
 
 .appface.show {
-	left:0px
+  left: 0px;
 }
 
 .appface.slide-hide {
-	left:-600px
+  left: -600px;
 }
 
-	
-.hidden
-{
-	display: none;
+.hidden {
+  display: none;
 }
 
-.visible
-{
-	display: inline-block;
+.visible {
+  display: inline-block;
 }
 
-.subface
-{
-	position:absolute;
-	top:235px;
-	left:0px;
-	width:359px;
-	height:283px;
-	max-height: 300px;
-	background-color: var(--NarBackground);
+.subpage {
+  position: absolute;
+  top: 235px;
+  left: 0px;
+  width: 359px;
+  height: 283px;
+  max-height: 300px;
+  background-color: var(--NarBackground);
 }
 
-.scroll
-{
-	overflow-y: scroll;	
+.scroll {
+  overflow-y: scroll;
 }
-
 
 .logo-128 {
-    padding: 20px;
-    width: 130px;
-    height: 130px;
-	display: inline-block;
-    background-image: url(../icons/logo.svg);
-    background-repeat: no-repeat;
-    background-position: center;
-	margin:1px;
-	margin-top: 15px;
-  }
+  padding: 20px;
+  width: 130px;
+  height: 130px;
+  display: inline-block;
+  background-image: url(../icons/logo.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 1px;
+  margin-top: 15px;
+}
 
 /* Bottom Bar ---------------------------------------------------------------------*/
 
 .bottombar {
-	  position:absolute;
-	  width: 359px;
-	  height: 55px;
-	  max-height: 55px;
-	  display: inline-block;
-	  top: 465px;
-	  left: 0px;
-	  padding-top:4px;
-	  border-top-color: var(--NarDarkHighlight);
-	  border-top-style: solid;
-	  border-top-width: 1px;
-	  display: inline-flex;
-	  justify-content:flex-end;
-	  background-color: var(--NarTope);
-	}
-
+  position: absolute;
+  width: 359px;
+  height: 55px;
+  max-height: 55px;
+  display: inline-block;
+  top: 465px;
+  left: 0px;
+  padding-top: 4px;
+  border-top-color: var(--NarDarkHighlight);
+  border-top-style: solid;
+  border-top-width: 1px;
+  display: inline-flex;
+  justify-content: flex-end;
+  background-color: var(--NarTope);
+}
 
 /* Top Bar ------------------------------------------------------------------------*/
 
-.topbar 
-{
-	position:absolute;
-	color: black;
-	font-weight:lighter;
-	font-size: 12px;
-	width: 100%;
-	height: 40px;
-	display: inline-block;
-	background-color: var(--NarTope);
-	top: 0px;
-	left: 0px;
-	margin: 0px;
-	padding: 0px;
+.topbar {
+  position: absolute;
+  color: black;
+  font-weight: lighter;
+  font-size: 12px;
+  width: 100%;
+  height: 40px;
+  display: inline-block;
+  background-color: var(--NarTope);
+  top: 0px;
+  left: 0px;
+  margin: 0px;
+  padding: 0px;
 }
 
-.topbarleft
-{
-	position:absolute;
-	color: white;
-	width: 40px;
-	height: 40px;
-	display: inline-block;
-	/* background-color: var(--NarTope); */
-	top: 0px;
-	left: 4px;
-	margin-left: 0px;
-	padding: 0px;
-	background-image: url("../images/logo_48.png");
-	background-repeat: no-repeat;
-	background-size: 32px;
-	background-position:left;
-	background-position: (15% 1%);
+.topbarleft {
+  position: absolute;
+  color: white;
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  /* background-color: var(--NarTope); */
+  top: 0px;
+  left: 4px;
+  margin-left: 0px;
+  padding: 0px;
+  background-image: url("../images/logo_48.png");
+  background-repeat: no-repeat;
+  background-size: 32px;
+  background-position: left;
+  background-position: (15% 1%);
 }
 
-.topbarcaption
-{
-	position:absolute;
-	color: black;
-	font-weight:300;
-	width: 150px;
-	height: 16px;
-	display: inline-flex;
-	/* background-color: var(--NarTope); */
-	top: 8px;
-	left: 46px;
-	margin-left: 0px;
-	padding: 0px;
-	font-size: 16px;
+.topbarcaption {
+  position: absolute;
+  color: black;
+  font-weight: 300;
+  width: 150px;
+  height: 16px;
+  display: inline-flex;
+  /* background-color: var(--NarTope); */
+  top: 8px;
+  left: 46px;
+  margin-left: 0px;
+  padding: 0px;
+  font-size: 16px;
 }
 
-.topbarpulldown
-{
-	position:absolute;
-	color: white;
-	font-weight:lighter;
-	font-size: 12px;
-	width: 148px;
-	height: 40px;
-	display: inline-block;
-	top: 5px;
-	left: 170px;
-	margin: 0px;
-	padding: 0px;
+.topbarpulldown {
+  position: absolute;
+  color: white;
+  font-weight: lighter;
+  font-size: 12px;
+  width: 148px;
+  height: 40px;
+  display: inline-block;
+  top: 5px;
+  left: 170px;
+  margin: 0px;
+  padding: 0px;
 }
 
-.topbarhamburguer
-{
-	position:absolute;
-	color: white;
-	font-weight:lighter;
-	font-size: 12px;
-	width: 40px;
-	height: 40px;
-	display: inline-block;
-	top: 0px;
-	left: 359px;
-	margin: 0px;
-	padding: 0px;
-	background-image: url("../images/hamb.png");
+.topbarhamburguer {
+  position: absolute;
+  color: white;
+  font-weight: lighter;
+  font-size: 12px;
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  top: 0px;
+  left: 359px;
+  margin: 0px;
+  padding: 0px;
+  background-image: url("../images/hamb.png");
 }
 
-.topbarhamburguer:hover
-{
-	background-color: var(--NarTopeHighLight);
-	
+.topbarhamburguer:hover {
+  background-color: var(--NarTopeHighLight);
 }
 
-.serverpulldown
-{
-	position:absolute;
-	display: inline-block;
-	background-color: var(--NarTope);
-	color:white;
-	width:150px;
-	top:12px;
-	border-style: none;
-	border-bottom: solid;
-	border-bottom-width: thin;
-	font-size:12px;
+.serverpulldown {
+  position: absolute;
+  display: inline-block;
+  background-color: var(--NarTope);
+  color: white;
+  width: 150px;
+  top: 12px;
+  border-style: none;
+  border-bottom: solid;
+  border-bottom-width: thin;
+  font-size: 12px;
 }
 
 /* add (N) */
 .balance:after {
-	content: "\24c3";
-	/*content: "©";*/
-	padding-left: 0.15em;
-	font-size: 12px;
-	position: relative;
-	top: -2px;
-}
-  
-.backarea
-{
-    position: absolute;
-    left:0px;
-	top:0px;
-	text-align: center;
-    display: block;
-	height: 40px;
-	width: 40px;
-	margin:0px;
-	padding-top: 8px;
+  content: "\24c3";
+  /*content: "©";*/
+  padding-left: 0.15em;
+  font-size: 12px;
+  position: relative;
+  top: -2px;
 }
 
-.titulo
-{
-	position: absolute;
-    display: inline-block;
-	top:0px;
-	left:40px;
-	width:318px;
-	text-align: center;
-	height: 40px;
+.backarea {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  text-align: center;
+  display: block;
+  height: 40px;
+  width: 40px;
+  margin: 0px;
+  padding-top: 8px;
 }
 
-.titulo h1
-{
-	font-size: 25px;	
-	font-weight:200;
-	color:var(--NarMidBar);
-	margin: 5px;
+.titulo {
+  position: absolute;
+  display: inline-block;
+  top: 0px;
+  left: 40px;
+  width: 318px;
+  text-align: center;
+  height: 40px;
 }
 
-.resultsarea
-{
-	position: absolute;
-	display: inline-block;
-	left:0px;
-	top:41px;
-	width:359px;
-	height: 478px;
-	overflow-y: scroll;
-
+.titulo h1 {
+  font-size: 25px;
+  font-weight: 200;
+  color: var(--NarMidBar);
+  margin: 5px;
 }
 
-.listitem
-{
-	position: relative;
-	display: inline-block;
-	background-color:var(--NarListBack);
-	width:359px;
-	height:40px;
-	border-bottom: lightgray;
-	border-bottom-style: solid;
-	border-bottom-width: 1px;
-
+.resultsarea {
+  position: absolute;
+  display: inline-block;
+  left: 0px;
+  top: 41px;
+  width: 359px;
+  height: 478px;
+  overflow-y: scroll;
 }
 
-.listitem h1
-{
-	margin-left: 10px;
-	font-size: 14px;
-	font-weight: 200;
-	color:  var(--NarDarkText);
+.listitem {
+  position: relative;
+  display: inline-block;
+  background-color: var(--NarListBack);
+  width: 359px;
+  height: 40px;
+  border-bottom: lightgray;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
 }
 
-.listitem:hover
-{
-	background-color: var(--NarListHoover);
+.listitem h1 {
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 200;
+  color: var(--NarDarkText);
+}
+
+.listitem:hover {
+  background-color: var(--NarListHoover);
 }
