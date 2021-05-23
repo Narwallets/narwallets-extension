@@ -3,217 +3,179 @@
 
 /* ALL BUTTONS */
 
-
-.button 
-{
-
-  	  width: 60px;
-	  height: 48px;
-	  display:inline-block;
-	  margin:0px;
-	  background-repeat:no-repeat; 
-	  color:white;
-	  padding: 0px;
-	  font-size:10px;
-	  text-align: center;
-	  border-style: none;
-	  background-color:var(--NarBackground);
-	  padding-top: 33px;
+.button {
+  width: 60px;
+  height: 48px;
+  display: inline-block;
+  margin: 0px;
+  background-repeat: no-repeat;
+  color: black;
+  padding: 0px;
+  font-size: 10px;
+  text-align: center;
+  border-style: none;
+  background-color: var(--NarBackground);
+  padding-top: 33px;
 }
 
-.big
-{
-	border-radius: 5px;
-	width:300px;
-	height:35px;
-	margin:0px;
-	padding:0px;
-	padding-top: 10px;
-	font-size: 15px;
-	font-weight: 200;
-	background-color: var(--NarMidBar);
-	display: inline-flex;
-	justify-content: center;
-	align-content: center;
-	
+.big {
+  border-radius: 5px;
+  width: 300px;
+  height: 35px;
+  margin: 0px;
+  padding: 0px;
+  padding-top: 10px;
+  font-size: 15px;
+  font-weight: 200;
+  background-color: var(--NarMidBar);
+  display: inline-flex;
+  justify-content: center;
+  align-content: center;
 }
 
-.big:hover
-{
-	background-color: var(--NarMidBarhighlight);
+.big:hover {
+  background-color: var(--NarMidBarhighlight);
 }
 
 /*buttons that appear in light background*/
 
-.edit 
-{	
-	margin-top: 5px;
-	background-image: url("../icons/SVG/edit_dark.svg");	
-	height:32px;
-	padding-top: 0px;
+.edit {
+  margin-top: 5px;
+  background-image: url("../icons/SVG/edit_dark.svg");
+  height: 32px;
+  padding-top: 0px;
 }
 
-.edit:hover
-{	  
-	background-image: url("../icons/SVG/edit_light.svg");
+.edit:hover {
+  background-image: url("../icons/SVG/edit_light.svg");
 }
 
-.more 
-{	
-	background-image: url("../icons/SVG/more_dark.svg");	
-	height:32px;
+.more {
+  background-image: url("../icons/SVG/more_dark.svg");
+  height: 32px;
 }
 
-.more:hover
-{	  
-	background-image: url("../icons/SVG/more_light.svg");
+.more:hover {
+  background-image: url("../icons/SVG/more_light.svg");
 }
 
-.unlock 
-{	
-	background-image: url("../icons/SVG/key_light.svg");	
-	height:32px;
-	padding-top: 0px;
+.unlock {
+  background-image: url("../icons/SVG/key_light.svg");
+  height: 32px;
+  padding-top: 0px;
 }
 
-.unlock:hover
-{	  
-	background-image: url("../icons/SVG/key_dark.svg");
+.unlock:hover {
+  background-image: url("../icons/SVG/key_dark.svg");
 }
 
-
-.lock 
-{	
-	background-image: url("../icons/SVG/lock_light.svg");	
-	height:32px;
-	padding-top: 0px;
+.lock {
+  background-image: url("../icons/SVG/lock_light.svg");
+  height: 32px;
+  padding-top: 0px;
 }
 
-.lock:hover
-{	  
-	background-image: url("../icons/SVG/lock_dark.svg");
+.lock:hover {
+  background-image: url("../icons/SVG/lock_dark.svg");
 }
 
-.back 
-{	
-	margin: 0px;
-	width:16px;
-	background-image: url("../icons/SVG/back_dark.svg");	
-	background-repeat: no-repeat;
-	padding:0px;
+.back {
+  margin: 0px;
+  width: 16px;
+  background-image: url("../icons/SVG/back_dark.svg");
+  background-repeat: no-repeat;
+  padding: 0px;
 }
 
-.back:hover
-{	  
-	background-image: url("../icons/SVG/back_light.svg");
+.back:hover {
+  background-image: url("../icons/SVG/back_light.svg");
 }
 
 /*buttons that appear in dark background*/
 
-
-.receive 
-{	
-	background-color: var(--NarMidBar);
-	margin-top: 5px;
-	margin-left: 15px;
-	margin-right: 15px;
-	background-image: url("../icons/SVG/send_light.svg");	
-	width:32px;
-	height:40px;
-	
+.receive {
+  background-color: var(--NarMidBar);
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 15px;
+  background-image: url("../icons/SVG/send_light.svg");
+  width: 32px;
+  height: 40px;
 }
 
-.receive:hover
-{	
-	background-image: url("../icons/SVG/send_dark.svg");	
-
+.receive:hover {
+  background-image: url("../icons/SVG/send_dark.svg");
 }
 
-.send 
-{	
-	background-color: var(--NarMidBar);
-	margin-top: 5px;
-	margin-left: 15px;
-	margin-right: 15px;
-	background-image: url("../icons/SVG/receive_light.svg");	
-	width:32px;
-	height:40px;
+.send {
+  background-color: var(--NarMidBar);
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 15px;
+  background-image: url("../icons/SVG/receive_light.svg");
+  width: 32px;
+  height: 40px;
 }
 
-.send:hover
-{	
-	background-image: url("../icons/SVG/receive_dark.svg");	
+.send:hover {
+  background-image: url("../icons/SVG/receive_dark.svg");
 }
 
-.stake 
-{	
-	background-color: var(--NarMidBar);
-	margin-top: 5px;
-	margin-left: 15px;
-	margin-right: 15px;
-	background-image: url("../icons/SVG/stake_light.svg");	
-	width:32px;
-	height:40px;
+.stake {
+  background-color: var(--NarMidBar);
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 15px;
+  background-image: url("../icons/SVG/stake_light.svg");
+  width: 32px;
+  height: 40px;
 }
 
-.stake:hover
-{	
-	background-image: url("../icons/SVG/stake_dark.svg");	
+.stake:hover {
+  background-image: url("../icons/SVG/stake_dark.svg");
 }
 
-.add 
-{	
-	background-color: var(--NarMidBar);
-	margin-top: 5px;
-	margin-left: 15px;
-	margin-right: 15px;
-	background-image: url("../icons/SVG/plus_light.svg");	
-	width:32px;
-	height:40px;
+.add {
+  background-color: var(--NarMidBar);
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 15px;
+  background-image: url("../icons/SVG/plus_light.svg");
+  width: 32px;
+  height: 40px;
 }
 
-.add:hover
-{	
-	background-image: url("../icons/SVG/plus_dark.svg");	
+.add:hover {
+  background-image: url("../icons/SVG/plus_dark.svg");
 }
 
-.unlocked
-{	
-
-	background-image: url("../icons/SVG/key_light.svg");	
-	background-position: center;
-	margin-top: 5px;
-	margin-left: 15px;
-	margin-right: 15px;
-	border-style: none;
-	background-color: white;
-	padding: 0px;
-	padding-top:50px;
-	color:var(--NarMidBar);
-	
+.unlocked {
+  background-image: url("../icons/SVG/key_light.svg");
+  background-position: center;
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 15px;
+  border-style: none;
+  background-color: white;
+  padding: 0px;
+  padding-top: 50px;
+  color: var(--NarMidBar);
 }
 
-.unlocked:hover
-{
-	background-image: url("../icons/SVG/key_dark.svg");
-	
+.unlocked:hover {
+  background-image: url("../icons/SVG/key_dark.svg");
 }
 
-
-.remove 
-{	
-	background-color: var(--NarMidBar);
-	margin-top: 5px;
-	margin-left: 15px;
-	margin-right: 15px;
-	background-image: url("../icons/SVG/minus_light.svg");	
-	width:32px;
-	height:40px;
+.remove {
+  background-color: var(--NarMidBar);
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 15px;
+  background-image: url("../icons/SVG/minus_light.svg");
+  width: 32px;
+  height: 40px;
 }
 
-.remove:hover
-{
-	background-image: url("../icons/SVG/minus_dark.svg");
-	
+.remove:hover {
+  background-image: url("../icons/SVG/minus_dark.svg");
 }
-

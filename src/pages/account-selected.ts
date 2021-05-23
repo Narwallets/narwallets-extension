@@ -66,6 +66,8 @@ function initPage() {
     cancelBtn = new d.El("#account-selected-action-cancel")
     okCancelRow = new d.El("#account-selected .ok-cancel")
     
+    confirmBtn.onClick(confirmClicked);
+    cancelBtn.onClick(cancelClicked);
 
     return;
     
@@ -101,8 +103,6 @@ function initPage() {
 
     removeButton.onClick(removeAccountClicked);
 
-    confirmBtn.onClick(confirmClicked);
-    cancelBtn.onClick(cancelClicked);
 
 }
 
@@ -1230,7 +1230,7 @@ function confirmClicked(ev:Event) {
 }
 
 function showButtons() {
-    d.showSubPage("account-selected-buttons")
+    d.showSubPage("assests")
     okCancelRow.hide()
     if (showingMore()) moreLessClicked()
 }

@@ -162,7 +162,7 @@
 		<div class="addaccount_face">
 
 			<div class="backarea">
-				<div class="button back"></div>
+				<button class="button back"></button>
 			</div>
 			<div class="titulo">
 				<h1>Do you have an Account?</h1>
@@ -171,14 +171,14 @@
 			<h2>No, create a new NAMED account</h2>
 			<h3>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
 					temporary account</b> to complete the account creation</h3>
-			<div class="button big in" id="option-create">Create named account</div>
+			<button class="button big in" id="option-create">Create named account</button>
 
 			<h2>Yes, I already have an account</h2>
-			<div class="button big in" id="option-import">Import existing account</div>
+			<button class="button big in" id="option-import">Import existing account</button>
 
 			<h2>No, create a free implicit Account</h2>
 			<h3>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h3>
-			<div class="button big in" id="option-create-implicit">Create implicit account</div>
+			<button class="button big in" id="option-create-implicit">Create implicit account</button>
 		</div>
 
 	</div>
@@ -202,10 +202,10 @@
 		</div>
 
 		<div class="accountdetsmidbar">
-			<div class="button receive" id="receive">Receive</div>
-			<div class="button send" id="send">Send</div>
-			<div class="button stake">Stake</div>
-			<div class="button add">Add</div>
+			<button class="button receive" id="receive">Receive</button>
+			<button class="button send" id="send">Send</button>
+			<button class="button stake">Stake</button>
+			<button class="button add">Add</button>
 		</div>
 
 		<!-- Template -->
@@ -217,7 +217,7 @@
 		</div>
 
 
-		<div class="subpage scroll">
+		<div class="subpage scroll" id="assests">
 
 			<div class="accountdetsassets">
 				<div class="accountassetcoin"></div>
@@ -261,6 +261,17 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- OK CANCEL buttons common to all subpages -->
+		<div class="button-group ok-cancel" id="account-selected .ok-cancel">
+			<button id="account-selected-action-confirm" class="button btn-primary">
+				OK
+			</button>
+			<button id="account-selected-action-cancel" class="button btn-cancel">
+				Cancel
+			</button>
+		</div>
+		
 
 	</div>
 
@@ -350,7 +361,7 @@
 		</div>
 
 		<div class="bottombar">
-			<div class="button add" id="add-account">Add</div>
+			<button class="button add" id="add-account">Add</button>
 		</div>
 	</div>
 
@@ -478,7 +489,7 @@
 	<div class="appface slide-hide" id="AccountAssetDetail">
 
 		<div class="accountdetstopleft">
-			<div class="button back"></div>
+			<button class="button back"></button>
 		</div>
 		<div class="accountdetstopcenter">
 			<div class="accountdetscuenta">cuenta.sadasda.asd.ar</div>
@@ -487,7 +498,7 @@
 			<div class="accountdetsfiat">1,000,000.000 usd</div>
 		</div>
 		<div class="accountdetstopright">
-			<div class="button"></div>
+			<button class="button"></button>
 		</div>
 
 		<div class="accountdetsmidbar">
@@ -522,7 +533,7 @@
 		<div class="receive_face">
 
 			<div class="backarea">
-				<div class="button back"></div>
+				<button class="button back"></button>
 			</div>
 			<div class="titulo">
 				<h1>Receive</h1>
@@ -538,9 +549,9 @@
 		</div>
 
 		<div class="accountdetsmidbar">
-			<div class="button send">Send</div>
-			<div class="button receive">Receive</div>
-			<div class="button remove">Remove</div>
+			<button class="button send">Send</button>
+			<button class="button receive">Receive</button>
+			<button class="button remove">Remove</button>
 		</div>
 
 		<div class="accountdetsscroll">
@@ -600,7 +611,7 @@
 				<div class="edit_face">
 
 					<div class="backarea">
-						<div class="button back"></div>
+						<button class="button back"></button>
 					</div>
 					<div class="titulo">
 						<h1>Stake</h1>
@@ -617,7 +628,7 @@
 				<div class="edit_face">
 
 					<div class="backarea">
-						<div class="button back"></div>
+						<button class="button back"></button>
 					</div>
 					<div class="titulo">
 						<h1>Stake</h1>
@@ -627,15 +638,6 @@
 
 			</div>
 
-			<!-- OK CANCEL buttons common to all subpages -->
-			<div class="button-group ok-cancel">
-				<button id="account-selected-action-confirm" class="button btn-primary">
-					OK
-				</button>
-				<button id="account-selected-action-cancel" class="button btn-cancel">
-					Cancel
-				</button>
-			</div>
 
 			<!-- STAKE -->
 
@@ -644,7 +646,7 @@
 				<div class="search_face">
 
 					<div class="backarea">
-						<div class="button back"></div>
+						<button class="button back"></button>
 					</div>
 					<div class="titulo">
 						<h1>Stake</h1>
@@ -679,7 +681,7 @@
 				<div class="search_face">
 
 					<div class="backarea">
-						<div class="button back"></div>
+						<button class="button back"></button>
 					</div>
 					<div class="titulo">
 						<h1>Add Token</h1>
@@ -728,7 +730,7 @@
 						<div class="search_face">
 
 							<div class="backarea">
-								<div class="button back"></div>
+								<button class="button back"></button>
 							</div>
 							<div class="titulo">
 								<h1>Add Token</h1>
@@ -765,7 +767,7 @@
 				<div class="appface slide-hide">
 
 					<div class="backarea">
-						<div class="button back"></div>
+						<button class="button back"></button>
 					</div>
 					<div class="titulo">
 						<h1>Search Results</h1>

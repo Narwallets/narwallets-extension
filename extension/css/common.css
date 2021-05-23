@@ -43,6 +43,15 @@
   background-color: var(--NarBackground);
 }
 
+.button-group.ok-cancel {
+  position: absolute;
+  top: 450px;
+  left: 0px;
+  width: 359px;
+  height: 383px;
+  max-height: 300px;
+  background-color: var(--NarBackground);
+}
 .scroll {
   overflow-y: scroll;
 }
