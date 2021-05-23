@@ -97,9 +97,67 @@
 
 	<!--#endregion  -->
 
+
+	<!-- WELCOME New user, onboarding-->
+	<div id="welcome-new-user-page" class="appface slide-hide">
+		<div class="contents-body">
+			<h1>Welcome to Narwallets!</h1>
+			<h2>The future is NEAR</h2>
+			<h2>Let's start our journey</h2>
+			<div class="select-action-button-box">
+				<p>
+					<b>Step one:</b><br> Create user and password to protect this wallet
+				</p>
+				<button id="welcome-create-pass" class="btn-primary">Create User &amp; Password</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- New User create pass-->
+	<div id="create-user" class="appface slide-hide">
+		<h1>Create User</h1>
+		<div class="form">
+			<div class="form-field-label">
+				<label data-shrink="true" for="email">Your e-mail</label>
+				<div class="form-control">
+					<input type="text" tabindex="0" autocomplete="email" id="email" />
+				</div>
+			</div>
+			<div class="form-field-label">
+				<label class="" data-shrink="true" for="pass" id="create-password-label">New password (min 8
+					chars)</label>
+				<div class="form-control">
+					<input type="password" autocomplete="new-password" type="password" id="pass">
+				</div>
+			</div>
+			<div class="form-field-label">
+				<label class="form-field-label" data-shrink="true" for="pass-confirm"
+					id="confirm-password-label">Confirm password</label>
+				<div class="form-control">
+					<input type="password" autocomplete="new-password" id="pass-confirm">
+				</div>
+			</div>
+			<div class="checkbox-container">
+				<input id="agree-check" type="checkbox" bind:checked aria-checked="false"
+					aria-labelledby="checkbox-label" />
+				<label for="agree-check" class="checkbox-label">
+					I have read and agree to the
+					<a href=# id="open-terms-of-use">Terms of
+						Use
+					</a>
+				</label>
+			</div>
+			<button class="big btn-primary" id="create-user">Create
+			</button>
+		</div>
+
+	</div>
+
+
 	<!--#region AddAccount-->
 
 	<div class="appface slide-hide" id="import-or-create">
+
 
 		<div class="addaccount_face">
 
@@ -304,7 +362,8 @@
 	<div id="display-seed-phrase" class="appface slide-hide">
 		<div class="contents-header">
 			<h1>This is your Seed Phrase</h1>
-			<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed phrase owns the account.</b></h3>
+			<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed
+					phrase owns the account.</b></h3>
 		</div>
 		<div class="contents-body">
 			<div class="round-box bg-yellow">
@@ -451,10 +510,6 @@
 
 		</div>
 
-			<button id="import" class="button btn-primary medium hidden">
-				Import Account into this Wallet
-			</button>
-		</div>
 	</div>
 
 	<!--#endregion -->
@@ -536,222 +591,222 @@
 			</div>
 
 
-	<!--#endregion -->
+			<!--#endregion -->
 
-	<!--#region EDIT COMMENT -->
-
-	<div class="appface slide-hide">
-
-		<div class="edit_face">
-
-			<div class="backarea">
-				<div class="button back"></div>
-			</div>
-			<div class="titulo">
-				<h1>Stake</h1>
-			</div>
-
-		</div>
-
-		</div>
-
-		<!-- EDIT COMMENT -->
-
-		<div class="appface slide-hide">
-
-			<div class="edit_face">
-
-				<div class="backarea">
-					<div class="button back"></div>
-				</div>
-				<div class="titulo">
-					<h1>Stake</h1>
-				</div>
-
-			</div>
-
-		</div>
-
-		<!-- OK CANCEL buttons common to all subpages -->
-		<div class="button-group ok-cancel">
-			<button id="account-selected-action-confirm" class="button btn-primary">
-				OK
-			</button>
-			<button id="account-selected-action-cancel" class="button btn-cancel">
-				Cancel
-			</button>
-		</div>
-
-		<!-- STAKE -->
-
-		<div class="appface slide-hide">
-
-			<div class="search_face">
-
-				<div class="backarea">
-					<div class="button back"></div>
-				</div>
-				<div class="titulo">
-					<h1>Stake</h1>
-				</div>
-				<div class="searcharea">
-					<h1>Usuario.asdasdasdsad.adasdas</h1>
-					<h2>(Comentario)</h2>
-					<h3>search for pool</h3>
-					<div class="searchbox">
-						<input class="searchboxtext" type="Text">
-						<input class="searchboxbutton" type="button">search</>
-					</div>
-					<div class="resultarea">
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-					</div>
-
-				</div>
-
-			</div>
-
-		</div>
-
-
-		<!-- add token -->
-
-
-		<div class="appface slide-hide">
-
-			<div class="search_face">
-
-				<div class="backarea">
-					<div class="button back"></div>
-				</div>
-				<div class="titulo">
-					<h1>Add Token</h1>
-				</div>
-				<div class="searcharea">
-					<h1>Usuario.asdasdasdsad.adasdas</h1>
-					<h2>(Comentario)</h2>
-					<h3>search for token</h3>
-					<div class="searchbox">
-						<input class="searchboxtext" type="Text">
-						<input class="searchboxbutton" type="button">search</>
-					</div>
-					<div class="resultarea">
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-						<div class="resultline">sdasdasdasdasdasda</div>
-					</div>
-
-				</div>
-
-
-				<!-- add token -->
-
-
-				<div class="appface slide-hide">
-
-					<div class="search_face">
-
-						<div class="backarea">
-							<div class="button back"></div>
-						</div>
-						<div class="titulo">
-							<h1>Add Token</h1>
-						</div>
-						<div class="searcharea">
-							<h1>Usuario.asdasdasdsad.adasdas</h1>
-							<h2>(Comentario)</h2>
-							<h3>search for token</h3>
-							<div class="searchbox">
-								<input class="searchboxtext" type="Text">
-								<input class="searchboxbutton" type="button">search</>
-							</div>
-							<div class="resultarea">
-								<div class="resultline">sdasdasdasdasdasda</div>
-								<div class="resultline">sdasdasdasdasdasda</div>
-								<div class="resultline">sdasdasdasdasdasda</div>
-								<div class="resultline">sdasdasdasdasdasda</div>
-							</div>
-
-						</div>
-
-					</div>
-
-				</div>
-
-			</div>
-
-			<!-- Import Existing Account-->
-
-
-
-			<!-- Search Results-->
+			<!--#region EDIT COMMENT -->
 
 			<div class="appface slide-hide">
 
-				<div class="backarea">
-					<div class="button back"></div>
-				</div>
-				<div class="titulo">
-					<h1>Search Results</h1>
-				</div>
-				<div class="resultsarea">
-					<div class="listitem">
-						<h1>adasda</h1>
+				<div class="edit_face">
+
+					<div class="backarea">
+						<div class="button back"></div>
 					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
-					</div>
-					<div class="listitem">
-						<h1>adasda</h1>
+					<div class="titulo">
+						<h1>Stake</h1>
 					</div>
 
 				</div>
 
 			</div>
 
-			<script src="bundled-libs.js"></script>
-			<script type="module" src="dist/index.js"></script>
+			<!-- EDIT COMMENT -->
+
+			<div class="appface slide-hide">
+
+				<div class="edit_face">
+
+					<div class="backarea">
+						<div class="button back"></div>
+					</div>
+					<div class="titulo">
+						<h1>Stake</h1>
+					</div>
+
+				</div>
+
+			</div>
+
+			<!-- OK CANCEL buttons common to all subpages -->
+			<div class="button-group ok-cancel">
+				<button id="account-selected-action-confirm" class="button btn-primary">
+					OK
+				</button>
+				<button id="account-selected-action-cancel" class="button btn-cancel">
+					Cancel
+				</button>
+			</div>
+
+			<!-- STAKE -->
+
+			<div class="appface slide-hide">
+
+				<div class="search_face">
+
+					<div class="backarea">
+						<div class="button back"></div>
+					</div>
+					<div class="titulo">
+						<h1>Stake</h1>
+					</div>
+					<div class="searcharea">
+						<h1>Usuario.asdasdasdsad.adasdas</h1>
+						<h2>(Comentario)</h2>
+						<h3>search for pool</h3>
+						<div class="searchbox">
+							<input class="searchboxtext" type="Text">
+							<input class="searchboxbutton" type="button">search</>
+						</div>
+						<div class="resultarea">
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+
+			<!-- add token -->
+
+
+			<div class="appface slide-hide">
+
+				<div class="search_face">
+
+					<div class="backarea">
+						<div class="button back"></div>
+					</div>
+					<div class="titulo">
+						<h1>Add Token</h1>
+					</div>
+					<div class="searcharea">
+						<h1>Usuario.asdasdasdsad.adasdas</h1>
+						<h2>(Comentario)</h2>
+						<h3>search for token</h3>
+						<div class="searchbox">
+							<input class="searchboxtext" type="Text">
+							<input class="searchboxbutton" type="button">search</>
+						</div>
+						<div class="resultarea">
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+							<div class="resultline">sdasdasdasdasdasda</div>
+						</div>
+
+					</div>
+
+
+					<!-- add token -->
+
+
+					<div class="appface slide-hide">
+
+						<div class="search_face">
+
+							<div class="backarea">
+								<div class="button back"></div>
+							</div>
+							<div class="titulo">
+								<h1>Add Token</h1>
+							</div>
+							<div class="searcharea">
+								<h1>Usuario.asdasdasdsad.adasdas</h1>
+								<h2>(Comentario)</h2>
+								<h3>search for token</h3>
+								<div class="searchbox">
+									<input class="searchboxtext" type="Text">
+									<input class="searchboxbutton" type="button">search</>
+								</div>
+								<div class="resultarea">
+									<div class="resultline">sdasdasdasdasdasda</div>
+									<div class="resultline">sdasdasdasdasdasda</div>
+									<div class="resultline">sdasdasdasdasdasda</div>
+									<div class="resultline">sdasdasdasdasdasda</div>
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+				<!-- Import Existing Account-->
+
+
+
+				<!-- Search Results-->
+
+				<div class="appface slide-hide">
+
+					<div class="backarea">
+						<div class="button back"></div>
+					</div>
+					<div class="titulo">
+						<h1>Search Results</h1>
+					</div>
+					<div class="resultsarea">
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+						<div class="listitem">
+							<h1>adasda</h1>
+						</div>
+
+					</div>
+
+				</div>
+
+				<script src="bundled-libs.js"></script>
+				<script type="module" src="dist/index.js"></script>
 
 </body>

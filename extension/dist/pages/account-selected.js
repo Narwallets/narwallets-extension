@@ -109,9 +109,9 @@ function showSelectedAccount() {
     d.clearContainer(SELECTED_ACCOUNT);
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
     /* lala_design
+    accountBalance = new d.El(".selected-account-info .total.balance");
     accountInfoName = new d.El(".selected-account-info .name");
 
-    accountBalance = new d.El(".selected-account-info .total.balance");
 
     if (selectedAccountData.accountInfo.ownerId) {
         const oiLine = new d.El(".selected-account-info #owner-id-info-line");

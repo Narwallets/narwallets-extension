@@ -146,6 +146,7 @@ export async function show() {
         //for(let item of list) console.log(item.accountInfo.order,item.accountInfo.type, item.name)
         d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list);
         let total = 0;
+        let semiTotal = 0;
         //connect all item to accountItemClicked
         document.querySelectorAll(".accountlistitem")
             .forEach((item) => {
