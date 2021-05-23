@@ -6,16 +6,19 @@
 
 .button 
 {
-	  right:0;
-  	  width: 32px;
+
+  	  width: 60px;
 	  height: 48px;
 	  display:inline-block;
-	  margin:5px;
+	  margin:0px;
 	  background-repeat:no-repeat; 
 	  color:white;
-	  padding-top: 33px;
+	  padding: 0px;
 	  font-size:10px;
 	  text-align: center;
+	  border-style: none;
+	  background-color:var(--NarBackground);
+	  padding-top: 33px;
 }
 
 .big
@@ -25,7 +28,7 @@
 	height:35px;
 	margin:0px;
 	padding:0px;
-	padding-top: 15px;
+	padding-top: 10px;
 	font-size: 15px;
 	font-weight: 200;
 	background-color: var(--NarMidBar);
@@ -59,7 +62,6 @@
 {	
 	background-image: url("../icons/SVG/more_dark.svg");	
 	height:32px;
-	padding-top: 0px;
 }
 
 .more:hover
@@ -111,6 +113,7 @@
 
 .receive 
 {	
+	background-color: var(--NarMidBar);
 	margin-top: 5px;
 	margin-left: 15px;
 	margin-right: 15px;
@@ -128,6 +131,7 @@
 
 .send 
 {	
+	background-color: var(--NarMidBar);
 	margin-top: 5px;
 	margin-left: 15px;
 	margin-right: 15px;
@@ -143,6 +147,7 @@
 
 .stake 
 {	
+	background-color: var(--NarMidBar);
 	margin-top: 5px;
 	margin-left: 15px;
 	margin-right: 15px;
@@ -158,6 +163,7 @@
 
 .add 
 {	
+	background-color: var(--NarMidBar);
 	margin-top: 5px;
 	margin-left: 15px;
 	margin-right: 15px;
@@ -196,6 +202,7 @@
 
 .remove 
 {	
+	background-color: var(--NarMidBar);
 	margin-top: 5px;
 	margin-left: 15px;
 	margin-right: 15px;

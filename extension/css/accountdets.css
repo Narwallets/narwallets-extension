@@ -52,17 +52,7 @@
 
 /*Scroll area and items   ---------------------------------------------------------*/
 
-.accountdetsscroll
-{
-	position:absolute;
-	top:235px;
-	left:0px;
-	width:359px;
-	height:283px;
-	max-height: 300px;
-	overflow-y: scroll;	
-	background-color: blue;
-}
+
 
 .accountdetsassets
 {

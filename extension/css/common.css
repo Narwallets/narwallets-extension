@@ -11,10 +11,11 @@
 	background-color: var(--NarBackground);
 	overflow-y: hidden;
 
+	/*
 	border-style:solid;
 	border-color: black;
 	border-width: 1px;
-	
+	*/
 }
 
 .appface.show {
@@ -36,6 +37,21 @@
 	display: inline-block;
 }
 
+.subface
+{
+	position:absolute;
+	top:235px;
+	left:0px;
+	width:359px;
+	height:283px;
+	max-height: 300px;
+	background-color: var(--NarBackground);
+}
+
+.scroll
+{
+	overflow-y: scroll;	
+}
 
 
 .logo-128 {
