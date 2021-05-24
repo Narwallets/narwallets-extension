@@ -18,6 +18,36 @@
   padding-top: 33px;
 }
 
+.ok 
+{
+   color:white;
+   width: 80px;
+   border-radius: 5px;
+   background-color: green;
+   align-items: center;
+   display: inline-flex;
+   justify-content: center;
+   padding: 0px;
+   margin:0px;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+.cancel
+{
+  width: 80px;
+   color:white;
+   border-radius: 5px;
+   background-color:red;
+   align-items: center;
+   display: inline-flex;
+   justify-content: center;
+   padding: 0px;
+   margin:0px;
+   margin-left: auto;
+   margin-right: auto;
+}
+
 .big {
   border-radius: 5px;
   width: 300px;

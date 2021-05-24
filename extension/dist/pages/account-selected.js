@@ -48,6 +48,8 @@ function initPage() {
     confirmBtn = new d.El("#account-selected-action-confirm");
     cancelBtn = new d.El("#account-selected-action-cancel");
     okCancelRow = new d.El("#account-selected .ok-cancel");
+    confirmBtn.onClick(confirmClicked);
+    cancelBtn.onClick(cancelClicked);
     return;
     //accountAmount.onInput(amountInput);
     removeButton = new d.El("button#remove");
@@ -70,8 +72,6 @@ function initPage() {
     d.onClickId("delete-account", DeleteAccount);
     //d.onClickId("assign-staking-pool", assignStakingPool);
     removeButton.onClick(removeAccountClicked);
-    confirmBtn.onClick(confirmClicked);
-    cancelBtn.onClick(cancelClicked);
 }
 function showingMore() {
     const buttonsMore = new d.All(".buttons-more");
@@ -1040,7 +1040,7 @@ function confirmClicked(ev) {
     }
 }
 function showButtons() {
-    d.showSubPage("account-selected-buttons");
+    d.showSubPage("assests");
     okCancelRow.hide();
     if (showingMore())
         moreLessClicked();

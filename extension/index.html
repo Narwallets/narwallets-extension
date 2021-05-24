@@ -38,8 +38,8 @@
 	</div>
 
 	<!-- 
-	    Networks Dropdown 
-	    -->
+Networks Dropdown 
+-->
 	<div id="networks-list" class="networks-list-box">
 		<div class="networks-list-content">
 			<div class="network-box-header">
@@ -76,14 +76,14 @@
 			<li id="lock">Lock</li>
 			<hr>
 			<!--<li id="expand">Expand</li>
-				<hr>
-				-->
+<hr>
+-->
 			<li id="accounts">Accounts</li>
 			<hr>
 			<li id="add-account-side">Add Account</li>
 			<hr>
 			<!--<li id="change-password">Change your password</li>
-				<hr>-->
+<hr>-->
 			<li id="create-user">Create a new User</li>
 			<hr>
 			<li id="options">Options</li>
@@ -97,8 +97,7 @@
 
 	<!--#endregion  -->
 
-
-	<!-- WELCOME New user, onboarding-->
+	<!--#region WELCOME New user, onboarding-->
 	<div id="welcome-new-user-page" class="appface slide-hide">
 		<div class="contents-body">
 			<h1>Welcome to Narwallets!</h1>
@@ -112,8 +111,9 @@
 			</div>
 		</div>
 	</div>
+	<!--#endregion-->
 
-	<!-- New User create pass-->
+	<!--#region New User create pass-->
 	<div id="create-user" class="appface slide-hide">
 		<h1>Create User</h1>
 		<div class="form">
@@ -153,6 +153,7 @@
 
 	</div>
 
+	<!--#endregion-->
 
 	<!--#region AddAccount-->
 
@@ -216,7 +217,7 @@
 			<div class="accountdetsfiat">{totalUSD} usd</div>
 		</div>
 
-
+		<!--#region subpage asset list-->
 		<div class="subpage scroll" id="assests">
 
 			<div class="accountdetsassets">
@@ -241,8 +242,11 @@
 			</div>
 
 		</div>
+		<!--#endregion -->
 
-		<div id="account-selected-make-full-access" class="accountdetsscroll subpage hidden">
+		<!--#region set Full Access-->
+
+		<div id="account-selected-make-full-access" class="subpage hidden">
 			<div class="title">
 				<h2>Make Full Access</h2>
 			</div>
@@ -262,54 +266,57 @@
 			</div>
 		</div>
 
+		<!--#endregion-->
+
+		<!--#region subpage RECEIVE -->
+		<div id="account-selected-receive" class="subpage hidden">
+			
+				<h3>Tell the other party to send to:</h3>
+				<h2 id="account-selected-receive-name" class="important-label"></h2>
+			
+		</div>
+
+		<!--#endregion-->
+
+		<!--#region subpage SEND -->
+		<div id="account-selected-send" class="subpage hidden">
+			<div class="title">
+				<h2>Send</h2>
+			</div>
+			<div class="send-form">
+				<div class="form-field-label">
+					<label for="send-to-account-name">
+						Send to Account Id
+					</label>
+					<div class="form-control">
+						<input id="send-to-account-name" type="text" dir="auto" value="">
+					</div>
+				</div>
+				<div class="form-field-label">
+					<label for="send-to-account-amount">
+						Amount in NEAR (Max. <span id="max-amount-send"></span>)
+					</label>
+					<div class="form-control">
+						<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--#endregion -->
+
 		<!-- OK CANCEL buttons common to all subpages -->
-		<div class="button-group ok-cancel" id="account-selected .ok-cancel">
-			<button id="account-selected-action-confirm" class="button btn-primary">
-				OK
-			</button>
-			<button id="account-selected-action-cancel" class="button btn-cancel">
-				Cancel
-			</button>
+		<div class="button-group" id="account-selected .ok-cancel">
+			<button id="account-selected-action-confirm" class="button ok">OK</button>
+			<button id="account-selected-action-cancel" class="button cancel">Cancel</button>
 		</div>
-		
+
 
 	</div>
 
+	<!--#endregion -->
 
-	<!-- subpage RECEIVE -->
-	<div id="account-selected-receive" class="subpage hidden">
-		<div class="round-box bg-lightblue">
-			<div>Tell the other party to send to:</div>
-			<div id="account-selected-receive-name" class="important-label"></div>
-		</div>
-	</div>
-
-	<!-- subpage SEND -->
-	<div id="account-selected-send" class="subpage hidden">
-		<div class="title">
-			<h2>Send</h2>
-		</div>
-		<div class="send-form">
-			<div class="form-field-label">
-				<label for="send-to-account-name">
-					Send to Account Id
-				</label>
-				<div class="form-control">
-					<input id="send-to-account-name" type="text" dir="auto" value="">
-				</div>
-			</div>
-			<div class="form-field-label">
-				<label for="send-to-account-amount">
-					Amount in NEAR (Max. <span id="max-amount-send"></span>)
-				</label>
-				<div class="form-control">
-					<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- subpage SEND CONFIRMATION -->
+	<!--#region subpage SEND CONFIRMATION -->
 	<div id="account-selected-send-confirmation" class="subpage hidden">
 		<div class="title">
 			<h2>Confirm Send</h2>
@@ -322,9 +329,9 @@
 			<br>
 		</div>
 	</div>
+	<!--#endregion-->
 
-
-	<!-- subpage is OK to grant access? -->
+	<!--#region subpage is OK to grant access? -->
 	<div id="account-selected-ok-to-grant-access" class="subpage hidden">
 		<div class="round-box bg-lightblue">
 			<div>Grant full access to this account ?</div>
@@ -387,7 +394,9 @@
 			</div>
 		</div>
 	</div>
+	<!--#endregion -->
 
+	<!--#region import account-->
 
 	<div id="import-account" class="appface slide-hide">
 		<h1>Import existing account</h1>
@@ -448,9 +457,9 @@
 		</div>
 	</div>
 
+	<!--#endregion -->
 
-
-	<!-- Existing user, unlock-->
+	<!--#region Existing user, unlock-->
 
 	<div id="unlock" class="appface slide-hide">
 
@@ -507,7 +516,7 @@
 			<button class="button remove">Remove</button>
 		</div>
 
-		<div class="subpage scroll">
+		<div class="subpage scroll hide">
 
 			<div class="assethistoryline">
 				<div class="assethisttype">
@@ -518,23 +527,10 @@
 				<div class="assethistammount">100,000.000</div>
 			</div>
 
-
 		</div>
 
-	</div>
+		<div class="subpage">
 
-	<!--#endregion -->
-
-	<!--#region Receive -->
-
-
-	<div class="appface slide-hide">
-
-		<div class="receive_face">
-
-			<div class="backarea">
-				<button class="button back"></button>
-			</div>
 			<div class="titulo">
 				<h1>Receive</h1>
 			</div>
@@ -545,270 +541,14 @@
 				<h3>(nota Comentario)</h3>
 			</div>
 
-
 		</div>
 
-		<div class="accountdetsmidbar">
-			<button class="button send">Send</button>
-			<button class="button receive">Receive</button>
-			<button class="button remove">Remove</button>
-		</div>
 
-		<div class="accountdetsscroll">
+	</div>
 
-			<div class="assethistoryline">
-				<div class="assethisttype">
-					<div class="histreceive"></div>
-				</div>
-				<div class="assethistdate">01/01/2021</div>
-				<div class="assethistaccount">sasdasdas</div>
-				<div class="assethistammount">100,000.000</div>
-			</div>
+	<!--#endregion -->
 
-			<div class="assethistoryline">
-				<div class="assethisttype">
-					<div class="histreceive"></div>
-				</div>
-				<div class="assethistdate">01/01/2021</div>
-				<div class="assethistaccount">sasdasdas</div>
-				<div class="assethistammount">100,000.000</div>
-			</div>
-
-			<div class="assethistoryline">
-				<div class="assethisttype">
-					<div class="histsend"></div>
-				</div>
-				<div class="assethistdate">01/01/2021</div>
-				<div class="assethistaccount">sasdasdas</div>
-				<div class="assethistammount">100,000.000</div>
-			</div>
-
-			<div class="assethistoryline">
-				<div class="assethisttype">
-					<div class="histreceive"></div>
-				</div>
-				<div class="assethistdate">01/01/2021</div>
-				<div class="assethistaccount">sasdasdas</div>
-				<div class="assethistammount">100,000.000</div>
-			</div>
-
-			<div class="assethistoryline">
-				<div class="assethisttype">
-					<div class="histsend"></div>
-				</div>
-				<div class="assethistdate">01/01/2021</div>
-				<div class="assethistaccount">sasdasdas</div>
-				<div class="assethistammount">100,000.000</div>
-			</div>
-
-
-			<!--#endregion -->
-
-			<!--#region EDIT COMMENT -->
-
-			<div class="appface slide-hide">
-
-				<div class="edit_face">
-
-					<div class="backarea">
-						<button class="button back"></button>
-					</div>
-					<div class="titulo">
-						<h1>Stake</h1>
-					</div>
-
-				</div>
-
-			</div>
-
-			<!-- EDIT COMMENT -->
-
-			<div class="appface slide-hide">
-
-				<div class="edit_face">
-
-					<div class="backarea">
-						<button class="button back"></button>
-					</div>
-					<div class="titulo">
-						<h1>Stake</h1>
-					</div>
-
-				</div>
-
-			</div>
-
-
-			<!-- STAKE -->
-
-			<div class="appface slide-hide">
-
-				<div class="search_face">
-
-					<div class="backarea">
-						<button class="button back"></button>
-					</div>
-					<div class="titulo">
-						<h1>Stake</h1>
-					</div>
-					<div class="searcharea">
-						<h1>Usuario.asdasdasdsad.adasdas</h1>
-						<h2>(Comentario)</h2>
-						<h3>search for pool</h3>
-						<div class="searchbox">
-							<input class="searchboxtext" type="Text">
-							<input class="searchboxbutton" type="button">search</>
-						</div>
-						<div class="resultarea">
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-						</div>
-
-					</div>
-
-				</div>
-
-			</div>
-
-
-			<!-- add token -->
-
-
-			<div class="appface slide-hide">
-
-				<div class="search_face">
-
-					<div class="backarea">
-						<button class="button back"></button>
-					</div>
-					<div class="titulo">
-						<h1>Add Token</h1>
-					</div>
-					<div class="searcharea">
-						<h1>Usuario.asdasdasdsad.adasdas</h1>
-						<h2>(Comentario)</h2>
-						<h3>search for token</h3>
-						<div class="searchbox">
-							<input class="searchboxtext" type="Text">
-							<input class="searchboxbutton" type="button">search</>
-						</div>
-						<div class="resultarea">
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-							<div class="resultline">sdasdasdasdasdasda</div>
-						</div>
-
-					</div>
-
-
-					<!-- add token -->
-
-
-					<div class="appface slide-hide">
-
-						<div class="search_face">
-
-							<div class="backarea">
-								<button class="button back"></button>
-							</div>
-							<div class="titulo">
-								<h1>Add Token</h1>
-							</div>
-							<div class="searcharea">
-								<h1>Usuario.asdasdasdsad.adasdas</h1>
-								<h2>(Comentario)</h2>
-								<h3>search for token</h3>
-								<div class="searchbox">
-									<input class="searchboxtext" type="Text">
-									<input class="searchboxbutton" type="button">search</>
-								</div>
-								<div class="resultarea">
-									<div class="resultline">sdasdasdasdasdasda</div>
-									<div class="resultline">sdasdasdasdasdasda</div>
-									<div class="resultline">sdasdasdasdasdasda</div>
-									<div class="resultline">sdasdasdasdasdasda</div>
-								</div>
-
-							</div>
-
-						</div>
-
-					</div>
-
-				</div>
-
-				<!-- Import Existing Account-->
-
-
-
-				<!-- Search Results-->
-
-				<div class="appface slide-hide">
-
-					<div class="backarea">
-						<button class="button back"></button>
-					</div>
-					<div class="titulo">
-						<h1>Search Results</h1>
-					</div>
-					<div class="resultsarea">
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-						<div class="listitem">
-							<h1>adasda</h1>
-						</div>
-
-					</div>
-
-				</div>
-
-				<script src="bundled-libs.js"></script>
-				<script type="module" src="dist/index.js"></script>
+	<script src="bundled-libs.js"></script>
+	<script type="module" src="dist/index.js"></script>
 
 </body>
