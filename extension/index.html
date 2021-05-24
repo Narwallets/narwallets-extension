@@ -270,13 +270,23 @@ Networks Dropdown
 
 		<!--#region subpage RECEIVE -->
 		<div id="account-selected-receive" class="subpage hidden">
-			
-				<h3>Tell the other party to send to:</h3>
-				<h2 id="account-selected-receive-name" class="important-label"></h2>
-			
+
+			<h3>Tell the other party to send to:</h3>
+			<h2 id="account-selected-receive-name" class="important-label"></h2>
+
 		</div>
 
-		<!--#endregion-->
+		<!--#endregion-->		
+
+		<!--#region subpage is OK to grant access? -->
+		<div id="account-selected-ok-to-grant-access" class="subpage hidden">
+
+			<h2>Grant full access to this account ?</h2>
+			<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+
+		</div>
+
+		<!--#endregion-->		
 
 		<!--#region subpage SEND -->
 		<div id="account-selected-send" class="subpage hidden">
@@ -306,37 +316,12 @@ Networks Dropdown
 		<!--#endregion -->
 
 		<!-- OK CANCEL buttons common to all subpages -->
-		<div class="button-group" id="account-selected .ok-cancel">
+		<div class="button-group hidden" id="account-selected .ok-cancel">
 			<button id="account-selected-action-confirm" class="button ok">OK</button>
 			<button id="account-selected-action-cancel" class="button cancel">Cancel</button>
 		</div>
 
 
-	</div>
-
-	<!--#endregion -->
-
-	<!--#region subpage SEND CONFIRMATION -->
-	<div id="account-selected-send-confirmation" class="subpage hidden">
-		<div class="title">
-			<h2>Confirm Send</h2>
-		</div>
-		<div class="send-form-confirmation">
-			<div class="subtitle">
-				<h3 class="warning">Send <span id="send-confirmation-amount"></span> NEAR
-					to <span id="send-confirmation-receiver"></span> ?</h3>
-			</div>
-			<br>
-		</div>
-	</div>
-	<!--#endregion-->
-
-	<!--#region subpage is OK to grant access? -->
-	<div id="account-selected-ok-to-grant-access" class="subpage hidden">
-		<div class="round-box bg-lightblue">
-			<div>Grant full access to this account ?</div>
-			<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
-		</div>
 	</div>
 
 	<!--#endregion -->
