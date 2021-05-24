@@ -217,77 +217,8 @@ Networks Dropdown
 			<div class="accountdetsfiat">{totalUSD} usd</div>
 		</div>
 
-		<!--#region subpage asset list-->
-		<div class="subpage scroll" id="assests">
-
-			<div class="accountdetsassets">
-				<div class="accountassetcoin"></div>
-				<div class="accountassettoken">asdad.asdasda.asdasd</div>
-				<div class="accountassetbalance">1000000000</div>
-				<div class="accountassetfiat">100000000 usd</div>
-			</div>
-
-			<div class="accountdetsassets">
-				<div class="accountassetcoin"></div>
-				<div class="accountassettoken">asdad.asdasda.asdasd</div>
-				<div class="accountassetbalance">1000000000</div>
-				<div class="accountassetfiat">1000000200 usd</div>
-			</div>
-
-			<div class="accountdetsassets">
-				<div class="accountassetcoin"></div>
-				<div class="accountassettoken">asdad.asdasda.asdasd</div>
-				<div class="accountassetbalance">1000000000</div>
-				<div class="accountassetfiat">1000000200 usd</div>
-			</div>
-
-		</div>
-		<!--#endregion -->
-
-		<!--#region set Full Access-->
-
-		<div id="account-selected-make-full-access" class="subpage hidden">
-			<div class="title">
-				<h2>Make Full Access</h2>
-			</div>
-			<div class="subtitle">
-				<h3>Enter the seed phrase (or private key)<br> for this account</h3>
-			</div>
-			<div class="seed-phrase-form">
-				<div class="form-field-label">
-					<label for="seed-phrase">
-						Seed Phrase
-					</label>
-					<div class="form-control">
-						<input autocomplete="off" placeholder="correct horse battery staple..." id="seed-phrase"
-							type="text">
-					</div>
-				</div>
-			</div>
-		</div>
 
 		<!--#endregion-->
-
-		<!--#region subpage RECEIVE -->
-		<div id="account-selected-receive" class="subpage hidden">
-
-			<h3>Tell the other party to send to:</h3>
-			<h2 id="account-selected-receive-name" class="important-label"></h2>
-
-		</div>
-
-		<!--#endregion-->		
-
-		<!--#region subpage is OK to grant access? -->
-		<div id="account-selected-ok-to-grant-access" class="subpage hidden">
-
-			<h2>Grant full access to this account ?</h2>
-			<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
-
-		</div>
-
-		<!--#endregion-->		
-
 		<!--#region subpage SEND -->
 		<div id="account-selected-send" class="subpage hidden">
 			<div class="title">
@@ -315,13 +246,112 @@ Networks Dropdown
 
 		<!--#endregion -->
 
-		<!-- OK CANCEL buttons common to all subpages -->
-		<div class="button-group hidden" id="account-selected .ok-cancel">
+
+
+
+		<!-- #region subpage MAKE READ ONLY -->
+		<div id="account-selected-make-read-only" class="subpage hidden">
+			<div class="title">
+				<h2>Make Read Only</h2>
+			</div>
+			<div class="subtitle">
+				<h3 class="warning">WARNING: Removing access means
+					you won't be able to access this account again
+					without the seed phrase. Please make sure you
+					have the seed phrase securely stored and available</h3>
+			</div>
+			<div class="make-read-only-form">
+				<div class="form-field-label">
+					<label for="account-name-confirm">
+						Type the account name to confirm
+					</label>
+					<div class="form-control">
+						<input placeholder="" id="account-name-confirm" type="text" dir="auto" value="">
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--#endregion-->
+
+
+		<!--#region subpage RECEIVE -->
+		<div id="account-selected-receive" class="subpage hidden">
+
+			<h3>Tell the other party to send to:</h3>
+			<h2 id="account-selected-receive-name" class="important-label"></h2>
+
+		</div>
+
+		<!--#endregion-->
+
+		<!--#region subpage is OK to grant access? -->
+		<div id="account-selected-ok-to-grant-access" class="subpage hidden">
+
+			<h2>Grant full access to this account ?</h2>
+			<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+
+		</div>
+
+		<!--#endregion-->
+
+		<!--#region set Full Access-->
+
+		<div id="account-selected-make-full-access" class="subpage hidden">
+			<div class="title">
+				<h2>Make Full Access</h2>
+			</div>
+			<div class="subtitle">
+				<h3>Enter the seed phrase (or private key)<br> for this account</h3>
+			</div>
+			<div class="seed-phrase-form">
+				<div class="form-field-label">
+					<label for="seed-phrase">
+						Seed Phrase
+					</label>
+					<div class="form-control">
+						<input autocomplete="off" placeholder="correct horse battery staple..." id="seed-phrase"
+							type="text">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--#region OK CANCEL buttons common to all subpages -->
+		<div class="button-group hidden" id="ok-cancel-row">
 			<button id="account-selected-action-confirm" class="button ok">OK</button>
 			<button id="account-selected-action-cancel" class="button cancel">Cancel</button>
 		</div>
+		<!--#endregion-->
 
 
+
+
+		<!--#region subpage asset list-->
+		<div class="subpage scroll" id="assests">
+
+			<div class="accountdetsassets">
+				<div class="accountassetcoin"></div>
+				<div class="accountassettoken">asdad.asdasda.asdasd</div>
+				<div class="accountassetbalance">1000000000</div>
+				<div class="accountassetfiat">100000000 usd</div>
+			</div>
+
+			<div class="accountdetsassets">
+				<div class="accountassetcoin"></div>
+				<div class="accountassettoken">asdad.asdasda.asdasd</div>
+				<div class="accountassetbalance">1000000000</div>
+				<div class="accountassetfiat">1000000200 usd</div>
+			</div>
+
+			<div class="accountdetsassets">
+				<div class="accountassetcoin"></div>
+				<div class="accountassettoken">asdad.asdasda.asdasd</div>
+				<div class="accountassetbalance">1000000000</div>
+				<div class="accountassetfiat">1000000200 usd</div>
+			</div>
+
+		</div>
+		<!--#endregion -->
 	</div>
 
 	<!--#endregion -->

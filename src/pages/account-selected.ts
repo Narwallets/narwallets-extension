@@ -64,7 +64,7 @@ function initPage() {
     //lala_redesign
     confirmBtn = new d.El("#account-selected-action-confirm")
     cancelBtn = new d.El("#account-selected-action-cancel")
-    okCancelRow = new d.El("#account-selected .ok-cancel")
+    okCancelRow = new d.El("#ok-cancel-row")
     
     confirmBtn.onClick(confirmClicked);
     cancelBtn.onClick(cancelClicked);
@@ -265,8 +265,6 @@ function showOKToGrantAccess() {
 }
 
 function receiveClicked() {
-    console.log('ASDSA');
-    
     d.showSubPage('account-selected-receive')
     d.byId("account-selected-receive-name").innerText = selectedAccountData.name
     showOKCancel(showButtons)
@@ -1232,7 +1230,7 @@ function confirmClicked(ev:Event) {
 function showButtons() {
     d.showSubPage("assests")
     okCancelRow.hide()
-    if (showingMore()) moreLessClicked()
+    //if (showingMore()) moreLessClicked()
 }
 
 function cancelClicked() {
