@@ -28,9 +28,8 @@
    display: inline-flex;
    justify-content: center;
    padding: 0px;
-   margin:0px;
    margin-left: auto;
-   margin-right: auto;
+   margin-right: 5px;
 }
 
 .cancel
@@ -43,9 +42,8 @@
    display: inline-flex;
    justify-content: center;
    padding: 0px;
-   margin:0px;
-   margin-left: auto;
-   margin-right: auto;
+   margin-left: 10px;
+   margin-right: 15px;
 }
 
 .big {

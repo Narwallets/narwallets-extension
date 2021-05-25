@@ -40,7 +40,7 @@
   top:450px;
   width: 360px;
   height: 60px;
-  align-items: center;
+  align-items: right;
   padding: 0px;
   background-color: var(--NarBackground);
 }
