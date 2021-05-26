@@ -7,10 +7,9 @@
   width: 60px;
   height: 48px;
   display: inline-block;
-  margin: 0px;
+  margin: 5px;
   background-repeat: no-repeat;
   color: white;
-  padding: 0px;
   font-size: 10px;
   text-align: center;
   border-style: none;
@@ -22,6 +21,7 @@
 {
    color:white;
    width: 80px;
+   height: 24px;
    border-radius: 5px;
    background-color: green;
    align-items: center;
@@ -32,10 +32,16 @@
    margin-right: 5px;
 }
 
+.ok:hover
+{
+  background-color: lightgreen;
+}
+
 .cancel
 {
   width: 80px;
    color:white;
+   height: 24px;
    border-radius: 5px;
    background-color:red;
    align-items: center;
@@ -44,6 +50,11 @@
    padding: 0px;
    margin-left: 10px;
    margin-right: 15px;
+}
+
+.cancel:hover
+{
+  background-color: darkorange;
 }
 
 .big {
@@ -108,7 +119,7 @@
 }
 
 .back {
-  margin: 0px;
+  margin: 5px;
   width: 16px;
   background-image: url("../icons/SVG/back_dark.svg");
   background-repeat: no-repeat;

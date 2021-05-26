@@ -5,16 +5,10 @@
   position: absolute;
   left: 0px;
   top: 40px;
-  width: 359px;
-  height: 520px;
+  width: 100%;
+  height: 522px;
   background-color: var(--NarBackground);
   overflow-y: hidden;
-
-  /*
-	border-style:solid;
-	border-color: black;
-	border-width: 1px;
-	*/
 }
 
 .appface.show {
@@ -37,21 +31,21 @@
 {
   position: absolute;
   display:inline-flex;
-  top:450px;
-  width: 360px;
-  height: 60px;
+  top:485px;
+  width: 361px;
+  height: 45px;
   align-items: right;
-  padding: 0px;
+  padding: 5px;
   background-color: var(--NarBackground);
 }
 
 .subpage {
   position: absolute;
-  top: 235px;
+  top: 191px;
   left: 0px;
   width: 359px;
-  height: 283px;
-  max-height: 300px;
+  height: 329px;
+  max-height: 329px;
   background-color: var(--NarBackground);
   text-align: center;
   align-items: center;

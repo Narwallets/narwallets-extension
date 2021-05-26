@@ -14,7 +14,6 @@ import { DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transacti
 import { show as AccountPages_show } from "./main.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
-let selectedAccountAsset = [];
 let accountInfoName;
 let accountBalance;
 let removeButton;

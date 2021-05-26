@@ -11,18 +11,16 @@
 	top:0px;
 	left:0px;
 	width:48px;
-	height:200px;
-	margin-top:6px;
+	height:130px;
 }
 
 .accountdetstopright
 {
 	position:absolute;
-	margin-top:6px;
 	top:0px;
 	left:312px;
 	width:48px;
-	height:200px;	
+	height:130px;
 }
 
 .accountdetstopcenter
@@ -31,14 +29,13 @@
 	top:0px;
 	left:40px;
 	width:274px;
-	height:210px;
-	
+	height:130px;
 }
 
 .accountdetsmidbar
 {
 	position:absolute;
-	top:170px;
+	top:131px;
 	left:0px;
 	width:359px;
 	height:60px;
@@ -155,7 +152,7 @@
 {
 	position:absolute;
 	width:260px;
-	top:80px;
+	top:60px;
 	text-align: center;
 	font-weight: 100;
 	font-size:15px;
@@ -165,25 +162,22 @@
 .accountdetsbalance
 {
 	position:absolute;
-	top:100px;
+	top:80px;
 	width:260px;
 	text-align: center;
 	font-size:25px;
 	color:var(--NarBotBar);
-	font-weight: 800;
-
-	
+	font-weight: 800;	
 }
 
 .accountdetsfiat
 {
 	position: absolute;
-	top:130px;	
+	top:110px;	
 	text-align: center;
 	width:260px;
 	font-size:16px;
 	color:black;
-
 }
 
 /* for asset history */
