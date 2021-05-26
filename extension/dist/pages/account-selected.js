@@ -7,13 +7,14 @@ import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/vali
 import { checkSeedPhrase, parseSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { ExtendedAccountData } from "../data/account.js";
+import { Asset, ExtendedAccountData } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount } from "../background/askBackground.js";
 import { DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
+let selectedAccountAsset = [];
 let accountInfoName;
 let accountBalance;
 let removeButton;
@@ -79,7 +80,33 @@ function moreClicked() {
     d.showSubPage("more-subpage");
 }
 function addClicked() {
+    console.log(selectedAccountData);
     d.showSubPage("add-subpage");
+    fullAccessSubPage("add-subpage", addOKClicked);
+}
+async function addOKClicked() {
+    console.log(selectedAccountData);
+    try {
+        let item = new Asset();
+        item.type = "ft"; //combo
+        item.contractId = "meta-v2.pool.testnet"; //en un combo
+        let result = await askBackgroundCallMethod(item.contractId, "ft_metadata", {}, selectedAccountData.name);
+        console.log('result ', result);
+        item.symbol = result.symbol;
+        item.icon = result.icon;
+        item.url = result.reference;
+        item.spec = result.spec;
+        let resultBalance = await askBackgroundCallMethod(item.contractId, "ft_balance_of", { account_id: selectedAccountData.name }, selectedAccountData.name);
+        console.log(resultBalance);
+        item.balance = c.yton(resultBalance);
+        selectedAccountData.accountInfo.assets.push(item);
+        saveSelectedAccount();
+        console.log(selectedAccountData);
+    }
+    catch (ex) {
+        console.log(selectedAccountData);
+        console.log(ex);
+    }
 }
 function showingMore() {
     const buttonsMore = new d.All(".buttons-more");

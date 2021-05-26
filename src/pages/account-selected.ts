@@ -10,7 +10,7 @@ import {checkSeedPhrase,parseSeedPhraseAsync}from "../lib/near-api-lite/utils/se
 import { CurveAndArrayKey, KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js"
 
 import { LockupContract } from "../contracts/LockupContract.js"
-import { Account, ExtendedAccountData } from "../data/account.js"
+import { Account, Asset, ExtendedAccountData } from "../data/account.js"
 import { localStorageSet } from "../data/util.js"
 import { askBackground, askBackgroundApplyTxAction, askBackgroundApplyBatchTx, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount } from "../background/askBackground.js"
 import { BatchTransaction, DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transaction.js"
@@ -115,7 +115,46 @@ function moreClicked(){
 }
 
 function addClicked() {
+    console.log(selectedAccountData);
+
     d.showSubPage("add-subpage");
+    fullAccessSubPage("add-subpage", addOKClicked)
+    
+}
+
+async function addOKClicked() {
+    console.log(selectedAccountData);
+    
+    try {
+        let item = new Asset();
+        item.type = "ft"; //combo
+        item.contractId = "meta-v2.pool.testnet"; //en un combo
+        
+        let result = await askBackgroundCallMethod(item.contractId, "ft_metadata", {}, selectedAccountData.name)
+        console.log('result ',result);
+
+        item.symbol = result.symbol;
+        item.icon = result.icon;
+        item.url = result.reference;
+        item.spec = result.spec;
+
+        let resultBalance = await askBackgroundCallMethod(item.contractId, "ft_balance_of", {account_id:selectedAccountData.name}, selectedAccountData.name)
+        console.log(resultBalance);
+        item.balance = c.yton(resultBalance);
+        
+
+        
+        selectedAccountData.accountInfo.assets.push(item);
+
+        saveSelectedAccount();
+        console.log(selectedAccountData);
+
+    } 
+    catch (ex) {
+        console.log(selectedAccountData);
+        console.log(ex);
+
+    }
 }
 
 function showingMore() {
@@ -142,7 +181,7 @@ async function selectAndShowAccount(accName:string) {
     if (!accInfo) throw new Error("Account is not in this wallet: " + accName)
 
     selectedAccountData = new ExtendedAccountData(accName, accInfo)
-
+    
     if (accInfo.ownerId && accInfo.type == "lock.c" && !accInfo.privateKey) {
         //lock.c is read-only, but do we have full access on the owner?
         const ownerInfo = await getAccountRecord(accInfo.ownerId)
@@ -252,8 +291,8 @@ async function fullAccessSubPage(subPageId:string, OKHandler:ClickHandler) {
     }
     catch (ex) {
         d.showErr(ex.message)
+        
     }
-
 }
 
 function GotoOwnerOkHandler() {

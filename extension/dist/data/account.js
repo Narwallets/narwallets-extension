@@ -9,9 +9,29 @@ export class Account {
         this.unstaked = 0; // in the pool & unstaked (maybe can withdraw)
         this.rewards = 0; //Stakingpool rewards (initial staking - (staked+unstaked))
         this.lockedOther = 0; //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
+        this.assets = []; //assets
+        this.history = []; //history
     }
     get totalInThePool() {
         return this.staked + this.unstaked;
+    }
+}
+export class Asset {
+    constructor() {
+        this.spec = "";
+        this.url = "";
+        this.contractId = "";
+        this.balance = 0;
+        this.type = "ft";
+        this.symbol = "";
+        this.history = [];
+        this.icon = "";
+    }
+}
+export class History {
+    constructor() {
+        this.date = new Date();
+        this.type = "send";
     }
 }
 export class ExtendedAccountData {
@@ -30,6 +50,8 @@ export class ExtendedAccountData {
             this.typeFull += formattedNote;
         }
         this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
+        if (!this.accountInfo.assets)
+            this.accountInfo.assets = [];
         if (!this.accountInfo.staked)
             this.accountInfo.staked = 0;
         if (!this.accountInfo.unstaked)
