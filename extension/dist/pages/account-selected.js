@@ -43,6 +43,10 @@ function initPage() {
     d.onClickId("access", changeAccessClicked);
     d.onClickId("receive", receiveClicked);
     d.onClickId("send", sendClicked);
+    d.onClickId("stake", stakeClicked);
+    d.onClickId("list-pools", listPoolsClicked);
+    d.onClickId("add", addClicked);
+    d.onClickId("more", moreClicked);
     seedTextElem = new d.El("#seed-phrase");
     //lala_redesign
     confirmBtn = new d.El("#account-selected-action-confirm");
@@ -54,9 +58,8 @@ function initPage() {
     //accountAmount.onInput(amountInput);
     removeButton = new d.El("button#remove");
     refreshButton = new d.El("button#refresh");
-    d.onClickId("stake", stakeClicked);
+    d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("unstake", unstakeClicked);
-    d.onClickId("list-pools", listPoolsClicked);
     d.onClickId("acc-connect-to-page", connectToWebAppClicked);
     d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
     showButtons(); //2nd or third entry - always show the buttons
@@ -65,13 +68,18 @@ function initPage() {
     d.onClickId("add-note", addNoteClicked);
     d.onClickId("explore", exploreButtonClicked);
     d.onClickId("detailed-rewards", detailedRewardsClicked);
-    d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("show-public-key", showPublicKeyClicked);
     d.onClickId("show-private-key", showPrivateKeyClicked);
     d.onClickId("lockup-add-public-key", LockupAddPublicKey);
     d.onClickId("delete-account", DeleteAccount);
     //d.onClickId("assign-staking-pool", assignStakingPool);
     removeButton.onClick(removeAccountClicked);
+}
+function moreClicked() {
+    d.showSubPage("more-subpage");
+}
+function addClicked() {
+    d.showSubPage("add-subpage");
 }
 function showingMore() {
     const buttonsMore = new d.All(".buttons-more");
