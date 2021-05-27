@@ -17,6 +17,22 @@
   padding-top: 33px;
 }
 
+.morepage
+{
+  width:200px;
+  height:48px;
+  margin:6px;
+  border-radius: 5px;
+  background-color: var(--NarMidBar);
+  color:white;
+  padding-top: 26px;
+}
+
+.morepage:hover
+{
+  background-color: var(--NarMidBarhighlight);
+}
+
 .ok 
 {
    color:white;
