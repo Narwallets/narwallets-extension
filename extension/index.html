@@ -269,17 +269,51 @@ Networks Dropdown
 
 		<div id="account-selected-stake" class="subpage hidden">
 
-			<h2>Stake</h2>
+			<div class="wrapper">
+					
+				<input class="radio" id="one" name="group" type="radio" checked>
+				<input class="radio" id="two" name="group" type="radio">
+				<input class="radio" id="three" name="group" type="radio">
 
-			<h3>Deposit & Stake with this Staking Pool</h3>
+				<div class="tabs">
+					<label class="tab" id="one-tab" for="one">Tab 1</label>
+					<label class="tab" id="two-tab" for="two">Tab 2</label>
+					<label class="tab" id="three-tab" for="three">Tab 3</label>
+				</div>
 
-			<div class="inputboxwithbutton">
-				<input id="stake-with-staking-pool" type="text"></input>
-				<button id="list-pools">List Pools</button>
-			</div>
+				<div class="panels">
 
-			<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
-			<input id="stake-amount" type="text">
+					<div class="panel" id="one-panel">
+						<div>
+
+							<h2>Stake</h2>
+
+							<h3>Deposit & Stake with this Staking Pool</h3>
+
+							<div class="inputboxwithbutton">
+								<input id="stake-with-staking-pool" type="text"></input>
+								<button id="list-pools">List Pools</button>
+							</div>
+
+							<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
+							<input id="stake-amount" type="text">
+
+						</div>
+					</div>					
+
+					<div class="panel" id="two-panel">
+						<div>content 2</div>					
+					</div>						
+
+					<div class="panel" id="three-panel">
+						<div>content 3</div>					
+					</div>						
+
+				</div>
+
+			</div>	
+
+
 
 
 		</div>
