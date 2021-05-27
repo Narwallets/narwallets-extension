@@ -11,11 +11,13 @@
     padding:10px 20px;
     padding-top: 5px;
     margin:0px 2px;
-    background:var(--NarMidBar);
+    background:var(--NarBackground);
     display:inline-block;
-    color:#fff;
+    color:var(--NarMidBar);
     border-radius:3px 3px 0px 0px;
+    border-style: solid;
     border-bottom-style: none;
+    border-width: 1px;
   }
 
   .panels{
@@ -27,7 +29,8 @@
     overflow:hidden;
     padding:20px;  
     border-style: solid none none none;
-    border-width: 1px;
+    border-color: var(--NarMidBar);
+    border-width: 2px;
   }
 
   .panel{
@@ -56,11 +59,10 @@
   #one:checked ~ .tabs #one-tab,
   #two:checked ~ .tabs #two-tab,
   #three:checked ~ .tabs #three-tab{
-    background:#fffffff6;
+    background:var(--NarMidBar);
     border-style: solid;
     border-width: 1px;
     border-color: var(--NarMidBar);
-    color:#000;
-    /*border-top: 3px solid #000;*/
+    color:var(--NarBackground);
     border-bottom-style: none;
   }
