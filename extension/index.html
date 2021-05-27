@@ -217,31 +217,16 @@ Networks Dropdown
 			<div class="accountdetsfiat">{totalUSD} usd</div>
 		</div>
 
-		<!--#endregion-->
-
 		<!--#region subpage SEND -->
 		<div id="account-selected-send" class="subpage show">
-			<div class="title">
-				<h2>Send</h2>
-			</div>
-			<div class="send-form">
-				<div class="form-field-label">
-					<label for="send-to-account-name">
-						Send to Account Id
-					</label>
-					<div class="form-control">
-						<input id="send-to-account-name" type="text" dir="auto" value="">
-					</div>
-				</div>
-				<div class="form-field-label">
-					<label for="send-to-account-amount">
-						Amount in NEAR (Max. <span id="max-amount-send"></span>)
-					</label>
-					<div class="form-control">
-						<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
-					</div>
-				</div>
-			</div>
+
+			<h2>Send</h2>
+			<h3>Send to Account Id</h3>
+			<input id="send-to-account-name" type="text" dir="auto" value="">
+			<h3>Amount in NEAR (Max. <span id="max-amount-send"></span>)</h3>
+			<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+
+
 		</div>
 
 		<!--#endregion -->
@@ -278,32 +263,27 @@ Networks Dropdown
 
 		</div>
 
+		<!--#endregion -->
+
+		<!--#region STAKE-->
+
 		<div id="account-selected-stake" class="subpage hidden">
-			<div class="title">
-				<h2>Stake</h2>
+
+			<h2>Stake</h2>
+
+			<h3>Deposit & Stake with this Staking Pool</h3>
+
+			<div class="inputboxwithbutton">
+				<input id="stake-with-staking-pool" type="text"></input>
+				<button id="list-pools">List Pools</button>
 			</div>
-			<div class="form">
-				<div class="form-field-label">
-					<label for="stake-with-staking-pool">
-						Deposit & Stake with this Staking Pool
-					</label>
-					<div class="form-control">
-						<div class="flex-row">
-							<input id="stake-with-staking-pool" type="text" class="with-inside-button">
-							<button id="list-pools" class="button inside-input">List Pools</button>
-						</div>
-					</div>
-					<div class="form-field-label">
-						<label for="stake-amount">
-							Amount in NEAR to Stake (Max <span id="max-stake-amount"></span>)
-						</label>
-						<div class="form-control">
-							<input id="stake-amount" type="text">
-						</div>
-					</div>
-				</div>
-			</div>
+
+			<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
+			<input id="stake-amount" type="text">
+
+
 		</div>
+
 		<!--#endregion -->
 
 		<!--#region add asset-->
@@ -313,16 +293,16 @@ Networks Dropdown
 		<!--#endregion -->
 
 		<!--#region MORE-->
-		<div id="more-subpage" class="subpage hidden"> 
+		<div id="more-subpage" class="subpage hidden">
 
+			<button class="button more">A</button>
 			<button class="button big">A</button>
 			<button class="button big">A</button>
 			<button class="button big">A</button>
 			<button class="button big">A</button>
 			<button class="button big">A</button>
 			<button class="button big">A</button>
-			<button class="button big">A</button>
-			
+
 
 		</div>
 		<!--#endregion -->
@@ -359,15 +339,14 @@ Networks Dropdown
 			</div>
 		</div>
 
+		<!--#endregion -->
+
 		<!--#region OK CANCEL buttons common to all subpages -->
 		<div class="button-group hidden" id="ok-cancel-row">
 			<button id="account-selected-action-confirm" class="button ok">OK</button>
 			<button id="account-selected-action-cancel" class="button cancel">Cancel</button>
 		</div>
 		<!--#endregion-->
-
-
-
 
 		<!--#region subpage asset list-->
 		<div class="subpage scroll" id="assests">
@@ -395,12 +374,10 @@ Networks Dropdown
 
 		</div>
 		<!--#endregion -->
+
 	</div>
 
 	<!--#endregion -->
-
-
-
 
 	<!--#region All Accounts page, Account Item Template -->
 	<div class="appface slide-hide" id="account-list-main">
