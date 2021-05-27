@@ -198,7 +198,8 @@ Networks Dropdown
 		</div>
 
 		<div class="accountdetstopright">
-			<button class="button unlock" id="access"></button>
+			<button class="button unlock"></button>
+			<!-- Le saco el id para dejarlo en el more -->
 			<button class="button more" id="more"></button>
 		</div>
 
@@ -270,7 +271,7 @@ Networks Dropdown
 		<div id="account-selected-stake" class="subpage hidden">
 
 			<div class="wrapper">
-					
+
 				<input class="radio" id="one" name="group" type="radio" checked>
 				<input class="radio" id="two" name="group" type="radio">
 				<input class="radio" id="three" name="group" type="radio">
@@ -299,50 +300,31 @@ Networks Dropdown
 							<input id="stake-amount" type="text">
 
 						</div>
-					</div>					
+					</div>
 
 					<div class="panel" id="two-panel">
-						<div>content 2</div>					
-					</div>						
+						<div>content 2</div>
+					</div>
 
 					<div class="panel" id="three-panel">
-						<div>content 3</div>					
-					</div>						
-
+						<div>content 3</div>
+					</div>
 				</div>
-
-			</div>	
-
-
-
-
+			</div>
 		</div>
 
 		<!--#endregion -->
 
 		<!--#region add asset-->
 		<div id="add-subpage" class="subpage hidden"> HOLA ESTOY ACA
-
+			<select name="select" id="combo">
+				<option value="value1">meta-v2.pool.testnet</option>
+				<option value="value2">Value 2</option>
+			</select>
 		</div>
 		<!--#endregion -->
 
-		<!--#region MORE-->
-		<div id="more-subpage" class="subpage scroll hidden">
 
-			<h2>More Options</h2>
-
-			<button class="button morepage">Search More Assets</button>
-			<button class="button morepage">Explore Account</button>
-			<button class="button morepage">Detailed Rewards</button>
-			<button class="button morepage">Add Note</button>
-			<button class="button morepage">Make Read Only / Make Full Access</button>
-			<button class="button morepage">Show Public Key</button>
-			<button class="button morepage">Show Private Key</button>
-			<button class="button morepage">Remove Account from Wallet</button>
-			<button class="button morepage">Lock Up Contract - Take Control</button>
-			<button class="button morepage">Delete Account</button>
-		</div>
-		<!--#endregion -->
 
 		<!--#region subpage is OK to grant access? -->
 		<div id="account-selected-ok-to-grant-access" class="subpage hidden">
@@ -353,6 +335,63 @@ Networks Dropdown
 		</div>
 
 		<!--#endregion-->
+
+		<!-- #regionsubpage ADD NOTE -->
+		<div id="account-selected-add-note" class="subpage hidden">
+			<div class="title">
+				<h2>Add Note to this account</h2>
+			</div>
+			<div class="subtitle">
+				<h3>Text will be displayed with the account type. Enter a small note</h3>
+			</div>
+			<!--<div class="round-box bg-lightblue">
+			</div>-->
+			<div class="public-key">
+				<div class="form-field-label">
+					<label for="add-note">
+						Note:
+					</label>
+					<div class="form-control">
+						<input id="add-note" type="text">
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--#endregion -->
+		<!-- #region subpage SHOW PRIVATE KEY -->
+		<div id="account-selected-show-private-key" class="subpage hidden">
+			<div class="subtitle">
+				<h3>Please store the private key in a safe place. You WILL eventually need a seed phrase
+					or this private key to regain access to your funds.
+					<b>It's extremely important that you preserve your seed phrase or your private key</b>
+				</h3>
+			</div>
+			<div class="round-box bg-yellow">
+				<div>Your PRIVATE key <b>DO NOT SHARE!</b></div>
+				<div id="account-selected-private-key" class="important-label"></div>
+			</div>
+		</div>
+		<!--#endregion -->
+
+		<!-- subpage SHOW PUBLIC KEY  -->
+		<div id="account-selected-show-public-key" class="subpage hidden">
+			<div class="round-box bg-lightblue">
+				<div>Your public key:</div>
+				<div id="account-selected-public-key" class="important-label"></div>
+			</div>
+		</div>
+		<!--#endregion -->
+
+		<!-- subpage SHOW PUBLIC KEY  -->
+
+		<div id="staking-pool-info-line" class="hidden single-account-item-group small-labels">
+			<label>Staking Pool</label>
+			<div>{accountInfo.stakingPool} ({accountInfo.stakingPoolPct}%)</div>
+			<label>Rewards</label>
+			<div class="balance">{accountInfo.rewards}</div>
+		</div>
+
+		<!--#endregion -->
 
 		<!--#region set Full Access-->
 
@@ -412,6 +451,27 @@ Networks Dropdown
 		</div>
 		<!--#endregion -->
 
+		<!--#region MORE-->
+		<div id="more-subpage" class="subpage scroll hidden">
+
+			<h2>More Options</h2>
+
+			<button class="button morepage" id="search-pools">Search More Assets</button>
+			<button class="button morepage" id="explore">Explore Account</button>
+			<button class="button morepage" id="detailed-rewards">Detailed Rewards</button>
+			<button class="button morepage" id="add-note">Add Note</button>
+			<button class="button morepage" id="access">Make Read Only / Make Full Access</button>
+			<button class="button morepage" id="show-public-key">Show Public Key</button>
+			<button class="button morepage" id="show-private-key">Show Private Key</button>
+			<button class="button morepage">Remove Account from Wallet</button>
+			<button class="button morepage">Lock Up Contract - Take Control</button>
+			<button class="button morepage">Delete Account</button>
+		</div>
+		<!--#endregion -->
+
+		<!--Este div lo usamos para que no se muestre una pagina rara -->
+		<div class="subpage hidden"></div>
+
 	</div>
 
 	<!--#endregion -->
@@ -428,7 +488,7 @@ Networks Dropdown
 				<div class="accountlistitem">
 					<div class="accountlistname">{name}</div>
 					<div class="accountlistbalance balance">{total}</div>
-					<div class="accountlistcomment">{note}</div>
+					<div class="accountlistcomment">{accountInfo.note}</div>
 				</div>
 			</div>
 
@@ -468,7 +528,25 @@ Networks Dropdown
 				<button id="seed-phrase-cancel" class="btn-cancel">Cancel</button>
 			</div>
 		</div>
+		<div id="seed-phrase-step-2" class="page slide-hide">
+			<div class="contents-header">
+				<h1>Verifying your Seed Phrase</h1>
+				<h2>What was word #<span id="seed-phrase-word-number"></span>?</h2>
+			</div>
+			<div class="form">
+				<div class="form-field-label">
+					<div class="form-control">
+						<input id="seed-word" type="text" dir="auto" value="">
+					</div>
+				</div>
+				<div class="flex-row">
+					<button id="seed-word-continue" class="medium btn-primary">Continue</button>
+					<button id="seed-word-cancel" class="medium btn-cancel">Back</button>
+				</div>
+			</div>
+		</div>
 	</div>
+
 	<!--#endregion -->
 
 	<!--#region import account-->

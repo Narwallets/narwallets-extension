@@ -3,14 +3,14 @@ import * as d from "../util/document.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import * as Pages from "../pages/main.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/valid.js";
-import { checkSeedPhrase, parseSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
-import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
+import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/valid.js";
+import { checkSeedPhrase, parseSeedPhraseAsync, } from "../lib/near-api-lite/utils/seed-phrase.js";
+import { KeyPairEd25519, } from "../lib/near-api-lite/utils/key-pair.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Asset, ExtendedAccountData } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
-import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount } from "../background/askBackground.js";
-import { DeleteAccountToBeneficiary } from "../lib/near-api-lite/batch-transaction.js";
+import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount, } from "../background/askBackground.js";
+import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
@@ -19,6 +19,8 @@ let accountBalance;
 let removeButton;
 let refreshButton;
 let seedTextElem;
+let comboAdd;
+let isMoreOptionsOpen = false;
 export async function show(accName, reposition) {
     initPage();
     await selectAndShowAccount(accName);
@@ -47,7 +49,14 @@ function initPage() {
     d.onClickId("list-pools", listPoolsClicked);
     d.onClickId("add", addClicked);
     d.onClickId("more", moreClicked);
+    d.onClickId("show-public-key", showPublicKeyClicked);
+    d.onClickId("show-private-key", showPrivateKeyClicked);
+    d.onClickId("add-note", addNoteClicked);
+    d.onClickId("detailed-rewards", detailedRewardsClicked);
+    d.onClickId("explore", exploreButtonClicked);
+    d.onClickId("search-pools", searchPoolsButtonClicked);
     seedTextElem = new d.El("#seed-phrase");
+    comboAdd = new d.El("#combo");
     //lala_redesign
     confirmBtn = new d.El("#account-selected-action-confirm");
     cancelBtn = new d.El("#account-selected-action-cancel");
@@ -58,49 +67,57 @@ function initPage() {
     //accountAmount.onInput(amountInput);
     removeButton = new d.El("button#remove");
     refreshButton = new d.El("button#refresh");
-    d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("unstake", unstakeClicked);
     d.onClickId("acc-connect-to-page", connectToWebAppClicked);
     d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
     showButtons(); //2nd or third entry - always show the buttons
     refreshButton.onClick(refreshClicked);
     d.onClickId("moreless", moreLessClicked);
-    d.onClickId("add-note", addNoteClicked);
-    d.onClickId("explore", exploreButtonClicked);
-    d.onClickId("detailed-rewards", detailedRewardsClicked);
-    d.onClickId("show-public-key", showPublicKeyClicked);
-    d.onClickId("show-private-key", showPrivateKeyClicked);
     d.onClickId("lockup-add-public-key", LockupAddPublicKey);
     d.onClickId("delete-account", DeleteAccount);
     //d.onClickId("assign-staking-pool", assignStakingPool);
     removeButton.onClick(removeAccountClicked);
 }
 function moreClicked() {
-    d.showSubPage("more-subpage");
+    if (!isMoreOptionsOpen) {
+        d.showSubPage("more-subpage");
+        isMoreOptionsOpen = true;
+        return;
+    }
+    isMoreOptionsOpen = false;
+    d.showSubPage("assests");
 }
 function addClicked() {
-    console.log(selectedAccountData);
     d.showSubPage("add-subpage");
     fullAccessSubPage("add-subpage", addOKClicked);
+    console.log(comboAdd.value);
 }
 async function addOKClicked() {
-    console.log(selectedAccountData);
+    disableOKCancel();
+    d.showWait();
     try {
         let item = new Asset();
-        item.type = "ft"; //combo
-        item.contractId = "meta-v2.pool.testnet"; //en un combo
+        item.type = "ft";
+        switch (comboAdd.value) {
+            case "value1":
+                item.contractId = "meta-v2.pool.testnet";
+                break;
+            case "value2":
+                item.contractId = "";
+        }
+        console.log("item: ", item.contractId);
         let result = await askBackgroundCallMethod(item.contractId, "ft_metadata", {}, selectedAccountData.name);
-        console.log('result ', result);
         item.symbol = result.symbol;
         item.icon = result.icon;
         item.url = result.reference;
         item.spec = result.spec;
         let resultBalance = await askBackgroundCallMethod(item.contractId, "ft_balance_of", { account_id: selectedAccountData.name }, selectedAccountData.name);
-        console.log(resultBalance);
         item.balance = c.yton(resultBalance);
         selectedAccountData.accountInfo.assets.push(item);
-        saveSelectedAccount();
-        console.log(selectedAccountData);
+        refreshSaveSelectedAccount();
+        enableOKCancel();
+        //d.showSuccess("Success");
+        //showButtons();
     }
     catch (ex) {
         console.log(selectedAccountData);
@@ -115,13 +132,18 @@ function showingMore() {
 }
 async function moreLessClicked() {
     const options = await askBackgroundGetOptions();
-    const selector = options.advancedMode ? ".buttons-more" : ".buttons-more:not(.advanced)";
+    const selector = options.advancedMode
+        ? ".buttons-more"
+        : ".buttons-more:not(.advanced)";
     const buttonsMore = new d.All(selector);
     buttonsMore.toggleClass("hidden");
-    d.qs("#moreless").innerText = (showingMore() ? "Less..." : "More...");
+    d.qs("#moreless").innerText = showingMore() ? "Less..." : "More...";
 }
 function getAccountRecord(accName) {
-    return askBackground({ code: "get-account", accountId: accName }); /*as Promise<Account>*/
+    return askBackground({
+        code: "get-account",
+        accountId: accName,
+    }); /*as Promise<Account>*/
 }
 async function selectAndShowAccount(accName) {
     const accInfo = await getAccountRecord(accName);
@@ -138,41 +160,44 @@ async function selectAndShowAccount(accName) {
 }
 function showSelectedAccount() {
     //make sure available is up to date before displaying
-    selectedAccountData.available = selectedAccountData.accountInfo.lastBalance - selectedAccountData.accountInfo.lockedOther;
+    selectedAccountData.available =
+        selectedAccountData.accountInfo.lastBalance -
+            selectedAccountData.accountInfo.lockedOther;
     const SELECTED_ACCOUNT = "selected-account";
     d.clearContainer(SELECTED_ACCOUNT);
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
     /* lala_design
-    accountBalance = new d.El(".selected-account-info .total.balance");
-    accountInfoName = new d.El(".selected-account-info .name");
-
-
-    if (selectedAccountData.accountInfo.ownerId) {
-        const oiLine = new d.El(".selected-account-info #owner-id-info-line");
-        oiLine.show()
-    }
-    if (selectedAccountData.accountInfo.lockedOther) {
-        const lockedOthLine = new d.El(".selected-account-info #locked-others-line");
-        lockedOthLine.show()
-    }
-    if (selectedAccountData.accountInfo.stakingPool) {
-        d.qs(".selected-account-info #staking-pool-info-line").show()
-        d.qs(".selected-account-info #staking-pool-balance-line").show()
-    }
-    
-    d.onClickSelector(".selected-account-info .access-status", accessLabelClicked)
-    */
+      accountBalance = new d.El(".selected-account-info .total.balance");
+      accountInfoName = new d.El(".selected-account-info .name");
+  
+  
+      if (selectedAccountData.accountInfo.ownerId) {
+          const oiLine = new d.El(".selected-account-info #owner-id-info-line");
+          oiLine.show()
+      }
+      if (selectedAccountData.accountInfo.lockedOther) {
+          const lockedOthLine = new d.El(".selected-account-info #locked-others-line");
+          lockedOthLine.show()
+      }
+      if (selectedAccountData.accountInfo.stakingPool) {
+          d.qs(".selected-account-info #staking-pool-info-line").show()
+          d.qs(".selected-account-info #staking-pool-balance-line").show()
+      }
+      
+      d.onClickSelector(".selected-account-info .access-status", accessLabelClicked)
+      */
 }
 function listPoolsClicked() {
     d.inputById("stake-with-staking-pool").value = "";
     localStorageSet({ reposition: "stake", account: selectedAccountData.name });
     chrome.windows.create({
         url: chrome.runtime.getURL("outside/list-pools.html"),
-        state: "maximized"
+        state: "maximized",
     });
 }
 let confirmFunction = function (ev) { };
 function showOKCancel(OKHandler) {
+    isMoreOptionsOpen = false;
     confirmFunction = OKHandler;
     okCancelRow.show();
     enableOKCancel();
@@ -200,10 +225,13 @@ async function checkAccountAccess() {
         if (!ownerInfo)
             throw Error("The owner account is not in this wallet");
         if (!ownerInfo.privateKey)
-            throw Error("You need full access on the owner account: " + selectedAccountData.accountInfo.ownerId + " to operate this lockup account");
+            throw Error("You need full access on the owner account: " +
+                selectedAccountData.accountInfo.ownerId +
+                " to operate this lockup account");
         //new d.El(".footer .title").hide() //no hay  espacio
     }
-    else { //normal account
+    else {
+        //normal account
         checkNormalAccountIsFullAccess();
         //new d.El(".footer .title").show() //hay espacio
     }
@@ -228,17 +256,18 @@ function GotoOwnerOkHandler() {
 }
 function showGotoOwner() {
     if (selectedAccountData.accountInfo.ownerId) {
-        d.byId("account-selected-open-owner-name").innerText = selectedAccountData.accountInfo.ownerId;
-        d.showSubPage('account-selected-open-owner');
+        d.byId("account-selected-open-owner-name").innerText =
+            selectedAccountData.accountInfo.ownerId;
+        d.showSubPage("account-selected-open-owner");
         showOKCancel(GotoOwnerOkHandler);
     }
 }
 function showOKToGrantAccess() {
-    d.showSubPage('account-selected-ok-to-grant-access');
+    d.showSubPage("account-selected-ok-to-grant-access");
     showOKCancel(changeAccessClicked);
 }
 function receiveClicked() {
-    d.showSubPage('account-selected-receive');
+    d.showSubPage("account-selected-receive");
     d.byId("account-selected-receive-name").innerText = selectedAccountData.name;
     showOKCancel(showButtons);
     showGotoOwner(); //if this is a lock.c shows the "goto owner" page
@@ -247,7 +276,10 @@ function receiveClicked() {
 async function connectToWebAppClicked() {
     d.showWait();
     try {
-        await askBackground({ code: "connect", accountId: selectedAccountData.name });
+        await askBackground({
+            code: "connect",
+            accountId: selectedAccountData.name,
+        });
         d.showSuccess("connected");
         window.close();
     }
@@ -276,8 +308,12 @@ async function checkOwnerAccessThrows(action) {
         const owner = await getAccountRecord(info.ownerId);
         if (!owner || !owner.privateKey) {
             showGotoOwner();
-            throw Error("You need full access on " + info.ownerId +
-                " to " + action + " from this " + selectedAccountData.typeFull);
+            throw Error("You need full access on " +
+                info.ownerId +
+                " to " +
+                action +
+                " from this " +
+                selectedAccountData.typeFull);
         }
     }
 }
@@ -286,7 +322,8 @@ async function sendClicked() {
     try {
         let maxAmountToSend = selectedAccountData.available;
         //if it's a lock.c and we didn't add a priv key yet, use contract method "trasnfer" (performLockupContractSend)
-        if (selectedAccountData.accountInfo.type == "lock.c" && !selectedAccountData.accountInfo.privateKey) {
+        if (selectedAccountData.accountInfo.type == "lock.c" &&
+            !selectedAccountData.accountInfo.privateKey) {
             maxAmountToSend = selectedAccountData.unlockedOther;
         }
         //check amount
@@ -316,7 +353,8 @@ async function sendOKClicked() {
         let performer;
         let maxAvailable;
         //if it's a lock.c and we didn't add a priv key yet, use contract method "trasnfer" (performLockupContractSend)
-        if (selectedAccountData.accountInfo.type == "lock.c" && !selectedAccountData.accountInfo.privateKey) {
+        if (selectedAccountData.accountInfo.type == "lock.c" &&
+            !selectedAccountData.accountInfo.privateKey) {
             await checkOwnerAccessThrows("send");
             performer = performLockupContractSend;
             maxAvailable = selectedAccountData.unlockedOther;
@@ -355,7 +393,12 @@ async function performLockupContractSend() {
         const lc = new LockupContract(info);
         await lc.computeContractAccount();
         await lc.transfer(amountToSend, toAccName);
-        d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
+        d.showSuccess("Success: " +
+            selectedAccountData.name +
+            " transferred " +
+            c.toStringDec(amountToSend) +
+            "\u{24c3} to " +
+            toAccName);
         displayReflectTransfer(amountToSend);
         showButtons();
     }
@@ -395,7 +438,8 @@ async function stakeClicked() {
         if (amountToStake < 0)
             amountToStake = 0;
         await fullAccessSubPage("account-selected-stake", performer);
-        d.inputById("stake-with-staking-pool").value = selectedAccountData.accountInfo.stakingPool || "";
+        d.inputById("stake-with-staking-pool").value =
+            selectedAccountData.accountInfo.stakingPool || "";
         d.byId("max-stake-amount").innerText = c.toStringDec(amountToStake);
         //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
         if (info.type == "lock.c")
@@ -436,16 +480,20 @@ async function performStake() {
         }
         let actualSP = selectedAccountData.accountInfo.stakingPool;
         let poolAccInfo = {
-            account_id: '',
-            unstaked_balance: '0',
-            staked_balance: '0',
-            can_withdraw: false
+            //empty info
+            account_id: "",
+            unstaked_balance: "0",
+            staked_balance: "0",
+            can_withdraw: false,
         };
-        if (actualSP) { //there's a selected SP
+        if (actualSP) {
+            //there's a selected SP
             //ask the actual SP how much is staked
             poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
-            if (actualSP != newStakingPool) { //requesting a change of SP
-                if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 || c.yton(poolAccInfo.staked_balance) >= 0.005) {
+            if (actualSP != newStakingPool) {
+                //requesting a change of SP
+                if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
+                    c.yton(poolAccInfo.staked_balance) >= 0.005) {
                     const staked = c.yton(poolAccInfo.staked_balance);
                     const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
                     throw Error(`Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(staked)}`);
@@ -462,7 +510,8 @@ async function performStake() {
             //2nd select the new staking pool. ONLY if the pool exists
             selectedAccountData.accountInfo.stakingPool = newStakingPool;
         }
-        if (c.yton(poolAccInfo.unstaked_balance) >= 10) { //at least 10 deposited but unstaked, stake that
+        if (c.yton(poolAccInfo.unstaked_balance) >= 10) {
+            //at least 10 deposited but unstaked, stake that
             //just re-stake (maybe the user asked unstaking but now regrets it)
             const amountToStakeY = fixUserAmountInY(amountToStake, poolAccInfo.unstaked_balance);
             if (amountToStakeY == poolAccInfo.unstaked_balance) {
@@ -473,7 +522,8 @@ async function performStake() {
                 //await near.call_method(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
             }
         }
-        else { //no unstaked funds
+        else {
+            //no unstaked funds
             //deposit and stake
             await askBackgroundCallMethod(newStakingPool, "deposit_and_stake", {}, selectedAccountData.name, c.TGas(75), c.ntoy(amountToStake));
             // await near.call_method(newStakingPool, "deposit_and_stake", {},
@@ -596,11 +646,12 @@ async function unstakeClicked() {
 }
 //-----------------------
 function fixUserAmountInY(amount, yoctosMax) {
-    let yoctosResult = yoctosMax; //default => all 
+    let yoctosResult = yoctosMax; //default => all
     if (amount + 2 < c.yton(yoctosResult)) {
         yoctosResult = c.ntoy(amount); //only if it's less of what's available, we take the input amount
     }
-    else if (amount > 2 + c.yton(yoctosMax)) { //only if it's +1 above max
+    else if (amount > 2 + c.yton(yoctosMax)) {
+        //only if it's +1 above max
         throw Error("Max amount is " + c.toStringDec(c.yton(yoctosMax)));
         //----------------
     }
@@ -611,7 +662,7 @@ async function performUnstake() {
     try {
         disableOKCancel();
         d.showWait();
-        const modeWithraw = (d.inputById("radio-withdraw").checked);
+        const modeWithraw = d.inputById("radio-withdraw").checked;
         const modeUnstake = !modeWithraw;
         const amount = c.toNum(d.inputById("unstake-amount").value);
         if (!isValidAmount(amount))
@@ -627,7 +678,7 @@ async function performUnstake() {
             if (poolAccInfo.unstaked_balance == "0")
                 throw Error("No funds unstaked to withdraw");
             //if (!poolAccInfo.can_withdraw) throw Error("Funds are unstaked but you must wait (36-48hs) after unstaking to withdraw")
-            //ok we've unstaked funds we can withdraw 
+            //ok we've unstaked funds we can withdraw
             let yoctosToWithdraw = fixUserAmountInY(amount, poolAccInfo.unstaked_balance); // round user amount
             if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
                 await askBackgroundCallMethod(actualSP, "withdraw_all", {}, selectedAccountData.name);
@@ -638,7 +689,8 @@ async function performUnstake() {
             d.showSuccess(c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool");
             //----------------
         }
-        else { //mode unstake
+        else {
+            //mode unstake
             //here we've staked balance in the pool, call unstake
             if (poolAccInfo.staked_balance == "0")
                 throw Error("No funds staked to unstake");
@@ -709,7 +761,12 @@ async function performSend() {
         //TODO transaction history per network
         //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
         //global.state.transactions[Network.current].push(transactionInfo)
-        d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
+        d.showSuccess("Success: " +
+            selectedAccountData.name +
+            " transferred " +
+            c.toStringDec(amountToSend) +
+            "\u{24c3} to " +
+            toAccName);
         displayReflectTransfer(amountToSend);
     }
     catch (ex) {
@@ -725,7 +782,7 @@ async function exploreButtonClicked() {
     const netInfo = await askBackgroundGetNetworkInfo();
     chrome.windows.create({
         url: netInfo.explorerUrl + "accounts/" + selectedAccountData.name,
-        state: "maximized"
+        state: "maximized",
     });
 }
 async function detailedRewardsClicked() {
@@ -737,7 +794,7 @@ async function detailedRewardsClicked() {
     else {
         chrome.windows.create({
             url: "https://near-staking.com/user/" + selectedAccountData.name,
-            state: "maximized"
+            state: "maximized",
         });
     }
 }
@@ -759,8 +816,8 @@ export async function searchThePools(exAccData) {
                     poolAccInfo = await StakingPool.getAccInfo(exAccData.name, pool.account_id);
                 }
                 catch (ex) {
-                    if (ex.message.indexOf("cannot find contract code for account") != -1
-                        || ex.message.indexOf("FunctionCallError(MethodResolveError(MethodNotFound))") != -1) {
+                    if (ex.message.indexOf("cannot find contract code for account") != -1 ||
+                        ex.message.indexOf("FunctionCallError(MethodResolveError(MethodNotFound))") != -1) {
                         //validator is not a staking pool - ignore
                         isStakingPool = false;
                     }
@@ -772,14 +829,17 @@ export async function searchThePools(exAccData) {
                 }
                 checked[pool.account_id] = true;
                 if (isStakingPool && poolAccInfo) {
-                    const amount = c.yton(poolAccInfo.unstaked_balance) + c.yton(poolAccInfo.staked_balance);
+                    const amount = c.yton(poolAccInfo.unstaked_balance) +
+                        c.yton(poolAccInfo.staked_balance);
                     if (amount > 0) {
                         d.showSuccess(`Found! ${c.toStringDec(amount)} on ${pool.account_id}`);
-                        if (amount > lastAmountFound) { //save only one
+                        if (amount > lastAmountFound) {
+                            //save only one
                             exAccData.accountInfo.stakingPool = pool.account_id;
                             exAccData.accountInfo.staked = c.yton(poolAccInfo.staked_balance);
                             exAccData.accountInfo.unstaked = c.yton(poolAccInfo.unstaked_balance);
-                            exAccData.inThePool = exAccData.accountInfo.staked + exAccData.accountInfo.unstaked;
+                            exAccData.inThePool =
+                                exAccData.accountInfo.staked + exAccData.accountInfo.unstaked;
                             exAccData.accountInfo.stakingPoolPct = await StakingPool.getFee(pool.account_id);
                             lastAmountFound = amount;
                         }
@@ -795,7 +855,7 @@ export async function searchThePools(exAccData) {
         doingDiv.remove();
         d.hideWait();
     }
-    return (lastAmountFound > 0);
+    return lastAmountFound > 0;
 }
 //-------------------------------
 async function searchPoolsButtonClicked() {
@@ -819,12 +879,14 @@ function getPublicKey(privateKey) {
 //---------------------------------------
 function showPublicKeyClicked() {
     d.hideErr();
-    if (selectedAccountData.isReadOnly) { //we don't have any key for ReadOnly accounts
+    if (selectedAccountData.isReadOnly) {
+        //we don't have any key for ReadOnly accounts
         d.showErr("Account is read only");
         d.showSubPage("account-selected-make-full-access");
         showOKCancel(makeFullAccessOKClicked);
     }
-    else { //normal acc priv key
+    else {
+        //normal acc priv key
         d.showSubPage("account-selected-show-public-key");
         d.byId("account-selected-public-key").innerText = getPublicKey(selectedAccountData.accountInfo.privateKey || "");
         showOKCancel(showButtons);
@@ -833,14 +895,17 @@ function showPublicKeyClicked() {
 //---------------------------------------
 export function showPrivateKeyClicked() {
     d.hideErr();
-    if (selectedAccountData.isReadOnly) { //we don't have any key for ReadOnly accounts
+    if (selectedAccountData.isReadOnly) {
+        //we don't have any key for ReadOnly accounts
         d.showErr("Account is read only");
         d.showSubPage("account-selected-make-full-access");
         showOKCancel(makeFullAccessOKClicked);
     }
-    else { //normal acc priv key
+    else {
+        //normal acc priv key
         d.showSubPage("account-selected-show-private-key");
-        d.byId("account-selected-private-key").innerText = selectedAccountData.accountInfo.privateKey || "";
+        d.byId("account-selected-private-key").innerText =
+            selectedAccountData.accountInfo.privateKey || "";
         showOKCancel(showButtons);
         cancelBtn.hidden = true;
     }
@@ -863,7 +928,8 @@ function changeAccessClicked() {
         d.inputById("account-name-confirm").value = "";
         showOKCancel(makeReadOnlyOKClicked);
     }
-    else { //is ReadOnly
+    else {
+        //is ReadOnly
         d.showSubPage("account-selected-make-full-access");
         showOKCancel(makeFullAccessOKClicked);
     }
@@ -882,8 +948,8 @@ function LockupAddPublicKey() {
 //---------------------------------------
 function addNoteClicked() {
     d.hideErr();
-    d.inputById("add-note").value = selectedAccountData.accountInfo.note || "";
     d.showSubPage("account-selected-add-note");
+    d.inputById("add-note").value = selectedAccountData.accountInfo.note || "";
     showOKCancel(addNoteOKClicked);
 }
 async function addNoteOKClicked() {
@@ -902,7 +968,8 @@ async function DeleteAccount() {
             throw Error("Account is Read-Only");
         await refreshSaveSelectedAccount(); //refresh account to have updated balance
         d.showSubPage("account-selected-delete");
-        d.inputById("send-balance-to-account-name").value = selectedAccountData.accountInfo.ownerId || "";
+        d.inputById("send-balance-to-account-name").value =
+            selectedAccountData.accountInfo.ownerId || "";
         showOKCancel(AccountDeleteOKClicked);
     }
     catch (ex) {
@@ -928,7 +995,10 @@ async function AccountDeleteOKClicked() {
             throw Error("Enter the beneficiary account");
         const result = await askBackgroundApplyTxAction(toDeleteAccName, new DeleteAccountToBeneficiary(beneficiary), selectedAccountData.name);
         //remove from wallet
-        await askBackground({ code: "remove-account", accountId: selectedAccountData.name });
+        await askBackground({
+            code: "remove-account",
+            accountId: selectedAccountData.name,
+        });
         //console.log("remove-account sent ",selectedAccountData.name)
         //return to accounts page
         await AccountPages_show();
@@ -961,7 +1031,7 @@ async function AddPublicKeyToLockupOKClicked() {
         }
         catch (ex) {
             if (ex.message.indexOf("Transfers are already enabled") != -1) {
-                //ok, Transfers are enabled 
+                //ok, Transfers are enabled
             }
             else
                 throw ex;
@@ -969,7 +1039,7 @@ async function AddPublicKeyToLockupOKClicked() {
         const newPubKey = getPublicKey(privateKey);
         const result = await askBackgroundCallMethod(selectedAccountData.name, "add_full_access_key", { new_public_key: newPubKey }, owner);
         d.showSuccess("Public Key added");
-        //check if that's a known-key 
+        //check if that's a known-key
         const allNetworkAccounts = await askBackgroundAllNetworkAccounts();
         for (let accName in allNetworkAccounts) {
             if (accName != selectedAccountData.name) {
@@ -987,8 +1057,10 @@ async function AddPublicKeyToLockupOKClicked() {
         showButtons();
     }
     catch (ex) {
-        if (ex.message.indexOf("assertion failed") != -1 && ex.message.indexOf("(left == right)") != -1) {
-            ex.message = "Err: Locked amount is not 0. Lockup period has not ended yet";
+        if (ex.message.indexOf("assertion failed") != -1 &&
+            ex.message.indexOf("(left == right)") != -1) {
+            ex.message =
+                "Err: Locked amount is not 0. Lockup period has not ended yet";
         }
         d.showErr(ex.message);
     }
@@ -1023,13 +1095,14 @@ async function makeFullAccessOKClicked() {
     d.showWait();
     try {
         let secretKey, publicKey;
-        if (words.startsWith("ed25519:")) { //let's assume is a private key
+        if (words.startsWith("ed25519:")) {
+            //let's assume is a private key
             secretKey = words;
             publicKey = getPublicKey(secretKey);
         }
         else {
             //a seed phrase
-            const seedPrhase = words.trim().split(' ');
+            const seedPrhase = words.trim().split(" ");
             checkSeedPhrase(seedPrhase);
             const result = await parseSeedPhraseAsync(seedPrhase);
             secretKey = result.secretKey;
@@ -1042,7 +1115,8 @@ async function makeFullAccessOKClicked() {
             let err = ex.message;
             //better explanation
             if (err.indexOf("does not exists") != 0)
-                err = "Seed phrase was incorrect or is not the seed phrase for this account key";
+                err =
+                    "Seed phrase was incorrect or is not the seed phrase for this account key";
             throw new Error(err);
         }
         //if key found correctly
@@ -1089,7 +1163,10 @@ async function removeAccountClicked(ev) {
             return;
         }
         //remove
-        await askBackground({ code: "remove-account", accountId: selectedAccountData.name });
+        await askBackground({
+            code: "remove-account",
+            accountId: selectedAccountData.name,
+        });
         //return to main page
         Pages.show();
     }
