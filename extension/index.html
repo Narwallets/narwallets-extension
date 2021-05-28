@@ -37,9 +37,8 @@
 
 	</div>
 
-	<!-- 
-Networks Dropdown 
--->
+	<!-- Networks Dropdown -->
+
 	<div id="networks-list" class="networks-list-box">
 		<div class="networks-list-content">
 			<div class="network-box-header">
@@ -162,9 +161,6 @@ Networks Dropdown
 
 		<div class="addaccount_face">
 
-			<div class="backarea">
-				<button class="button back"></button>
-			</div>
 			<div class="titulo">
 				<h1>Do you have an Account?</h1>
 			</div>
@@ -180,7 +176,9 @@ Networks Dropdown
 			<h2>No, create a free implicit Account</h2>
 			<h3>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h3>
 			<button class="button big in" id="option-create-implicit">Create implicit account</button>
+		
 		</div>
+
 
 	</div>
 
@@ -234,15 +232,18 @@ Networks Dropdown
 
 		<!-- #region subpage MAKE READ ONLY -->
 		<div id="account-selected-make-read-only" class="subpage hidden">
+
 			<div class="title">
 				<h2>Make Read Only</h2>
 			</div>
+
 			<div class="subtitle">
 				<h3 class="warning">WARNING: Removing access means
 					you won't be able to access this account again
 					without the seed phrase. Please make sure you
 					have the seed phrase securely stored and available</h3>
 			</div>
+
 			<div class="make-read-only-form">
 				<div class="form-field-label">
 					<label for="account-name-confirm">
@@ -253,6 +254,7 @@ Networks Dropdown
 					</div>
 				</div>
 			</div>
+
 		</div>
 		<!--#endregion-->
 
@@ -324,8 +326,6 @@ Networks Dropdown
 		</div>
 		<!--#endregion -->
 
-
-
 		<!--#region subpage is OK to grant access? -->
 		<div id="account-selected-ok-to-grant-access" class="subpage hidden">
 
@@ -334,18 +334,20 @@ Networks Dropdown
 
 		</div>
 
-		<!--#endregion-->
+		<!--#endregion -->
 
-		<!-- #regionsubpage ADD NOTE -->
+		<!--#region subpage ADD NOTE -->
+
 		<div id="account-selected-add-note" class="subpage hidden">
+
 			<div class="title">
 				<h2>Add Note to this account</h2>
 			</div>
+
 			<div class="subtitle">
 				<h3>Text will be displayed with the account type. Enter a small note</h3>
 			</div>
-			<!--<div class="round-box bg-lightblue">
-			</div>-->
+
 			<div class="public-key">
 				<div class="form-field-label">
 					<label for="add-note">
@@ -357,32 +359,35 @@ Networks Dropdown
 				</div>
 			</div>
 		</div>
+
 		<!--#endregion -->
-		<!-- #region subpage SHOW PRIVATE KEY -->
+
+		<!--#region subpage SHOW PRIVATE KEY -->
 		<div id="account-selected-show-private-key" class="subpage hidden">
-			<div class="subtitle">
-				<h3>Please store the private key in a safe place. You WILL eventually need a seed phrase
-					or this private key to regain access to your funds.
-					<b>It's extremely important that you preserve your seed phrase or your private key</b>
-				</h3>
-			</div>
-			<div class="round-box bg-yellow">
-				<div>Your PRIVATE key <b>DO NOT SHARE!</b></div>
-				<div id="account-selected-private-key" class="important-label"></div>
-			</div>
+
+			<h2>Private Key</h2>
+
+			<h3>Please store the private key in a safe place. You WILL eventually need a seed phrase
+				or this private key to regain access to your funds.
+				<b>It's extremely important that you preserve your seed phrase or your private key</b>
+			</h3>
+
+			<h3>Your PRIVATE key <b>DO NOT SHARE!</h3>
+			<h4 id="account-selected-private-key"></h4>
+
 		</div>
 		<!--#endregion -->
 
-		<!-- subpage SHOW PUBLIC KEY  -->
+		<!--#region subpage SHOW PUBLIC KEY  -->
 		<div id="account-selected-show-public-key" class="subpage hidden">
-			<div class="round-box bg-lightblue">
-				<div>Your public key:</div>
-				<div id="account-selected-public-key" class="important-label"></div>
-			</div>
+
+			<h2>Your public key:</h2v>
+			<h4 id="account-selected-public-key"></h4>
+
 		</div>
 		<!--#endregion -->
 
-		<!-- subpage SHOW PUBLIC KEY  -->
+		<!--#region subpage stakingpool  -->
 
 		<div id="staking-pool-info-line" class="hidden single-account-item-group small-labels">
 			<label>Staking Pool</label>
@@ -453,9 +458,6 @@ Networks Dropdown
 
 		<!--#region MORE-->
 		<div id="more-subpage" class="subpage scroll hidden">
-
-			<h2>More Options</h2>
-
 			<button class="button morepage" id="search-pools">Search More Assets</button>
 			<button class="button morepage" id="explore">Explore Account</button>
 			<button class="button morepage" id="detailed-rewards">Detailed Rewards</button>
@@ -513,38 +515,47 @@ Networks Dropdown
 
 	<!--#region Existing user, unlock-->
 	<div id="display-seed-phrase" class="appface slide-hide">
-		<div class="contents-header">
-			<h1>This is your Seed Phrase</h1>
-			<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed
-					phrase owns the account.</b></h3>
-		</div>
+
+		<h2>This is your Seed Phrase</h2>
+		<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed
+				phrase owns the account.</b></h3>
+
 		<div class="contents-body">
+
 			<div class="round-box bg-yellow">
 				<h3>Your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
-				<div id="seed-phrase-show-box" class="seed-phrase"></div>
+				<h4 id="seed-phrase-show-box" class="seed-phrase"></h4>
 			</div>
+
 			<div class="flex-row">
 				<button id="seed-phrase-continue" class="btn-primary">OK, I've written down the Seed Phrase</button>
 				<button id="seed-phrase-cancel" class="btn-cancel">Cancel</button>
 			</div>
+
 		</div>
+
 		<div id="seed-phrase-step-2" class="page slide-hide">
+
 			<div class="contents-header">
-				<h1>Verifying your Seed Phrase</h1>
-				<h2>What was word #<span id="seed-phrase-word-number"></span>?</h2>
+				<h2>Verifying your Seed Phrase</h2>
+				<h3>What was word #<span id="seed-phrase-word-number"></span>?</h3>
 			</div>
+
 			<div class="form">
+
 				<div class="form-field-label">
 					<div class="form-control">
 						<input id="seed-word" type="text" dir="auto" value="">
 					</div>
 				</div>
+
 				<div class="flex-row">
 					<button id="seed-word-continue" class="medium btn-primary">Continue</button>
 					<button id="seed-word-cancel" class="medium btn-cancel">Back</button>
 				</div>
 			</div>
 		</div>
+
 	</div>
 
 	<!--#endregion -->

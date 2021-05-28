@@ -7,12 +7,14 @@
 	display:inline-block;
 	position:absolute;
 	top:0px;
-	left:0px;
+	left:-15px;
 	width:359px;
 	height:510px;
 	overflow: hidden;
 	justify-items: center;
-	padding-top: 40px;
+	padding:0px;
+	padding-top: 70px;	
+	margin:0px;
 	
 }
 

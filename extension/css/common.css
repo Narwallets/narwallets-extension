@@ -5,11 +5,50 @@
   position: absolute;
   left: 0px;
   top: 40px;
-  width: 100%;
+  width: 361px;
   height: 522px;
   background-color: var(--NarBackground);
   overflow-y: hidden;
+  text-align: center;
 }
+
+.appface h2
+{
+  font-size: 25px;
+  font-weight: 200;
+  color: var(--NarMidBar);
+  margin: 15px;
+
+}
+
+
+.appface h3
+{
+  font-size: 15px;
+  font-weight: 200;
+	color:var(--NarBotBar);
+  margin: 5px;
+  margin-bottom: 15px;
+
+}
+
+.appface h4
+{
+  font-size: 15px;
+  font-weight: 300;
+	color:var(--NarBotBar);
+  display:inline-block;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  width:300px;
+  height: auto;
+  overflow-wrap:anywhere;
+  background-color: lightyellow;
+  border-radius: 8px;
+  padding:5px;
+}
+
 
 .appface.show {
   left: 0px;
@@ -39,6 +78,7 @@
   background-color: var(--NarBackground);
 }
 
+
 .subpage {
   position: absolute;
   top: 191px;
@@ -49,6 +89,8 @@
   background-color: var(--NarBackground);
   text-align: center;
   align-items: center;
+  
+
 }
 
 .subpage h2
@@ -56,7 +98,7 @@
   font-size: 25px;
   font-weight: 200;
   color: var(--NarMidBar);
-  margin: 5px;
+  margin: 15px;
 
 }
 
@@ -78,6 +120,20 @@
   margin: 5px;
   margin-bottom: 15px;
 
+}
+
+.subpage h4
+{
+  font-size: 15px;
+  font-weight: 200;
+	color:var(--NarBotBar);
+  display:inline-block;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  width:300px;
+  height: auto;
+  overflow-wrap:anywhere;
 }
 
 .subpage input

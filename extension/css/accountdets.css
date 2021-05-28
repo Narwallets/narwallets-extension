@@ -144,7 +144,7 @@
 	height: auto;
 	max-height: 75px;
 	font-weight: 500;
-	overflow-wrap: break-word;	
+	overflow-wrap: anywhere;	
 	overflow-y: hidden;
 }
 

@@ -19,13 +19,14 @@
 
 .morepage
 {
-  width:200px;
+  width:361px;
   height:48px;
-  margin:6px;
-  border-radius: 5px;
+  margin:0px;
+  margin-top:2px;
   background-color: var(--NarMidBar);
   color:white;
   padding-top: 26px;
+  
 }
 
 .morepage:hover
