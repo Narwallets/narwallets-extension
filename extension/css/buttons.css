@@ -4,17 +4,21 @@
 /* ALL BUTTONS */
 
 .button {
-  width: 60px;
+  width: 80px;
   height: 48px;
-  display: inline-block;
+  display: block;
   margin: 5px;
   background-repeat: no-repeat;
   color: white;
   font-size: 10px;
-  text-align: center;
+  text-align: center; 
   border-style: none;
   background-color: var(--NarBackground);
+  padding:0px;
   padding-top: 33px;
+  background-size: 30px;
+  background-position-x: center;
+
 }
 
 .morepage
@@ -107,6 +111,7 @@
 }
 
 .more {
+  width: 32px;
   background-image: url("../icons/SVG/more_dark.svg");
   height: 32px;
 }
@@ -116,6 +121,7 @@
 }
 
 .unlock {
+  width: 32px;
   background-image: url("../icons/SVG/key_light.svg");
   height: 32px;
   padding-top: 0px;
@@ -137,9 +143,10 @@
 
 .back {
   margin: 5px;
-  width: 16px;
+  width: 32px;
   background-image: url("../icons/SVG/back_dark.svg");
   background-repeat: no-repeat;
+  background-size: 16px;
   padding: 0px;
 }
 
@@ -155,7 +162,8 @@
   margin-left: 15px;
   margin-right: 15px;
   background-image: url("../icons/SVG/send_light.svg");
-  width: 32px;
+  background-position-x: center;
+  width: 40px;
   height: 40px;
 }
 

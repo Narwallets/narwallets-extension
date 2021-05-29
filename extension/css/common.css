@@ -8,7 +8,7 @@
   width: 361px;
   height: 522px;
   background-color: var(--NarBackground);
-  overflow-y: hidden;
+  overflow: hidden;
   text-align: center;
 }
 
@@ -71,11 +71,13 @@
   position: absolute;
   display:inline-flex;
   top:480px;
+  left:0px;
   width: 361px;
   height: 45px;
   align-items: right;
   padding: 5px;
   background-color: var(--NarBackground);
+  margin:0px;
 }
 
 
@@ -110,6 +112,7 @@
   position: relative;
   margin:auto;
   padding:5px;
+
 }
 
 .subpage h3

@@ -27,7 +27,7 @@
     max-width:500px;
     border-radius:3px;
     overflow:hidden;
-    padding:20px;  
+    padding:0px;  
     border-style: solid none none none;
     border-color: var(--NarMidBar);
     border-width: 2px;
