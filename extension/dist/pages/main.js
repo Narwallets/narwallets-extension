@@ -3,8 +3,8 @@ import * as c from "../util/conversions.js";
 import { ExtendedAccountData } from "../data/account.js";
 import { show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
-import { localStorageGetAndRemove, localStorageRemove } from "../data/util.js";
-import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetState, askBackgroundIsLocked } from "../background/askBackground.js";
+import { localStorageGetAndRemove, localStorageRemove, } from "../data/util.js";
+import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetState, askBackgroundIsLocked, } from "../background/askBackground.js";
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
 export const CREATE_USER = "create-user";
@@ -15,6 +15,7 @@ export const IMPORT_OR_CREATE = "import-or-create";
 export const ACCOUNTS_LIST = "accounts-list";
 export const ACCOUNT_ITEM_TEMPLATE = "account-item-template";
 export const ACCOUNT_ITEM = "account-item";
+let totalisimo;
 let draggingEl;
 function accountItem_drag(ev) {
     ev.preventDefault();
@@ -73,7 +74,11 @@ async function accountItem_dragend(ev) {
         const accInfo = networkAccounts[li.id];
         //console.log(n,accInfo.type,li.id)
         if (accInfo && accInfo.order != order) {
-            await askBackground({ code: "set-account-order", accountId: li.id, order: order });
+            await askBackground({
+                code: "set-account-order",
+                accountId: li.id,
+                order: order,
+            });
         }
         order++;
     });
@@ -107,7 +112,7 @@ async function disconnectFromWepPageClicked() {
 export async function show() {
     try {
         d.hideErr();
-        //is locked? 
+        //is locked?
         const locked = await askBackgroundIsLocked();
         if (locked) {
             //do a user exists?
@@ -123,7 +128,9 @@ export async function show() {
             return; //*****
         }
         //logged-in and with no accounts? add an account
-        const countAccounts = await askBackground({ code: "getNetworkAccountsCount" });
+        const countAccounts = await askBackground({
+            code: "getNetworkAccountsCount",
+        });
         if (countAccounts == 0) {
             d.showPage(IMPORT_OR_CREATE);
             return;
@@ -142,13 +149,13 @@ export async function show() {
             list.push(new ExtendedAccountData(key, accountsRecord[key]));
         }
         list.sort(sortByOrder);
-        //debug 
+        //debug
         //for(let item of list) console.log(item.accountInfo.order,item.accountInfo.type, item.name)
         d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list);
         let total = 0;
-        let semiTotal = 0;
         //connect all item to accountItemClicked
-        document.querySelectorAll(".accountlistitem")
+        document
+            .querySelectorAll("#accounts-list .account-item")
             .forEach((item) => {
             item.addEventListener("click", accountItemClicked);
             //item.addEventListener("dragstart", accountItem_dragStart)
@@ -176,13 +183,11 @@ export async function show() {
         totalEl.innerText = c.toStringDec(total);
         d.qs("#account-list-main .total-row").el.addEventListener("dragover", total_dragOver);
         d.onClickId(ADD_ACCOUNT, addAccountClicked);
-        //lala_design temp commented
-        //const disconnectButton = d.qs("#disconnect-from-web-page")
+        //const disconnectButton = d.qs("#disconnect-from-web-page");
         //disconnectButton.onClick(disconnectFromWepPageClicked);
         d.showPage(ACCOUNT_LIST_MAIN);
-        //lala_design temp commented
         //d.qs("#disconnect-line").hide();
-        //const isConnected = await askBackground({code:"isConnected"})
+        const isConnected = await askBackground({ code: "isConnected" });
         //d.qs("#disconnect-line").showIf(isConnected);
         await tryReposition();
     }
@@ -196,7 +201,8 @@ export async function show() {
 async function tryReposition() {
     const reposition = await localStorageGetAndRemove("reposition");
     switch (reposition) {
-        case "create-user": { //was creating user but maybe jumped to terms-of-use
+        case "create-user": {
+            //was creating user but maybe jumped to terms-of-use
             d.showPage(CREATE_USER);
             d.inputById("email").value = await localStorageGetAndRemove("email");
             break;

@@ -40,12 +40,13 @@ export class ExtendedAccountData {
         this.accountInfo = accountInfo;
         const typeFullTranslation = {
             acc: "Account",
-            "lock.c": "Lockup Contract"
+            "lock.c": "Lockup Contract",
         };
+        this.accountInfo.assets = accountInfo.assets;
         this.type = this.accountInfo.type;
         this.typeFull = typeFullTranslation[this.accountInfo.type];
         if (this.accountInfo.note) {
-            const formattedNote = ' (' + this.accountInfo.note + ')';
+            const formattedNote = " (" + this.accountInfo.note + ")";
             this.type += formattedNote;
             this.typeFull += formattedNote;
         }
@@ -59,15 +60,23 @@ export class ExtendedAccountData {
         this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
         if (!this.accountInfo.lockedOther)
             this.accountInfo.lockedOther = 0;
-        this.unlockedOther = this.accountInfo.lastBalance + this.inThePool - this.accountInfo.lockedOther;
-        this.available = this.accountInfo.lastBalance - this.accountInfo.lockedOther;
+        this.unlockedOther =
+            this.accountInfo.lastBalance +
+                this.inThePool -
+                this.accountInfo.lockedOther;
+        this.available =
+            this.accountInfo.lastBalance - this.accountInfo.lockedOther;
         if (this.accountInfo.type == "lock.c") {
             this.available = Math.max(0, this.available - 36);
         }
         this.total = this.accountInfo.lastBalance + this.inThePool;
-        this.totalUSD = this.total * 4.70;
+        this.totalUSD = this.total * 4.7;
     }
-    get isReadOnly() { return !this.accountInfo.privateKey; }
-    get isFullAccess() { return !this.isReadOnly; }
+    get isReadOnly() {
+        return !this.accountInfo.privateKey;
+    }
+    get isFullAccess() {
+        return !this.isReadOnly;
+    }
 }
 //# sourceMappingURL=account.js.map
