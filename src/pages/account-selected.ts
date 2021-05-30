@@ -97,6 +97,7 @@ function initPage() {
 
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo");
+  removeButton = new d.El("button#remove");
   //lala_redesign
   confirmBtn = new d.El("#account-selected-action-confirm");
   cancelBtn = new d.El("#account-selected-action-cancel");
@@ -104,12 +105,12 @@ function initPage() {
 
   confirmBtn.onClick(confirmClicked);
   cancelBtn.onClick(cancelClicked);
+  removeButton.onClick(removeAccountClicked);
 
   return;
 
   //accountAmount.onInput(amountInput);
 
-  removeButton = new d.El("button#remove");
   refreshButton = new d.El("button#refresh");
 
   d.onClickId("unstake", unstakeClicked);
@@ -124,8 +125,6 @@ function initPage() {
   d.onClickId("lockup-add-public-key", LockupAddPublicKey);
   d.onClickId("delete-account", DeleteAccount);
   //d.onClickId("assign-staking-pool", assignStakingPool);
-
-  removeButton.onClick(removeAccountClicked);
 }
 
 function moreClicked() {
