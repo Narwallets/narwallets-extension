@@ -3,19 +3,7 @@
 
 /* account items -------------------------------------------------------------------*/
 
-.accountlistscrollarea
-{
-	position:absolute;
-	width: 359px;
-	height: 463px;
-	top: 0px;
-	left: 0px;
-	display: block;
-	margin:0px;
-	padding: 0px;
-	overflow-y: scroll;
-	
-}
+
 
 .accountlistitem
 {

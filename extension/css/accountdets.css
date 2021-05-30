@@ -12,6 +12,7 @@
 	left:0px;
 	width:48px;
 	height:130px;
+
 }
 
 .accountdetstopright
@@ -23,28 +24,74 @@
 	height:130px;
 }
 
-.accountdetstopcenter
+
+/* top info */
+
+.accountdetscuenta
 {
-	position:absolute;
-	top:0px;
-	left:40px;
-	width:274px;
-	height:130px;
+	text-align: center;
+	font-size:15px;
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:10px;
+
+	color: rgb(#4c4774);
+
+	width:280px;
+	height: auto;
+	max-height: 75px;
+	font-weight: 500;
+	overflow-wrap: anywhere;	
+	
 }
 
-.accountdetsmidbar
+.accountdetscomment
 {
-	position:absolute;
-	top:131px;
-	left:0px;
-	width:359px;
-	height:60px;
-	padding-top: 5px;
-	background-color: var(--NarMidBar);		
-	display: inline-flex;
-	justify-content:center;
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:5px;
+	height:15px;
+
+	width:260px;
+	text-align: center;
+	font-weight: 100;
+	font-size:12px;
+
 }
 
+
+.accountdetsbalance
+{
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:5px;
+	height:20px;
+
+	width:260px;
+	text-align: center;
+	font-size:25px;
+
+	font-weight: 800;	
+	color: rgb(#4c4774);
+}
+
+.accountdetsfiat
+{
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:5px;
+	height:20px;
+
+	text-align: center;
+	width:260px;
+	font-size:16px;
+	color:black;
+
+}
 
 
 /*Scroll area and items   ---------------------------------------------------------*/
@@ -130,55 +177,7 @@
 	text-align: right;
 }
 
-/* top info */
 
-.accountdetscuenta
-{
-	text-align: center;
-	position: absolute;
-	font-size:20px;
-	color:var(--NarMidBar);	
-	display: block;
-	top:5px;
-	width:260px;
-	height: auto;
-	max-height: 75px;
-	font-weight: 500;
-	overflow-wrap: anywhere;	
-	overflow-y: hidden;
-}
-
-.accountdetscomment
-{
-	position:absolute;
-	width:260px;
-	top:60px;
-	text-align: center;
-	font-weight: 100;
-	font-size:15px;
-}
-
-
-.accountdetsbalance
-{
-	position:absolute;
-	top:80px;
-	width:260px;
-	text-align: center;
-	font-size:25px;
-	color:var(--NarBotBar);
-	font-weight: 800;	
-}
-
-.accountdetsfiat
-{
-	position: absolute;
-	top:110px;	
-	text-align: center;
-	width:260px;
-	font-size:16px;
-	color:black;
-}
 
 /* for asset history */
 

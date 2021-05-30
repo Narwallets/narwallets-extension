@@ -16,20 +16,8 @@ body { font-family: 'Inter', sans-serif; !important }
 }
 
 :root {
-	  /*--NarBackground: rgb(190,190,190);*/
-	  --NarBackground:white;
-	  --NarTope: rgb(160 160 160 / 33%);
-	  --NarListBack: white;
-	  --NarListHoover: rgb(226 226 226);
-	  --NarDarkHighlight: rgb(155, 155, 155);
-	  --NarMidBar: #1994E6;
-	  --NarMidBarhighlight: #74b6e2;
-	  --NarBotBar: #22618A;
-	  --NarTextoNormal: black;
-	  --NarTextoResaltado: #1B64B7;
-	  --NarLightText: white;
-	  --NarTopeHighLight:rgb(140,140,140);
-	  --NarDarkText:rgb(80,80,80);
+	  --Background:rgb(216, 216, 216);  
+	  --PanelBackground: rgb(255,255,255);
 	}
 
 ::-webkit-scrollbar {
@@ -39,10 +27,11 @@ body { font-family: 'Inter', sans-serif; !important }
 
 body {
 		/*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-		width: 361px;
+		width: 362px;
 		height: 560px;
 		margin: 0px;
 		overflow: hidden;
 	    padding:0px;
+		border-style: none;
 	}
 

@@ -2,53 +2,18 @@
 /* Main div container -------------------------------------------------------------*/
 
 .appface {
+
+
   position: absolute;
+  z-index: 0;
   left: 0px;
   top: 40px;
   width: 361px;
   height: 522px;
-  background-color: var(--NarBackground);
+  background-color: var(--Background);
   overflow: hidden;
   text-align: center;
 }
-
-.appface h2
-{
-  font-size: 25px;
-  font-weight: 200;
-  color: var(--NarMidBar);
-  margin: 15px;
-
-}
-
-
-.appface h3
-{
-  font-size: 15px;
-  font-weight: 200;
-	color:var(--NarBotBar);
-  margin: 5px;
-  margin-bottom: 15px;
-
-}
-
-.appface h4
-{
-  font-size: 15px;
-  font-weight: 300;
-	color:var(--NarBotBar);
-  display:inline-block;
-  margin: auto;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  width:300px;
-  height: auto;
-  overflow-wrap:anywhere;
-  background-color: lightyellow;
-  border-radius: 8px;
-  padding:5px;
-}
-
 
 .appface.show {
   left: 0px;
@@ -76,33 +41,63 @@
   height: 45px;
   align-items: right;
   padding: 5px;
-  background-color: var(--NarBackground);
   margin:0px;
 }
 
-
 .subpage {
+
   position: absolute;
-  top: 191px;
+
+  top: 190px;
   left: 0px;
-  width: 359px;
+  width: 361px;
   height: 500px;
-  max-height: 329px;
-  background-color: var(--NarBackground);
+  max-height: 328px;
+
+  background-color: var(--PanelBackground);
   text-align: center;
   align-items: center;
   
-
 }
 
-.subpage h2
+.accountdetstopcenter
 {
-  font-size: 25px;
-  font-weight: 200;
-  color: var(--NarMidBar);
-  margin: 15px;
+  position: absolute;
+  display: inline-block;  
+  z-index: -1;
+  top:0px;
+  left:0px;
+  width: 361px;
+  height: 130px;
+  background: rgb(214,214,214);
+  background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
 
 }
+
+.accountdetsmidbar
+{
+	position:absolute;
+	top:131px;
+	left:0px;
+	width:359px;
+	padding:0px;
+
+  padding-top:5px;
+
+	display: inline-flex;
+	justify-content:center;
+
+  background: rgb(51,46,147);
+	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  border-style: solid;
+  border-width: 1px;
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
+
+}
+
 
 .inputboxwithbutton
 {
@@ -113,81 +108,6 @@
   margin:auto;
   padding:5px;
 
-}
-
-.subpage h3
-{
-  font-size: 15px;
-  font-weight: 200;
-	color:var(--NarBotBar);
-  margin: 5px;
-  margin-bottom: 15px;
-
-}
-
-.subpage h4
-{
-  font-size: 15px;
-  font-weight: 200;
-	color:var(--NarBotBar);
-  display:inline-block;
-  margin: auto;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  width:300px;
-  height: auto;
-  overflow-wrap:anywhere;
-}
-
-.subpage input
-{
-  border-radius: 5px;
-  border-width: 1px;
-  border-color: lightgray;
-  background-color:  lightgray;
-  width: 250px;
-  height: 20px;
-  margin: 8px;
-}
-
-.inputboxwithbutton input
-{
-  position: absolute;
-  top: 0px;
-  left: 50px;
-  width:180px;
-  border-radius: 0px;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-  padding: 0px;
-  margin:0px;
-}
-
-.inputboxwithbutton button
-{
-  position: absolute;
-  width: 80px;
-  height: 22px;
-  top:0px;
-  left:230px;
-  margin:0px;
-  border-radius: 0px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  background-color: var(--NarMidBar);
-  border-style: none;
-  color: white;
-}
-
-.inputboxwithbutton button:hover
-{
-  background-color: var(--NarMidBarhighlight);
-}
-
-
-.small
-{
-  height: 20px;
 }
 
 
