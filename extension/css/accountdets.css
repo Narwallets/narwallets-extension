@@ -55,7 +55,7 @@
 	margin-left:auto;
 	margin-right:auto;
 	margin-top:5px;
-	height:20px;
+	height:25px;
 
 	text-align: center;
 	width:260px;
@@ -71,47 +71,74 @@
 {
 	position: relative;
 	width: 359px;
-	height: 64px;
+	height: 48px;
 	display: block;
-	background-color: var(--NarListBack);
-	border-bottom-style: solid;
-	border-bottom-width: 1px;
-	border-color: lightgray;
+
+	border-style: solid;
+	border-width: 1px;
+
 	font-weight: lighter;
 	margin: 0px;
 	padding: 0px;
 	top: 0px;
 	bottom: 0px;
 	overflow: hidden;
-	
+
+	background: rgb(214,214,214);
+  	background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+	border-top-color: white;
+	border-left-color: white;
+	border-right-color: darkgrey;
+	border-bottom-color: darkgrey;
 }
 
 .accountdetsassets:hover
 {
 	background-color: var(--NarListHoover);
+	background: linear-gradient(131deg, lightgray 0%, darkgray 100%);
+	border-top-color: white;
+	border-left-color: white;
+	border-right-color: darkgrey;
+	border-bottom-color: darkgrey;
 }
 
 
 .accountassetcoin
 {
-	position:relative;
+	position:absolute;
 	border-style: none;
 	display: inline-block;
 	top:0;
-	left:0;
-	width: 30px;	
-	height: 58px;
+	left:48px;
+	width: 40px;	
+
+	font-size: 10px;
+	font-weight: 400;
 }
 
 .accountassettoken
 {
 	position:absolute;
-	border-style: none;
 	display: block;
-	font-size: 16px;		
-	top:1px;	
-	left:35px;
-	width: 300px;
+	font-size: 12px;		
+	top:0px;	
+	left:80px;
+	width: 271px;
+
+	text-align: right;
+	font-weight: bold;
+	color:navy;
+}
+
+.accountasseticon
+{	
+	position: absolute;
+	top:1px;
+	left:1px;
+	width: 46px;
+	height: 46px;
+	background-color: darkgrey;
+
 }
 
 .accountassetbalance
@@ -119,17 +146,17 @@
 	position:absolute;
 	display: block;
 	border-style: none;
-	font-weight: 400;
-	color:var(--NarBotBar);
-	font-size: 25px;		
-	top:20px;	
-	right:5px;
-	width:359px;
-	text-align: right;
-	margin:0px;
-	padding: 0px;
+	font-weight: bold;
 
 	
+	font-size: 24px;		
+	top:16px;	
+	left:36px;
+	width:315px;
+	text-align: right;
+
+	color:darkgreen;
+		
 }
 
 .accountassetfiat
@@ -144,6 +171,7 @@
 	right:5px;
 	width:200px;
 	text-align: right;
+
 }
 
 

@@ -91,7 +91,7 @@
 
 .ok:hover
 {
-  background-color: lightgreen;
+  background-color: rgba(45, 129, 45, 0.534);
 }
 
 .cancel
@@ -116,7 +116,7 @@
 
 .cancel:hover
 {
-  background-color: darkorange;
+  background-color: rgba(255, 0, 0, 0.527);
 }
 
 .big {
@@ -168,7 +168,7 @@
 
 .more {
   position:absolute;
-  top:40px;
+  top:5px;
   left:305px;
   background-image: url("../icons/SVG/more_dark.svg");
 }
@@ -177,17 +177,7 @@
   background-image: url("../icons/SVG/more_light.svg");
 }
 
-.unlock {
-  
-  position:absolute;
-  top:5px;
-  left:305px;
-  background-image: url("../icons/SVG/key_light.svg");
-}
 
-.unlock:hover {
-  background-image: url("../icons/SVG/key_dark.svg");
-}
 
 .lock {
   background-image: url("../icons/SVG/lock_light.svg");
@@ -220,6 +210,14 @@
 
 .receive:hover {
   background-image: url("../icons/SVG/send_dark.svg");
+}
+
+.unlock {
+  background-image: url("../icons/SVG/key_light.svg");
+}
+
+.unlock:hover {
+  background-image: url("../icons/SVG/key_dark.svg");
 }
 
 .send {

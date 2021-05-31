@@ -129,9 +129,9 @@ input
 .accountdetstopcenter h3
 {
   margin:0px;
-  margin-bottom: 5px;
+  margin: 0px;
   padding:0px;
-  font-size: 25px;
+  font-size: 23px;
   font-weight: 300;
   color:darkgreen;
 }
@@ -139,8 +139,8 @@ input
 .accountdetstopcenter h4
 {
   margin:0px;
-  margin-bottom: 5px;
-  padding:0px;
+  margin-top: 5px;
+  padding:10px;
   font-size: 12px;
   font-weight: 200;
   color:black;
@@ -179,8 +179,48 @@ input
   position: relative;
   margin:auto;
   padding:5px;
+}
+
+.inputboxwithbutton input
+{
+  
+  position: absolute;
+  border-style: solid;
+  border-width: 1px;
+  padding: 5px;
+  text-align: center;
+  width: 200px;
+  height:16px;
+  left:30px;
+  top:1px;
+}
+
+.inputboxwithbutton button
+{
+
+  position: absolute;
+  border-style: solid;
+  border-width: 1px;
+ 
+  text-align: center;
+  width: 80px;
+  height:28px;
+  left:242px;
+  top:1px;
+  color:white;
+
+  background: rgb(51,46,147);
+	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  border-style: solid;
+  border-width: 1px;
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
 
 }
+
+
 
 
 .scroll {

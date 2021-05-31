@@ -189,7 +189,6 @@
 	<div class="appface slide-show" id="account-selected">
 
 		<button class="button back"></button>
-		<button class="button unlock"></button>
 		<button class="button more" id="more"></button>
 
 		<div class="accountdetstopcenter" id="selected-account">
@@ -202,6 +201,7 @@
 			<button class="button send" id="send">Send</button>
 			<button class="button stake" id="stake">Stake</button>
 			<button class="button add" id="add">Add</button>
+			<button class="button unlock">Unlock</button>
 		</div>
 
 		<!-- Template -->
@@ -443,6 +443,7 @@
 
 		<div id="asset-item-template" class="hidden asset-item" data-id="{contractId}">
 			<div class="accountdetsassets">
+				<div class="accountasseticon"></div>
 				<div class="accountassetcoin">{symbol}</div>
 				<div class="accountassettoken">{contractId}</div>
 				<div class="accountassetbalance">{balance}</div>
