@@ -438,29 +438,16 @@
 		<!--#endregion-->
 
 		<!--#region subpage asset list-->
-		<div class="subpage scroll" id="assests">
+		<div class="subpage scroll" id="assets">
+		</div>
 
+		<div id="asset-item-template" class="hidden asset-item" data-id="{contractId}">
 			<div class="accountdetsassets">
-				<div class="accountassetcoin"></div>
-				<div class="accountassettoken">asdad.asdasda.asdasd</div>
-				<div class="accountassetbalance">1000000000</div>
-				<div class="accountassetfiat">100000000 usd</div>
+				<div class="accountassetcoin">{symbol}</div>
+				<div class="accountassettoken">{contractId}</div>
+				<div class="accountassetbalance">{balance}</div>
+				<div class="accountassetfiat"></div>
 			</div>
-
-			<div class="accountdetsassets">
-				<div class="accountassetcoin"></div>
-				<div class="accountassettoken">asdad.asdasda.asdasd</div>
-				<div class="accountassetbalance">1000000000</div>
-				<div class="accountassetfiat">1000000200 usd</div>
-			</div>
-
-			<div class="accountdetsassets">
-				<div class="accountassetcoin"></div>
-				<div class="accountassettoken">asdad.asdasda.asdasd</div>
-				<div class="accountassetbalance">1000000000</div>
-				<div class="accountassetfiat">1000000200 usd</div>
-			</div>
-
 		</div>
 		<!--#endregion -->
 
@@ -669,9 +656,9 @@
 
 	<div class="appface slide-hide" id="AccountAssetDetail">
 
-		
+
 		<button class="button back"></button>
-	
+
 		<div class="accountdetstopcenter">
 			<div class="accountdetscuenta">cuenta.sadasda.asd.ar</div>
 			<div class="accountdetscomment">(Comentario)</div>

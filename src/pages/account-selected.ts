@@ -134,7 +134,7 @@ function moreClicked() {
     return;
   }
   isMoreOptionsOpen = false;
-  d.showSubPage("assests");
+  d.showSubPage("assets");
 }
 
 function addClicked() {
@@ -241,6 +241,13 @@ function showSelectedAccount() {
     SELECTED_ACCOUNT,
     "selected-account-template",
     selectedAccountData
+  );
+
+  //lleno lista de assets
+  d.populateUL(
+    "assets",
+    "asset-item-template",
+    selectedAccountData.accountInfo.assets
   );
 
   /* lala_design
@@ -1419,7 +1426,7 @@ function confirmClicked(ev: Event) {
 }
 
 function showButtons() {
-  d.showSubPage("assests");
+  d.showSubPage("assets");
   okCancelRow.hide();
   //if (showingMore()) moreLessClicked()
 }
