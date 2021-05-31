@@ -1,6 +1,26 @@
 @charset "utf-8";
 /* Main div container -------------------------------------------------------------*/
 
+h2
+{
+  color:green;
+  font-weight: 200;
+  font-size: 24px;
+}
+
+h3
+{
+  color:green;
+  font-weight: 200;
+  font-size: 16px;
+}
+			
+input
+{
+  border-style: solid;
+  border-width: 1px;
+}
+
 .appface {
 
 
@@ -34,14 +54,20 @@
 .button-group
 {
   position: absolute;
-  display:inline-flex;
+  display:block;
+  text-align: right;
   top:480px;
   left:0px;
   width: 361px;
   height: 45px;
-  align-items: right;
-  padding: 5px;
+
   margin:0px;
+
+  background: rgb(51,46,147);
+	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  border-style: none;
+
+
 }
 
 .subpage {
@@ -54,7 +80,9 @@
   height: 500px;
   max-height: 328px;
 
-  background-color: var(--PanelBackground);
+  background: rgb(214,214,214);
+  background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+
   text-align: center;
   align-items: center;
   
@@ -138,12 +166,18 @@
   top: 465px;
   left: 0px;
   padding-top: 4px;
-  border-top-color: var(--NarDarkHighlight);
-  border-top-style: solid;
-  border-top-width: 1px;
   display: inline-flex;
   justify-content: flex-end;
-  background-color: var(--NarTope);
+
+  background: rgb(51,46,147);
+	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  border-style: solid;
+  border-width: 1px;
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
+  
 }
 
 /* Top Bar ------------------------------------------------------------------------*/

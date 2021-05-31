@@ -48,19 +48,40 @@
   background: linear-gradient(131deg, rgba(153,210,247,1) 0%, rgba(92,89,167,1) 100%);
 }
 
+.filler
+{
+  position: absolute;
+  top:0px;
+  left:0px;
+  width: 160px;
+  color:white;
+  height: 44px;
+  background-color: transparent;
+  display: block;
+  
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
+}
+
 .ok 
 {
-   color:white;
-   width: 80px;
-   height: 24px;
-   border-radius: 5px;
-   background-color: green;
-   align-items: center;
-   display: inline-flex;
-   justify-content: center;
-   padding: 0px;
-   margin-left: auto;
-   margin-right: 5px;
+  position: absolute;
+  top:0px;
+  left:260px;
+  width: 100px;
+  color:white;
+  height: 44px;
+  background-color: transparent;
+  display: block;
+  
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
+  
+  
 }
 
 .ok:hover
@@ -70,17 +91,20 @@
 
 .cancel
 {
-  width: 80px;
-   color:white;
-   height: 24px;
-   border-radius: 5px;
-   background-color:red;
-   align-items: center;
-   display: inline-flex;
-   justify-content: center;
-   padding: 0px;
-   margin-left: 10px;
-   margin-right: 15px;
+  position: absolute;
+  top:0px;
+  left:160px;
+  width: 100px;
+  color:white;
+  height: 44px;
+  background-color: transparent;
+  display: block;
+  
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
+   
 }
 
 .cancel:hover

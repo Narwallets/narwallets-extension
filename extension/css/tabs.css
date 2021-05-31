@@ -4,6 +4,8 @@
     display:flex;
     flex-direction: column;
     align-items: left;
+    background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+
 }
 
   .tab{
@@ -11,9 +13,9 @@
     padding:10px 20px;
     padding-top: 5px;
     margin:0px 2px;
-    background:var(--NarBackground);
+    background:rgba(51,46,147,1);
     display:inline-block;
-    color:var(--NarMidBar);
+    color:white;
     border-radius:3px 3px 0px 0px;
     border-style: solid;
     border-bottom-style: none;
@@ -21,16 +23,17 @@
   }
 
   .panels{
-    background:#fffffff6;
+    background: rgb(214,214,214);
+    background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
     min-height:200px;
     width:100%;
     max-width:500px;
     border-radius:3px;
     overflow:hidden;
     padding:0px;  
-    border-style: solid none none none;
-    border-color: var(--NarMidBar);
-    border-width: 2px;
+    border-style: none;
+
+
   }
 
   .panel{
@@ -59,7 +62,7 @@
   #one:checked ~ .tabs #one-tab,
   #two:checked ~ .tabs #two-tab,
   #three:checked ~ .tabs #three-tab{
-    background:var(--NarMidBar);
+    background: rgba(214,214,214,1);
     border-style: solid;
     border-width: 1px;
     border-color: var(--NarMidBar);

@@ -287,12 +287,11 @@
 
 				<input class="radio" id="one" name="group" type="radio" checked>
 				<input class="radio" id="two" name="group" type="radio">
-				<input class="radio" id="three" name="group" type="radio">
+
 
 				<div class="tabs">
-					<label class="tab" id="one-tab" for="one">Tab 1</label>
-					<label class="tab" id="two-tab" for="two">Tab 2</label>
-					<label class="tab" id="three-tab" for="three">Tab 3</label>
+					<label class="tab" id="one-tab" for="one">Liquid Stake</label>
+					<label class="tab" id="two-tab" for="two">Delayed Stake</label>
 				</div>
 
 				<div class="panels">
@@ -319,9 +318,6 @@
 						<div>content 2</div>
 					</div>
 
-					<div class="panel" id="three-panel">
-						<div>content 3</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -435,8 +431,9 @@
 
 		<!--#region OK CANCEL buttons common to all subpages -->
 		<div class="button-group hidden" id="ok-cancel-row">
-			<button id="account-selected-action-confirm" class="button ok">OK</button>
-			<button id="account-selected-action-cancel" class="button cancel">Cancel</button>
+			<button class="filler"></button>
+			<button id="account-selected-action-confirm" class="ok">OK</button>
+			<button id="account-selected-action-cancel" class="cancel">Cancel</button>
 		</div>
 		<!--#endregion-->
 
@@ -672,18 +669,16 @@
 
 	<div class="appface slide-hide" id="AccountAssetDetail">
 
-		<div class="accountdetstopleft">
-			<button class="button back"></button>
-		</div>
+		
+		<button class="button back"></button>
+	
 		<div class="accountdetstopcenter">
 			<div class="accountdetscuenta">cuenta.sadasda.asd.ar</div>
 			<div class="accountdetscomment">(Comentario)</div>
 			<div class="accountdetsbalance">1,000,000.000 Ⓝ</div>
 			<div class="accountdetsfiat">1,000,000.000 usd</div>
 		</div>
-		<div class="accountdetstopright">
-			<button class="button"></button>
-		</div>
+
 
 		<div class="accountdetsmidbar">
 			<button class="button send">Send</button>
