@@ -98,17 +98,17 @@
 
 	<!--#region WELCOME New user, onboarding-->
 	<div id="welcome-new-user-page" class="appface slide-hide">
-		<div class="contents-body">
-			<h1>Welcome to Narwallets!</h1>
-			<h2>The future is NEAR</h2>
-			<h2>Let's start our journey</h2>
-			<div class="select-action-button-box">
+		
+			<h2>Welcome to Narwallets!</h2>
+			<h3>The future is NEAR</h3>
+			<h3>Let's start our journey</h3>
 				<p>
 					<b>Step one:</b><br> Create user and password to protect this wallet
 				</p>
-				<button id="welcome-create-pass" class="btn-primary">Create User &amp; Password</button>
-			</div>
-		</div>
+				<div class="flex-row">	
+				<button id="welcome-create-pass" class="button generic">Create User &amp; Password</button>
+				</div>
+		
 	</div>
 	<!--#endregion-->
 
@@ -719,6 +719,20 @@
 	</div>
 
 	<!--#endregion -->
+
+
+    <!--#region Error div -->
+    <div id="err-div"></div>
+    <!-- -->
+    <div id="wait">
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+	<!--#endregion-->
 
 	<script src="bundled-libs.js"></script>
 	<script type="module" src="dist/index.js"></script>
