@@ -168,14 +168,14 @@
 			<h2>No, create a new NAMED account</h2>
 			<h3>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
 					temporary account</b> to complete the account creation</h3>
-			<button class="button big in" id="option-create">Create named account</button>
+			<button class="big" id="option-create">Create named account</button>
 
 			<h2>Yes, I already have an account</h2>
-			<button class="button big in" id="option-import">Import existing account</button>
+			<button class="big" id="option-import">Import existing account</button>
 
 			<h2>No, create a free implicit Account</h2>
 			<h3>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h3>
-			<button class="button big in" id="option-create-implicit">Create implicit account</button>
+			<button class="big" id="option-create-implicit">Create implicit account</button>
 
 		</div>
 
@@ -206,10 +206,10 @@
 
 		<!-- Template -->
 		<div id="selected-account-template" class="hidden">
-			<div class="accountdetscuenta">{name}</div>
-			<div class="accountdetscomment">{accountInfo.note}</div>
-			<div class="accountdetsbalance balance">{total}</div>
-			<div class="accountdetsfiat">{totalUSD} usd</div>
+			<div class="accountdetscuenta"><h1>{name}</h1></div>
+			<div class="accountdetscomment"><h2>{accountInfo.note}</h2></div>
+			<div class="accountdetsbalance balance"><h3>{total}</h3></div>
+			<div class="accountdetsfiat"><h4>{totalUSD} usd</h4></div>
 		</div>
 
 		<!--#region subpage SEND -->

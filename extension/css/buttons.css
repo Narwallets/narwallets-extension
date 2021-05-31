@@ -58,7 +58,9 @@
   height: 44px;
   background-color: transparent;
   display: block;
-  
+  border-width: 1px;
+  border-style: solid;
+
   border-top-color:rgb(135, 170, 233) ;
   border-left-color: rgb(135, 170, 233);
   border-right-color: rgb(31, 27, 104);
@@ -75,6 +77,9 @@
   height: 44px;
   background-color: transparent;
   display: block;
+  border-width: 1px;
+  border-style: solid;
+
   
   border-top-color:rgb(135, 170, 233) ;
   border-left-color: rgb(135, 170, 233);
@@ -99,7 +104,9 @@
   height: 44px;
   background-color: transparent;
   display: block;
-  
+  border-width: 1px;
+  border-style: solid;
+
   border-top-color:rgb(135, 170, 233) ;
   border-left-color: rgb(135, 170, 233);
   border-right-color: rgb(31, 27, 104);
@@ -113,22 +120,40 @@
 }
 
 .big {
-  border-radius: 5px;
+  
   width: 300px;
   height: 35px;
+  
   margin: 0px;
+  margin-left: 50px;
+  
+
+  font-size: 14px;
+  font-weight: 100;
+
   padding: 0px;
-  padding-top: 10px;
-  font-size: 15px;
-  font-weight: 200;
-  background-color: var(--NarMidBar);
-  display: inline-flex;
-  justify-content: center;
+  padding-top: 0px;
+  
+  display: block;
+  border-style: solid;
+  border-width: 1px;
+  color:white;
+  border-radius: 2px;
+
+  background: rgb(51,46,147);
+	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
+
   align-content: center;
+
 }
 
 .big:hover {
-  background-color: var(--NarMidBarhighlight);
+  background: rgb(153,210,247);
+  background: linear-gradient(131deg, rgba(153,210,247,1) 0%, rgba(92,89,167,1) 100%);
 }
 
 /*buttons that appear in light background*/

@@ -10,7 +10,7 @@ h2
 
 h3
 {
-  color:green;
+  color:black;
   font-weight: 200;
   font-size: 16px;
 }
@@ -19,6 +19,8 @@ input
 {
   border-style: solid;
   border-width: 1px;
+  padding: 5px;
+  text-align: center;
 }
 
 .appface {
@@ -30,9 +32,12 @@ input
   top: 40px;
   width: 361px;
   height: 522px;
-  background-color: var(--Background);
+  background: rgb(214,214,214);
+  background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+
   overflow: hidden;
   text-align: center;
+  align-items: center;
 }
 
 .appface.show {
@@ -99,7 +104,46 @@ input
   height: 130px;
   background: rgb(214,214,214);
   background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+}
 
+.accountdetstopcenter h1
+{
+  margin:0px;
+  margin-bottom: 5px;
+  padding:0px;
+  font-size: 18px;
+  font-weight: 300;
+  color:navy;
+}
+
+.accountdetstopcenter h2
+{
+  margin:0px;
+  margin-bottom: 5px;
+  padding:0px;
+  font-size: 12px;
+  font-weight: 200;
+  color:black;
+}
+
+.accountdetstopcenter h3
+{
+  margin:0px;
+  margin-bottom: 5px;
+  padding:0px;
+  font-size: 25px;
+  font-weight: 300;
+  color:darkgreen;
+}
+
+.accountdetstopcenter h4
+{
+  margin:0px;
+  margin-bottom: 5px;
+  padding:0px;
+  font-size: 12px;
+  font-weight: 200;
+  color:black;
 }
 
 .accountdetsmidbar
