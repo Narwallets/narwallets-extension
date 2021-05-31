@@ -206,10 +206,18 @@
 
 		<!-- Template -->
 		<div id="selected-account-template" class="hidden">
-			<div class="accountdetscuenta"><h1>{name}</h1></div>
-			<div class="accountdetscomment"><h2>{accountInfo.note}</h2></div>
-			<div class="accountdetsbalance balance"><h3>{total}</h3></div>
-			<div class="accountdetsfiat"><h4>{totalUSD} usd</h4></div>
+			<div class="accountdetscuenta">
+				<h1>{name}</h1>
+			</div>
+			<div class="accountdetscomment">
+				<h2>{accountInfo.note}</h2>
+			</div>
+			<div class="accountdetsbalance balance">
+				<h3>{total}</h3>
+			</div>
+			<div class="accountdetsfiat">
+				<h4>{totalUSD} usd</h4>
+			</div>
 		</div>
 
 		<!--#region subpage SEND -->
@@ -326,10 +334,15 @@
 
 		<!--#region add asset-->
 		<div id="add-subpage" class="subpage hidden"> HOLA ESTOY ACA
-			<select name="select" id="combo">
-				<option value="value1">meta-v2.pool.testnet</option>
-				<option value="value2">Value 2</option>
-			</select>
+
+			<div class="combobox">
+				<select name="select" id="combo">
+					<option value="value1">meta-v2.pool.testnet</option>
+					<option value="value2">Value 2</option>
+				</select>
+			</div>
+
+
 		</div>
 		<!--#endregion -->
 
@@ -516,19 +529,18 @@
 		<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed
 				phrase owns the account.</b></h3>
 
-		<div class="contents-body">
-
-			<div class="round-box bg-yellow">
+		
+			
 				<h3>Your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
-				<h4 id="seed-phrase-show-box" class="seed-phrase"></h4>
-			</div>
+				<div class="boximportante" id="seed-phrase-show-box" ></div>
+			
 
 			<div class="flex-row">
-				<button id="seed-phrase-continue" class="btn-primary">OK, I've written down the Seed Phrase</button>
-				<button id="seed-phrase-cancel" class="btn-cancel">Cancel</button>
+				<button id="seed-phrase-continue" class="button generic">OK, I've written down the Seed Phrase</button>
+				<button id="seed-phrase-cancel" class="button generic">Cancel</button>
 			</div>
 
-		</div>
+		
 
 		<div id="seed-phrase-step-2" class="page slide-hide">
 
@@ -546,8 +558,8 @@
 				</div>
 
 				<div class="flex-row">
-					<button id="seed-word-continue" class="medium btn-primary">Continue</button>
-					<button id="seed-word-cancel" class="medium btn-cancel">Back</button>
+					<button id="seed-word-continue" class="button generic">Continue</button>
+					<button id="seed-word-cancel" class="button generic">Back</button>
 				</div>
 			</div>
 		</div>
@@ -564,8 +576,10 @@
 			<div class="form-field-label">
 				<label for="search-account-name">Search Account Name</label>
 				<div class="form-control">
-					<input id="search-account-name" type="text" class="with-inside-button">
-					<button id="net-root" class="button inside-input normal-font" disabled="">.guildnet</button>
+					<div class="inputboxwithbutton"
+						<input id="search-account-name" type="text">
+						<button id="net-root" disabled="">.guildnet</button>
+					</div>
 				</div>
 			</div>
 			<div class="form-field-label">
@@ -582,7 +596,7 @@
 				</div>
 			</div>
 
-			<button id="search" class="button btn-primary medium">
+			<button id="search" class="button generic">
 				Search Account in&nbsp;<span id="net-name"></span>
 			</button>
 
@@ -611,7 +625,7 @@
 				</div>
 			</div>
 
-			<button id="import" class="button btn-primary medium hidden">
+			<button id="import" class="button generic hidden">
 				Import Account into this Wallet
 			</button>
 		</div>

@@ -269,3 +269,44 @@
 .remove:hover {
   background-image: url("../icons/SVG/minus_dark.svg");
 }
+
+.generic
+{
+  width: 130px;
+  height: 60px;
+  
+  margin: 8px;
+  margin-top: 15px;
+  padding:10px;
+  
+
+  font-size: 12px;
+  font-weight: 100;
+
+  padding: 0px;
+  padding-top: 0px;
+  
+  display: block;
+  border-style: solid;
+  border-width: 1px;
+  color:white;
+  border-radius: 2px;
+
+  background: rgb(51,46,147);
+	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  border-top-color:rgb(135, 170, 233) ;
+  border-left-color: rgb(135, 170, 233);
+  border-right-color: rgb(31, 27, 104);
+  border-bottom-color: rgb(31, 27, 104);
+
+  align-content: center;
+}
+
+
+.generic:hover
+{
+
+  background: rgb(153,210,247);
+  background: linear-gradient(131deg, rgba(153,210,247,1) 0%, rgba(92,89,167,1) 100%);
+
+}

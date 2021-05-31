@@ -1,6 +1,7 @@
 @charset "utf-8";
 /* Main div container -------------------------------------------------------------*/
 
+
 h2
 {
   color:green;
@@ -12,8 +13,9 @@ h3
 {
   color:black;
   font-weight: 200;
-  font-size: 16px;
+  font-size: 14px;
 }
+
 			
 input
 {
@@ -38,6 +40,7 @@ input
   overflow: hidden;
   text-align: center;
   align-items: center;
+  
 }
 
 .appface.show {
@@ -72,7 +75,6 @@ input
 	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
   border-style: none;
 
-
 }
 
 .subpage {
@@ -91,6 +93,46 @@ input
   text-align: center;
   align-items: center;
   
+}
+
+.subpage h4
+{
+  position: relative;
+  width:300px;
+  margin:0px;
+  margin-left: auto;
+  margin-right: auto;
+
+  height:auto;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 5px;
+  background-color: lightblue;
+  border-style: solid;
+  border-width: 1px;
+  overflow-wrap:break-word;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+
+}
+
+.boximportante
+{
+  position: relative;
+  width:300px;
+  margin:0px;
+  margin-left: auto;
+  margin-right: auto;
+
+  height:auto;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 5px;
+  background-color: lightblue;
+  border-style: solid;
+  border-width: 1px;
+  overflow-wrap:break-word;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+
 }
 
 .accountdetstopcenter
@@ -430,3 +472,10 @@ input
 .listitem:hover {
   background-color: var(--NarListHoover);
 }
+
+.flex-row {
+  display: flex!important;
+  flex-flow: row nowrap;
+  overflow: hidden;
+  justify-content: space-evenly!important;
+  }
