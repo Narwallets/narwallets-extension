@@ -85,7 +85,7 @@ function moreClicked() {
         return;
     }
     isMoreOptionsOpen = false;
-    d.showSubPage("assests");
+    d.showSubPage("assets");
 }
 function addClicked() {
     d.showSubPage("add-subpage");
@@ -166,6 +166,8 @@ function showSelectedAccount() {
     const SELECTED_ACCOUNT = "selected-account";
     d.clearContainer(SELECTED_ACCOUNT);
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
+    //lleno lista de assets
+    d.populateUL("assets", "asset-item-template", selectedAccountData.accountInfo.assets);
     /* lala_design
       accountBalance = new d.El(".selected-account-info .total.balance");
       accountInfoName = new d.El(".selected-account-info .name");
@@ -1147,7 +1149,7 @@ function confirmClicked(ev) {
     }
 }
 function showButtons() {
-    d.showSubPage("assests");
+    d.showSubPage("assets");
     okCancelRow.hide();
     //if (showingMore()) moreLessClicked()
 }
