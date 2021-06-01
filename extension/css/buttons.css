@@ -67,7 +67,7 @@
   border-bottom-color: rgb(31, 27, 104);
 }
 
-.ok 
+.cancel 
 {
   position: absolute;
   top:0px;
@@ -80,7 +80,7 @@
   border-width: 1px;
   border-style: solid;
 
-  
+  background-color: rgb(109, 15, 15);
   border-top-color:rgb(135, 170, 233) ;
   border-left-color: rgb(135, 170, 233);
   border-right-color: rgb(31, 27, 104);
@@ -89,12 +89,12 @@
   
 }
 
-.ok:hover
+.cancel:hover
 {
-  background-color: rgba(45, 129, 45, 0.534);
+  background-color: rgb(216, 30, 30);
 }
 
-.cancel
+.ok
 {
   position: absolute;
   top:0px;
@@ -106,7 +106,7 @@
   display: block;
   border-width: 1px;
   border-style: solid;
-
+  background-color: rgb(21, 75, 50);
   border-top-color:rgb(135, 170, 233) ;
   border-left-color: rgb(135, 170, 233);
   border-right-color: rgb(31, 27, 104);
@@ -114,9 +114,9 @@
    
 }
 
-.cancel:hover
+.ok:hover
 {
-  background-color: rgba(255, 0, 0, 0.527);
+  background-color: rgb(49, 165, 111);
 }
 
 .big {
@@ -124,8 +124,9 @@
   width: 300px;
   height: 35px;
   
-  margin: 0px;
-  margin-left: 50px;
+  margin: 10px;
+  margin-left: auto;
+  margin-right: auto;
   
 
   font-size: 14px;
@@ -260,6 +261,14 @@
 
 .unlocked:hover {
   background-image: url("../icons/SVG/key_dark.svg");
+}
+
+.connect {
+  background-image: url("../icons/SVG/link_light.svg");
+}
+
+.connect:hover {
+  background-image: url("../icons/SVG/link_dark.svg");
 }
 
 .remove {

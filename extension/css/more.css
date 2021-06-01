@@ -9,8 +9,10 @@
     padding: 5px;
     width: 250px;
     border: none;
+    border-radius: 5px;
     font-size: 14px;  
     -webkit-appearance: button;
+    
     appearance: button;
     outline: none;
   }

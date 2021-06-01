@@ -98,44 +98,53 @@
 
 	<!--#region WELCOME New user, onboarding-->
 	<div id="welcome-new-user-page" class="appface slide-hide">
-		
-			<h2>Welcome to Narwallets!</h2>
-			<h3>The future is NEAR</h3>
-			<h3>Let's start our journey</h3>
-				<p>
-					<b>Step one:</b><br> Create user and password to protect this wallet
-				</p>
-				<div class="flex-row">	
-				<button id="welcome-create-pass" class="button generic">Create User &amp; Password</button>
-				</div>
-		
+
+		<h2>Welcome to Narwallets!</h2>
+		<h3>The future is NEAR</h3>
+		<h3>Let's start our journey</h3>
+		<p>
+			<b>Step one:</b><br> Create user and password to protect this wallet
+		</p>
+		<div class="flex-row">
+			<button id="welcome-create-pass" class="button generic">Create User &amp; Password</button>
+		</div>
+
 	</div>
 	<!--#endregion-->
 
 	<!--#region New User create pass-->
 	<div id="create-user" class="appface slide-hide">
-		<h1>Create User</h1>
+		<h2>Create User</h2>
 		<div class="form">
 			<div class="form-field-label">
-				<label data-shrink="true" for="email">Your e-mail</label>
+				<label data-shrink="true" for="email">
+					<h3>Your e-mail</h3>
+				</label>
 				<div class="form-control">
 					<input type="text" tabindex="0" autocomplete="email" id="email" />
 				</div>
 			</div>
 			<div class="form-field-label">
-				<label class="" data-shrink="true" for="pass" id="create-password-label">New password (min 8
-					chars)</label>
+				<label class="" data-shrink="true" for="pass" id="create-password-label">
+					<h3>New password (min 8
+						chars)</h3>
+				</label>
 				<div class="form-control">
 					<input type="password" autocomplete="new-password" type="password" id="pass">
 				</div>
 			</div>
 			<div class="form-field-label">
-				<label class="form-field-label" data-shrink="true" for="pass-confirm"
-					id="confirm-password-label">Confirm password</label>
+				<label class="form-field-label" data-shrink="true" for="pass-confirm" id="confirm-password-label">
+					<h3>Confirm password</h3>
+				</label>
 				<div class="form-control">
 					<input type="password" autocomplete="new-password" id="pass-confirm">
 				</div>
 			</div>
+
+			<p></p>
+			<p></p>
+
 			<div class="checkbox-container">
 				<input id="agree-check" type="checkbox" bind:checked aria-checked="false"
 					aria-labelledby="checkbox-label" />
@@ -146,9 +155,16 @@
 					</a>
 				</label>
 			</div>
-			<button class="big btn-primary" id="create-user">Create
-			</button>
+
+			<p></p>
+
+			<button class="big" id="create-user">Create</button>
+
+
 		</div>
+
+
+
 
 	</div>
 
@@ -159,25 +175,24 @@
 	<div class="appface slide-hide" id="import-or-create">
 
 
-		<div class="addaccount_face">
+			<h2>Do you have an Account?</h2>
+			
+			<h3>No, create a new NAMED account</h4>
+			<h4>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
+					temporary account</b> to complete the account creation</h4>
 
-			<div class="titulo">
-				<h1>Do you have an Account?</h1>
-			</div>
-
-			<h2>No, create a new NAMED account</h2>
-			<h3>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
-					temporary account</b> to complete the account creation</h3>
 			<button class="big" id="option-create">Create named account</button>
 
-			<h2>Yes, I already have an account</h2>
+			<h3>Yes, I already have an account</h3>
+			
 			<button class="big" id="option-import">Import existing account</button>
 
-			<h2>No, create a free implicit Account</h2>
-			<h3>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h3>
+			<h3>No, create a free implicit Account</h3>
+			<h4>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h4>
+			
 			<button class="big" id="option-create-implicit">Create implicit account</button>
 
-		</div>
+	
 
 
 	</div>
@@ -201,7 +216,7 @@
 			<button class="button send" id="send">Send</button>
 			<button class="button stake" id="stake">Stake</button>
 			<button class="button add" id="add">Token</button>
-			<button class="button unlock">Unlock</button>
+			<button class="button connect">Connect</button>
 		</div>
 
 		<!-- Template -->
@@ -212,8 +227,8 @@
 			<div class="accountdetscomment">
 				<h2>{accountInfo.note}</h2>
 			</div>
-			<div class="accountdetsbalance balance">
-				<h3>{total}</h3>
+			<div class="accountdetsbalance ">
+				<h3 class="balance">{total}</h3>
 			</div>
 			<div class="accountdetsfiat">
 				<h4>{totalUSD} usd</h4>
@@ -529,18 +544,18 @@
 		<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed
 				phrase owns the account.</b></h3>
 
-		
-			
-				<h3>Your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
-				<div class="boximportante" id="seed-phrase-show-box" ></div>
-			
 
-			<div class="flex-row">
-				<button id="seed-phrase-continue" class="button generic">OK, I've written down the Seed Phrase</button>
-				<button id="seed-phrase-cancel" class="button generic">Cancel</button>
-			</div>
 
-		
+		<h3>Your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
+		<div class="boximportante" id="seed-phrase-show-box"></div>
+
+
+		<div class="flex-row">
+			<button id="seed-phrase-continue" class="button generic">OK, I've written down the Seed Phrase</button>
+			<button id="seed-phrase-cancel" class="button generic">Cancel</button>
+		</div>
+
+
 
 		<div id="seed-phrase-step-2" class="page slide-hide">
 
@@ -571,34 +586,40 @@
 	<!--#region import account-->
 
 	<div id="import-account" class="appface slide-hide">
-		<h1>Import existing account</h1>
+		<h2>Import existing account</h2>
 		<div class="form">
-			<div class="form-field-label">
-				<label for="search-account-name">Search Account Name</label>
-				<div class="form-control">
-					<div class="inputboxwithbutton"
-						<input id="search-account-name" type="text">
-						<button id="net-root" disabled="">.guildnet</button>
-					</div>
-				</div>
+
+			<h3>Search Account Name</h3>
+
+			<div class="inputboxwithbutton">
+			    <input id="search-account-name" type="text">
+				<button id="net-root" disabled="">.guildnet</button>
 			</div>
+
+
 			<div class="form-field-label">
-				<label for="yes-no-search-pools">
-					Have you staked from this account or its lockup?
-				</label>
+				<h3>Have you staked from this account or its lockup?</h3>
+				
 				<div class="form-control" id="yes-search-pools">
 					<input id="yes-search-the-pools" type="radio" name="search-the-pools" checked>
 					<label for="yes-search-the-pools">Yes, search the pools</label>
 				</div>
+
 				<div class="form-control">
 					<input id="no-search-the-pools" type="radio" name="search-the-pools">
 					<label for="no-search-the-pools">No, do not search the pools</label>
 				</div>
+
 			</div>
 
-			<button id="search" class="button generic">
+			<button id="search" class="button big">
 				Search Account in&nbsp;<span id="net-name"></span>
 			</button>
+
+			<button id="import" class="big hidden">
+				Import Account into this Wallet
+			</button>
+
 
 			<!-- IMPORT: SHOW DATA BEFORE IMPORT-->
 			<div id="account-search-results" class="hidden">
@@ -614,7 +635,7 @@
 
 
 			<!-- Template -->
-			<div id="search-info-account-template" class="hidden  account-info flex-labeled-container">
+			<div id="search-info-account-template" class="hidden account-info flex-labeled-container">
 				<div id="account-line" class="flex-labeled-row small-labels">
 					<div class="name">{name}</div>
 					<div class="balance">{accountInfo.lastBalance}</div>
@@ -625,9 +646,7 @@
 				</div>
 			</div>
 
-			<button id="import" class="button generic hidden">
-				Import Account into this Wallet
-			</button>
+
 		</div>
 	</div>
 
@@ -721,17 +740,20 @@
 	<!--#endregion -->
 
 
-    <!--#region Error div -->
-    <div id="err-div"></div>
-    <!-- -->
-    <div id="wait">
-        <div class="lds-ring">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-    </div>
+	<!--#region Error and wait div -->
+
+	<div id="err-div"></div>
+	
+
+	<div id="wait">
+		<div class="lds-ring">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+	</div>
+	
 	<!--#endregion-->
 
 	<script src="bundled-libs.js"></script>
