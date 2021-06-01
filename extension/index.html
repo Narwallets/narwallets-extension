@@ -702,12 +702,12 @@
 
 
 		<div class="accountdetsmidbar">
-			<button class="button send">Send</button>
-			<button class="button receive">Receive</button>
+			<button class="button send" id="asset-send">Send</button>
+			<button class="button receive" id="asset-receive">Receive</button>
 			<button class="button remove">Remove</button>
 		</div>
 
-		<div class="subpage scroll hide">
+		<div class="subpage scroll hide" id="asset-history">
 
 			<div class="assethistoryline">
 				<div class="assethisttype">
@@ -720,7 +720,7 @@
 
 		</div>
 
-		<div class="subpage">
+		<div class="subpage hidden" id="asset-receive-subpage">
 
 			<div class="titulo">
 				<h1>Receive</h1>
@@ -733,6 +733,12 @@
 			</div>
 
 		</div>
+
+		<div class="subpage hidden" id="asset-send-subpage">
+			HOLA LALA COMPLETAME
+		</div>
+		
+		<div class="subpage hiden"></div>
 
 
 	</div>

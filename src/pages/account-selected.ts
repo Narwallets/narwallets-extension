@@ -94,6 +94,9 @@ function initPage() {
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
   d.onClickId("search-pools", searchPoolsButtonClicked);
+  d.onClickId("assets", showAssetDetailsClicked);
+  d.onClickId("asset-receive", showAssetReceiveClicked);
+  d.onClickId("asset-send", showAssetSendClicked);
 
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo");
@@ -137,10 +140,22 @@ function moreClicked() {
   d.showSubPage("assets");
 }
 
+function showAssetDetailsClicked() {
+  d.showPage("AccountAssetDetail");
+  d.showSubPage("asset-history");
+}
+
+function showAssetReceiveClicked() {
+  d.showSubPage("asset-receive-subpage");
+}
+
+function showAssetSendClicked() {
+  d.showSubPage("asset-send-subpage");
+}
+
 function addClicked() {
   d.showSubPage("add-subpage");
   fullAccessSubPage("add-subpage", addOKClicked);
-  console.log(comboAdd.value);
 }
 
 async function addOKClicked() {
@@ -157,7 +172,6 @@ async function addOKClicked() {
       case "value2":
         item.contractId = "";
     }
-    console.log("item: ", item.contractId);
 
     let result = await askBackgroundCallMethod(
       item.contractId,
@@ -185,10 +199,7 @@ async function addOKClicked() {
     enableOKCancel();
     //d.showSuccess("Success");
     //showButtons();
-  } catch (ex) {
-    console.log(selectedAccountData);
-    console.log(ex);
-  }
+  } catch (ex) {}
 }
 
 function showingMore() {
