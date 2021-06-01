@@ -15,25 +15,39 @@ body { font-family: 'Inter', sans-serif; !important }
   body { font-family: 'Inter var', sans-serif; !important }
 }
 
-:root {
-	  --Background:rgb(216, 216, 216);  
-	  --PanelBackground: rgb(255,255,255);
-	}
 
 ::-webkit-scrollbar {
-	  display: none;
-	}
+	display: none;
+  }
 
 
 body {
-		/*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-		width: 360px;
-		height: 557px;
-		margin: 0px;
-		overflow: hidden;
-	    padding:0px;
-		border-style: solid;
-		border-width: 1px;
-		background-color: white;
+	  /*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
+	  width: 360px;
+	  height: 557px;
+	  margin: 0px;
+	  overflow: hidden;
+	  padding:0px;
+	  border-style: solid;
+	  border-width: 1px;
+	  background-color: white;
+  }
+
+
+
+/*Colores */
+
+:root {
+
+	  --Background:rgb(216, 216, 216);  
+	  --PanelBackground: rgb(255,255,255);
+
+	  /*Font Colors*/
+
+
+	  /*block colors*/
+
 	}
 
+
+	

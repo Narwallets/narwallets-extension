@@ -694,10 +694,7 @@
 		<button class="button back"></button>
 
 		<div class="accountdetstopcenter">
-			<div class="accountdetscuenta">cuenta.sadasda.asd.ar</div>
-			<div class="accountdetscomment">(Comentario)</div>
-			<div class="accountdetsbalance">1,000,000.000 Ⓝ</div>
-			<div class="accountdetsfiat">1,000,000.000 usd</div>
+
 		</div>
 
 
@@ -735,7 +732,20 @@
 		</div>
 
 		<div class="subpage hidden" id="asset-send-subpage">
-			HOLA LALA COMPLETAME
+
+			<div class="accountdetscuenta">
+				<h1>{name}</h1>
+			</div>
+			<div class="accountdetscomment">
+				<h2>{accountInfo.note}</h2>
+			</div>
+			<div class="accountdetsbalance ">
+				<h3 class="balance">{total}</h3>
+			</div>
+			<div class="accountdetsfiat">
+				<h4>{totalUSD} usd</h4>
+			</div>
+
 		</div>
 		
 		<div class="subpage hiden"></div>
@@ -759,7 +769,7 @@
 			<div></div>
 		</div>
 	</div>
-	
+
 	<!--#endregion-->
 
 	<script src="bundled-libs.js"></script>
