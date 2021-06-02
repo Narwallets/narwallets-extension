@@ -40,6 +40,7 @@ import {
 } from "../lib/near-api-lite/batch-transaction.js";
 
 import { show as AccountPages_show } from "./main.js";
+import { show as AssetSelected_show } from "./asset-selected.js";
 
 import type { AnyElement, ClickHandler } from "../util/document.js";
 import { D } from "../lib/tweetnacl/core/core.js";
@@ -71,6 +72,7 @@ export async function show(accName: string, reposition?: string) {
     }
   }
   localStorageSet({ reposition: "account", account: accName });
+  checkConnectOrDisconnect();
 }
 
 // page init
@@ -97,6 +99,8 @@ function initPage() {
   d.onClickId("assets", showAssetDetailsClicked);
   d.onClickId("asset-receive", showAssetReceiveClicked);
   d.onClickId("asset-send", showAssetSendClicked);
+  d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+  // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo");
@@ -117,8 +121,6 @@ function initPage() {
   refreshButton = new d.El("button#refresh");
 
   d.onClickId("unstake", unstakeClicked);
-  d.onClickId("acc-connect-to-page", connectToWebAppClicked);
-  d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   showButtons(); //2nd or third entry - always show the buttons
 
@@ -140,9 +142,26 @@ function moreClicked() {
   d.showSubPage("assets");
 }
 
-function showAssetDetailsClicked() {
-  d.showPage("AccountAssetDetail");
-  d.showSubPage("asset-history");
+async function checkConnectOrDisconnect() {
+  await askBackground({
+    code: "connect",
+    accountId: selectedAccountData.name,
+  });
+
+  const buttonClass = d.byId("acc-connect-to-page");
+  buttonClass.classList.remove("connect");
+  buttonClass.classList.add("disconnect");
+}
+
+function showAssetDetailsClicked(ev: Event) {
+  if (ev.target && ev.target instanceof HTMLElement) {
+    const li = ev.target.closest("li");
+    if (li) {
+      const asset = li.id; // d.getClosestChildText(".account-item", ev.target, ".name");
+      if (!asset) return;
+      AssetSelected_show(asset, undefined);
+    }
+  }
 }
 
 function showAssetReceiveClicked() {
@@ -389,6 +408,7 @@ function receiveClicked() {
 
 //--------------------------------
 async function connectToWebAppClicked(): Promise<any> {
+  //TODO.
   d.showWait();
   try {
     await askBackground({
@@ -408,6 +428,9 @@ async function disconnectFromPageClicked() {
   try {
     await askBackground({ code: "disconnect" });
     d.showSuccess("disconnected");
+    const buttonClass = d.byId("acc-connect-to-page");
+    buttonClass.classList.remove("disconnect");
+    buttonClass.classList.add("connect");
   } catch (ex) {
     d.showErr(ex.message);
   }

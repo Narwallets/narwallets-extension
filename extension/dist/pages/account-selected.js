@@ -12,6 +12,7 @@ import { localStorageSet } from "../data/util.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount, } from "../background/askBackground.js";
 import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
+import { show as AssetSelected_show } from "./asset-selected.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
 let accountInfoName;
@@ -34,11 +35,13 @@ export async function show(accName, reposition) {
         }
     }
     localStorageSet({ reposition: "account", account: accName });
+    checkConnectOrDisconnect();
 }
 // page init
 let okCancelRow;
 let confirmBtn;
 let cancelBtn;
+let hola = "Hola COMO ESTAS";
 function initPage() {
     const backLink = new d.El("#account-selected.appface .button.back");
     backLink.onClick(Pages.backToAccountsList);
@@ -58,6 +61,8 @@ function initPage() {
     d.onClickId("assets", showAssetDetailsClicked);
     d.onClickId("asset-receive", showAssetReceiveClicked);
     d.onClickId("asset-send", showAssetSendClicked);
+    d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+    // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
     seedTextElem = new d.El("#seed-phrase");
     comboAdd = new d.El("#combo");
     removeButton = new d.El("button#remove");
@@ -72,8 +77,6 @@ function initPage() {
     //accountAmount.onInput(amountInput);
     refreshButton = new d.El("button#refresh");
     d.onClickId("unstake", unstakeClicked);
-    d.onClickId("acc-connect-to-page", connectToWebAppClicked);
-    d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
     showButtons(); //2nd or third entry - always show the buttons
     refreshButton.onClick(refreshClicked);
     d.onClickId("moreless", moreLessClicked);
@@ -90,9 +93,25 @@ function moreClicked() {
     isMoreOptionsOpen = false;
     d.showSubPage("assets");
 }
-function showAssetDetailsClicked() {
-    d.showPage("AccountAssetDetail");
-    d.showSubPage("asset-history");
+async function checkConnectOrDisconnect() {
+    await askBackground({
+        code: "connect",
+        accountId: selectedAccountData.name,
+    });
+    const buttonClass = d.byId("acc-connect-to-page");
+    buttonClass.classList.remove("connect");
+    buttonClass.classList.add("disconnect");
+}
+function showAssetDetailsClicked(ev) {
+    if (ev.target && ev.target instanceof HTMLElement) {
+        const li = ev.target.closest("li");
+        if (li) {
+            const asset = li.id; // d.getClosestChildText(".account-item", ev.target, ".name");
+            if (!asset)
+                return;
+            AssetSelected_show(asset, undefined);
+        }
+    }
 }
 function showAssetReceiveClicked() {
     d.showSubPage("asset-receive-subpage");
@@ -103,7 +122,6 @@ function showAssetSendClicked() {
 function addClicked() {
     d.showSubPage("add-subpage");
     fullAccessSubPage("add-subpage", addOKClicked);
-    console.log(comboAdd.value);
 }
 async function addOKClicked() {
     disableOKCancel();
@@ -131,10 +149,7 @@ async function addOKClicked() {
         //d.showSuccess("Success");
         //showButtons();
     }
-    catch (ex) {
-        console.log(selectedAccountData);
-        console.log(ex);
-    }
+    catch (ex) { }
 }
 function showingMore() {
     const buttonsMore = new d.All(".buttons-more");
@@ -288,6 +303,7 @@ function receiveClicked() {
 }
 //--------------------------------
 async function connectToWebAppClicked() {
+    //TODO.
     d.showWait();
     try {
         await askBackground({
@@ -309,6 +325,9 @@ async function disconnectFromPageClicked() {
     try {
         await askBackground({ code: "disconnect" });
         d.showSuccess("disconnected");
+        const buttonClass = d.byId("acc-connect-to-page");
+        buttonClass.classList.remove("disconnect");
+        buttonClass.classList.add("connect");
     }
     catch (ex) {
         d.showErr(ex.message);

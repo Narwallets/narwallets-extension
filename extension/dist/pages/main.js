@@ -234,6 +234,7 @@ export function accountItemClicked(ev) {
             const accName = li.id; // d.getClosestChildText(".account-item", ev.target, ".name");
             if (!accName)
                 return;
+            console.log(accName);
             AccountSelectedPage_show(accName, undefined);
         }
     }

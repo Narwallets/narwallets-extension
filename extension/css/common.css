@@ -1,30 +1,25 @@
 @charset "utf-8";
 /* Main div container -------------------------------------------------------------*/
 
-
-h2
-{
-  color:rgb(168, 107, 26);
+h2 {
+  color: rgb(168, 107, 26);
   font-weight: 200;
   font-size: 24px;
 }
 
-h3
-{
-  color:black;
+h3 {
+  color: black;
   font-weight: 200;
   font-size: 14px;
 }
 
-h4
-{
-  color:black;
+h4 {
+  color: black;
   font-weight: 100;
-  font-size:12;
+  font-size: 12;
 }
-			
-input
-{
+
+input {
   border-style: solid;
   border-width: 1px;
   border-radius: 5px;
@@ -33,21 +28,22 @@ input
 }
 
 .appface {
-
-
   position: absolute;
   z-index: 0;
   left: 0px;
   top: 40px;
   width: 361px;
   height: 522px;
-  background: rgb(214,214,214);
-  background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+  background: rgb(214, 214, 214);
+  background: linear-gradient(
+    131deg,
+    rgba(214, 214, 214, 1) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
 
   overflow: hidden;
   text-align: center;
   align-items: center;
-  
 }
 
 .appface.show {
@@ -59,33 +55,34 @@ input
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .visible {
   display: inline-block;
 }
 
-.button-group
-{
+.button-group {
   position: absolute;
-  display:block;
+  display: block;
   text-align: right;
-  top:480px;
-  left:0px;
+  top: 480px;
+  left: 0px;
   width: 361px;
   height: 45px;
 
-  margin:0px;
+  margin: 0px;
 
-  background: rgb(51,46,147);
-	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  background: rgb(51, 46, 147);
+  background: linear-gradient(
+    131deg,
+    rgba(51, 46, 147, 1) 0%,
+    rgba(53, 93, 168, 1) 100%
+  );
   border-style: none;
-
 }
 
 .subpage {
-
   position: absolute;
 
   top: 190px;
@@ -94,145 +91,141 @@ input
   height: 500px;
   max-height: 328px;
 
-  background: rgb(214,214,214);
-  background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+  background: rgb(214, 214, 214);
+  background: linear-gradient(
+    131deg,
+    rgba(214, 214, 214, 1) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
 
   text-align: center;
   align-items: center;
-  
 }
 
-.subpage h4
-{
+.subpage h4 {
   position: relative;
-  width:300px;
-  margin:0px;
+  width: 300px;
+  margin: 0px;
   margin-left: auto;
   margin-right: auto;
 
-  height:auto;
+  height: auto;
   font-size: 15px;
   font-weight: 300;
   padding: 5px;
   background-color: lightblue;
   border-style: solid;
   border-width: 1px;
-  overflow-wrap:break-word;
+  overflow-wrap: break-word;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-
 }
 
-.boximportante
-{
+.boximportante {
   position: relative;
-  width:300px;
-  margin:0px;
+  width: 300px;
+  margin: 0px;
   margin-left: auto;
   margin-right: auto;
 
-  height:auto;
+  height: auto;
   font-size: 15px;
   font-weight: 300;
   padding: 5px;
   background-color: lightblue;
   border-style: solid;
   border-width: 1px;
-  overflow-wrap:break-word;
+  overflow-wrap: break-word;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-
 }
 
-.accountdetstopcenter
-{
+.accountdetstopcenter {
   position: absolute;
-  display: inline-block;  
+  display: inline-block;
   z-index: -1;
-  top:0px;
-  left:0px;
+  top: 0px;
+  left: 0px;
   width: 361px;
   height: 130px;
-  background: rgb(214,214,214);
-  background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+  background: rgb(214, 214, 214);
+  background: linear-gradient(
+    131deg,
+    rgba(214, 214, 214, 1) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
 }
 
-.accountdetstopcenter h1
-{
-  margin:0px;
+.accountdetstopcenter h1 {
+  margin: 0px;
   margin-bottom: 5px;
-  padding:0px;
+  padding: 0px;
   font-size: 18px;
   font-weight: 300;
-  color:navy;
+  color: navy;
 }
 
-.accountdetstopcenter h2
-{
-  margin:0px;
+.accountdetstopcenter h2 {
+  margin: 0px;
   margin-bottom: 5px;
-  padding:0px;
+  padding: 0px;
   font-size: 12px;
   font-weight: 200;
-  color:black;
+  color: black;
 }
 
-.accountdetstopcenter h3
-{
-  margin:0px;
+.accountdetstopcenter h3 {
   margin: 0px;
-  padding:0px;
+  margin: 0px;
+  padding: 0px;
   font-size: 23px;
   font-weight: 300;
-  color:darkgreen;
+  color: darkgreen;
 }
 
-.accountdetstopcenter h4
-{
-  margin:0px;
+.accountdetstopcenter h4 {
+  margin: 0px;
   margin-top: 5px;
-  padding:10px;
+  padding: 10px;
   font-size: 12px;
   font-weight: 200;
-  color:black;
+  color: black;
 }
 
-.accountdetsmidbar
-{
-	position:absolute;
-	top:131px;
-	left:0px;
-	width:359px;
-	padding:0px;
+.accountdetsmidbar {
+  position: absolute;
+  top: 131px;
+  left: 0px;
+  width: 359px;
+  padding: 0px;
 
-  padding-top:5px;
+  padding-top: 5px;
 
-	display: inline-flex;
-	justify-content:center;
+  display: inline-flex;
+  justify-content: center;
 
-  background: rgb(51,46,147);
-	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  background: rgb(51, 46, 147);
+  background: linear-gradient(
+    131deg,
+    rgba(51, 46, 147, 1) 0%,
+    rgba(53, 93, 168, 1) 100%
+  );
   border-style: solid;
   border-width: 1px;
-  border-top-color:rgb(135, 170, 233) ;
+  border-top-color: rgb(135, 170, 233);
   border-left-color: rgb(135, 170, 233);
   border-right-color: rgb(31, 27, 104);
   border-bottom-color: rgb(31, 27, 104);
-
 }
 
-
-.inputboxwithbutton
-{
+.inputboxwithbutton {
   width: 360px;
   height: 30px;
   display: block;
   position: relative;
-  margin:auto;
-  padding:5px;
+  margin: auto;
+  padding: 5px;
 }
 
-.inputboxwithbutton input
-{
-  
+.inputboxwithbutton input {
   position: absolute;
   border-style: solid;
   border-width: 1px;
@@ -242,41 +235,39 @@ input
   padding: 5px;
   text-align: center;
   width: 200px;
-  height:16px;
-  left:32px;
-  top:1px;
+  height: 16px;
+  left: 32px;
+  top: 1px;
 }
 
-.inputboxwithbutton button
-{
-
+.inputboxwithbutton button {
   position: absolute;
   border-style: solid;
   border-width: 1px;
- 
+
   text-align: center;
   width: 80px;
-  height:28px;
-  left:242px;
-  top:1px;
-  color:white;
+  height: 28px;
+  left: 242px;
+  top: 1px;
+  color: white;
 
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 
-  background: rgb(51,46,147);
-	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  background: rgb(51, 46, 147);
+  background: linear-gradient(
+    131deg,
+    rgba(51, 46, 147, 1) 0%,
+    rgba(53, 93, 168, 1) 100%
+  );
   border-style: solid;
   border-width: 1px;
-  border-top-color:rgb(135, 170, 233) ;
+  border-top-color: rgb(135, 170, 233);
   border-left-color: rgb(135, 170, 233);
   border-right-color: rgb(31, 27, 104);
   border-bottom-color: rgb(31, 27, 104);
-
 }
-
-
-
 
 .scroll {
   overflow-y: scroll;
@@ -308,15 +299,18 @@ input
   display: inline-flex;
   justify-content: flex-end;
 
-  background: rgb(51,46,147);
-	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  background: rgb(51, 46, 147);
+  background: linear-gradient(
+    131deg,
+    rgba(51, 46, 147, 1) 0%,
+    rgba(53, 93, 168, 1) 100%
+  );
   border-style: solid;
   border-width: 1px;
-  border-top-color:rgb(135, 170, 233) ;
+  border-top-color: rgb(135, 170, 233);
   border-left-color: rgb(135, 170, 233);
   border-right-color: rgb(31, 27, 104);
   border-bottom-color: rgb(31, 27, 104);
-  
 }
 
 /* Top Bar ------------------------------------------------------------------------*/
@@ -329,7 +323,7 @@ input
   width: 100%;
   height: 40px;
   display: inline-block;
-  background-color:  rgb(207, 207, 207);
+  background-color: rgb(207, 207, 207);
   top: 0px;
   left: 0px;
   margin: 0px;
@@ -487,23 +481,22 @@ input
 }
 
 .flex-row {
-  display: flex!important;
+  display: flex !important;
   flex-flow: row nowrap;
   overflow: hidden;
-  justify-content: space-evenly!important;
-  }
+  justify-content: space-evenly !important;
+}
 
-
-  /*wait spinner*/
+/*wait spinner*/
 
 .lds-ring {
   display: inline-block;
   width: 20%;
   height: 20%;
   border-color: #fff transparent;
-  }
+}
 
-  .lds-ring:after {
+.lds-ring:after {
   content: " ";
   display: block;
   width: 20%;
@@ -511,20 +504,19 @@ input
   /*margin: 18px;*/
   border-radius: 50%;
   border: 30px solid;
-  border-color:#fff transparent;
-  animation: lds-dual-ring .75s linear infinite;
-  }
-  @keyframes lds-dual-ring {
+  border-color: #fff transparent;
+  animation: lds-dual-ring 0.75s linear infinite;
+}
+@keyframes lds-dual-ring {
   0% {
     transform: rotate(0deg);
   }
   100% {
     transform: rotate(360deg);
   }
-  }
- 
-  
-  #wait{
+}
+
+#wait {
   right: 0;
   position: absolute;
   top: 0;
@@ -541,20 +533,14 @@ input
   flex-flow: column nowrap;
   align-items: center;
   justify-content: space-around;
-  }
-  
-  #wait.show{
+}
+
+#wait.show {
   opacity: 1;
   transition: opacity 1s 1s ease-in-out;
   z-index: 999;
-  }
+}
 
-
-
-
-
-
-  
 #err-div {
   position: absolute;
   left: 10px;
@@ -563,9 +549,9 @@ input
   z-index: 999;
 }
 
-#err-div>div{
+#err-div > div {
   color: darkred;
-  text-align:center;
+  text-align: center;
   margin: 2px;
   padding: 15px;
   background-color: #981313;
@@ -574,27 +560,27 @@ input
   border-radius: 12px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   opacity: 0;
-  font-size:14pt;
-  max-height:0px;
+  font-size: 14pt;
+  max-height: 0px;
   transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
 }
 
-#err-div>div.show{
+#err-div > div.show {
   opacity: 1;
   max-height: 400px;
   word-break: break-word;
 }
-#err-div>div.success {
-background-color: #529453;
-border-width: 2px;
-color: whitesmoke;
+#err-div > div.success {
+  background-color: #529453;
+  border-width: 2px;
+  color: whitesmoke;
 }
-#err-div>div.info {
-background-color: #ecffff;
-border-width: 2px;
-color: #3b3b3b;
+#err-div > div.info {
+  background-color: #ecffff;
+  border-width: 2px;
+  color: #3b3b3b;
 }
-#err-div>div.warning {
+#err-div > div.warning {
   background-color: #eef1bb;
   border-width: 2px;
   color: #3b3b3b;
