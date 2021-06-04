@@ -32,6 +32,7 @@ export class History {
     constructor() {
         this.date = new Date();
         this.type = "send";
+        this.ammount = "";
     }
 }
 export class ExtendedAccountData {

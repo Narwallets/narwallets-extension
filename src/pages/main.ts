@@ -219,6 +219,8 @@ export async function show() {
 
     //d.qs("#disconnect-line").hide();
     const isConnected = await askBackground({ code: "isConnected" });
+    d.onClickId("back-to-account", backToAccountsClicked);
+
     //d.qs("#disconnect-line").showIf(isConnected);
 
     await tryReposition();
@@ -227,6 +229,12 @@ export async function show() {
     d.showErr(ex.message);
   } finally {
   }
+}
+
+function backToAccountsClicked() {
+  d.clearContainer("assets");
+  d.showPage("account-list-main");
+  d.showSubPage("assets");
 }
 
 async function tryReposition() {

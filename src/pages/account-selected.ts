@@ -17,6 +17,7 @@ import {
   CurveAndArrayKey,
   KeyPairEd25519,
 } from "../lib/near-api-lite/utils/key-pair.js";
+import { show as UnlockPage_show } from "./unlock.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Account, Asset, ExtendedAccountData } from "../data/account.js";
@@ -33,6 +34,7 @@ import {
   askBackgroundGetAccessKey,
   askBackgroundAllNetworkAccounts,
   askBackgroundSetAccount,
+  askBackgroundViewMethod,
 } from "../background/askBackground.js";
 import {
   BatchTransaction,
@@ -97,8 +99,6 @@ function initPage() {
   d.onClickId("explore", exploreButtonClicked);
   d.onClickId("search-pools", searchPoolsButtonClicked);
   d.onClickId("assets", showAssetDetailsClicked);
-  d.onClickId("asset-receive", showAssetReceiveClicked);
-  d.onClickId("asset-send", showAssetSendClicked);
   d.onClickId("acc-connect-to-page", connectToWebAppClicked);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
@@ -148,28 +148,21 @@ async function checkConnectOrDisconnect() {
     accountId: selectedAccountData.name,
   });
 
-  const buttonClass = d.byId("acc-connect-to-page");
-  buttonClass.classList.remove("connect");
-  buttonClass.classList.add("disconnect");
+  const connectButton = d.byId("acc-connect-to-page");
+  connectButton.classList.remove("connect");
+  connectButton.classList.add("disconnect");
+  connectButton.innerText = "Disconnect";
 }
 
 function showAssetDetailsClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
-      const asset = li.id; // d.getClosestChildText(".account-item", ev.target, ".name");
-      if (!asset) return;
-      AssetSelected_show(asset, undefined);
+      const assetIndex = Number(li.id); // d.getClosestChildText(".account-item", ev.target, ".name");
+      if (isNaN(assetIndex)) return;
+      AssetSelected_show(selectedAccountData, assetIndex);
     }
   }
-}
-
-function showAssetReceiveClicked() {
-  d.showSubPage("asset-receive-subpage");
-}
-
-function showAssetSendClicked() {
-  d.showSubPage("asset-send-subpage");
 }
 
 function addClicked() {
@@ -192,11 +185,10 @@ async function addOKClicked() {
         item.contractId = "";
     }
 
-    let result = await askBackgroundCallMethod(
+    let result = await askBackgroundViewMethod(
       item.contractId,
       "ft_metadata",
-      {},
-      selectedAccountData.name
+      {}
     );
 
     item.symbol = result.symbol;
@@ -204,11 +196,10 @@ async function addOKClicked() {
     item.url = result.reference;
     item.spec = result.spec;
 
-    let resultBalance = await askBackgroundCallMethod(
+    let resultBalance = await askBackgroundViewMethod(
       item.contractId,
       "ft_balance_of",
-      { account_id: selectedAccountData.name },
-      selectedAccountData.name
+      { account_id: selectedAccountData.name }
     );
     item.balance = c.yton(resultBalance);
 

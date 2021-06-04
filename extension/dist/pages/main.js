@@ -188,6 +188,7 @@ export async function show() {
         d.showPage(ACCOUNT_LIST_MAIN);
         //d.qs("#disconnect-line").hide();
         const isConnected = await askBackground({ code: "isConnected" });
+        d.onClickId("back-to-account", backToAccountsClicked);
         //d.qs("#disconnect-line").showIf(isConnected);
         await tryReposition();
     }
@@ -197,6 +198,11 @@ export async function show() {
     }
     finally {
     }
+}
+function backToAccountsClicked() {
+    d.clearContainer("assets");
+    d.showPage("account-list-main");
+    d.showSubPage("assets");
 }
 async function tryReposition() {
     const reposition = await localStorageGetAndRemove("reposition");
@@ -234,7 +240,6 @@ export function accountItemClicked(ev) {
             const accName = li.id; // d.getClosestChildText(".account-item", ev.target, ".name");
             if (!accName)
                 return;
-            console.log(accName);
             AccountSelectedPage_show(accName, undefined);
         }
     }

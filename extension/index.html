@@ -203,7 +203,7 @@
 
 	<div class="appface slide-show" id="account-selected">
 
-		<button class="button back"></button>
+		<button class="button back" id="back-to-account"></button>
 		<button class="button more" id="more"></button>
 
 		<div class="accountdetstopcenter" id="selected-account">
@@ -351,16 +351,14 @@
 		<!--#endregion -->
 
 		<!--#region add asset-->
-		<div id="add-subpage" class="subpage hidden"> HOLA ESTOY ACA
-
+		<div id="add-subpage" class="subpage hidden"> 
+			<h2>Add Token</h2>
 			<div class="combobox">
 				<select name="select" id="combo">
 					<option value="value1">meta-v2.pool.testnet</option>
 					<option value="value2">Value 2</option>
 				</select>
 			</div>
-
-
 		</div>
 		<!--#endregion -->
 
@@ -472,7 +470,7 @@
 		<div class="subpage scroll" id="assets">
 		</div>
 
-		<div id="asset-item-template" class="hidden asset-item" data-id="{contractId}">
+		<div id="asset-item-template" class="hidden asset-item" data-id="{key}">
 			<div class="accountdetsassets">
 				<div class="accountasseticon"></div>
 				<div class="accountassetcoin">{symbol}</div>
@@ -701,7 +699,7 @@
 		<div class="accountdetsmidbar">
 			<button class="button send" id="asset-send">Send</button>
 			<button class="button receive" id="asset-receive">Receive</button>
-			<button class="button remove">Remove</button>
+			<button class="button remove" id="asset-remove">Remove</button>
 		</div>
 
 		<div class="subpage scroll hide" id="asset-history">

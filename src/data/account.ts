@@ -34,6 +34,7 @@ export class Asset {
 export class History {
   date: Date = new Date();
   type: "receive" | "send" = "send";
+  ammount: string = "";
 }
 
 export class ExtendedAccountData {

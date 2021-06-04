@@ -6,10 +6,11 @@ import * as StakingPool from "../contracts/staking-pool.js";
 import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/valid.js";
 import { checkSeedPhrase, parseSeedPhraseAsync, } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { KeyPairEd25519, } from "../lib/near-api-lite/utils/key-pair.js";
+import { show as UnlockPage_show } from "./unlock.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Asset, ExtendedAccountData } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
-import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount, } from "../background/askBackground.js";
+import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount, askBackgroundViewMethod, } from "../background/askBackground.js";
 import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
@@ -41,7 +42,6 @@ export async function show(accName, reposition) {
 let okCancelRow;
 let confirmBtn;
 let cancelBtn;
-let hola = "Hola COMO ESTAS";
 function initPage() {
     const backLink = new d.El("#account-selected.appface .button.back");
     backLink.onClick(Pages.backToAccountsList);
@@ -59,8 +59,6 @@ function initPage() {
     d.onClickId("explore", exploreButtonClicked);
     d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("assets", showAssetDetailsClicked);
-    d.onClickId("asset-receive", showAssetReceiveClicked);
-    d.onClickId("asset-send", showAssetSendClicked);
     d.onClickId("acc-connect-to-page", connectToWebAppClicked);
     // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
     seedTextElem = new d.El("#seed-phrase");
@@ -98,26 +96,21 @@ async function checkConnectOrDisconnect() {
         code: "connect",
         accountId: selectedAccountData.name,
     });
-    const buttonClass = d.byId("acc-connect-to-page");
-    buttonClass.classList.remove("connect");
-    buttonClass.classList.add("disconnect");
+    const connectButton = d.byId("acc-connect-to-page");
+    connectButton.classList.remove("connect");
+    connectButton.classList.add("disconnect");
+    connectButton.innerText = "Disconnect";
 }
 function showAssetDetailsClicked(ev) {
     if (ev.target && ev.target instanceof HTMLElement) {
         const li = ev.target.closest("li");
         if (li) {
-            const asset = li.id; // d.getClosestChildText(".account-item", ev.target, ".name");
-            if (!asset)
+            const assetIndex = Number(li.id); // d.getClosestChildText(".account-item", ev.target, ".name");
+            if (isNaN(assetIndex))
                 return;
-            AssetSelected_show(asset, undefined);
+            AssetSelected_show(selectedAccountData, assetIndex);
         }
     }
-}
-function showAssetReceiveClicked() {
-    d.showSubPage("asset-receive-subpage");
-}
-function showAssetSendClicked() {
-    d.showSubPage("asset-send-subpage");
 }
 function addClicked() {
     d.showSubPage("add-subpage");
@@ -136,12 +129,12 @@ async function addOKClicked() {
             case "value2":
                 item.contractId = "";
         }
-        let result = await askBackgroundCallMethod(item.contractId, "ft_metadata", {}, selectedAccountData.name);
+        let result = await askBackgroundViewMethod(item.contractId, "ft_metadata", {});
         item.symbol = result.symbol;
         item.icon = result.icon;
         item.url = result.reference;
         item.spec = result.spec;
-        let resultBalance = await askBackgroundCallMethod(item.contractId, "ft_balance_of", { account_id: selectedAccountData.name }, selectedAccountData.name);
+        let resultBalance = await askBackgroundViewMethod(item.contractId, "ft_balance_of", { account_id: selectedAccountData.name });
         item.balance = c.yton(resultBalance);
         selectedAccountData.accountInfo.assets.push(item);
         refreshSaveSelectedAccount();
@@ -193,6 +186,7 @@ function showSelectedAccount() {
     const SELECTED_ACCOUNT = "selected-account";
     d.clearContainer(SELECTED_ACCOUNT);
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
+    function backToAccountsClicked() { }
     //lleno lista de assets
     d.populateUL("assets", "asset-item-template", selectedAccountData.accountInfo.assets);
     /* lala_design
@@ -910,8 +904,9 @@ function getPublicKey(privateKey) {
     return keyPair.getPublicKey().toString();
 }
 //---------------------------------------
-function showPublicKeyClicked() {
+async function showPublicKeyClicked() {
     d.hideErr();
+    await UnlockPage_show();
     if (selectedAccountData.isReadOnly) {
         //we don't have any key for ReadOnly accounts
         d.showErr("Account is read only");
