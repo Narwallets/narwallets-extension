@@ -1,6 +1,38 @@
 @charset "utf-8";
 /* Main div container -------------------------------------------------------------*/
 
+.combotextbox
+{
+  width: 360px;
+  height: 30px;
+  display: block;
+  position: relative;
+  margin: auto;
+  padding: 5px;
+  border-style: solid;
+}
+
+
+.combotextbox input {
+  position: absolute;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  padding: 5px;
+  text-align: center;
+  width: 200px;
+  height: 24px;
+  left:80px;
+  top: 1px;
+}
+
+.combotextbox option
+{
+  background-color: darkblue;
+}
+
 h2 {
   color: rgb(168, 107, 26);
   font-weight: 200;
