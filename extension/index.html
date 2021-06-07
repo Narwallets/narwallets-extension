@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html5>
 <html>
 
 <head>
@@ -175,24 +175,24 @@
 	<div class="appface slide-hide" id="import-or-create">
 
 
-			<h2>Do you have an Account?</h2>
-			
-			<h3>No, create a new NAMED account</h4>
+		<h2>Do you have an Account?</h2>
+
+		<h3>No, create a new NAMED account</h4>
 			<h4>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
 					temporary account</b> to complete the account creation</h4>
 
 			<button class="big" id="option-create">Create named account</button>
 
 			<h3>Yes, I already have an account</h3>
-			
+
 			<button class="big" id="option-import">Import existing account</button>
 
 			<h3>No, create a free implicit Account</h3>
 			<h4>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h4>
-			
+
 			<button class="big" id="option-create-implicit">Create implicit account</button>
 
-	
+
 
 
 	</div>
@@ -230,9 +230,9 @@
 			<div class="accountdetsbalance ">
 				<h3 class="balance">{total}</h3>
 			</div>
-			<div class="accountdetsfiat">
-				<h4>{totalUSD} usd</h4>
-			</div>
+
+			<h4>{totalUSD} usd</h4>
+
 		</div>
 
 		<!--#region subpage SEND -->
@@ -321,17 +321,9 @@
 
 					<div class="panel" id="one-panel">
 						<h2>Stake</h2>
-						
+
 						<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
 						<input id="stake-amount-liquid" type="text">
-					</div>
-
-					<div class="panel" id="two-panel">
-						<div>
-
-							
-
-						</div>
 					</div>
 
 					<div class="panel" id="two-panel">
@@ -347,7 +339,7 @@
 
 						<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
 						<input id="stake-amount" type="text">
-						
+
 					</div>
 
 				</div>
@@ -357,13 +349,17 @@
 		<!--#endregion -->
 
 		<!--#region add asset-->
-		<div id="add-subpage" class="subpage hidden"> 
+		<div id="add-subpage" class="subpage hidden">
+
 			<h2>Add Token</h2>
-			<div class="combobox">
-				<select name="select" id="combo">
-					<option value="value1">meta-v2.pool.testnet</option>
-					<option value="value2">Value 2</option>
-				</select>
+			<div>
+
+				<input type="text" list="combo" />
+				<datalist id="combo">
+					<option value="meta-v2.pool.testnet"></option>
+					<option value="value2"></option>
+				</datalist>
+
 			</div>
 		</div>
 		<!--#endregion -->
@@ -466,7 +462,7 @@
 
 		<!--#region OK CANCEL buttons common to all subpages -->
 		<div class="button-group hidden" id="ok-cancel-row">
-			<button class="filler"></button>
+
 			<button id="account-selected-action-confirm" class="ok">OK</button>
 			<button id="account-selected-action-cancel" class="cancel">Cancel</button>
 		</div>
@@ -489,16 +485,56 @@
 
 		<!--#region MORE-->
 		<div id="more-subpage" class="subpage scroll hidden">
-			<button class="button morepage" id="search-pools">Search More Assets</button>
-			<button class="button morepage" id="explore">Explore Account</button>
-			<button class="button morepage" id="detailed-rewards">Detailed Rewards</button>
-			<button class="button morepage" id="add-note">Add Note</button>
-			<button class="button morepage" id="access">Make Read Only / Make Full Access</button>
-			<button class="button morepage" id="show-public-key">Show Public Key</button>
-			<button class="button morepage" id="show-private-key">Show Private Key</button>
-			<button class="button morepage" id="remove">Remove Account from Wallet</button>
-			<button class="button morepage">Lock Up Contract - Take Control</button>
-			<button class="button morepage">Delete Account</button>
+			<button class="button morepage" id="search-pools">
+				<h1>Search More Assets</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da
+				</h2>
+			</button>
+			<button class="button morepage" id="explore">
+				<h1>Explore Account</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da
+				</h2>
+			</button>
+			<button class="button morepage" id="detailed-rewards">
+				<h1>Detailed Rewards</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da
+				</h2>
+			</button>
+			<button class="button morepage" id="add-note">
+				<h1>Add Note</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf dajhsgd fajhsg
+					fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da</h2>
+			</button>
+			<button class="button morepage" id="access">
+				<h1>Make Read Only / Make Full Access</h1>
+				<h2>Asdasdasdasdasdjga jahsg
+					fajshgf dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da</h2>
+			</button>
+			<button class="button morepage" id="show-public-key">
+				<h1>Show Public Key</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf
+					dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da</h2>
+			</button>
+			<button class="button morepage" id="show-private-key">
+				<h1>Show Private Key</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf
+					dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da</h2>
+			</button>
+			<button class="button morepage" id="remove">
+				<h1>Remove Account from Wallet</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf
+					dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da</h2>
+			</button>
+			<button class="button morepage">
+				<h1>Lock Up Contract - Take Control</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf dajhsgd
+					fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da</h2>
+			</button>
+			<button class="button morepage">
+				<h1>Delete Account</h1>
+				<h2>Asdasdasdasdasdjga jahsg fajshgf dajhsgd fajhsg fhadsf fh
+					affsahg hfsga sgdsajghd ahjsghasg gh da</h2>
+			</button>
 		</div>
 		<!--#endregion -->
 
@@ -596,14 +632,14 @@
 			<h3>Search Account Name</h3>
 
 			<div class="inputboxwithbutton">
-			    <input id="search-account-name" type="text">
+				<input id="search-account-name" type="text">
 				<button id="net-root" disabled="">.guildnet</button>
 			</div>
 
 
 			<div class="form-field-label">
 				<h3>Have you staked from this account or its lockup?</h3>
-				
+
 				<div class="form-control" id="yes-search-pools">
 					<input id="yes-search-the-pools" type="radio" name="search-the-pools" checked>
 					<label for="yes-search-the-pools">Yes, search the pools</label>
@@ -708,18 +744,94 @@
 			<button class="button remove" id="asset-remove">Remove</button>
 		</div>
 
-		<div class="subpage scroll hide" id="asset-history">
+		<div class="subpage hide" id="asset-history">
+			
+			<div class="wrapper">
 
-			<div class="assethistoryline">
-				<div class="assethisttype">
-					<div class="histreceive"></div>
+				<input class="radio" id="one" name="group" type="radio" checked>
+
+
+				<div class="tabs">
+					<label class="tab" id="one-tab" for="one">Asset Activity</label>
 				</div>
-				<div class="assethistdate">01/01/2021</div>
-				<div class="assethistaccount">sasdasdas</div>
-				<div class="assethistammount">100,000.000</div>
-			</div>
 
+				<div class="panels">
+
+					<div class="panel" id="one-panel">
+
+						<div class="assethistoryline">
+							<div class="assethisttype">
+								<div class="histreceive"></div>
+							</div>
+							<div class="assethistdate">01/01/2021</div>
+							<div class="assethistaccount">sasdasdas</div>
+							<div class="assethistammount">100,000.000</div>
+						</div>
+
+						<div class="assethistoryline">
+							<div class="assethisttype">
+								<div class="histreceive"></div>
+							</div>
+							<div class="assethistdate">01/01/2021</div>
+							<div class="assethistaccount">sasdasdas</div>
+							<div class="assethistammount">100,000.000</div>
+						</div>
+						
+						<div class="assethistoryline">
+							<div class="assethisttype">
+								<div class="histreceive"></div>
+							</div>
+							<div class="assethistdate">01/01/2021</div>
+							<div class="assethistaccount">sasdasdas</div>
+							<div class="assethistammount">100,000.000</div>
+						</div>
+						
+						<div class="assethistoryline">
+							<div class="assethisttype">
+								<div class="histreceive"></div>
+							</div>
+							<div class="assethistdate">01/01/2021</div>
+							<div class="assethistaccount">sasdasdas</div>
+							<div class="assethistammount">100,000.000</div>
+						</div>
+						
+						<div class="assethistoryline">
+							<div class="assethisttype">
+								<div class="histreceive"></div>
+							</div>
+							<div class="assethistdate">01/01/2021</div>
+							<div class="assethistaccount">sasdasdas</div>
+							<div class="assethistammount">100,000.000</div>
+						</div>		
+						
+						<div class="assethistoryline">
+							<div class="assethisttype">
+								<div class="histreceive"></div>
+							</div>
+							<div class="assethistdate">01/01/2021</div>
+							<div class="assethistaccount">sasdasdas</div>
+							<div class="assethistammount">100,000.000</div>
+						</div>		
+						
+						<div class="assethistoryline">
+							<div class="assethisttype">
+								<div class="histreceive"></div>
+							</div>
+							<div class="assethistdate">01/01/2021</div>
+							<div class="assethistaccount">sasdasdas</div>
+							<div class="assethistammount">100,000.000</div>
+						</div>								
+
+					</div>
+
+				</div>
+
+			</div>
 		</div>
+
+
+
+
 
 		<div class="subpage hidden" id="asset-receive-subpage">
 
@@ -735,7 +847,7 @@
 
 		</div>
 
-		<div class="subpage hidden" id="asset-send-subpage">
+		<div id="selected-asset-template" class="hidden">
 
 			<div class="accountdetscuenta">
 				<h1>{name}</h1>
@@ -751,11 +863,13 @@
 			</div>
 
 		</div>
-		
+
 		<div class="subpage hiden"></div>
 
 
+
 	</div>
+
 
 	<!--#endregion -->
 
@@ -763,7 +877,7 @@
 	<!--#region Error and wait div -->
 
 	<div id="err-div"></div>
-	
+
 
 	<div id="wait">
 		<div class="lds-ring">

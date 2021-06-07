@@ -543,6 +543,7 @@ h3 {
     max-width: 340px;
     padding: 3px 0px;
     border-top: solid 1px lightgray;
+    background-color: lightgray;
 }
 
 .button-group.no-top-line {

@@ -13,6 +13,7 @@
   font-size: 10px;
   text-align: center; 
   border-style: none;
+  border-radius: 5px;
   background-color: var(--NarBackground);
   padding:0px;
   padding-top: 33px;
@@ -23,14 +24,14 @@
 
 .morepage
 {
-
+  position: relative;
   width:361px;
   height:48px;
-  background-color: var(--NarMidBar);
   color:white;
-  padding-top: 26px;
- 
+  padding: 0px; 
   margin:0px;
+  border-radius: 0px;
+
   background: rgb(51,46,147);
 	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
   border-style: solid;
@@ -40,6 +41,35 @@
   border-right-color: rgb(31, 27, 104);
   border-bottom-color: rgb(31, 27, 104);
   
+}
+
+.morepage h1
+{
+
+  position:absolute;
+  padding: 0px;
+  margin:0px;
+  left:50px;
+  top:2px;
+  font-weight: 200;
+  font-size: 14px;
+
+}
+
+.morepage h2
+{
+  
+  position:absolute;
+  padding: 0px;
+  margin:0px;
+  left:50px;
+  top:21px;
+  width:300px;
+  text-align: left;
+  font-weight: 100;
+  font-size: 10px;
+  color:white;
+  overflow-wrap: normal;
 }
 
 .morepage:hover
@@ -71,52 +101,41 @@
 {
   position: absolute;
   top:0px;
-  left:260px;
-  width: 100px;
+  left:270px;
+  width: 80px;
   color:white;
-  height: 44px;
-  background-color: transparent;
+  height: 34px;
+  margin:0px;
   display: block;
-  border-width: 1px;
-  border-style: solid;
-
-  background-color: rgb(109, 15, 15);
-  border-top-color:rgb(135, 170, 233) ;
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
-  
-  
+  border-radius: 5px;
+  border-style: none;
+  background-color: rgb(134, 21, 21);
 }
 
 .cancel:hover
 {
-  background-color: rgb(216, 30, 30);
+  background-color: rgb(255, 0, 0);
 }
 
 .ok
 {
   position: absolute;
   top:0px;
-  left:160px;
-  width: 100px;
+  left:184px;
+  width: 80px;
   color:white;
-  height: 44px;
-  background-color: transparent;
+  height: 34px;
+  margin:0px;
   display: block;
-  border-width: 1px;
-  border-style: solid;
-  background-color: rgb(21, 75, 50);
-  border-top-color:rgb(135, 170, 233) ;
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-radius: 5px;
+  border-style: none;
+  background-color: rgb(12, 73, 60);
    
 }
 
 .ok:hover
 {
-  background-color: rgb(49, 165, 111);
+  background-color: rgb(0, 255, 136);
 }
 
 .big {
@@ -139,7 +158,7 @@
   border-style: solid;
   border-width: 1px;
   color:white;
-  border-radius: 2px;
+  border-radius: 5px;
 
   background: rgb(51,46,147);
 	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
@@ -173,6 +192,8 @@
   left:305px;
   background-image: url("../icons/SVG/more_dark.svg");
 }
+
+
 
 .more:hover {
   background-image: url("../icons/SVG/more_light.svg");
@@ -271,6 +292,15 @@
   background-image: url("../icons/SVG/link_dark.svg");
 }
 
+
+.disconnect {
+  background-image: url("../icons/SVG/unlink_light.svg");
+}
+
+.disconnect:hover {
+  background-image: url("../icons/SVG/unlink_dark.svg");
+}
+
 .remove {
   background-image: url("../icons/SVG/minus_light.svg");
 }
@@ -299,7 +329,7 @@
   border-style: solid;
   border-width: 1px;
   color:white;
-  border-radius: 2px;
+  border-radius: 5px;
 
   background: rgb(51,46,147);
 	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);

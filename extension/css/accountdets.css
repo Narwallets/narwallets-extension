@@ -14,11 +14,15 @@
 	margin-left:auto;
 	margin-right:auto;
 	margin-top:10px;
-
+	max-height: 24px;
 	width:260px;
 	height: auto;
-	max-height: 75px;
-	overflow-wrap: anywhere;	
+	max-height: 40px;
+	overflow-wrap:break-word;
+	word-break: break-word;
+	white-space: initial;
+	overflow: hidden;
+
 	
 }
 
@@ -32,6 +36,7 @@
 
 	width:260px;
 	text-align: center;
+
 
 }
 
@@ -51,13 +56,15 @@
 
 .accountdetsfiat
 {
-	display: block;
+	display:inline-block;
 	margin-left:auto;
 	margin-right:auto;
 	margin-top:5px;
-	height:25px;
-
+	height:28px;
+	padding: 0px;
+	font-weight: 400;
 	text-align: center;
+	align-items: center;
 	width:260px;
 
 }

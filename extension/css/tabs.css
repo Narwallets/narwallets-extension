@@ -11,7 +11,8 @@
   .tab{
     cursor: pointer;
     padding:10px 20px;
-    padding-top: 5px;
+    padding-top: 3px;
+    height:7px;
     margin:0px 2px;
     background:rgba(51,46,147,1);
     display:inline-block;
@@ -29,15 +30,16 @@
     width:100%;
     max-width:500px;
     border-radius:3px;
-    overflow:hidden;
+    max-height: 4000px;
     padding:0px;  
     border-style: none;
-
+    overflow-y:scroll;
 
   }
 
   .panel{
     display:none;
+    
   }
 
   @keyframes fadein {
