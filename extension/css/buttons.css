@@ -14,7 +14,24 @@
   text-align: center; 
   border-style: none;
   border-radius: 5px;
-  background-color: var(--NarBackground);
+  padding:0px;
+  padding-top: 33px;
+  background-size: 30px;
+  background-position-x: center;
+
+}
+
+.buttonextra {
+  width: 60px;
+  height: 48px;
+  display: block;
+  margin: auto;
+  background-repeat: no-repeat;
+  color: rgb(35, 9, 78);
+  font-size: 10px;
+  text-align: center; 
+  border-style: none;
+  border-radius: 5px;
   padding:0px;
   padding-top: 33px;
   background-size: 30px;
@@ -277,11 +294,11 @@
 
 
 .unlocked {
-  background-image: url("../icons/SVG/key_light.svg");
+  background-image: url("../icons/SVG/lock_dark.svg");
 }
 
 .unlocked:hover {
-  background-image: url("../icons/SVG/key_dark.svg");
+  background-image: url("../icons/SVG/lock_light.svg");
 }
 
 .connect {
