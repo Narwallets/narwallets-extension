@@ -14,6 +14,7 @@
   text-align: center; 
   border-style: none;
   border-radius: 5px;
+  background-color: var(--NarBackground);
   padding:0px;
   padding-top: 33px;
   background-size: 30px;

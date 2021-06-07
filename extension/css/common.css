@@ -18,19 +18,12 @@
   border-style: solid;
   border-width: 1px;
   border-radius: 5px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
   padding: 5px;
   text-align: center;
   width: 200px;
   height: 24px;
   left:80px;
   top: 1px;
-}
-
-.combotextbox option
-{
-  background-color: darkblue;
 }
 
 h2 {
