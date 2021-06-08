@@ -60,6 +60,7 @@ let refreshButton: d.El;
 let seedTextElem: d.El;
 let comboAdd: d.El;
 let isMoreOptionsOpen = false;
+let stakeTabSelected: number = 1;
 
 export async function show(accName: string, reposition?: string) {
   initPage();
@@ -100,6 +101,8 @@ function initPage() {
   d.onClickId("search-pools", searchPoolsButtonClicked);
   d.onClickId("assets", showAssetDetailsClicked);
   d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+  d.onClickId("one-tab", selectFirstTab);
+  d.onClickId("two-tab", selectSecondTab);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   seedTextElem = new d.El("#seed-phrase");
@@ -130,6 +133,14 @@ function initPage() {
   d.onClickId("lockup-add-public-key", LockupAddPublicKey);
   d.onClickId("delete-account", DeleteAccount);
   //d.onClickId("assign-staking-pool", assignStakingPool);
+}
+
+function selectFirstTab() {
+  stakeTabSelected = 1;
+}
+
+function selectSecondTab() {
+  stakeTabSelected = 2;
 }
 
 function moreClicked() {
@@ -207,9 +218,12 @@ async function addOKClicked() {
 
     refreshSaveSelectedAccount();
     enableOKCancel();
-    //d.showSuccess("Success");
+    d.showSuccess("Success");
     //showButtons();
-  } catch (ex) {}
+  } catch (ex) {
+  } finally {
+    d.hideWait();
+  }
 }
 
 function showingMore() {
@@ -556,6 +570,8 @@ async function performLockupContractSend() {
 
 //----------------------
 async function stakeClicked() {
+  const ques = d.byId("tabtab");
+  console.log(ques);
   try {
     const info = selectedAccountData.accountInfo;
     const stakeAmountBox = d.inputById("stake-amount");
@@ -602,10 +618,16 @@ async function saveSelectedAccount(): Promise<any> {
 //----------------------
 async function performStake() {
   //normal accounts
+
   disableOKCancel();
   d.showWait();
+  let newStakingPool;
   try {
-    const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+    if (stakeTabSelected == 1) {
+      newStakingPool = "meta.pool.testnet";
+    } else {
+      newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+    }
     if (!isValidAccountID(newStakingPool))
       throw Error("Staking pool Account Id is invalid");
 
@@ -613,7 +635,7 @@ async function performStake() {
       throw Error("you need full access on " + selectedAccountData.name);
 
     //const amountToStake = info.lastBalance - info.staked - 36
-    const amountToStake = c.toNum(d.inputById("stake-amount").value);
+    const amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     if (!isValidAmount(amountToStake))
       throw Error("Amount should be a positive integer");
     if (amountToStake < 5) throw Error("Stake at least 5 Near");
@@ -723,6 +745,8 @@ async function performStake() {
 
     //update staked to avoid incorrect "rewards" calculations on refresh
     selectedAccountData.accountInfo.staked += amountToStake;
+    selectedAccountData.total -= selectedAccountData.total;
+    selectedAccountData.totalUSD = selectedAccountData.total * 4.7;
     //refresh status & save
     await refreshSaveSelectedAccount();
 

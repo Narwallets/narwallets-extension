@@ -6,7 +6,6 @@ import * as StakingPool from "../contracts/staking-pool.js";
 import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/valid.js";
 import { checkSeedPhrase, parseSeedPhraseAsync, } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { KeyPairEd25519, } from "../lib/near-api-lite/utils/key-pair.js";
-import { show as UnlockPage_show } from "./unlock.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Asset, ExtendedAccountData } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
@@ -23,6 +22,7 @@ let refreshButton;
 let seedTextElem;
 let comboAdd;
 let isMoreOptionsOpen = false;
+let stakeTabSelected = 1;
 export async function show(accName, reposition) {
     initPage();
     await selectAndShowAccount(accName);
@@ -60,6 +60,8 @@ function initPage() {
     d.onClickId("search-pools", searchPoolsButtonClicked);
     d.onClickId("assets", showAssetDetailsClicked);
     d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+    d.onClickId("one-tab", selectFirstTab);
+    d.onClickId("two-tab", selectSecondTab);
     // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
     seedTextElem = new d.El("#seed-phrase");
     comboAdd = new d.El("#combo");
@@ -81,6 +83,12 @@ function initPage() {
     d.onClickId("lockup-add-public-key", LockupAddPublicKey);
     d.onClickId("delete-account", DeleteAccount);
     //d.onClickId("assign-staking-pool", assignStakingPool);
+}
+function selectFirstTab() {
+    stakeTabSelected = 1;
+}
+function selectSecondTab() {
+    stakeTabSelected = 2;
 }
 function moreClicked() {
     if (!isMoreOptionsOpen) {
@@ -139,10 +147,14 @@ async function addOKClicked() {
         selectedAccountData.accountInfo.assets.push(item);
         refreshSaveSelectedAccount();
         enableOKCancel();
-        //d.showSuccess("Success");
+        d.showSuccess("Success");
         //showButtons();
     }
-    catch (ex) { }
+    catch (ex) {
+    }
+    finally {
+        d.hideWait();
+    }
 }
 function showingMore() {
     const buttonsMore = new d.All(".buttons-more");
@@ -186,7 +198,6 @@ function showSelectedAccount() {
     const SELECTED_ACCOUNT = "selected-account";
     d.clearContainer(SELECTED_ACCOUNT);
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
-    function backToAccountsClicked() { }
     //lleno lista de assets
     d.populateUL("assets", "asset-item-template", selectedAccountData.accountInfo.assets);
     /* lala_design
@@ -439,6 +450,8 @@ async function performLockupContractSend() {
 }
 //----------------------
 async function stakeClicked() {
+    const ques = d.byId("tabtab");
+    console.log(ques);
     try {
         const info = selectedAccountData.accountInfo;
         const stakeAmountBox = d.inputById("stake-amount");
@@ -484,14 +497,20 @@ async function performStake() {
     //normal accounts
     disableOKCancel();
     d.showWait();
+    let newStakingPool;
     try {
-        const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+        if (stakeTabSelected == 1) {
+            newStakingPool = "meta.pool.testnet";
+        }
+        else {
+            newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+        }
         if (!isValidAccountID(newStakingPool))
             throw Error("Staking pool Account Id is invalid");
         if (!selectedAccountData.isFullAccess)
             throw Error("you need full access on " + selectedAccountData.name);
         //const amountToStake = info.lastBalance - info.staked - 36
-        const amountToStake = c.toNum(d.inputById("stake-amount").value);
+        const amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
         if (!isValidAmount(amountToStake))
             throw Error("Amount should be a positive integer");
         if (amountToStake < 5)
@@ -562,6 +581,8 @@ async function performStake() {
         }
         //update staked to avoid incorrect "rewards" calculations on refresh
         selectedAccountData.accountInfo.staked += amountToStake;
+        selectedAccountData.total -= selectedAccountData.total;
+        selectedAccountData.totalUSD = selectedAccountData.total * 4.7;
         //refresh status & save
         await refreshSaveSelectedAccount();
         d.showSuccess("Success");
@@ -904,9 +925,8 @@ function getPublicKey(privateKey) {
     return keyPair.getPublicKey().toString();
 }
 //---------------------------------------
-async function showPublicKeyClicked() {
+function showPublicKeyClicked() {
     d.hideErr();
-    await UnlockPage_show();
     if (selectedAccountData.isReadOnly) {
         //we don't have any key for ReadOnly accounts
         d.showErr("Account is read only");

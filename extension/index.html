@@ -312,7 +312,7 @@
 				<input class="radio" id="two" name="group" type="radio">
 
 
-				<div class="tabs">
+				<div class="tabs" id="tabtab">
 					<label class="tab" id="one-tab" for="one">Liquid Stake</label>
 					<label class="tab" id="two-tab" for="two">Delayed Stake</label>
 				</div>
@@ -320,9 +320,9 @@
 				<div class="panels">
 
 					<div class="panel" id="one-panel">
-						<h2>Stake</h2>
+						<h2>Liquid Stake</h2>
 						
-						<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
+						<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span>)</h3>
 						<input id="stake-amount-liquid" type="text">
 					</div>
 
@@ -697,10 +697,27 @@
 
 		<button class="button back" id="back-to-selected"></button>
 
-		<div class="accountdetstopcenter">
+	<div class="accountdetstopcenter" id="selected-asset">
 
 		</div>
 
+		<div id="selected-asset-template" class="hidden">
+			<div class="accountdetscuenta">
+				<h1>{acc.name}</h1>
+			</div>
+			<div class="accountdetscomment">
+				<h2>{accountInfo.note}</h2>
+			</div>
+			<div class="accountdetsbalance ">
+				<h3 class="balance">{asset.symbol}</h3>
+			</div>
+			<div class="assetdeticon">
+				<h4>{asset.icon}</h4>
+			</div>
+			<div class="assetdetcontract">
+				<h4>{asset.contract}</h4>
+			</div>
+		</div>
 
 		<div class="accountdetsmidbar">
 			<button class="button send" id="asset-send">Send</button>
@@ -735,6 +752,13 @@
 
 		</div>
 
+		<div id="asset-selected-remove" class="subpage hidden">
+
+			<h2>Delete this asset?</h2>
+			<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+
+		</div>
+
 		<div class="subpage hidden" id="asset-send-subpage">
 
 			<div class="accountdetscuenta">
@@ -752,10 +776,16 @@
 
 		</div>
 		
+		<div class="button-group hidden" id="ok-cancel-row-asset">
+			<button class="filler"></button>
+			<button id="asset-selected-action-confirm" class="ok">OK</button>
+			<button id="asset-selected-action-cancel" class="cancel">Cancel</button>
+		</div>
+
 		<div class="subpage hiden"></div>
-
-
+		
 	</div>
+	
 
 	<!--#endregion -->
 
