@@ -450,8 +450,6 @@ async function performLockupContractSend() {
 }
 //----------------------
 async function stakeClicked() {
-    const ques = d.byId("tabtab");
-    console.log(ques);
     try {
         const info = selectedAccountData.accountInfo;
         const stakeAmountBox = d.inputById("stake-amount");
@@ -478,6 +476,7 @@ async function stakeClicked() {
         if (amountToStake < 0)
             amountToStake = 0;
         await fullAccessSubPage("account-selected-stake", performer);
+        d.qs("#account-selected-stake #one").el.checked = true;
         d.inputById("stake-with-staking-pool").value =
             selectedAccountData.accountInfo.stakingPool || "";
         d.byId("max-stake-amount").innerText = c.toStringDec(amountToStake);
