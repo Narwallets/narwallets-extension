@@ -14,7 +14,7 @@
   text-align: center; 
   border-style: none;
   border-radius: 5px;
-  background-color: var(--NarBackground);
+  background-color: transparent;
   padding:0px;
   padding-top: 33px;
   background-size: 30px;
@@ -37,7 +37,7 @@
   padding-top: 33px;
   background-size: 30px;
   background-position-x: center;
-
+  background-color: transparent;
 }
 
 .morepage
@@ -244,12 +244,12 @@
 /*buttons that appear in dark background*/
 
 .receive {
-  background-image: url("../icons/SVG/send_light.svg");
+  background-image: url("../icons/SVG/receive_light.svg");
 
 }
 
 .receive:hover {
-  background-image: url("../icons/SVG/send_dark.svg");
+  background-image: url("../icons/SVG/receive_dark.svg");
 }
 
 .unlock {
@@ -261,11 +261,11 @@
 }
 
 .send {
-  background-image: url("../icons/SVG/receive_light.svg");
+  background-image: url("../icons/SVG/send_light.svg");
 }
 
 .send:hover {
-  background-image: url("../icons/SVG/receive_dark.svg");
+  background-image: url("../icons/SVG/send_dark.svg");
 }
 
 .stake {

@@ -39,7 +39,7 @@
 
   .panel{
     display:none;
-    
+
   }
 
   @keyframes fadein {
@@ -58,7 +58,8 @@
   #one:checked ~ .panels #one-panel,
   #two:checked ~ .panels #two-panel,
   #three:checked ~ .panels #three-panel{
-    display:block
+    display:block;
+    overflow-y: scroll;
   }
 
   #one:checked ~ .tabs #one-tab,
