@@ -5,7 +5,7 @@
   
   .combobox select {
     background-color: #0563af;
-    color: white;
+    color:var(--LightBorderLightAccent);
     padding: 5px;
     width: 250px;
     border: none;

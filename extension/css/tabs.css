@@ -4,16 +4,18 @@
     display:flex;
     flex-direction: column;
     align-items: left;
-    background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+    background: linear-gradient(131deg, var(--DarkBackgroundTop) 0%, var(--DarkBackgroundBot) 100%);
 
 }
 
   .tab{
     cursor: pointer;
     padding:10px 20px;
-    padding-top: 5px;
+    padding-top: 3px;
+    height:7px;
+    width: auto;
     margin:0px 2px;
-    background:rgba(51,46,147,1);
+    background:var(--DarkBackgroundTop);
     display:inline-block;
     color:white;
     border-radius:3px 3px 0px 0px;
@@ -23,21 +25,23 @@
   }
 
   .panels{
-    background: rgb(214,214,214);
-    background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
+    background: var(--LightBackground);    
+    background: linear-gradient(131deg, var (--LightGradientTop) 0%, var (--LightGradientBottom)  100%);
     min-height:200px;
     width:100%;
     max-width:500px;
     border-radius:3px;
-    overflow:hidden;
+    max-height: 4000px;
     padding:0px;  
     border-style: none;
-
+    overflow-y:scroll;
+    height: 500px;
 
   }
 
   .panel{
     display:none;
+
   }
 
   @keyframes fadein {
@@ -56,16 +60,15 @@
   #one:checked ~ .panels #one-panel,
   #two:checked ~ .panels #two-panel,
   #three:checked ~ .panels #three-panel{
-    display:block
+    display:block;
+    overflow-y: scroll;
   }
 
   #one:checked ~ .tabs #one-tab,
   #two:checked ~ .tabs #two-tab,
   #three:checked ~ .tabs #three-tab{
-    background: rgba(214,214,214,1);
+    background: var (--LightGradientTop);
     border-style: solid;
     border-width: 1px;
-    border-color: var(--NarMidBar);
-    color:var(--NarBackground);
     border-bottom-style: none;
   }

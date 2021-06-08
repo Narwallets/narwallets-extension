@@ -55,7 +55,7 @@ word-break: break-word;
 #err-div>div.success {
 background-color: #529453;
 border-width: 2px;
-color: whitesmoke;
+color:var(--LightBorderLightAccent)smoke;
 }
 #err-div>div.info {
 background-color: #ecffff;
@@ -299,7 +299,7 @@ background-color: #e89700e6;
 
 button:disabled {
 color: #999;
-background-color: whitesmoke;
+background-color:var(--LightBorderLightAccent)smoke;
 border-color: #dfdfdf;
 }
 
@@ -395,8 +395,8 @@ input[type=checkbox] {
 
 
 .lined-title {
-  border-top: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
+  border-top: 1px solid var (--LightGradientDarkTop) ;
+  border-bottom: 1px solid var (--LightGradientDarkTop) ;
   margin-top: 7px;
   display: flex;
   justify-content: center;

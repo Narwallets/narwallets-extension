@@ -8,58 +8,84 @@
 
 .accountdetscuenta
 {
+	
 	text-align: center;
-	font-size:15px;
 	display: block;
-	margin-left:auto;
-	margin-right:auto;
-	margin-top:10px;
 
+	color:var(--DarkBackgroundTop);
+	
+	margin:auto;
+	margin-top:10px;
+	margin-bottom: 0px;
+	max-height: 24px;
 	width:260px;
 	height: auto;
-	max-height: 75px;
-	overflow-wrap: anywhere;	
-	
+	max-height: 40px;
+	overflow-wrap:break-word;
+	word-break: break-word;
+	white-space: initial;
+	overflow: hidden;
+
+	font-size:18px;
+	font-weight: 400;
+
+
 }
 
 .accountdetscomment
 {
-	display: block;
-	margin-left:auto;
-	margin-right:auto;
-	margin-top:5px;
-	height:15px;
 
+	display: block;
+	margin:auto;
+	margin-top:4px;
+	margin-bottom: 0px;
+
+	max-height: 24px;
+	height:15px;
 	width:260px;
 	text-align: center;
+
+	font-size:12px;
+	font-weight: 200;
 
 }
 
 
 .accountdetsbalance
 {
-	display: block;
-	margin-left:auto;
-	margin-right:auto;
-	margin-top:5px;
-	height:20px;
 
+	display: block;
+	margin:auto;
+	margin-top:4px;
+	margin-bottom: 0px;
+	max-height: 24px;
+	height:20px;
 	width:260px;
 	text-align: center;
+
+	font-size:28px;
+	font-weight: 400;
+
+	color:var(--TextHightlight);
 
 }
 
 .accountdetsfiat
 {
-	display: block;
-	margin-left:auto;
-	margin-right:auto;
-	margin-top:5px;
-	height:25px;
 
+	display:inline-block;
+	margin-top:10px;
+	margin-bottom: 0px;
+	max-height: 24px;
+	height:28px;
+	padding: 0px;
+	font-weight: 400;
 	text-align: center;
+	align-items: center;
 	width:260px;
 
+	font-size:15px;
+	font-weight: 400;
 }
 
 
@@ -84,22 +110,22 @@
 	bottom: 0px;
 	overflow: hidden;
 
-	background: rgb(214,214,214);
-  	background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
-	border-top-color: white;
-	border-left-color: white;
-	border-right-color: darkgrey;
-	border-bottom-color: darkgrey;
+	background: var(--LightBackground);  	
+	background: linear-gradient(131deg, var (--LightGradientTop) 0%, var (--LightGradientBottom)  100%);
+	border-top-color:var(--LightBorderLightAccent);
+	border-left-color:var(--LightBorderLightAccent);
+	border-right-color:var(--LightBorderDarkAccent);
+	border-bottom-color:var(--LightBorderDarkAccent);
 }
 
 .accountdetsassets:hover
 {
 	background-color: var(--NarListHoover);
-	background: linear-gradient(131deg, lightgray 0%, darkgray 100%);
-	border-top-color: white;
-	border-left-color: white;
-	border-right-color: darkgrey;
-	border-bottom-color: darkgrey;
+	background: linear-gradient(131deg, var (--LightGradientDarkTop)  0%, var (--LightGradientDarkBot)  100%);
+	border-top-color:var(--LightBorderLightAccent);
+	border-left-color:var(--LightBorderLightAccent);
+	border-right-color:var(--LightBorderDarkAccent);
+	border-bottom-color:var(--LightBorderDarkAccent);
 }
 
 
@@ -137,7 +163,7 @@
 	left:1px;
 	width: 46px;
 	height: 46px;
-	background-color: darkgrey;
+	background-color:var(--LightBorderDarkAccent);
 
 }
 
@@ -155,7 +181,7 @@
 	width:315px;
 	text-align: right;
 
-	color:darkgreen;
+	color:var(--TextHightlight);
 		
 }
 

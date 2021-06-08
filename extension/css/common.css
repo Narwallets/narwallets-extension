@@ -2,22 +2,95 @@
 /* Main div container -------------------------------------------------------------*/
 
 h2 {
-  color: rgb(168, 107, 26);
+  color: var(--TextHightlight);
   font-weight: 200;
   font-size: 24px;
+
+  padding: 5px;
+  width: 300px;
+  height: auto;
+  overflow-wrap: break-word;
+  margin: auto;
 }
 
 h3 {
   color: black;
   font-weight: 200;
   font-size: 14px;
+  padding: 5px;
+  width: 300px;
+  height: auto;
+  overflow-wrap: break-word;
+  margin: auto;
 }
 
 h4 {
   color: black;
   font-weight: 100;
   font-size: 12;
+  padding: 5px;
+  width: 300px;
+  height: auto;
+  overflow-wrap: break-word;
+  margin: auto;
+
 }
+
+h5 {
+  color: black;
+  font-weight: 300;
+  font-size: 14;
+  padding: 5px;
+  width: 300px;
+  height: auto;
+  overflow-wrap: break-word;
+  margin: auto;
+}
+
+label
+{
+  color: black;
+  font-weight: 300;
+  font-size: 12;
+  padding: 5px;
+  width: 300px;
+  height: auto;
+  overflow-wrap: break-word;
+  margin: auto;
+  margin-top: 15px;
+}
+
+.biginput
+{
+  margin-top:15px;
+  width:300px;
+  height:50px;
+}
+
+.combotextbox
+{
+  width: 360px;
+  height: 30px;
+  display: block;
+  position: relative;
+  padding: 5px;
+
+}
+
+
+.combotextbox input {
+  position: relative;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+  padding: 5px;
+  text-align: center;
+  width: 200px;
+  height: 24px;
+  margin:auto;
+  top: 1px;
+}
+
 
 input {
   border-style: solid;
@@ -25,6 +98,7 @@ input {
   border-radius: 5px;
   padding: 5px;
   text-align: center;
+
 }
 
 .appface {
@@ -73,18 +147,25 @@ input {
 
   margin: 0px;
 
-  background: rgb(51, 46, 147);
-  background: linear-gradient(
-    131deg,
-    rgba(51, 46, 147, 1) 0%,
-    rgba(53, 93, 168, 1) 100%
-  );
-  border-style: none;
+
+}
+
+.contentarea
+{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding:10px;
+  text-align: center;
+  background-color: transparent;
+
 }
 
 .subpage {
   position: absolute;
 
+  padding:0px;
+  
   top: 190px;
   left: 0px;
   width: 361px;
@@ -100,24 +181,6 @@ input {
 
   text-align: center;
   align-items: center;
-}
-
-.subpage h4 {
-  position: relative;
-  width: 300px;
-  margin: 0px;
-  margin-left: auto;
-  margin-right: auto;
-
-  height: auto;
-  font-size: 15px;
-  font-weight: 300;
-  padding: 5px;
-  background-color: lightblue;
-  border-style: solid;
-  border-width: 1px;
-  overflow-wrap: break-word;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
 }
 
 .boximportante {
@@ -146,12 +209,16 @@ input {
   left: 0px;
   width: 361px;
   height: 130px;
+  max-height: 130px;
   background: rgb(214, 214, 214);
   background: linear-gradient(
     131deg,
     rgba(214, 214, 214, 1) 0%,
     rgba(255, 255, 255, 1) 100%
   );
+  overflow-y: hidden;
+  
+  
 }
 
 .accountdetstopcenter h1 {
@@ -210,10 +277,10 @@ input {
   );
   border-style: solid;
   border-width: 1px;
-  border-top-color: rgb(135, 170, 233);
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-top-color: var(--DarkBorderLightAcccent);
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 }
 
 .inputboxwithbutton {
@@ -234,8 +301,8 @@ input {
   border-bottom-right-radius: 0px;
   padding: 5px;
   text-align: center;
-  width: 200px;
-  height: 16px;
+  width: 220px;
+  height: 28px;
   left: 32px;
   top: 1px;
 }
@@ -250,7 +317,7 @@ input {
   height: 28px;
   left: 242px;
   top: 1px;
-  color: white;
+  color:var(--LightBorderLightAccent);
 
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -263,10 +330,10 @@ input {
   );
   border-style: solid;
   border-width: 1px;
-  border-top-color: rgb(135, 170, 233);
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-top-color: var(--DarkBorderLightAcccent);
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 }
 
 .scroll {
@@ -307,32 +374,42 @@ input {
   );
   border-style: solid;
   border-width: 1px;
-  border-top-color: rgb(135, 170, 233);
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-top-color: var(--DarkBorderLightAcccent);
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 }
 
 /* Top Bar ------------------------------------------------------------------------*/
 
 .topbar {
   position: absolute;
-  color: black;
+  color: rgb(0, 0, 0);
   font-weight: lighter;
   font-size: 12px;
   width: 100%;
-  height: 40px;
+  height: 39px;
   display: inline-block;
-  background-color: rgb(207, 207, 207);
+  background: linear-gradient(
+    131deg,
+    rgba(214, 214, 214, 1) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
   top: 0px;
   left: 0px;
   margin: 0px;
   padding: 0px;
+
+  border-style: solid;
+  border-width: 1px;
+  border-top-color:var(--LightBorderLightAccent);
+  border-left-color:var(--LightBorderLightAccent);
+  border-right-color:var(--LightBorderDarkAccent);
+  border-bottom-color:var(--LightBorderDarkAccent);
 }
 
 .topbarleft {
   position: absolute;
-  color: white;
   width: 40px;
   height: 40px;
   display: inline-block;
@@ -350,7 +427,7 @@ input {
 
 .topbarcaption {
   position: absolute;
-  color: black;
+  color: rgb(0, 0, 0);
   font-weight: 300;
   width: 150px;
   height: 16px;
@@ -361,11 +438,12 @@ input {
   margin-left: 0px;
   padding: 0px;
   font-size: 16px;
+  font-weight: 200;
 }
 
 .topbarpulldown {
   position: absolute;
-  color: white;
+  color:var(--LightBorderLightAccent);
   font-weight: lighter;
   font-size: 12px;
   width: 148px;
@@ -375,11 +453,12 @@ input {
   left: 170px;
   margin: 0px;
   padding: 0px;
+  font-weight: 200;
 }
 
 .topbarhamburguer {
   position: absolute;
-  color: white;
+  color:var(--LightBorderLightAccent);
   font-weight: lighter;
   font-size: 12px;
   width: 40px;
@@ -400,7 +479,7 @@ input {
   position: absolute;
   display: inline-block;
   background-color: var(--NarTope);
-  color: white;
+  color:var(--LightBorderLightAccent);
   width: 150px;
   top: 12px;
   border-style: none;
@@ -464,7 +543,7 @@ input {
   background-color: var(--NarListBack);
   width: 359px;
   height: 40px;
-  border-bottom: lightgray;
+  border-bottom: var (--LightGradientDarkTop) ;
   border-bottom-style: solid;
   border-bottom-width: 1px;
 }
@@ -573,7 +652,7 @@ input {
 #err-div > div.success {
   background-color: #529453;
   border-width: 2px;
-  color: whitesmoke;
+  color:var(--LightBorderLightAccent)smoke;
 }
 #err-div > div.info {
   background-color: #ecffff;

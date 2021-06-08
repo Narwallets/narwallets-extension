@@ -26,7 +26,7 @@
 
 .loginface label
 {
-	color:darkgray;
+	color:var (--LightGradientDarkBot) ;
 	
 }
 

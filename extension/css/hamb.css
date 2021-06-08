@@ -56,7 +56,7 @@ aside {
     top: 0;
     left: 400px;
     transition: transform 0.3s ease-in-out;
-    background-color: lightgray;
+    background-color: var (--LightGradientDarkTop) ;
     z-index: 98;
     opacity: 1;
     width: 100%;
@@ -165,7 +165,7 @@ NETWORK selection drop-down
 li {
     list-style-type: none;
     overflow-x:hidden;
-    white-space: nowrap;
+   var(--LightBorderLightAccent)-space: nowrap;
 }
 
 li#current-network-display-name {
@@ -228,7 +228,7 @@ li#current-network-display-name {
 }
 
 .network-box-header .title {
-    color: whitesmoke;
+    color:var(--LightBorderLightAccent)smoke;
     font-size: 14pt;
     padding-bottom: 5px;
 }
@@ -267,7 +267,7 @@ li#current-network-display-name {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    color: white;
+    color:var(--LightBorderLightAccent);
     line-height: 20px;
     border-color: rgb(3, 135, 137);
 }

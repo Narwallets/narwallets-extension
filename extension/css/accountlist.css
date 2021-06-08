@@ -15,30 +15,29 @@
 	overflow: hidden;
 	margin:0px;
 
-	background: rgb(214,214,214);
-	background: linear-gradient(131deg, rgba(214,214,214,1) 0%, rgba(255,255,255,1) 100%);
-  	border-top-color: white;
-  	border-left-color: white;
-  	border-right-color: darkgrey;
-  	border-bottom-color: darkgrey;
+	background: var(--LightBackground);	background: linear-gradient(131deg, var (--LightGradientTop); 0%, var (--LightGradientBottom)  100%);
+  	border-top-color:var(--LightBorderLightAccent);
+  	border-left-color:var(--LightBorderLightAccent);
+  	border-right-color:var(--LightBorderDarkAccent);
+  	border-bottom-color:var(--LightBorderDarkAccent);
 }
 
 .accountlistitem:hover 
 {
 	background-color: var(--NarListHoover);
-	background: linear-gradient(131deg, lightgray 0%, darkgray 100%);
-	border-top-color: white;
-	border-left-color: white;
-	border-right-color: darkgrey;
-	border-bottom-color: darkgrey;
+	background: linear-gradient(131deg, var (--LightGradientDarkTop)  0%, var (--LightGradientDarkBot)  100%);
+	border-top-color:var(--LightBorderLightAccent);
+	border-left-color:var(--LightBorderLightAccent);
+	border-right-color:var(--LightBorderDarkAccent);
+	border-bottom-color:var(--LightBorderDarkAccent);
 }
 
 .accountlistname 
 {
 	position:absolute;
 
-	color: navy;
-	font-size: 20px;
+	color: var(--DarkBackgroundTop);
+	font-size: 16px;
 	overflow:auto;
 	display: inline-block;
 	text-align: left;
@@ -53,14 +52,14 @@
 {
 	position:absolute;
 	text-align: right;
-	color:darkgreen;
+	color:var(--TextHightlight);
 	font-weight: 500;
 	font-size: 24px;
 	display: block;
 	width: 200px;
 	left: 148px;
 	height: 20px;
-	top:15px;
+	top:18px;
 
 }
 
