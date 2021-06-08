@@ -145,7 +145,7 @@ li {
 }
 
 .network-box-header .title {
-    color: whitesmoke;
+    color:var(--LightBorderLightAccent)smoke;
     font-size: 14pt;
     padding-bottom: 5px;
 }
@@ -184,7 +184,7 @@ li {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    color: white;
+    color:var(--LightBorderLightAccent);
     line-height: 20px;
     border-color: rgb(3, 135, 137);
 }
@@ -452,7 +452,7 @@ h3 {
     text-overflow: ellipsis;
     max-height: 30px;
     /* display: block; */
-    white-space: nowrap;
+   var(--LightBorderLightAccent)-space: nowrap;
 }
 
 .account-item .name , .total-row .name {
@@ -496,7 +496,7 @@ h3 {
 }
 
 .three-dots {
-    background-color: lightgray;
+    background-color: var (--LightGradientDarkTop) ;
     min-width: 19px;
     min-height: 37px;
     margin: 13px 3px;
@@ -525,7 +525,7 @@ h3 {
 
 .red-bg {
     background-color: #c56666 !important;
-    color: white
+    color:var(--LightBorderLightAccent)
 }
 
 .footer-buttons {
@@ -542,7 +542,7 @@ h3 {
     min-width: 230px;
     max-width: 340px;
     padding: 3px 0px;
-    border-top: solid 1px lightgray;
+    border-top: solid 1px var (--LightGradientDarkTop) ;
     
 }
 
@@ -617,7 +617,7 @@ button  {
     color: black;
     font-size: 1.2em;
     font-weight: 300;
-    white-space: nowrap;
+   var(--LightBorderLightAccent)-space: nowrap;
     min-height: 30px;
     align-items: center;
     padding-left: 4px;
@@ -678,13 +678,13 @@ button  {
     min-height: 30px!important;
     text-overflow: ellipsis!important;
     overflow: hidden!important;
-    white-space: break-spaces!important;
+   var(--LightBorderLightAccent)-space: break-spaces!important;
     line-height: 1em;
 }
 
 .account-item-group.small-labels div{
     /* word-break: keep-all; */
-    white-space: nowrap;
+   var(--LightBorderLightAccent)-space: nowrap;
     overflow: hidden;
     /* max-height: 26px; */
     /* flex-wrap: nowrap; */
@@ -737,8 +737,8 @@ button  {
 }
   
 .subpage .title h2 {
-    border-top: 1px solid lightgray;
-    border-bottom: 1px solid lightgray;
+    border-top: 1px solid var (--LightGradientDarkTop) ;
+    border-bottom: 1px solid var (--LightGradientDarkTop) ;
     margin-top: 7px;
     display: flex;
     justify-content: center;
@@ -858,6 +858,6 @@ button.ultrabig{
     max-width: 5em;
     text-align: center;
     padding: 5px;
-    border-color: lightgray;
+    border-color: var (--LightGradientDarkTop) ;
     top: 3px;
 }

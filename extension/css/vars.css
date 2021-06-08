@@ -42,8 +42,29 @@ body {
 	  --Background:rgb(216, 216, 216);  
 	  --PanelBackground: rgb(255,255,255);
 
-	  /*Font Colors*/
+	  --LightBackground: rgb(214,214,214);
+	  --LightGradientTop: rgba(214,214,214,1);
+	  --LightGradientBottom: rgba(255,255,255,1);
 
+	  --LightBorderLightAccent: white;
+	  --LightBorderDarkAccent: darkgrey;
+	  
+	  --lightGradientDarkTop: lightgray;
+	  --LightGradientDarkBot: darkgray;
+
+
+	  --DarkBackground: rgb(51,46,147);
+	  --DarkBackgroundTop: rgba(51,46,147,1);
+	  --DarkBackgroundBot: rgba(53,93,168,1);
+	  --DarkBorderLightAccent:rgb(135, 170, 233) ;
+	  --DarkBorderDarkAccent: rgb(31, 27, 104);
+	  
+	  --DarkGradientLight:rgba(153,210,247,1);
+	  --DarkGradientdark:rgba(92,89,167,1);
+
+
+	  /*Font Colors*/
+	  --TextHightlight: rgb(22, 116, 77);
 
 	  /*block colors*/
 

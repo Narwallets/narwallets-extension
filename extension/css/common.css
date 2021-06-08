@@ -2,10 +2,10 @@
 /* Main div container -------------------------------------------------------------*/
 
 h2 {
-  color: rgb(168, 107, 26);
+  color: var(--TextHightlight);
   font-weight: 200;
   font-size: 24px;
-  
+
   padding: 5px;
   width: 300px;
   height: auto;
@@ -36,20 +36,50 @@ h4 {
 
 }
 
+h5 {
+  color: black;
+  font-weight: 300;
+  font-size: 14;
+  padding: 5px;
+  width: 300px;
+  height: auto;
+  overflow-wrap: break-word;
+  margin: auto;
+}
+
+label
+{
+  color: black;
+  font-weight: 300;
+  font-size: 12;
+  padding: 5px;
+  width: 300px;
+  height: auto;
+  overflow-wrap: break-word;
+  margin: auto;
+  margin-top: 15px;
+}
+
+.biginput
+{
+  margin-top:15px;
+  width:300px;
+  height:50px;
+}
+
 .combotextbox
 {
   width: 360px;
   height: 30px;
   display: block;
   position: relative;
-  margin: auto;
   padding: 5px;
 
 }
 
 
 .combotextbox input {
-  position: absolute;
+  position: relative;
   border-style: solid;
   border-width: 1px;
   border-radius: 5px;
@@ -57,7 +87,7 @@ h4 {
   text-align: center;
   width: 200px;
   height: 24px;
-  left:80px;
+  margin:auto;
   top: 1px;
 }
 
@@ -68,6 +98,7 @@ input {
   border-radius: 5px;
   padding: 5px;
   text-align: center;
+
 }
 
 .appface {
@@ -126,7 +157,7 @@ input {
   height: 100%;
   padding:10px;
   text-align: center;
-
+  background-color: transparent;
 
 }
 
@@ -188,7 +219,6 @@ input {
   overflow-y: hidden;
   
   
-  
 }
 
 .accountdetstopcenter h1 {
@@ -247,10 +277,10 @@ input {
   );
   border-style: solid;
   border-width: 1px;
-  border-top-color: rgb(135, 170, 233);
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-top-color: var(--DarkBorderLightAcccent);
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 }
 
 .inputboxwithbutton {
@@ -271,8 +301,8 @@ input {
   border-bottom-right-radius: 0px;
   padding: 5px;
   text-align: center;
-  width: 200px;
-  height: 16px;
+  width: 220px;
+  height: 28px;
   left: 32px;
   top: 1px;
 }
@@ -287,7 +317,7 @@ input {
   height: 28px;
   left: 242px;
   top: 1px;
-  color: white;
+  color:var(--LightBorderLightAccent);
 
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -300,10 +330,10 @@ input {
   );
   border-style: solid;
   border-width: 1px;
-  border-top-color: rgb(135, 170, 233);
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-top-color: var(--DarkBorderLightAcccent);
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 }
 
 .scroll {
@@ -344,10 +374,10 @@ input {
   );
   border-style: solid;
   border-width: 1px;
-  border-top-color: rgb(135, 170, 233);
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-top-color: var(--DarkBorderLightAcccent);
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 }
 
 /* Top Bar ------------------------------------------------------------------------*/
@@ -372,10 +402,10 @@ input {
 
   border-style: solid;
   border-width: 1px;
-  border-top-color: white;
-  border-left-color: white;
-  border-right-color: darkgrey;
-  border-bottom-color: darkgrey;
+  border-top-color:var(--LightBorderLightAccent);
+  border-left-color:var(--LightBorderLightAccent);
+  border-right-color:var(--LightBorderDarkAccent);
+  border-bottom-color:var(--LightBorderDarkAccent);
 }
 
 .topbarleft {
@@ -413,7 +443,7 @@ input {
 
 .topbarpulldown {
   position: absolute;
-  color: white;
+  color:var(--LightBorderLightAccent);
   font-weight: lighter;
   font-size: 12px;
   width: 148px;
@@ -428,7 +458,7 @@ input {
 
 .topbarhamburguer {
   position: absolute;
-  color: white;
+  color:var(--LightBorderLightAccent);
   font-weight: lighter;
   font-size: 12px;
   width: 40px;
@@ -449,7 +479,7 @@ input {
   position: absolute;
   display: inline-block;
   background-color: var(--NarTope);
-  color: white;
+  color:var(--LightBorderLightAccent);
   width: 150px;
   top: 12px;
   border-style: none;
@@ -513,7 +543,7 @@ input {
   background-color: var(--NarListBack);
   width: 359px;
   height: 40px;
-  border-bottom: lightgray;
+  border-bottom: var (--LightGradientDarkTop) ;
   border-bottom-style: solid;
   border-bottom-width: 1px;
 }
@@ -622,7 +652,7 @@ input {
 #err-div > div.success {
   background-color: #529453;
   border-width: 2px;
-  color: whitesmoke;
+  color:var(--LightBorderLightAccent)smoke;
 }
 #err-div > div.info {
   background-color: #ecffff;

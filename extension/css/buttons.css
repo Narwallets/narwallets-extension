@@ -9,7 +9,7 @@
   display: block;
   margin: 2px;
   background-repeat: no-repeat;
-  color: white;
+  color:var(--LightBorderLightAccent);
   font-size: 10px;
   text-align: center; 
   border-style: none;
@@ -50,14 +50,14 @@
   margin:0px;
   border-radius: 0px;
 
-  background: rgb(51,46,147);
-	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
+  background: var (--DarkBackground) ;
+	background: linear-gradient(131deg, var(--DarkBackgroundTop) 0%, var(--DarkBackgroundBot) 100%);
   border-style: solid;
   border-width: 1px;
-  border-top-color:rgb(135, 170, 233) ;
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  border-top-color:var(--DarkBorderLightAcccent) ;
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
   
 }
 
@@ -92,28 +92,10 @@
 
 .morepage:hover
 {
-  background: rgb(153,210,247);
-  background: linear-gradient(131deg, rgba(153,210,247,1) 0%, rgba(92,89,167,1) 100%);
+  background:var(--DarkBackgroundBot);
+  
 }
 
-.filler
-{
-  position: absolute;
-  top:0px;
-  left:0px;
-  width: 160px;
-  color:white;
-  height: 44px;
-  background-color: transparent;
-  display: block;
-  border-width: 1px;
-  border-style: solid;
-
-  border-top-color:rgb(135, 170, 233) ;
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
-}
 
 .cancel 
 {
@@ -178,12 +160,12 @@
   color:white;
   border-radius: 5px;
 
-  background: rgb(51,46,147);
-	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
-  border-top-color:rgb(135, 170, 233) ;
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  background: var (--DarkBackground) ;
+	background: linear-gradient(131deg, var(--DarkBackgroundTop) 0%, var(--DarkBackgroundBot) 100%);
+  border-top-color:var(--DarkBorderLightAcccent) ;
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 
   align-content: center;
 
@@ -191,7 +173,7 @@
 
 .big:hover {
   background: rgb(153,210,247);
-  background: linear-gradient(131deg, rgba(153,210,247,1) 0%, rgba(92,89,167,1) 100%);
+  background: linear-gradient(131deg, var(--DarkGradientLight) 0%, var(--DarkGradientdark) 100%);
 }
 
 /*buttons that appear in light background*/
@@ -349,12 +331,12 @@
   color:white;
   border-radius: 5px;
 
-  background: rgb(51,46,147);
-	background: linear-gradient(131deg, rgba(51,46,147,1) 0%, rgba(53,93,168,1) 100%);
-  border-top-color:rgb(135, 170, 233) ;
-  border-left-color: rgb(135, 170, 233);
-  border-right-color: rgb(31, 27, 104);
-  border-bottom-color: rgb(31, 27, 104);
+  background: var (--DarkBackground) ;
+	background: linear-gradient(131deg, var(--DarkBackgroundTop) 0%, var(--DarkBackgroundBot) 100%);
+  border-top-color:var(--DarkBorderLightAcccent) ;
+  border-left-color: var(--DarkBorderLightAcccent);
+  border-right-color: var(--DarkBorderDarkAcccent);
+  border-bottom-color: var(--DarkBorderDarkAcccent);
 
   align-content: center;
 }
@@ -364,6 +346,6 @@
 {
 
   background: rgb(153,210,247);
-  background: linear-gradient(131deg, rgba(153,210,247,1) 0%, rgba(92,89,167,1) 100%);
+  background: linear-gradient(131deg, var(--DarkGradientLight) 0%, var(--DarkGradientdark) 100%);
 
 }
