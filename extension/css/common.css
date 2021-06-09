@@ -137,10 +137,10 @@ input {
 }
 
 .button-group {
-  position: absolute;
+  position: fixed;
   display: block;
   text-align: right;
-  top: 480px;
+  top: 510px;
   left: 0px;
   width: 361px;
   height: 45px;
