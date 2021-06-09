@@ -5,7 +5,7 @@
 	<link rel="stylesheet" href="css/styles.css">
 	<meta charset="UTF-8">
 	<title>Narwallet</title>
-	
+
 </head>
 
 <body>
@@ -509,14 +509,7 @@
 
 		<!--#endregion -->
 
-		<!--#region OK CANCEL buttons common to all subpages -->
-		<div class="button-group hidden" id="ok-cancel-row">
-
-			<button id="account-selected-action-confirm" class="ok">OK</button>
-			<button id="account-selected-action-cancel" class="cancel">Cancel</button>
-		</div>
-		<!--#endregion-->
-
+		
 		<!--#region subpage asset list-->
 		<div class="subpage scroll" id="assets">
 		</div>
@@ -847,7 +840,7 @@
 
 		<button class="button back" id="back-to-selected"></button>
 
-	<div class="accountdetstopcenter" id="selected-asset">
+		<div class="accountdetstopcenter" id="selected-asset">
 
 		</div>
 
@@ -962,31 +955,32 @@
 			</div>
 		</div>
 
+		<div class="subpage hidden" id="asset-send-subpage">
+			<div class="contentarea">
+				<h2>Send</h2>
 
-
-
+			</div>
+		</div>
 
 		<div class="subpage hidden" id="asset-receive-subpage">
+			<div class="contentarea">
+				<h2>Receive</h2>
 
-			<div class="titulo">
-				<h1>Receive</h1>
+				<h3>Tell the other party to send </h3>
+					<h3 id="asset-receive-symbol"></h3>
+					<h3>to:</h3>
+				
+				<h3 id="asset-receive-account">Usario.asdasdas.asdasdasd</h3>
 			</div>
-
-			<div class="descri">
-				<h2>Tell the other party to send to:</h2>
-				<h3>Usario.asdasdas.asdasdasd</h3>
-				<h3>(nota Comentario)</h3>
-			</div>
-
 		</div>
 
-		<div id="asset-selected-remove" class="subpage hidden">
-
-			<h2>Delete this asset?</h2>
-			<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
-
+		<div id="asset-remove-selected" class="subpage hidden">
+			<div class="contentarea">
+				<h2>Delete this asset?</h2>
+				<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+			</div>
 		</div>
-		
+
 		<div id="selected-asset-template" class="hidden">
 
 			<div class="accountdetscuenta">
@@ -1009,10 +1003,18 @@
 
 
 	</div>
-	
+
 
 
 	<!--#endregion -->
+
+	<!--#region OK CANCEL buttons common to all subpages -->
+	<div class="button-group hidden" id="ok-cancel-row">
+
+		<button id="account-selected-action-confirm" class="ok">OK</button>
+		<button id="account-selected-action-cancel" class="cancel">Cancel</button>
+	</div>
+	<!--#endregion-->
 
 	<!--#region Error and wait div -->
 
@@ -1027,6 +1029,7 @@
 			<div></div>
 		</div>
 	</div>
+
 
 	<!--#endregion-->
 

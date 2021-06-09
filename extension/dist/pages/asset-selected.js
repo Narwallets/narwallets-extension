@@ -12,12 +12,14 @@ let okCancelRow;
 let confirmBtn;
 let cancelBtn;
 export async function show(acc, assetIndex, reposition) {
-    confirmBtn = new d.El("#asset-selected-action-confirm");
-    cancelBtn = new d.El("#asset-selected-action-cancel");
-    okCancelRow = new d.El("#ok-cancel-row-asset");
+    confirmBtn = new d.El("#account-selected-action-confirm");
+    cancelBtn = new d.El("#account-selected-action-cancel");
+    okCancelRow = new d.El("#ok-cancel-row");
     d.onClickId("asset-receive", showAssetReceiveClicked);
     d.onClickId("asset-send", showAssetSendClicked);
     d.onClickId("asset-remove", removeSelectedFromAssets);
+    confirmBtn.onClick(confirmClicked);
+    cancelBtn.onClick(cancelClicked);
     accData = acc;
     asset_array = acc.accountInfo.assets;
     asset_index = assetIndex;
@@ -38,27 +40,31 @@ function backToSelectClicked() {
 }
 function showAssetReceiveClicked() {
     d.showSubPage("asset-receive-subpage");
-    showOKCancel(showButtons);
+    d.byId("asset-receive-symbol").innerText = asset_selected.symbol;
+    d.byId("asset-receive-account").innerText = accData.name;
+    showOKCancel(showInitial);
 }
 function showAssetSendClicked() {
     d.showSubPage("asset-send-subpage");
-    showOKCancel(showButtons);
+    showOKCancel(showInitial);
+}
+function deleteAsset() {
+    asset_array.splice(asset_index, 1);
+    d.clearContainer("assets");
+    d.populateUL("assets", "asset-item-template", asset_array);
+    //Guardo
+    refreshSaveSelectedAccount();
+    //Salgo del asset detail eliminado
+    backToSelectClicked();
 }
 export function removeSelectedFromAssets() {
-    d.showSubPage("asset-selected-remove");
-    enableOKCancel();
+    d.showSubPage("asset-remove-selected");
+    showOKCancel(deleteAsset);
     // //elimino, limpio y relleno lista de assets
-    // asset_array.splice(asset_index, 1);
-    // d.clearContainer("assets");
-    // d.populateUL("assets", "asset-item-template", asset_array);
-    // //Guardo
-    // refreshSaveSelectedAccount();
-    // //Salgo del asset detail eliminado
-    // backToSelectClicked();
 }
-function showButtons() {
+function showInitial() {
     okCancelRow.hide();
-    //if (showingMore()) moreLessClicked()
+    d.showSubPage("asset-history");
 }
 async function refreshSaveSelectedAccount() {
     await searchAccounts.asyncRefreshAccountInfo(accData.name, accData.accountInfo);
@@ -82,5 +88,21 @@ function enableOKCancel() {
     confirmBtn.disabled = false;
     cancelBtn.disabled = false;
     cancelBtn.hidden = false;
+}
+function cancelClicked() {
+    showInitial();
+    okCancelRow.hide();
+}
+function confirmClicked(ev) {
+    try {
+        if (confirmFunction)
+            confirmFunction(ev);
+        okCancelRow.hide();
+    }
+    catch (ex) {
+        d.showErr(ex.message);
+    }
+    finally {
+    }
 }
 //# sourceMappingURL=asset-selected.js.map
