@@ -1,5 +1,4 @@
 import * as c from "./conversions.js";
-import * as StakingPool from "../contracts/staking-pool.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Account } from "../data/account.js";
 import { askBackground } from "../background/askBackground.js";
@@ -36,27 +35,29 @@ export async function asyncRefreshAccountInfo(accName, info) {
         //normal account
         let stateResultYoctos;
         try {
-            stateResultYoctos = await askBackground({ code: "query-near-account", accountId: accName });
+            stateResultYoctos = await askBackground({
+                code: "query-near-account",
+                accountId: accName,
+            });
         }
         catch (ex) {
             const reason = ex.message.replace("while viewing", "");
             throw Error(reason);
         }
         info.lastBalance = c.yton(stateResultYoctos.amount);
-        if (info.stakingPool) {
-            const previnThePool = info.staked + info.unstaked;
-            const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool);
-            info.staked = c.yton(stakingInfo.staked_balance);
-            info.unstaked = c.yton(stakingInfo.unstaked_balance);
-            info.rewards = previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
-            if (info.rewards < 0)
-                info.rewards = 0;
-            info.stakingPoolPct = await StakingPool.getFee(info.stakingPool);
-        }
-        else {
-            info.staked = 0;
-            info.unstaked = 0;
-        }
+        // if (info.stakingPool) {
+        //     const previnThePool = info.staked + info.unstaked;
+        //     const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool)
+        //     info.staked = c.yton(stakingInfo.staked_balance)
+        //     info.unstaked = c.yton(stakingInfo.unstaked_balance)
+        //     info.rewards = previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
+        //     if (info.rewards < 0) info.rewards = 0;
+        //     info.stakingPoolPct = await StakingPool.getFee(info.stakingPool)
+        // }
+        // else {
+        //     info.staked = 0
+        //     info.unstaked = 0
+        // }
     }
 }
 export async function searchAccount(accName) {

@@ -1,23 +1,25 @@
+import { timeStamp } from "node:console";
+
 //user NEAR accounts info type
 export class Account {
   order: number = 0;
   type: "acc" | "lock.c" = "acc";
   note: string = "";
   lastBalance: number = 0; // native balance from rpc:query/account & near state
-  stakingPool?: string;
-  staked: number = 0; // in the pool & staked
-  unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
-  rewards: number = 0; //Stakingpool rewards (initial staking - (staked+unstaked))
-  stakingPoolPct?: number;
+  // stakingPool?: string;
+  // staked: number = 0; // in the pool & staked
+  // unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
+  // rewards: number = 0; //Stakingpool rewards (initial staking - (staked+unstaked))
+  // stakingPoolPct?: number;
   privateKey?: string;
   ownerId?: string; //ownerId if this is a lockup-contract {type:"lock.c"}
   lockedOther: number = 0; //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
   assets: Asset[] = []; //assets
   history: History[] = []; //history
 
-  get totalInThePool(): number {
-    return this.staked + this.unstaked;
-  }
+  // get totalInThePool(): number {
+  //   return this.staked + this.unstaked;
+  // }
 }
 
 export class Asset {
@@ -34,7 +36,7 @@ export class Asset {
 export class History {
   date: Date = new Date();
   type: "receive" | "send" = "send";
-  ammount: string = "";
+  ammount: number = 0;
 }
 
 export class ExtendedAccountData {
@@ -47,7 +49,7 @@ export class ExtendedAccountData {
   totalUSD: number; //lastBalance+inThePool * NEAR price
   unlockedOther: number;
   available: number;
-  inThePool: number;
+  // inThePool: number;
 
   constructor(name: string, accountInfo: Account) {
     this.name = name;
@@ -69,14 +71,14 @@ export class ExtendedAccountData {
     this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
 
     if (!this.accountInfo.assets) this.accountInfo.assets = [];
-    if (!this.accountInfo.staked) this.accountInfo.staked = 0;
-    if (!this.accountInfo.unstaked) this.accountInfo.unstaked = 0;
-    this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
+    // if (!this.accountInfo.staked) this.accountInfo.staked = 0;
+    // if (!this.accountInfo.unstaked) this.accountInfo.unstaked = 0;
+    // this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
 
     if (!this.accountInfo.lockedOther) this.accountInfo.lockedOther = 0;
     this.unlockedOther =
-      this.accountInfo.lastBalance +
-      this.inThePool -
+      this.accountInfo.lastBalance -
+      // this.inThePool -
       this.accountInfo.lockedOther;
 
     this.available =
@@ -85,8 +87,11 @@ export class ExtendedAccountData {
     if (this.accountInfo.type == "lock.c") {
       this.available = Math.max(0, this.available - 36);
     }
-
-    this.total = this.accountInfo.lastBalance + this.inThePool;
+    this.total = 0;
+    accountInfo?.assets.forEach((asset) => {
+      this.total += asset.balance;
+      console.log(this.total);
+    });
     this.totalUSD = this.total * 4.7;
   }
 

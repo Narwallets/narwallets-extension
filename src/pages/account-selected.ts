@@ -20,7 +20,12 @@ import {
 import { show as UnlockPage_show } from "./unlock.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
-import { Account, Asset, ExtendedAccountData } from "../data/account.js";
+import {
+  Account,
+  Asset,
+  ExtendedAccountData,
+  History,
+} from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
 import {
   askBackground,
@@ -101,8 +106,8 @@ function initPage() {
   d.onClickId("search-pools", searchPoolsButtonClicked);
   d.onClickId("assets", showAssetDetailsClicked);
   d.onClickId("acc-connect-to-page", connectToWebAppClicked);
-  d.onClickId("one-tab", selectFirstTab);
-  d.onClickId("two-tab", selectSecondTab);
+  d.onClickId("one-tab-stake", selectFirstTab);
+  d.onClickId("two-tab-stake", selectSecondTab);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   seedTextElem = new d.El("#seed-phrase");
@@ -571,16 +576,18 @@ async function performLockupContractSend() {
 //----------------------
 async function stakeClicked() {
   try {
+    //Crear asset
+
     const info = selectedAccountData.accountInfo;
     const stakeAmountBox = d.inputById("stake-amount");
     let performer = performStake; //default
-    let amountToStake;
-    if (info.unstaked > 0) {
-      amountToStake = info.unstaked;
-    } else {
-      amountToStake = info.unstaked + info.lastBalance - 2;
-      if (info.type == "lock.c") amountToStake -= 34;
-    }
+    let amountToStake = selectedAccountData.unlockedOther;
+    // if (info.unstaked > 0) {
+    //   amountToStake = info.unstaked;
+    // } else {
+    //   amountToStake = info.unstaked + info.lastBalance - 2;
+    //   if (info.type == "lock.c") amountToStake -= 34;
+    // }
 
     if (info.type == "lock.c") {
       await checkOwnerAccessThrows("stake");
@@ -596,8 +603,7 @@ async function stakeClicked() {
 
     await fullAccessSubPage("account-selected-stake", performer);
     d.qs("#account-selected-stake #one").el.checked = true;
-    d.inputById("stake-with-staking-pool").value =
-      selectedAccountData.accountInfo.stakingPool || "";
+    d.inputById("stake-with-staking-pool").value = "";
     d.byId("max-stake-amount").innerText = c.toStringDec(amountToStake);
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
     if (info.type == "lock.c")
@@ -620,12 +626,17 @@ async function performStake() {
 
   disableOKCancel();
   d.showWait();
-  let newStakingPool;
+  let newStakingPool: string;
   try {
+    let amountToStake: number;
+    let existAssetWithThisPool = false;
+
     if (stakeTabSelected == 1) {
       newStakingPool = "meta.pool.testnet";
+      amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     } else {
       newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
+      amountToStake = c.toNum(d.inputById("stake-amount").value);
     }
     if (!isValidAccountID(newStakingPool))
       throw Error("Staking pool Account Id is invalid");
@@ -634,7 +645,6 @@ async function performStake() {
       throw Error("you need full access on " + selectedAccountData.name);
 
     //const amountToStake = info.lastBalance - info.staked - 36
-    const amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     if (!isValidAmount(amountToStake))
       throw Error("Amount should be a positive integer");
     if (amountToStake < 5) throw Error("Stake at least 5 Near");
@@ -648,7 +658,7 @@ async function performStake() {
       d.showErr(ex.message);
     }
 
-    let actualSP = selectedAccountData.accountInfo.stakingPool;
+    let actualSP = "";
 
     let poolAccInfo = {
       //empty info
@@ -686,7 +696,7 @@ async function performStake() {
 
         //if ZERO in the pool, remove current staking pool ref
         actualSP = "";
-        selectedAccountData.accountInfo.stakingPool = "";
+        //selectedAccountData.accountInfo.stakingPool = "";
       }
     }
 
@@ -697,7 +707,7 @@ async function performStake() {
         newStakingPool
       );
       //2nd select the new staking pool. ONLY if the pool exists
-      selectedAccountData.accountInfo.stakingPool = newStakingPool;
+      //selectedAccountData.accountInfo.stakingPool = newStakingPool;
     }
 
     if (c.yton(poolAccInfo.unstaked_balance) >= 10) {
@@ -734,6 +744,42 @@ async function performStake() {
         c.TGas(75),
         c.ntoy(amountToStake)
       );
+
+      poolAccInfo = await StakingPool.getAccInfo(
+        selectedAccountData.name,
+        newStakingPool
+      );
+
+      selectedAccountData.accountInfo.assets.forEach((element) => {
+        if (element.contractId == newStakingPool) {
+          existAssetWithThisPool = true;
+          let hist: History;
+          hist = { ammount: amountToStake, date: new Date(), type: "send" };
+          element.history.push(hist);
+          element.balance = c.yton(poolAccInfo.staked_balance);
+        }
+      });
+
+      if (!existAssetWithThisPool) {
+        let asset: Asset;
+        let hist: History;
+        hist = { ammount: amountToStake, date: new Date(), type: "send" };
+        asset = {
+          spec: "idk",
+          url: "",
+          contractId: newStakingPool,
+          balance: c.yton(poolAccInfo.staked_balance),
+          type: "stake",
+          symbol: "",
+          icon: "",
+          history: [],
+        };
+        asset.history.push(hist);
+        selectedAccountData.accountInfo.assets.push(asset);
+      }
+
+      console.log(selectedAccountData.accountInfo.assets);
+
       // await near.call_method(newStakingPool, "deposit_and_stake", {},
       //     selectedAccountData.name,
       //     selectedAccountData.accountInfo.privateKey,
@@ -743,9 +789,9 @@ async function performStake() {
     }
 
     //update staked to avoid incorrect "rewards" calculations on refresh
-    selectedAccountData.accountInfo.staked += amountToStake;
-    selectedAccountData.total -= selectedAccountData.total;
-    selectedAccountData.totalUSD = selectedAccountData.total * 4.7;
+    // selectedAccountData.accountInfo.staked += amountToStake;
+    // selectedAccountData.total -= selectedAccountData.total;
+    // selectedAccountData.totalUSD = selectedAccountData.total * 4.7;
     //refresh status & save
     await refreshSaveSelectedAccount();
 
@@ -830,25 +876,25 @@ async function unstakeClicked() {
     //---refresh first
     await refreshSaveSelectedAccount();
 
-    if (!selectedAccountData.accountInfo.stakingPool) {
-      showButtons();
-      throw Error("No staking pool associated whit this account. Stake first");
-    }
+    // if (!selectedAccountData.accountInfo.stakingPool) {
+    //   showButtons();
+    //   throw Error("No staking pool associated whit this account. Stake first");
+    // }
 
     let amountForTheField;
-    const amountToWithdraw = selectedAccountData.accountInfo.unstaked;
+    let amountToWithdraw = selectedAccountData.unlockedOther;
     if (amountToWithdraw > 0) {
       d.inputById("radio-withdraw").checked = true;
       amountForTheField = amountToWithdraw;
     } else {
       d.inputById("radio-unstake").checked = true;
-      amountForTheField = selectedAccountData.accountInfo.staked;
-      if (amountForTheField == 0) throw Error("No funds on the pool");
+      //amountForTheField = selectedAccountData.accountInfo.staked;
+      //if (amountForTheField == 0) throw Error("No funds on the pool");
     }
     if (info.type != "lock.c") optionWU.show();
 
-    d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
-    d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
+    //d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
+    //d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
     enableOKCancel();
   } catch (ex) {
     d.showErr(ex.message);
@@ -886,71 +932,71 @@ async function performUnstake() {
     if (!selectedAccountData.isFullAccess)
       throw Error("you need full access on " + selectedAccountData.name);
 
-    const actualSP = selectedAccountData.accountInfo.stakingPool;
-    if (!actualSP) throw Error("No staking pool selected in this account");
+    //const actualSP = selectedAccountData.accountInfo.stakingPool;
+    // if (!actualSP) throw Error("No staking pool selected in this account");
 
     //check if it's staked or just in the pool but unstaked
-    const poolAccInfo = await StakingPool.getAccInfo(
-      selectedAccountData.name,
-      actualSP
-    );
+    // const poolAccInfo = await StakingPool.getAccInfo(
+    //   selectedAccountData.name,
+    //   actualSP
+    // );
 
     if (modeWithraw) {
-      if (poolAccInfo.unstaked_balance == "0")
-        throw Error("No funds unstaked to withdraw");
+      // if (poolAccInfo.unstaked_balance == "0")
+      //   throw Error("No funds unstaked to withdraw");
 
       //if (!poolAccInfo.can_withdraw) throw Error("Funds are unstaked but you must wait (36-48hs) after unstaking to withdraw")
 
       //ok we've unstaked funds we can withdraw
-      let yoctosToWithdraw = fixUserAmountInY(
-        amount,
-        poolAccInfo.unstaked_balance
-      ); // round user amount
-      if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
-        await askBackgroundCallMethod(
-          actualSP,
-          "withdraw_all",
-          {},
-          selectedAccountData.name
-        );
-      } else {
-        await askBackgroundCallMethod(
-          actualSP,
-          "withdraw",
-          { amount: yoctosToWithdraw },
-          selectedAccountData.name
-        );
-      }
-      d.showSuccess(
-        c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
-      );
+      // let yoctosToWithdraw = fixUserAmountInY(
+      //   amount,
+      //   poolAccInfo.unstaked_balance
+      // ); // round user amount
+      // if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
+      //   await askBackgroundCallMethod(
+      //     actualSP,
+      //     "withdraw_all",
+      //     {},
+      //     selectedAccountData.name
+      //   );
+      // } else {
+      //   await askBackgroundCallMethod(
+      //     actualSP,
+      //     "withdraw",
+      //     { amount: yoctosToWithdraw },
+      //     selectedAccountData.name
+      //   );
+      // }
+      // d.showSuccess(
+      //   c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
+      // );
       //----------------
-    } else {
-      //mode unstake
-      //here we've staked balance in the pool, call unstake
+      // } else {
+      //   //mode unstake
+      //   //here we've staked balance in the pool, call unstake
 
-      if (poolAccInfo.staked_balance == "0")
-        throw Error("No funds staked to unstake");
+      //   if (poolAccInfo.staked_balance == "0")
+      //     throw Error("No funds staked to unstake");
 
-      let yoctosToUnstake = fixUserAmountInY(
-        amount,
-        poolAccInfo.staked_balance
-      ); // round user amount
-      if (yoctosToUnstake == poolAccInfo.staked_balance) {
-        await askBackgroundCallMethod(
-          actualSP,
-          "unstake_all",
-          {},
-          selectedAccountData.name
-        );
-      } else {
-        await askBackgroundCallMethod(
-          actualSP,
-          "unstake",
-          { amount: yoctosToUnstake },
-          selectedAccountData.name
-        );
-      }
+      //   let yoctosToUnstake = fixUserAmountInY(
+      //     amount,
+      //     poolAccInfo.staked_balance
+      //   ); // round user amount
+      //   if (yoctosToUnstake == poolAccInfo.staked_balance) {
+      //     await askBackgroundCallMethod(
+      //       actualSP,
+      //       "unstake_all",
+      //       {},
+      //       selectedAccountData.name
+      //     );
+      //   } else {
+      //     await askBackgroundCallMethod(
+      //       actualSP,
+      //       "unstake",
+      //       { amount: yoctosToUnstake },
+      //       selectedAccountData.name
+      //     );
+      //   }
       d.showSuccess("Unstake requested, you must wait (36-48hs) to withdraw");
     }
 
@@ -1132,16 +1178,16 @@ export async function searchThePools(
             );
             if (amount > lastAmountFound) {
               //save only one
-              exAccData.accountInfo.stakingPool = pool.account_id;
-              exAccData.accountInfo.staked = c.yton(poolAccInfo.staked_balance);
-              exAccData.accountInfo.unstaked = c.yton(
-                poolAccInfo.unstaked_balance
-              );
-              exAccData.inThePool =
-                exAccData.accountInfo.staked + exAccData.accountInfo.unstaked;
-              exAccData.accountInfo.stakingPoolPct = await StakingPool.getFee(
-                pool.account_id
-              );
+              // exAccData.accountInfo.stakingPool = pool.account_id;
+              // exAccData.accountInfo.staked = c.yton(poolAccInfo.staked_balance);
+              // exAccData.accountInfo.unstaked = c.yton(
+              //   poolAccInfo.unstaked_balance
+              // );
+              // exAccData.inThePool =
+              //   exAccData.accountInfo.staked + exAccData.accountInfo.unstaked;
+              // exAccData.accountInfo.stakingPoolPct = await StakingPool.getFee(
+              //   pool.account_id
+              // );
               lastAmountFound = amount;
             }
           }
@@ -1476,7 +1522,6 @@ function confirmClicked(ev: Event) {
 function showButtons() {
   d.showSubPage("assets");
   okCancelRow.hide();
-  //if (showingMore()) moreLessClicked()
 }
 
 function cancelClicked() {
