@@ -1,74 +1,79 @@
-.wrapper
-{
-    padding-top: 5px;
-    display:flex;
-    flex-direction: column;
-    align-items: left;
-    background: linear-gradient(131deg, var(--DarkBackgroundTop) 0%, var(--DarkBackgroundBot) 100%);
-
+.wrapper {
+  padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  background: linear-gradient(
+    131deg,
+    var(--DarkBackgroundTop) 0%,
+    var(--DarkBackgroundBot) 100%
+  );
 }
 
-  .tab{
-    cursor: pointer;
-    padding:10px 20px;
-    padding-top: 3px;
-    height:7px;
-    width: auto;
-    margin:0px 2px;
-    background:var(--DarkBackgroundTop);
-    display:inline-block;
-    color:white;
-    border-radius:3px 3px 0px 0px;
-    border-style: solid;
-    border-bottom-style: none;
-    border-width: 1px;
+.tab {
+  cursor: pointer;
+  padding: 10px 20px;
+  padding-top: 3px;
+  height: 7px;
+  width: auto;
+  margin: 0px 2px;
+  background: var(--DarkBackgroundTop);
+  display: inline-block;
+  color: white;
+  border-radius: 3px 3px 0px 0px;
+  border-style: solid;
+  border-bottom-style: none;
+  border-width: 1px;
+}
+
+.panels {
+  background: var(--LightBackground);
+  background: linear-gradient(
+    131deg,
+    var (--LightGradientTop) 0%,
+    var (--LightGradientBottom) 100%
+  );
+  min-height: 200px;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 3px;
+  max-height: 4000px;
+  padding: 0px;
+  border-style: none;
+  overflow-y: scroll;
+  height: 500px;
+}
+
+.panel {
+  height: 500px;
+  display: none;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
   }
-
-  .panels{
-    background: var(--LightBackground);    
-    background: linear-gradient(131deg, var (--LightGradientTop) 0%, var (--LightGradientBottom)  100%);
-    min-height:200px;
-    width:100%;
-    max-width:500px;
-    border-radius:3px;
-    max-height: 4000px;
-    padding:0px;  
-    border-style: none;
-    overflow-y:scroll;
-    height: 500px;
-
+  to {
+    opacity: 1;
   }
+}
 
-  .panel{
-    display:none;
+.radio {
+  display: none;
+}
 
-  }
+#one:checked ~ .panels #one-panel,
+#two:checked ~ .panels #two-panel,
+#three:checked ~ .panels #three-panel {
+  display: block;
+  overflow-y: scroll;
+}
 
-  @keyframes fadein {
-      from {
-          opacity:0;
-      }
-      to {
-          opacity:1;
-      }
-  }
-
-  .radio{
-    display:none;
-  }
-
-  #one:checked ~ .panels #one-panel,
-  #two:checked ~ .panels #two-panel,
-  #three:checked ~ .panels #three-panel{
-    display:block;
-    overflow-y: scroll;
-  }
-
-  #one:checked ~ .tabs #one-tab,
-  #two:checked ~ .tabs #two-tab,
-  #three:checked ~ .tabs #three-tab{
-    background: var (--LightGradientTop);
-    border-style: solid;
-    border-width: 1px;
-    border-bottom-style: none;
-  }
+#one:checked ~ .tabs #one-tab,
+#two:checked ~ .tabs #two-tab,
+#three:checked ~ .tabs #three-tab {
+  background: var (--LightGradientTop);
+  border-style: solid;
+  border-width: 1px;
+  border-bottom-style: none;
+}

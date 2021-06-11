@@ -128,15 +128,14 @@ async function addOKClicked() {
     disableOKCancel();
     d.showWait();
     try {
+        selectedAccountData.accountInfo.assets.forEach((element) => {
+            if (element.contractId == d.inputById("combo-add-token").value) {
+                throw new Error("Asset already exist");
+            }
+        });
         let item = new Asset();
         item.type = "ft";
-        switch (comboAdd.value) {
-            case "value1":
-                item.contractId = "meta-v2.pool.testnet";
-                break;
-            case "value2":
-                item.contractId = "";
-        }
+        item.contractId = d.inputById("combo-add-token").value;
         let result = await askBackgroundViewMethod(item.contractId, "ft_metadata", {});
         item.symbol = result.symbol;
         item.icon = result.icon;
@@ -151,9 +150,11 @@ async function addOKClicked() {
         //showButtons();
     }
     catch (ex) {
+        d.showErr(ex);
     }
     finally {
         d.hideWait();
+        enableOKCancel();
     }
 }
 function showingMore() {
@@ -190,6 +191,9 @@ async function selectAndShowAccount(accName) {
     }
     showSelectedAccount();
 }
+function populateAssets() {
+    d.populateUL("assets", "asset-item-template", selectedAccountData.accountInfo.assets);
+}
 function showSelectedAccount() {
     //make sure available is up to date before displaying
     selectedAccountData.available =
@@ -198,8 +202,8 @@ function showSelectedAccount() {
     const SELECTED_ACCOUNT = "selected-account";
     d.clearContainer(SELECTED_ACCOUNT);
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
+    populateAssets();
     //lleno lista de assets
-    d.populateUL("assets", "asset-item-template", selectedAccountData.accountInfo.assets);
     /* lala_design
       accountBalance = new d.El(".selected-account-info .total.balance");
       accountInfoName = new d.El(".selected-account-info .name");
@@ -592,7 +596,7 @@ async function performStake() {
                     contractId: newStakingPool,
                     balance: c.yton(poolAccInfo.staked_balance),
                     type: "stake",
-                    symbol: "",
+                    symbol: "STAKE",
                     icon: "",
                     history: [],
                 };
@@ -1253,6 +1257,8 @@ function confirmClicked(ev) {
     }
 }
 function showButtons() {
+    d.clearContainer("assets");
+    populateAssets();
     d.showSubPage("assets");
     okCancelRow.hide();
 }

@@ -85,13 +85,10 @@ export class ExtendedAccountData {
       this.accountInfo.lastBalance - this.accountInfo.lockedOther;
 
     if (this.accountInfo.type == "lock.c") {
-      this.available = Math.max(0, this.available - 36);
+      this.available = Math.max(0, this.available - 4);
     }
-    this.total = 0;
-    accountInfo?.assets.forEach((asset) => {
-      this.total += asset.balance;
-      console.log(this.total);
-    });
+    this.total = accountInfo.lastBalance;
+
     this.totalUSD = this.total * 4.7;
   }
 

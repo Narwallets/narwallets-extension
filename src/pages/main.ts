@@ -17,6 +17,7 @@ import {
   askBackgroundGetState,
   askBackgroundIsLocked,
 } from "../background/askBackground.js";
+import { D } from "../lib/tweetnacl/core/core.js";
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
@@ -235,6 +236,7 @@ function backToAccountsClicked() {
   d.clearContainer("assets");
   d.showPage("account-list-main");
   d.showSubPage("assets");
+  d.byId("ok-cancel-row").classList.add("hidden");
 }
 
 async function tryReposition() {

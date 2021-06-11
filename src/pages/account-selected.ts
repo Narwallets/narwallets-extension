@@ -190,16 +190,15 @@ async function addOKClicked() {
   disableOKCancel();
   d.showWait();
   try {
+    selectedAccountData.accountInfo.assets.forEach((element) => {
+      if (element.contractId == d.inputById("combo-add-token").value) {
+        throw new Error("Asset already exist");
+      }
+    });
     let item = new Asset();
     item.type = "ft";
 
-    switch (comboAdd.value) {
-      case "value1":
-        item.contractId = "meta-v2.pool.testnet";
-        break;
-      case "value2":
-        item.contractId = "";
-    }
+    item.contractId = d.inputById("combo-add-token").value;
 
     let result = await askBackgroundViewMethod(
       item.contractId,
@@ -226,8 +225,10 @@ async function addOKClicked() {
     d.showSuccess("Success");
     //showButtons();
   } catch (ex) {
+    d.showErr(ex);
   } finally {
     d.hideWait();
+    enableOKCancel();
   }
 }
 
@@ -269,6 +270,14 @@ async function selectAndShowAccount(accName: string) {
   showSelectedAccount();
 }
 
+function populateAssets() {
+  d.populateUL(
+    "assets",
+    "asset-item-template",
+    selectedAccountData.accountInfo.assets
+  );
+}
+
 function showSelectedAccount() {
   //make sure available is up to date before displaying
   selectedAccountData.available =
@@ -282,13 +291,8 @@ function showSelectedAccount() {
     "selected-account-template",
     selectedAccountData
   );
-
+  populateAssets();
   //lleno lista de assets
-  d.populateUL(
-    "assets",
-    "asset-item-template",
-    selectedAccountData.accountInfo.assets
-  );
 
   /* lala_design
     accountBalance = new d.El(".selected-account-info .total.balance");
@@ -770,7 +774,7 @@ async function performStake() {
           contractId: newStakingPool,
           balance: c.yton(poolAccInfo.staked_balance),
           type: "stake",
-          symbol: "",
+          symbol: "STAKE",
           icon: "",
           history: [],
         };
@@ -1520,6 +1524,8 @@ function confirmClicked(ev: Event) {
 }
 
 function showButtons() {
+  d.clearContainer("assets");
+  populateAssets();
   d.showSubPage("assets");
   okCancelRow.hide();
 }

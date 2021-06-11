@@ -37,6 +37,7 @@ export async function show(acc, assetIndex, reposition) {
 function backToSelectClicked() {
     d.showPage("account-selected");
     d.showSubPage("assets");
+    d.byId("ok-cancel-row").classList.add("hidden");
 }
 function showAssetReceiveClicked() {
     d.showSubPage("asset-receive-subpage");

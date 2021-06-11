@@ -203,6 +203,7 @@ function backToAccountsClicked() {
     d.clearContainer("assets");
     d.showPage("account-list-main");
     d.showSubPage("assets");
+    d.byId("ok-cancel-row").classList.add("hidden");
 }
 async function tryReposition() {
     const reposition = await localStorageGetAndRemove("reposition");
