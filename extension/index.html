@@ -245,6 +245,7 @@
 
 				<h2>Send</h2>
 				<h3>Send to Account Id</h3>
+
 				<div class="combotextbox">
 					<input id="send-to-account-name" type="text" list="combo" />
 					<datalist id="combo">
@@ -318,10 +319,10 @@
 
 		<!--#region subpage RECEIVE -->
 		<div id="account-selected-receive" class="subpage hidden">
-
-			<h3>Tell the other party to send to:</h3>
-			<h2 id="account-selected-receive-name" class="important-label"></h2>
-
+			<div class="contentarea">
+				<h3>Tell the other party to send to:</h3>
+				<h2 id="account-selected-receive-name" class="important-label"></h2>
+			</div>
 		</div>
 
 		<!--#endregion -->
@@ -337,8 +338,8 @@
 
 
 				<div class="tabs" id="tabtab">
-					<label class="tab" id="one-tab-stake" for="one">Liquid Stake</label>
-					<label class="tab" id="two-tab-stake" for="two">Delayed Stake</label>
+					<label class="tab" id="one-tab" for="one">Liquid Stake</label>
+					<label class="tab" id="two-tab" for="two">Delayed Stake</label>
 				</div>
 
 				<div class="panels">
@@ -389,7 +390,7 @@
 				<h2>Add Token</h2>
 				<div class="combotextbox">
 
-					<input type="text" list="combo" id="combo-add-token"/>
+					<input type="text" list="combo" id="combo-add-token" />
 					<datalist id="combo">
 						<option value="meta-v2.pool.testnet"></option>
 						<option value="value2"></option>
@@ -509,20 +510,55 @@
 
 		<!--#endregion -->
 
-		
 		<!--#region subpage asset list-->
-		<div class="subpage scroll" id="assets">
+		<div class="subpage" id="assets">
+
+
+			<div class="wrapper">
+
+				<input class="radio" id="one" name="group" type="radio" checked>
+				<input class="radio" id="two" name="group" type="radio">
+
+				<div class="tabs" id="tabtab">
+					<label class="tab" id="one-tab" for="one">Assets</label>
+					<label class="tab" id="two-tab" for="two">Activity</label>
+				</div>
+
+				<div class="panels">
+
+					<div class="panel" id="one-panel">
+
+						<div class="contentarea">
+
+							<div id="asset-item-template" class="hidden asset-item" data-id="{key}">
+								<div class="accountdetsassets">
+									<div class="accountasseticon"></div>
+									<div class="accountassetcoin">{symbol}</div>
+									<div class="accountassettoken">{contractId}</div>
+									<div class="accountassetbalance">{balance}</div>
+									<div class="accountassetfiat"></div>
+								</div>
+							</div>							
+
+						</div>
+
+					</div>
+
+					<div class="panel" id="two-panel">
+
+						<div class="contentarea">
+						</div>
+					</div>
+
+			
+				</div>
+
+			</div>
+
+
 		</div>
 
-		<div id="asset-item-template" class="hidden asset-item" data-id="{key}">
-			<div class="accountdetsassets">
-				<div class="accountasseticon"></div>
-				<div class="accountassetcoin">{symbol}</div>
-				<div class="accountassettoken">{contractId}</div>
-				<div class="accountassetbalance">{balance}</div>
-				<div class="accountassetfiat"></div>
-			</div>
-		</div>
+
 		<!--#endregion -->
 
 		<!--#region MORE-->
@@ -912,12 +948,13 @@
 
 		<div class="subpage hidden" id="asset-receive-subpage">
 			<div class="contentarea">
+
 				<h2>Receive</h2>
 
 				<h3>Tell the other party to send </h3>
-					<h3 id="asset-receive-symbol"></h3>
-					<h3>to:</h3>
-				
+				<h3 id="asset-receive-symbol"></h3>
+				<h3>to:</h3>
+
 				<h3 id="asset-receive-account">Usario.asdasdas.asdasdasd</h3>
 			</div>
 		</div>

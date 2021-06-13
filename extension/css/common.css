@@ -11,6 +11,7 @@ h2 {
   height: auto;
   overflow-wrap: break-word;
   margin: auto;
+
 }
 
 h3 {
@@ -103,7 +104,7 @@ input {
 
 .appface {
   position: absolute;
-  z-index: 0;
+  z-index: 95;
   left: 0px;
   top: 40px;
   width: 361px;
@@ -154,10 +155,13 @@ input {
 {
   position: relative;
   width: 100%;
-  height: 100%;
-  padding:10px;
+  height: 381px;
+  padding-top:10px;
   text-align: center;
-  background-color: transparent;
+  display: flexbox;
+  background-color:transparent;
+  border-style: solid;
+  border-width: 1px;
 
 }
 
@@ -413,7 +417,6 @@ input {
   width: 40px;
   height: 40px;
   display: inline-block;
-  /* background-color: var(--NarTope); */
   top: 0px;
   left: 4px;
   margin-left: 0px;
