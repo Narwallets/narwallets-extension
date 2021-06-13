@@ -37,18 +37,29 @@ export async function show(
   d.showPage(THIS_PAGE);
   d.onClickId("back-to-selected", backToSelectClicked);
   d.showSubPage("asset-history");
+  d.byId("asset-history-template").classList.remove("hidden");
+  d.byId("topbar").innerText = "Assets";
+
   d.clearContainer("selected-asset");
   var templateData = {
     acc: accData,
     asset: asset_selected,
   };
   d.appendTemplateLI("selected-asset", "selected-asset-template", templateData);
+
+  var assetData = {
+    asset: asset_selected.history,
+  };
+  console.log(assetData);
+
+  d.populateUL("asset-history-details", "asset-history-template", templateData);
 }
 
 function backToSelectClicked() {
   d.showPage("account-selected");
   d.showSubPage("assets");
   d.byId("ok-cancel-row").classList.add("hidden");
+  d.byId("topbar").innerText = "Accounts";
 }
 
 function showAssetReceiveClicked() {

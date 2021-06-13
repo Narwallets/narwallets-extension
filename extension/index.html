@@ -14,7 +14,7 @@
 
 	<div class="topbar">
 		<div class="topbarleft"></div>
-		<div class="topbarcaption"></div>
+		<div class="topbarcaption" id="topbar"></div>
 		<div class="topbarpulldown">
 			<div class="app-header-network-component-wrapper">
 				<div id="select-network" class="network-component pointer" title="Active Network">
@@ -882,70 +882,18 @@
 				<div class="panels">
 
 					<div class="panel" id="one-panel">
-
-
-
-						<div class="assethistoryline">
-							<div class="assethisttype">
-								<div class="histreceive"></div>
-							</div>
-							<div class="assethistdate">01/01/2021</div>
-							<div class="assethistaccount">sasdasdas</div>
-							<div class="assethistammount">100,000.000</div>
+						
+						<div class="subpage scroll" id="asset-history-details">
 						</div>
-
-						<div class="assethistoryline">
-							<div class="assethisttype">
-								<div class="histreceive"></div>
+				
+						<div id="asset-history-template" class="hidden" data-id="{key}">
+							<div class="accountdetsassets">
+								<div class="accountasseticon"></div>
+								<div class="accountassetcoin">{type}</div>
+								<div class="accountassettoken">{date}</div>
+								<div class="accountassetbalance">{ammount}</div>
+								<div class="accountassetfiat"></div>
 							</div>
-							<div class="assethistdate">01/01/2021</div>
-							<div class="assethistaccount">sasdasdas</div>
-							<div class="assethistammount">100,000.000</div>
-						</div>
-
-						<div class="assethistoryline">
-							<div class="assethisttype">
-								<div class="histreceive"></div>
-							</div>
-							<div class="assethistdate">01/01/2021</div>
-							<div class="assethistaccount">sasdasdas</div>
-							<div class="assethistammount">100,000.000</div>
-						</div>
-
-						<div class="assethistoryline">
-							<div class="assethisttype">
-								<div class="histreceive"></div>
-							</div>
-							<div class="assethistdate">01/01/2021</div>
-							<div class="assethistaccount">sasdasdas</div>
-							<div class="assethistammount">100,000.000</div>
-						</div>
-
-						<div class="assethistoryline">
-							<div class="assethisttype">
-								<div class="histreceive"></div>
-							</div>
-							<div class="assethistdate">01/01/2021</div>
-							<div class="assethistaccount">sasdasdas</div>
-							<div class="assethistammount">100,000.000</div>
-						</div>
-
-						<div class="assethistoryline">
-							<div class="assethisttype">
-								<div class="histreceive"></div>
-							</div>
-							<div class="assethistdate">01/01/2021</div>
-							<div class="assethistaccount">sasdasdas</div>
-							<div class="assethistammount">100,000.000</div>
-						</div>
-
-						<div class="assethistoryline">
-							<div class="assethisttype">
-								<div class="histreceive"></div>
-							</div>
-							<div class="assethistdate">01/01/2021</div>
-							<div class="assethistaccount">sasdasdas</div>
-							<div class="assethistammount">100,000.000</div>
 						</div>
 
 					</div>

@@ -1532,6 +1532,7 @@ function showButtons() {
 
 function cancelClicked() {
   showButtons();
+  d.showSubPage("assets");
   okCancelRow.hide();
 }
 
