@@ -72,8 +72,9 @@
 #one:checked ~ .tabs #one-tab,
 #two:checked ~ .tabs #two-tab,
 #three:checked ~ .tabs #three-tab {
-  background: var (--LightGradientTop);
+  background: var(--LightGradientTop);
+  color:var(--DarkBackgroundTop);
   border-style: solid;
   border-width: 1px;
-  border-bottom-style: none;
+  border-color: var(--LightGradientTop);
 }
