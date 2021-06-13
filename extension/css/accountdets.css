@@ -97,11 +97,10 @@
   bottom: 0px;
   overflow: hidden;
 
-  background: var(--LightBackground);
-  background: linear-gradient(
+  background-color: linear-gradient(
     131deg,
-    var (--LightGradientTop) 0%,
-    var (--LightGradientBottom) 100%
+    var(--LightGradientTop) 0%,
+    var(--LightGradientBottom) 100%
   );
   border-top-color: var(--LightBorderLightAccent);
   border-left-color: var(--LightBorderLightAccent);
@@ -110,11 +109,10 @@
 }
 
 .accountdetsassets:hover {
-  background-color: var(--NarListHoover);
-  background: linear-gradient(
+  background-color: linear-gradient(
     131deg,
-    var (--LightGradientDarkTop) 0%,
-    var (--LightGradientDarkBot) 100%
+    var(--LightGradientDarkTop) 0%,
+    var(--LightGradientDarkBot) 100%
   );
   border-top-color: var(--LightBorderLightAccent);
   border-left-color: var(--LightBorderLightAccent);

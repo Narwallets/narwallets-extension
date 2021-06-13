@@ -76,8 +76,8 @@ function showAssetSendClicked() {
 
 function deleteAsset() {
   asset_array.splice(asset_index, 1);
-  d.clearContainer("assets");
-  d.populateUL("assets", "asset-item-template", asset_array);
+  d.clearContainer("assets-list");
+  d.populateUL("assets-list", "asset-item-template", asset_array);
 
   //Guardo
   refreshSaveSelectedAccount();

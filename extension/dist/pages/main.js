@@ -200,7 +200,7 @@ export async function show() {
     }
 }
 function backToAccountsClicked() {
-    d.clearContainer("assets");
+    d.clearContainer("assets-list");
     d.showPage("account-list-main");
     d.showSubPage("assets");
     d.byId("ok-cancel-row").classList.add("hidden");

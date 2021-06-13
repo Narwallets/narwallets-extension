@@ -11,7 +11,6 @@ h2 {
   height: auto;
   overflow-wrap: break-word;
   margin: auto;
-
 }
 
 h3 {
@@ -34,7 +33,6 @@ h4 {
   height: auto;
   overflow-wrap: break-word;
   margin: auto;
-
 }
 
 h5 {
@@ -48,8 +46,7 @@ h5 {
   margin: auto;
 }
 
-label
-{
+label {
   color: black;
   font-weight: 300;
   font-size: 12;
@@ -61,23 +58,19 @@ label
   margin-top: 15px;
 }
 
-.biginput
-{
-  margin-top:15px;
-  width:300px;
-  height:50px;
+.biginput {
+  margin-top: 15px;
+  width: 300px;
+  height: 50px;
 }
 
-.combotextbox
-{
+.combotextbox {
   width: 360px;
   height: 30px;
   display: block;
   position: relative;
   padding: 5px;
-
 }
-
 
 .combotextbox input {
   position: relative;
@@ -88,10 +81,9 @@ label
   text-align: center;
   width: 200px;
   height: 24px;
-  margin:auto;
+  margin: auto;
   top: 1px;
 }
-
 
 input {
   border-style: solid;
@@ -99,7 +91,6 @@ input {
   border-radius: 5px;
   padding: 5px;
   text-align: center;
-
 }
 
 .appface {
@@ -147,29 +138,26 @@ input {
   height: 45px;
 
   margin: 0px;
-
-
+  z-index: 98;
 }
 
-.contentarea
-{
+.contentarea {
   position: relative;
   width: 100%;
   height: 381px;
-  padding-top:10px;
+  padding-top: 10px;
   text-align: center;
   display: flexbox;
-  background-color:transparent;
+  background-color: transparent;
   border-style: solid;
   border-width: 1px;
-
 }
 
 .subpage {
   position: absolute;
 
-  padding:0px;
-  
+  padding: 0px;
+
   top: 190px;
   left: 0px;
   width: 361px;
@@ -221,8 +209,6 @@ input {
     rgba(255, 255, 255, 1) 100%
   );
   overflow-y: hidden;
-  
-  
 }
 
 .accountdetstopcenter h1 {
@@ -321,7 +307,7 @@ input {
   height: 28px;
   left: 242px;
   top: 1px;
-  color:var(--LightBorderLightAccent);
+  color: var(--LightBorderLightAccent);
 
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -406,10 +392,10 @@ input {
 
   border-style: solid;
   border-width: 1px;
-  border-top-color:var(--LightBorderLightAccent);
-  border-left-color:var(--LightBorderLightAccent);
-  border-right-color:var(--LightBorderDarkAccent);
-  border-bottom-color:var(--LightBorderDarkAccent);
+  border-top-color: var(--LightBorderLightAccent);
+  border-left-color: var(--LightBorderLightAccent);
+  border-right-color: var(--LightBorderDarkAccent);
+  border-bottom-color: var(--LightBorderDarkAccent);
 }
 
 .topbarleft {
@@ -446,7 +432,7 @@ input {
 
 .topbarpulldown {
   position: absolute;
-  color:var(--LightBorderLightAccent);
+  color: var(--LightBorderLightAccent);
   font-weight: lighter;
   font-size: 12px;
   width: 148px;
@@ -461,7 +447,7 @@ input {
 
 .topbarhamburguer {
   position: absolute;
-  color:var(--LightBorderLightAccent);
+  color: var(--LightBorderLightAccent);
   font-weight: lighter;
   font-size: 12px;
   width: 40px;
@@ -482,7 +468,7 @@ input {
   position: absolute;
   display: inline-block;
   background-color: var(--NarTope);
-  color:var(--LightBorderLightAccent);
+  color: var(--LightBorderLightAccent);
   width: 150px;
   top: 12px;
   border-style: none;
@@ -546,7 +532,7 @@ input {
   background-color: var(--NarListBack);
   width: 359px;
   height: 40px;
-  border-bottom: var (--LightGradientDarkTop) ;
+  border-bottom: var (--LightGradientDarkTop);
   border-bottom-style: solid;
   border-bottom-width: 1px;
 }
@@ -655,7 +641,7 @@ input {
 #err-div > div.success {
   background-color: #529453;
   border-width: 2px;
-  color:var(--LightBorderLightAccent)smoke;
+  color: var(--LightBorderLightAccent) smoke;
 }
 #err-div > div.info {
   background-color: #ecffff;

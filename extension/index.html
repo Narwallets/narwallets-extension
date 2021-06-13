@@ -333,18 +333,18 @@
 
 			<div class="wrapper">
 
-				<input class="radio" id="one" name="group" type="radio" checked>
-				<input class="radio" id="two" name="group" type="radio">
+				<input class="radio one" id="liquid-stake-radio" name="account-selected-stake" type="radio" checked>
+				<input class="radio two" id="delayed-stake-radio" name="account-selected-stake" type="radio">
 
 
 				<div class="tabs" id="tabtab">
-					<label class="tab" id="one-tab" for="one">Liquid Stake</label>
-					<label class="tab" id="two-tab" for="two">Delayed Stake</label>
+					<label class="tab one" id="one-tab-stake" for="liquid-stake-radio">Liquid Stake</label>
+					<label class="tab two" id="two-tab-stake" for="delayed-stake-radio">Delayed Stake</label>
 				</div>
 
 				<div class="panels">
 
-					<div class="panel" id="one-panel">
+					<div class="panel one">
 
 						<div class="contentarea">
 
@@ -357,7 +357,7 @@
 
 					</div>
 
-					<div class="panel" id="two-panel">
+					<div class="panel two">
 
 						<div class="contentarea">
 							<h2>Stake</h2>
@@ -516,41 +516,41 @@
 
 			<div class="wrapper">
 
-				<input class="radio" id="one" name="group" type="radio" checked>
-				<input class="radio" id="two" name="group" type="radio">
+				<input class="radio one" id="selected-account-asset-list" name="selected-account" type="radio" checked>
+				<input class="radio two" id="selected-account-activity" name="selected-account" type="radio">
 
 				<div class="tabs" id="tabtab">
-					<label class="tab" id="one-tab" for="one">Assets</label>
-					<label class="tab" id="two-tab" for="two">Activity</label>
+					<label class="tab one" for="selected-account-asset-list">Assets</label>
+					<label class="tab two" for="selected-account-activity">Activity</label>
 				</div>
 
 				<div class="panels">
 
-					<div class="panel" id="one-panel">
+					<div class="panel one" >
 
-						<div class="contentarea">
+						<div id="assets-list"> </div>
 
-							<div id="asset-item-template" class="hidden asset-item" data-id="{key}">
-								<div class="accountdetsassets">
-									<div class="accountasseticon"></div>
-									<div class="accountassetcoin">{symbol}</div>
-									<div class="accountassettoken">{contractId}</div>
-									<div class="accountassetbalance">{balance}</div>
-									<div class="accountassetfiat"></div>
-								</div>
-							</div>							
-
+						<div id="asset-item-template" class="hidden asset-item" data-id="{key}">
+							<div class="accountdetsassets">
+								<div class="accountasseticon"></div>
+								<div class="accountassetcoin">{symbol}</div>
+								<div class="accountassettoken">{contractId}</div>
+								<div class="accountassetbalance">{balance}</div>
+								<div class="accountassetfiat"></div>
+							</div>
 						</div>
+
+
 
 					</div>
 
-					<div class="panel" id="two-panel">
+					<div class="panel two" >
 
 						<div class="contentarea">
 						</div>
 					</div>
 
-			
+
 				</div>
 
 			</div>
@@ -918,10 +918,10 @@
 				<div class="panels">
 
 					<div class="panel" id="one-panel">
-						
+
 						<div class="subpage scroll" id="asset-history-details">
 						</div>
-				
+
 						<div id="asset-history-template" class="hidden" data-id="{key}">
 							<div class="accountdetsassets">
 								<div class="accountasseticon"></div>

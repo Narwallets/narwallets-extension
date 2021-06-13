@@ -272,7 +272,7 @@ async function selectAndShowAccount(accName: string) {
 
 function populateAssets() {
   d.populateUL(
-    "assets",
+    "assets-list",
     "asset-item-template",
     selectedAccountData.accountInfo.assets
   );
@@ -291,8 +291,11 @@ function showSelectedAccount() {
     "selected-account-template",
     selectedAccountData
   );
-  populateAssets();
   //lleno lista de assets
+  populateAssets();
+
+  // Muestro tab 1
+  //d.qs("#liquid-stake-radio").el.checked = true;
 
   /* lala_design
     accountBalance = new d.El(".selected-account-info .total.balance");
@@ -606,7 +609,7 @@ async function stakeClicked() {
     if (amountToStake < 0) amountToStake = 0;
 
     await fullAccessSubPage("account-selected-stake", performer);
-    d.qs("#account-selected-stake #one").el.checked = true;
+    d.qs("#liquid-stake-radio").el.checked = true;
     d.inputById("stake-with-staking-pool").value = "";
     d.byId("max-stake-amount").innerText = c.toStringDec(amountToStake);
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
@@ -1524,7 +1527,7 @@ function confirmClicked(ev: Event) {
 }
 
 function showButtons() {
-  d.clearContainer("assets");
+  d.clearContainer("assets-list");
   populateAssets();
   d.showSubPage("assets");
   okCancelRow.hide();
