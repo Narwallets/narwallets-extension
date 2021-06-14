@@ -27,7 +27,7 @@ export class Asset {
 }
 export class History {
     constructor() {
-        this.date = new Date();
+        this.date = "";
         this.type = "send";
         this.ammount = 0;
     }

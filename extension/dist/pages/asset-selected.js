@@ -1,6 +1,7 @@
 const THIS_PAGE = "AccountAssetDetail";
 import { askBackgroundSetAccount } from "../background/askBackground.js";
 import * as d from "../util/document.js";
+import { showOKCancel } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
 let asset_array;
 let asset_selected;
@@ -8,18 +9,14 @@ let asset_index;
 let accData;
 let isMoreOptionsOpen = false;
 // page init
-let okCancelRow;
-let confirmBtn;
-let cancelBtn;
 export async function show(acc, assetIndex, reposition) {
-    confirmBtn = new d.El("#account-selected-action-confirm");
-    cancelBtn = new d.El("#account-selected-action-cancel");
-    okCancelRow = new d.El("#ok-cancel-row");
+    // confirmBtn = new d.El("#account-selected-action-confirm");
+    // cancelBtn = new d.El("#account-selected-action-cancel");
     d.onClickId("asset-receive", showAssetReceiveClicked);
     d.onClickId("asset-send", showAssetSendClicked);
     d.onClickId("asset-remove", removeSelectedFromAssets);
-    confirmBtn.onClick(confirmClicked);
-    cancelBtn.onClick(cancelClicked);
+    // confirmBtn.onClick(confirmClicked);
+    // cancelBtn.onClick(cancelClicked);
     accData = acc;
     asset_array = acc.accountInfo.assets;
     asset_index = assetIndex;
@@ -27,7 +24,6 @@ export async function show(acc, assetIndex, reposition) {
     d.showPage(THIS_PAGE);
     d.onClickId("back-to-selected", backToSelectClicked);
     d.showSubPage("asset-history");
-    d.byId("asset-history-template").classList.remove("hidden");
     d.byId("topbar").innerText = "Assets";
     d.clearContainer("selected-asset");
     var templateData = {
@@ -35,11 +31,8 @@ export async function show(acc, assetIndex, reposition) {
         asset: asset_selected,
     };
     d.appendTemplateLI("selected-asset", "selected-asset-template", templateData);
-    var assetData = {
-        asset: asset_selected.history,
-    };
-    console.log(assetData);
-    d.populateUL("asset-history-details", "asset-history-template", templateData);
+    d.clearContainer("asset-history-details");
+    d.populateUL("asset-history-details", "asset-history-template", asset_selected.history);
 }
 function backToSelectClicked() {
     d.showPage("account-selected");
@@ -51,11 +44,11 @@ function showAssetReceiveClicked() {
     d.showSubPage("asset-receive-subpage");
     d.byId("asset-receive-symbol").innerText = asset_selected.symbol;
     d.byId("asset-receive-account").innerText = accData.name;
-    showOKCancel(showInitial);
+    showOKCancel(showInitial, showInitial);
 }
 function showAssetSendClicked() {
     d.showSubPage("asset-send-subpage");
-    showOKCancel(showInitial);
+    showOKCancel(showInitial, showInitial);
 }
 function deleteAsset() {
     asset_array.splice(asset_index, 1);
@@ -68,11 +61,10 @@ function deleteAsset() {
 }
 export function removeSelectedFromAssets() {
     d.showSubPage("asset-remove-selected");
-    showOKCancel(deleteAsset);
+    showOKCancel(deleteAsset, showInitial);
     // //elimino, limpio y relleno lista de assets
 }
 function showInitial() {
-    okCancelRow.hide();
     d.showSubPage("asset-history");
 }
 async function refreshSaveSelectedAccount() {
@@ -82,36 +74,7 @@ async function refreshSaveSelectedAccount() {
 async function saveSelectedAccount() {
     return askBackgroundSetAccount(accData.name, accData.accountInfo);
 }
-let confirmFunction = function (ev) { };
-function showOKCancel(OKHandler) {
-    isMoreOptionsOpen = false;
-    confirmFunction = OKHandler;
-    okCancelRow.show();
-    enableOKCancel();
-}
-function disableOKCancel() {
-    confirmBtn.disabled = true;
-    cancelBtn.disabled = true;
-}
-function enableOKCancel() {
-    confirmBtn.disabled = false;
-    cancelBtn.disabled = false;
-    cancelBtn.hidden = false;
-}
-function cancelClicked() {
-    showInitial();
-    okCancelRow.hide();
-}
-function confirmClicked(ev) {
-    try {
-        if (confirmFunction)
-            confirmFunction(ev);
-        okCancelRow.hide();
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-    finally {
-    }
+function cancelHide() {
+    throw new Error("Function not implemented.");
 }
 //# sourceMappingURL=asset-selected.js.map

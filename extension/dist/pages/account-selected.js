@@ -13,6 +13,7 @@ import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, ask
 import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
+import { OkCancelInit, disableOKCancel, enableOKCancel, showOKCancel, } from "../util/okCancel.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
 let accountInfoName;
@@ -39,9 +40,6 @@ export async function show(accName, reposition) {
     checkConnectOrDisconnect();
 }
 // page init
-let okCancelRow;
-let confirmBtn;
-let cancelBtn;
 function initPage() {
     const backLink = new d.El("#account-selected.appface .button.back");
     backLink.onClick(Pages.backToAccountsList);
@@ -67,17 +65,12 @@ function initPage() {
     comboAdd = new d.El("#combo");
     removeButton = new d.El("button#remove");
     //lala_redesign
-    confirmBtn = new d.El("#account-selected-action-confirm");
-    cancelBtn = new d.El("#account-selected-action-cancel");
-    okCancelRow = new d.El("#ok-cancel-row");
-    confirmBtn.onClick(confirmClicked);
-    cancelBtn.onClick(cancelClicked);
+    OkCancelInit();
     removeButton.onClick(removeAccountClicked);
     return;
     //accountAmount.onInput(amountInput);
     refreshButton = new d.El("button#refresh");
     d.onClickId("unstake", unstakeClicked);
-    showButtons(); //2nd or third entry - always show the buttons
     refreshButton.onClick(refreshClicked);
     d.onClickId("moreless", moreLessClicked);
     d.onClickId("lockup-add-public-key", LockupAddPublicKey);
@@ -204,8 +197,11 @@ function showSelectedAccount() {
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
     //lleno lista de assets
     populateAssets();
+    //lleno lista de activity de account
+    d.clearContainer("account-history-details");
+    d.populateUL("account-history-details", "asset-history-template", selectedAccountData.accountInfo.history);
     // Muestro tab 1
-    d.qs("#liquid-stake-radio").el.checked = true;
+    //d.qs("#liquid-stake-radio").el.checked = true;
     /* lala_design
       accountBalance = new d.El(".selected-account-info .total.balance");
       accountInfoName = new d.El(".selected-account-info .name");
@@ -234,22 +230,6 @@ function listPoolsClicked() {
         url: chrome.runtime.getURL("outside/list-pools.html"),
         state: "maximized",
     });
-}
-let confirmFunction = function (ev) { };
-function showOKCancel(OKHandler) {
-    isMoreOptionsOpen = false;
-    confirmFunction = OKHandler;
-    okCancelRow.show();
-    enableOKCancel();
-}
-function disableOKCancel() {
-    confirmBtn.disabled = true;
-    cancelBtn.disabled = true;
-}
-function enableOKCancel() {
-    confirmBtn.disabled = false;
-    cancelBtn.disabled = false;
-    cancelBtn.hidden = false;
 }
 function checkNormalAccountIsFullAccess() {
     if (selectedAccountData.isFullAccess)
@@ -281,7 +261,7 @@ async function fullAccessSubPage(subPageId, OKHandler) {
         d.hideErr();
         await checkAccountAccess();
         d.showSubPage(subPageId);
-        showOKCancel(OKHandler);
+        showOKCancel(OKHandler, showInitial);
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -299,17 +279,17 @@ function showGotoOwner() {
         d.byId("account-selected-open-owner-name").innerText =
             selectedAccountData.accountInfo.ownerId;
         d.showSubPage("account-selected-open-owner");
-        showOKCancel(GotoOwnerOkHandler);
+        showOKCancel(GotoOwnerOkHandler, showInitial);
     }
 }
 function showOKToGrantAccess() {
     d.showSubPage("account-selected-ok-to-grant-access");
-    showOKCancel(changeAccessClicked);
+    showOKCancel(changeAccessClicked, showInitial);
 }
 function receiveClicked() {
     d.showSubPage("account-selected-receive");
     d.byId("account-selected-receive-name").innerText = selectedAccountData.name;
-    showOKCancel(showButtons);
+    showOKCancel(showInitial, showInitial);
     showGotoOwner(); //if this is a lock.c shows the "goto owner" page
 }
 //--------------------------------
@@ -415,7 +395,7 @@ async function sendOKClicked() {
         d.showSubPage("account-selected-send-confirmation");
         d.byId("send-confirmation-amount").innerText = c.toStringDec(amountToSend);
         d.byId("send-confirmation-receiver").innerText = toAccName;
-        showOKCancel(performer); //on OK clicked, send
+        showOKCancel(performer, showInitial); //on OK clicked, send
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -444,7 +424,7 @@ async function performLockupContractSend() {
             "\u{24c3} to " +
             toAccName);
         displayReflectTransfer(amountToSend);
-        showButtons();
+        showInitial();
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -483,7 +463,8 @@ async function stakeClicked() {
         await fullAccessSubPage("account-selected-stake", performer);
         d.qs("#liquid-stake-radio").el.checked = true;
         d.inputById("stake-with-staking-pool").value = "";
-        d.byId("max-stake-amount").innerText = c.toStringDec(amountToStake);
+        d.qs("#max-stake-amount-1").innerText = c.toStringDec(amountToStake);
+        d.qs("#max-stake-amount-2").innerText = c.toStringDec(amountToStake);
         //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
         if (info.type == "lock.c")
             stakeAmountBox.value = c.toStringDec(amountToStake);
@@ -579,19 +560,25 @@ async function performStake() {
             //deposit and stake
             await askBackgroundCallMethod(newStakingPool, "deposit_and_stake", {}, selectedAccountData.name, c.TGas(75), c.ntoy(amountToStake));
             poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, newStakingPool);
-            selectedAccountData.accountInfo.assets.forEach((element) => {
-                if (element.contractId == newStakingPool) {
+            let hist;
+            hist = {
+                ammount: amountToStake,
+                date: new Date().toISOString(),
+                type: "stake",
+            };
+            let foundAsset = new Asset();
+            selectedAccountData.accountInfo.assets.forEach((asset) => {
+                if (asset.contractId == newStakingPool) {
                     existAssetWithThisPool = true;
-                    let hist;
-                    hist = { ammount: amountToStake, date: new Date(), type: "send" };
-                    element.history.push(hist);
-                    element.balance = c.yton(poolAccInfo.staked_balance);
+                    foundAsset = asset;
                 }
             });
-            if (!existAssetWithThisPool) {
+            if (existAssetWithThisPool) {
+                foundAsset.history.push(hist);
+                foundAsset.balance = c.yton(poolAccInfo.staked_balance);
+            }
+            else {
                 let asset;
-                let hist;
-                hist = { ammount: amountToStake, date: new Date(), type: "send" };
                 asset = {
                     spec: "idk",
                     url: "",
@@ -605,6 +592,11 @@ async function performStake() {
                 asset.history.push(hist);
                 selectedAccountData.accountInfo.assets.push(asset);
             }
+            //Agrego history de account
+            if (!selectedAccountData.accountInfo.history) {
+                selectedAccountData.accountInfo.history = [];
+            }
+            selectedAccountData.accountInfo.history.push(hist);
             console.log(selectedAccountData.accountInfo.assets);
             // await near.call_method(newStakingPool, "deposit_and_stake", {},
             //     selectedAccountData.name,
@@ -620,7 +612,7 @@ async function performStake() {
         //refresh status & save
         await refreshSaveSelectedAccount();
         d.showSuccess("Success");
-        showButtons();
+        showInitial();
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -658,7 +650,7 @@ async function performLockupContractStake() {
         //refresh status
         await refreshSaveSelectedAccount();
         d.showSuccess("Success");
-        showButtons();
+        showInitial();
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -813,7 +805,7 @@ async function performUnstake() {
         }
         //refresh status
         await refreshSaveSelectedAccount();
-        showButtons();
+        showInitial();
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -839,7 +831,7 @@ async function performLockupContractUnstake() {
         d.showSuccess(message);
         //refresh status
         await refreshSaveSelectedAccount();
-        showButtons();
+        showInitial();
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -865,7 +857,7 @@ async function performSend() {
         disableOKCancel();
         d.showWait();
         await askBackgroundTransferNear(selectedAccountData.name, toAccName, c.ntoy(amountToSend));
-        showButtons();
+        showInitial();
         //TODO transaction history per network
         //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
         //global.state.transactions[Network.current].push(transactionInfo)
@@ -995,13 +987,13 @@ function showPublicKeyClicked() {
         //we don't have any key for ReadOnly accounts
         d.showErr("Account is read only");
         d.showSubPage("account-selected-make-full-access");
-        showOKCancel(makeFullAccessOKClicked);
+        showOKCancel(makeFullAccessOKClicked, showInitial);
     }
     else {
         //normal acc priv key
         d.showSubPage("account-selected-show-public-key");
         d.byId("account-selected-public-key").innerText = getPublicKey(selectedAccountData.accountInfo.privateKey || "");
-        showOKCancel(showButtons);
+        showOKCancel(showInitial, showInitial);
     }
 }
 //---------------------------------------
@@ -1011,15 +1003,14 @@ export function showPrivateKeyClicked() {
         //we don't have any key for ReadOnly accounts
         d.showErr("Account is read only");
         d.showSubPage("account-selected-make-full-access");
-        showOKCancel(makeFullAccessOKClicked);
+        showOKCancel(makeFullAccessOKClicked, showInitial);
     }
     else {
         //normal acc priv key
         d.showSubPage("account-selected-show-private-key");
         d.byId("account-selected-private-key").innerText =
             selectedAccountData.accountInfo.privateKey || "";
-        showOKCancel(showButtons);
-        cancelBtn.hidden = true;
+        showOKCancel(showInitial, showInitial);
     }
 }
 //---------------------------------------
@@ -1038,12 +1029,12 @@ function changeAccessClicked() {
     if (selectedAccountData.isFullAccess) {
         d.showSubPage("account-selected-make-read-only");
         d.inputById("account-name-confirm").value = "";
-        showOKCancel(makeReadOnlyOKClicked);
+        showOKCancel(makeReadOnlyOKClicked, showInitial);
     }
     else {
         //is ReadOnly
         d.showSubPage("account-selected-make-full-access");
-        showOKCancel(makeFullAccessOKClicked);
+        showOKCancel(makeFullAccessOKClicked, showInitial);
     }
 }
 //---------------------------------------
@@ -1055,21 +1046,21 @@ function LockupAddPublicKey() {
     d.hideErr();
     //d.inputById("add-public-key").value = ""
     d.showSubPage("account-selected-add-public-key");
-    showOKCancel(AddPublicKeyToLockupOKClicked);
+    showOKCancel(AddPublicKeyToLockupOKClicked, showInitial);
 }
 //---------------------------------------
 function addNoteClicked() {
     d.hideErr();
     d.showSubPage("account-selected-add-note");
     d.inputById("add-note").value = selectedAccountData.accountInfo.note || "";
-    showOKCancel(addNoteOKClicked);
+    showOKCancel(addNoteOKClicked, showInitial);
 }
 async function addNoteOKClicked() {
     d.hideErr();
     selectedAccountData.accountInfo.note = d.inputById("add-note").value.trim();
     await saveSelectedAccount();
     showSelectedAccount();
-    showButtons();
+    showInitial();
 }
 //---------------------------------------
 async function DeleteAccount() {
@@ -1082,7 +1073,7 @@ async function DeleteAccount() {
         d.showSubPage("account-selected-delete");
         d.inputById("send-balance-to-account-name").value =
             selectedAccountData.accountInfo.ownerId || "";
-        showOKCancel(AccountDeleteOKClicked);
+        showOKCancel(AccountDeleteOKClicked, showInitial);
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -1166,7 +1157,7 @@ async function AddPublicKeyToLockupOKClicked() {
                 }
             }
         }
-        showButtons();
+        showInitial();
     }
     catch (ex) {
         if (ex.message.indexOf("assertion failed") != -1 &&
@@ -1193,7 +1184,7 @@ async function makeReadOnlyOKClicked() {
             selectedAccountData.accessStatus = "Read Only";
             showSelectedAccount();
             d.showMsg("Account access removed", "success");
-            showButtons();
+            showInitial();
         }
     }
     catch (ex) {
@@ -1237,7 +1228,7 @@ async function makeFullAccessOKClicked() {
         await saveSelectedAccount();
         selectAndShowAccount(selectedAccountData.name);
         d.showMsg("Seed Phrase is correct. Access granted", "success");
-        showButtons();
+        showInitial();
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -1247,27 +1238,8 @@ async function makeFullAccessOKClicked() {
         enableOKCancel();
     }
 }
-function confirmClicked(ev) {
-    try {
-        if (confirmFunction)
-            confirmFunction(ev);
-    }
-    catch (ex) {
-        d.showErr(ex.message);
-    }
-    finally {
-    }
-}
-function showButtons() {
-    d.clearContainer("assets-list");
-    populateAssets();
+function showInitial() {
     d.showSubPage("assets");
-    okCancelRow.hide();
-}
-function cancelClicked() {
-    showButtons();
-    d.showSubPage("assets");
-    okCancelRow.hide();
 }
 async function removeAccountClicked(ev) {
     try {

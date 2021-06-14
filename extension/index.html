@@ -350,7 +350,7 @@
 
 							<h2>Liquid Stake</h2>
 
-							<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
+							<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount-1"></span>)</h3>
 							<input id="stake-amount-liquid" type="text">
 
 						</div>
@@ -369,7 +369,7 @@
 								<button id="list-pools">List Pools</button>
 							</div>
 
-							<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount"></span></h3>
+							<h3>Amount in NEAR to Stake (Max <span id="max-stake-amount-2"></span>)</h3>
 							<input id="stake-amount" type="text">
 
 						</div>
@@ -451,7 +451,7 @@
 					<b>It's extremely important that you preserve your seed phrase or your private key</b>
 				</h3>
 
-				<h3>Your PRIVATE key <b>DO NOT SHARE!</h3>
+				<h3>Your PRIVATE key <b>DO NOT SHARE!</b></h3>
 				<h5 id="account-selected-private-key"></h5>
 			</div>
 
@@ -546,8 +546,11 @@
 
 					<div class="panel two" >
 
-						<div class="contentarea">
+						<div id="account-history-details">
 						</div>
+
+						
+
 					</div>
 
 
@@ -887,14 +890,17 @@
 			<div class="accountdetscomment">
 				<h2>{accountInfo.note}</h2>
 			</div>
-			<div class="accountdetsbalance ">
-				<h3 class="balance">{asset.symbol}</h3>
-			</div>
 			<div class="assetdeticon">
 				{asset.icon}
 			</div>
+			<div class="accountdetsbalance ">
+				{asset.balance}
+			</div>
+			<div class="accountdetssymbol">
+				<h3 >{asset.symbol}</h3>
+			</div>
 			<div class="assetdetcontract">
-				<h4>{asset.contract}</h4>
+				<h4>{asset.contractId}</h4>
 			</div>
 		</div>
 
@@ -908,30 +914,29 @@
 
 			<div class="wrapper">
 
-				<input class="radio" id="one" name="group" type="radio" checked>
+				<input class="radio one" id="asset-activity" name="asset-details" type="radio" checked>
 
 
 				<div class="tabs">
-					<label class="tab" id="one-tab" for="one">Asset Activity</label>
+					<label class="tab one" id="one-tab-history" for="asset-activty">Asset Activity</label>
 				</div>
 
 				<div class="panels">
 
-					<div class="panel" id="one-panel">
+					<div class="panel one" >
 
-						<div class="subpage scroll" id="asset-history-details">
+						<div id="asset-history-details">
 						</div>
+					</div>
 
-						<div id="asset-history-template" class="hidden" data-id="{key}">
-							<div class="accountdetsassets">
-								<div class="accountasseticon"></div>
-								<div class="accountassetcoin">{type}</div>
-								<div class="accountassettoken">{date}</div>
-								<div class="accountassetbalance">{ammount}</div>
-								<div class="accountassetfiat"></div>
-							</div>
+					<div id="asset-history-template" class="hidden" data-id="{key}">
+						<div class="accountdetsassets">
+							<div class="accountasseticon"></div>
+							<div class="accountassetcoin">{type}</div>
+							<div class="accountassettoken">{date}</div>
+							<div class="accountassetbalance">{ammount}</div>
+							<div class="accountassetfiat"></div>
 						</div>
-
 					</div>
 
 				</div>

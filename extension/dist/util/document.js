@@ -59,7 +59,7 @@ export function onClickId(id, clickHandler) {
  */
 export function onEnterKey(textId, clickHandler) {
     byId(textId).addEventListener("keyup", (event) => {
-        if (event.key === 'Enter')
+        if (event.key === "Enter")
             clickHandler(event);
     });
 }
@@ -84,10 +84,10 @@ export function getNumber(selector) {
 }
 //-------------------------------------------------------
 /**
-* showByClass(id)
-* removes class=hidden from a DIV with id=id & class=className
-* @param id
-*/
+ * showByClass(id)
+ * removes class=hidden from a DIV with id=id & class=className
+ * @param id
+ */
 export function showByClass(id, className) {
     const toShow = document.querySelectorAll("." + className + "#" + id)[0];
     if (!toShow) {
@@ -95,53 +95,56 @@ export function showByClass(id, className) {
         return;
     }
     //clear all input fields
-    toShow.querySelectorAll("input").forEach((item) => item.value = "");
+    toShow.querySelectorAll("input").forEach((item) => (item.value = ""));
     const allPages = document.querySelectorAll("." + className);
     allPages.forEach((el) => {
         el.classList.remove(HIDDEN);
     });
     //the setTimeout is needed because  HIDDEN=>display:none, and setting display:none BREAKS ANIMATIONS
-    setTimeout(() => {
-        //animated hide all 
-        allPages.forEach((el) => {
-            el.classList.remove("show");
-            el.classList.add("slide-hide");
-            el.setAttribute("disabled", "");
-        });
-        //show requested
-        toShow.classList.remove("slide-hide"); //show requested
-        toShow.classList.add("show"); //animate
-        toShow.removeAttribute("disabled");
-    }, 100);
+    // setTimeout(() => {
+    //animated hide all
+    allPages.forEach((el) => {
+        el.classList.remove("show");
+        el.classList.add("slide-hide");
+        el.setAttribute("disabled", "");
+    });
+    //show requested
+    toShow.classList.remove("slide-hide"); //show requested
+    toShow.classList.add("show"); //animate
+    toShow.removeAttribute("disabled");
+    // }, 100);
     //after animation, hide the other divs so they're not in the tab order
-    setTimeout(() => {
-        //console.log(toShow.id)
-        allPages.forEach((el) => {
-            if (el.id != toShow.id) {
-                //console.log("hiding",el.id)
-                el.classList.add(HIDDEN);
-            }
-        });
-        //console.log("show",toShow.id)
-        toShow.classList.remove(HIDDEN);
-    }, 300);
+    // setTimeout(() => {
+    //console.log(toShow.id)
+    allPages.forEach((el) => {
+        if (el.id != toShow.id) {
+            //console.log("hiding",el.id)
+            el.classList.add(HIDDEN);
+        }
+    });
+    //console.log("show",toShow.id)
+    toShow.classList.remove(HIDDEN);
+    // }, 300);
 }
 /**
-* showByClass(id)
-* removes class=hidden from a DIV with id=id & class="appface"
-* @param id
-*/
+ * showByClass(id)
+ * removes class=hidden from a DIV with id=id & class="appface"
+ * @param id
+ */
 export function showPage(id) {
     activePage = id;
     showByClass(id, "appface");
 }
 export function showSubPage(id) {
     showByClass(id, "subpage");
+    let primerRadio = document.querySelectorAll("#" + id + ".subpage .radio.one");
+    if (primerRadio.length > 0) {
+        primerRadio[0].checked = true;
+    }
 }
 export function hideDiv(id) {
     byId(id).classList.add(HIDDEN);
 }
-;
 //-----------------------------------
 //----- NOTIFICATIONS ---------------
 //-----------------------------------
@@ -179,11 +182,17 @@ export function showMsg(msg, extraClass, showMs) {
     }
     else {
         errDiv.appendChild(newDiv);
-        setTimeout(() => { newDiv.classList.add("show"); }, 30);
-        setTimeout(() => { newDiv.classList.remove("show"); }, showMs);
+        setTimeout(() => {
+            newDiv.classList.add("show");
+        }, 30);
+        setTimeout(() => {
+            newDiv.classList.remove("show");
+        }, showMs);
     }
     if (showMs > 0) {
-        setTimeout(() => { newDiv.remove(); }, showMs + 300);
+        setTimeout(() => {
+            newDiv.remove();
+        }, showMs + 300);
     }
     return newDiv;
 }
@@ -215,7 +224,9 @@ export function showWait() {
     window.addEventListener("keydown", ignoreKeys, true);
     hideTO = setTimeout(hideWait, 30000); //in case there's a programming error, hideWait is called automatically after 30 sec
 }
-function ignoreKeys(event) { event.preventDefault(); }
+function ignoreKeys(event) {
+    event.preventDefault();
+}
 export function hideWait() {
     window.removeEventListener("keydown", ignoreKeys, true);
     clearTimeout(hideTO);
@@ -286,7 +297,8 @@ export function appendTemplateLI(containerId, templateId, data) {
 }
 export function populateSingleLI(containerId, templateId, multiDataObj, key) {
     const dataItem = {
-        key: key, ...multiDataObj[key]
+        key: key,
+        ...multiDataObj[key],
     };
     appendTemplateLI(containerId, templateId, dataItem);
 }
@@ -367,26 +379,54 @@ export class El {
             return this;
         }
     }
-    hide() { this.el.classList.add("hidden"); }
-    show() { this.el.classList.remove("hidden"); }
-    showIf(truefalse) { if (truefalse)
-        this.show();
-    else
-        this.hide(); }
-    get hidden() { return this.el.classList.contains("hidden"); }
-    set hidden(value) { if (value)
-        this.hide();
-    else
-        this.show(); }
-    get innerText() { return this.el.innerText; }
-    set innerText(newText) { this.el.innerText = newText; }
-    get value() { return this.el.value; }
-    set value(newValue) { this.el.value = newValue; }
-    get disabled() { return this.el.disabled; }
-    set disabled(value) { this.el.disabled = value; }
-    get enabled() { return !this.el.disabled; }
-    set enabled(value) { this.el.disabled = !value; }
-    get classList() { return this.el.classList; }
+    hide() {
+        this.el.classList.add("hidden");
+    }
+    show() {
+        this.el.classList.remove("hidden");
+    }
+    showIf(truefalse) {
+        if (truefalse)
+            this.show();
+        else
+            this.hide();
+    }
+    get hidden() {
+        return this.el.classList.contains("hidden");
+    }
+    set hidden(value) {
+        if (value)
+            this.hide();
+        else
+            this.show();
+    }
+    get innerText() {
+        return this.el.innerText;
+    }
+    set innerText(newText) {
+        this.el.innerText = newText;
+    }
+    get value() {
+        return this.el.value;
+    }
+    set value(newValue) {
+        this.el.value = newValue;
+    }
+    get disabled() {
+        return this.el.disabled;
+    }
+    set disabled(value) {
+        this.el.disabled = value;
+    }
+    get enabled() {
+        return !this.el.disabled;
+    }
+    set enabled(value) {
+        this.el.disabled = !value;
+    }
+    get classList() {
+        return this.el.classList;
+    }
     toggleClass(className) {
         if (this.classList.contains(className)) {
             this.classList.remove(className);
@@ -395,8 +435,12 @@ export class El {
             this.classList.add(className);
         }
     }
-    onClick(clickHandler) { this.el.addEventListener(CLICK, clickHandler); }
-    onInput(inputHandler) { this.el.addEventListener(INPUT, inputHandler); }
+    onClick(clickHandler) {
+        this.el.addEventListener(CLICK, clickHandler);
+    }
+    onInput(inputHandler) {
+        this.el.addEventListener(INPUT, inputHandler);
+    }
 }
 //------------------------------------------------------------
 // a safe query selector ALL, throws if there's none
@@ -416,8 +460,16 @@ export class All {
             console.error("ERR: querySelectorAll('" + selector + "') " + ex.message);
         }
     }
-    hide() { this.elems.forEach((item) => { item.classList.add("hidden"); }); }
-    show() { this.elems.forEach((item) => { item.classList.remove("hidden"); }); }
+    hide() {
+        this.elems.forEach((item) => {
+            item.classList.add("hidden");
+        });
+    }
+    show() {
+        this.elems.forEach((item) => {
+            item.classList.remove("hidden");
+        });
+    }
     toggleClass(className) {
         this.elems.forEach((item) => {
             if (item.classList.contains(className)) {
@@ -443,7 +495,11 @@ export class All {
             item.addEventListener(event, handler);
         }
     }
-    onClick(clickHandler) { this.addEventListener(CLICK, clickHandler); }
-    onInput(inputHandler) { this.addEventListener(INPUT, inputHandler); }
+    onClick(clickHandler) {
+        this.addEventListener(CLICK, clickHandler);
+    }
+    onInput(inputHandler) {
+        this.addEventListener(INPUT, inputHandler);
+    }
 }
 //# sourceMappingURL=document.js.map
