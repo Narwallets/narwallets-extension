@@ -58,7 +58,7 @@
 	</div>
 
 	<!-- -->
-	<div id="err-div"></div>
+	<!-- <div id="err-div"></div> -->
 	<!-- -->
 	<div id="wait">
 		<div class="lds-ring">
@@ -391,7 +391,7 @@
 				<div class="combotextbox">
 
 					<input type="text" list="combo" id="combo-add-token" />
-					<datalist id="combo">
+					<datalist id="combo-add-token-datalis">
 						<option value="meta-v2.pool.testnet"></option>
 						<option value="value2"></option>
 					</datalist>
@@ -897,7 +897,7 @@
 				{asset.balance}
 			</div>
 			<div class="accountdetssymbol">
-				<h3>{asset.symbol}</h3>
+				{asset.symbol}
 			</div>
 			<div class="accountdetscomment">
 				{asset.contractId}
