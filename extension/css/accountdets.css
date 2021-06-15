@@ -10,7 +10,7 @@
   color: var(--DarkBackgroundTop);
 
   margin: auto;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-bottom: 0px;
   max-height: 24px;
   width: 260px;
@@ -28,7 +28,7 @@
 .accountdetscomment {
   display: block;
   margin: auto;
-  margin-top: 4px;
+  margin-top: 2px;
   margin-bottom: 0px;
 
   max-height: 24px;
@@ -40,9 +40,26 @@
   font-weight: 200;
 }
 
+.accountdetssymbol
+{
+  display: block;
+  margin: auto;
+  margin-top: 8px;
+  margin-bottom: 0px;
+  color: var(--TextHightlight);
+  max-height: 24px;
+  height: 15px;
+  width: 260px;
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
 .assetdeticon svg {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
+  margin-top:2px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -50,9 +67,9 @@
 .accountdetsbalance {
   display: block;
   margin: auto;
-  margin-top: 4px;
+  margin-top: 1px;
   margin-bottom: 0px;
-  max-height: 24px;
+  max-height: 22px;
   height: 20px;
   width: 260px;
   text-align: center;
@@ -97,10 +114,11 @@
   bottom: 0px;
   overflow: hidden;
 
-  background-color: linear-gradient(
+  background: var(--LightBackground);
+  background: linear-gradient(
     131deg,
-    var(--LightGradientTop) 0%,
-    var(--LightGradientBottom) 100%
+    var (--LightGradientTop) 0%,
+    var (--LightGradientBottom) 100%
   );
   border-top-color: var(--LightBorderLightAccent);
   border-left-color: var(--LightBorderLightAccent);
@@ -109,10 +127,11 @@
 }
 
 .accountdetsassets:hover {
-  background-color: linear-gradient(
+  background-color: var(--NarListHoover);
+  background: linear-gradient(
     131deg,
-    var(--LightGradientDarkTop) 0%,
-    var(--LightGradientDarkBot) 100%
+    var (--LightGradientDarkTop) 0%,
+    var (--LightGradientDarkBot) 100%
   );
   border-top-color: var(--LightBorderLightAccent);
   border-left-color: var(--LightBorderLightAccent);

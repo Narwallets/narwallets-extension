@@ -36,6 +36,7 @@ export function cancelClicked(ev) {
     }
 }
 export function showOKCancel(OKHandler, CancelHandler) {
+    //normalizo funcionalidad
     cancelBtn.innerText = "Cancel";
     confirmBtn.hidden = false;
     //isMoreOptionsOpen = false;

@@ -620,7 +620,7 @@ input {
 #err-div > div {
   color: darkred;
   text-align: center;
-  margin: 2px;
+  margin: 1px;
   padding: 15px;
   background-color: #981313;
   color: wheat;
@@ -640,16 +640,16 @@ input {
 }
 #err-div > div.success {
   background-color: #529453;
-  border-width: 2px;
+  border-width: 1px;
   color: var(--LightBorderLightAccent) smoke;
 }
 #err-div > div.info {
   background-color: #ecffff;
-  border-width: 2px;
+  border-width: 1px;
   color: #3b3b3b;
 }
 #err-div > div.warning {
   background-color: #eef1bb;
-  border-width: 2px;
+  border-width: 1px;
   color: #3b3b3b;
 }
