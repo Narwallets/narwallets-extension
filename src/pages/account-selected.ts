@@ -155,6 +155,7 @@ function moreClicked() {
     return;
   }
   isMoreOptionsOpen = false;
+  d.showPage("account-selected");
   d.showSubPage("assets");
 }
 
@@ -223,7 +224,7 @@ async function addOKClicked() {
     refreshSaveSelectedAccount();
     enableOKCancel();
     d.showSuccess("Success");
-    //showButtons();
+    hideOkCancel();
   } catch (ex) {
     d.showErr(ex);
   } finally {
@@ -807,6 +808,7 @@ async function performStake() {
     await refreshSaveSelectedAccount();
 
     d.showSuccess("Success");
+    hideOkCancel();
     showInitial();
   } catch (ex) {
     d.showErr(ex.message);
@@ -1093,7 +1095,7 @@ async function performSend() {
         "\u{24c3} to " +
         toAccName
     );
-
+    hideOkCancel();
     displayReflectTransfer(amountToSend);
   } catch (ex) {
     d.showErr(ex.message);
@@ -1253,7 +1255,6 @@ function showPublicKeyClicked() {
       selectedAccountData.accountInfo.privateKey || ""
     );
     showOKCancel(showInitial, showInitial);
-    
   }
 }
 
@@ -1272,7 +1273,6 @@ export function showPrivateKeyClicked() {
     d.byId("account-selected-private-key").innerText =
       selectedAccountData.accountInfo.privateKey || "";
     showOKCancel(showInitial, showInitial);
-    
   }
 }
 
@@ -1552,7 +1552,10 @@ async function refreshSaveSelectedAccount() {
     selectedAccountData.accountInfo
   );
   await saveSelectedAccount(); //save
+
   showSelectedAccount();
+  d.clearContainer("assets-list");
+  populateAssets();
 }
 
 async function refreshClicked(ev: Event) {

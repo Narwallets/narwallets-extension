@@ -79,6 +79,7 @@ function showAssetReceiveClicked() {
 }
 
 function showAssetSendClicked() {
+  console.log(accData);
   d.showSubPage("asset-send-subpage");
   d.byId("asset-symbol").innerText = asset_selected.symbol;
   showOKCancel(sendOKClicked, showInitial);
@@ -154,7 +155,7 @@ async function performSend() {
     );
 
     //Checkear
-    // displayReflectTransfer(amountToSend);
+    //displayReflectTransfer(amountToSend, toAccName);
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -197,9 +198,13 @@ async function refreshSaveSelectedAccount() {
 async function saveSelectedAccount(): Promise<any> {
   return askBackgroundSetAccount(accData.name, accData.accountInfo);
 }
-function cancelHide() {
-  throw new Error("Function not implemented.");
-}
-function displayReflectTransfer(amountToSend: number) {
-  throw new Error("Function not implemented.");
-}
+
+// function displayReflectTransfer(amountToSend: number, toAccName: string) {
+
+//   if (amountToSend == 0) return;
+
+//   .forEach(accData => {
+
+//   });
+//   selectedAccountData.accountInfo.lastBalance -= amountNear;
+//   selectedAccountData.available -= amountNear;}
