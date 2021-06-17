@@ -16,10 +16,10 @@ export function OkCancelInit() {
   cancelBtn.onClick(cancelClicked);
 }
 
+//Aca no ocultamos automaticamente por si hay error.
 export function confirmClicked(ev: Event) {
   try {
     if (confirmFunction) confirmFunction(ev);
-    hideOkCancel();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -28,9 +28,10 @@ export function confirmClicked(ev: Event) {
 
 export function cancelClicked(ev: Event) {
   try {
-    if (cancelFunction) cancelFunction(ev);
     hideOkCancel();
+    if (cancelFunction) cancelFunction(ev);
   } catch (ex) {
+    unHideOKCancel();
     d.showErr(ex.message);
   } finally {
   }
@@ -66,6 +67,10 @@ export function enableOKCancel() {
 export function singleButton() {
   cancelBtn.innerText = "Close";
   confirmBtn.hidden = true;
+}
+
+export function unHideOKCancel() {
+  okCancelRow.hidden = false;
 }
 
 export function hideOkCancel() {

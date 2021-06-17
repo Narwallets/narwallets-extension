@@ -1,7 +1,9 @@
 const THIS_PAGE = "AccountAssetDetail";
-import { askBackgroundSetAccount } from "../background/askBackground.js";
+import * as c from "../util/conversions.js";
+import { askBackgroundCallMethod, askBackgroundSetAccount, } from "../background/askBackground.js";
+import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/valid.js";
 import * as d from "../util/document.js";
-import { showOKCancel } from "../util/okCancel.js";
+import { disableOKCancel, enableOKCancel, hideOkCancel, showOKCancel, } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
 let asset_array;
 let asset_selected;
@@ -47,8 +49,70 @@ function showAssetReceiveClicked() {
     showOKCancel(showInitial, showInitial);
 }
 function showAssetSendClicked() {
+    console.log(accData);
     d.showSubPage("asset-send-subpage");
-    showOKCancel(showInitial, showInitial);
+    d.byId("asset-symbol").innerText = asset_selected.symbol;
+    showOKCancel(sendOKClicked, showInitial);
+}
+async function sendOKClicked() {
+    try {
+        //validate
+        const toAccName = new d.El("#send-to-asset-account").value;
+        const amountToSend = d.getNumber("#send-to-asset-amount");
+        if (!isValidAccountID(toAccName))
+            throw Error("Receiver Account Id is invalid");
+        if (!isValidAmount(amountToSend))
+            throw Error("Amount should be a positive integer");
+        if (accData.isReadOnly)
+            throw Error("Account is read-only");
+        if (amountToSend > asset_selected.balance)
+            throw Error("Amount exceeds available balance");
+        //show confirmation subpage
+        d.showSubPage("asset-selected-send-confirmation");
+        d.byId("asset-send-confirmation-amount").innerText =
+            c.toStringDec(amountToSend);
+        d.byId("asset-send-confirmation-receiver").innerText = toAccName;
+        showOKCancel(performSend, showInitial); //on OK clicked, send
+    }
+    catch (ex) {
+        d.showErr(ex.message);
+    }
+}
+async function performSend() {
+    try {
+        const toAccName = d.byId("asset-send-confirmation-receiver").innerText;
+        const amountToSend = c.toNum(d.byId("asset-send-confirmation-amount").innerText);
+        d.byId("asset-symbol-confirmation").innerText = asset_selected.symbol;
+        disableOKCancel();
+        d.showWait();
+        await askBackgroundCallMethod(asset_selected.contractId, "ft_transfer", {
+            receiver_id: toAccName,
+            amount: c.ntoy(amountToSend),
+            memo: null,
+        }, accData.name, undefined, "1");
+        hideOkCancel();
+        showInitial();
+        //TODO transaction history per network
+        //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
+        //global.state.transactions[Network.current].push(transactionInfo)
+        d.showSuccess("Success: " +
+            accData.name +
+            " transferred " +
+            c.toStringDec(amountToSend) +
+            " " +
+            asset_selected.symbol +
+            " to " +
+            toAccName);
+        //Checkear
+        //displayReflectTransfer(amountToSend, toAccName);
+    }
+    catch (ex) {
+        d.showErr(ex.message);
+    }
+    finally {
+        d.hideWait();
+        enableOKCancel();
+    }
 }
 function deleteAsset() {
     asset_array.splice(asset_index, 1);
@@ -74,7 +138,10 @@ async function refreshSaveSelectedAccount() {
 async function saveSelectedAccount() {
     return askBackgroundSetAccount(accData.name, accData.accountInfo);
 }
-function cancelHide() {
-    throw new Error("Function not implemented.");
-}
+// function displayReflectTransfer(amountToSend: number, toAccName: string) {
+//   if (amountToSend == 0) return;
+//   .forEach(accData => {
+//   });
+//   selectedAccountData.accountInfo.lastBalance -= amountNear;
+//   selectedAccountData.available -= amountNear;}
 //# sourceMappingURL=asset-selected.js.map

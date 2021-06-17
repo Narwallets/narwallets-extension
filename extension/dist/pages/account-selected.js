@@ -13,7 +13,7 @@ import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, ask
 import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
-import { OkCancelInit, disableOKCancel, enableOKCancel, showOKCancel, } from "../util/okCancel.js";
+import { OkCancelInit, disableOKCancel, enableOKCancel, showOKCancel, hideOkCancel, } from "../util/okCancel.js";
 const THIS_PAGE = "account-selected";
 let selectedAccountData;
 let accountInfoName;
@@ -90,6 +90,7 @@ function moreClicked() {
         return;
     }
     isMoreOptionsOpen = false;
+    d.showPage("account-selected");
     d.showSubPage("assets");
 }
 async function checkConnectOrDisconnect() {
@@ -140,7 +141,7 @@ async function addOKClicked() {
         refreshSaveSelectedAccount();
         enableOKCancel();
         d.showSuccess("Success");
-        //showButtons();
+        hideOkCancel();
     }
     catch (ex) {
         d.showErr(ex);
@@ -612,6 +613,7 @@ async function performStake() {
         //refresh status & save
         await refreshSaveSelectedAccount();
         d.showSuccess("Success");
+        hideOkCancel();
         showInitial();
     }
     catch (ex) {
@@ -867,6 +869,7 @@ async function performSend() {
             c.toStringDec(amountToSend) +
             "\u{24c3} to " +
             toAccName);
+        hideOkCancel();
         displayReflectTransfer(amountToSend);
     }
     catch (ex) {
@@ -1264,6 +1267,8 @@ async function refreshSaveSelectedAccount() {
     await searchAccounts.asyncRefreshAccountInfo(selectedAccountData.name, selectedAccountData.accountInfo);
     await saveSelectedAccount(); //save
     showSelectedAccount();
+    d.clearContainer("assets-list");
+    populateAssets();
 }
 async function refreshClicked(ev) {
     d.showWait();
