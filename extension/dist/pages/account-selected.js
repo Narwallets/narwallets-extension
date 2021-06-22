@@ -14,6 +14,7 @@ import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transact
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
 import { OkCancelInit, disableOKCancel, enableOKCancel, showOKCancel, hideOkCancel, } from "../util/okCancel.js";
+import { nearDollarPrice } from "../data/global.js";
 const THIS_PAGE = "account-selected";
 export const STAKE_DEFAULT_SVG = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 viewBox="0 0 67.8 67.8" style="enable-background:new 0 0 67.8 67.8;" xml:space="preserve">
@@ -84,6 +85,8 @@ function initPage() {
     //lala_redesign
     OkCancelInit();
     removeButton.onClick(removeAccountClicked);
+    var target = document.querySelector("#usd-price-link");
+    target?.addEventListener("usdPriceReady", usdPriceReady);
     return;
     //accountAmount.onInput(amountInput);
     refreshButton = new d.El("button#refresh");
@@ -93,6 +96,12 @@ function initPage() {
     d.onClickId("lockup-add-public-key", LockupAddPublicKey);
     d.onClickId("delete-account", DeleteAccount);
     //d.onClickId("assign-staking-pool", assignStakingPool);
+}
+function usdPriceReady() {
+    selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
+    let element = document.querySelector("#selected-account .accountdetsfiat");
+    element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
+    element.classList.remove("hidden");
 }
 function selectFirstTab() {
     stakeTabSelected = 1;
@@ -242,6 +251,9 @@ function showSelectedAccount() {
     //lleno lista de activity de account
     d.clearContainer("account-history-details");
     d.populateUL("account-history-details", "asset-history-template", selectedAccountData.accountInfo.history);
+    if (nearDollarPrice != 0) {
+        usdPriceReady();
+    }
     // Muestro tab 1
     //d.qs("#liquid-stake-radio").el.checked = true;
     /* lala_design

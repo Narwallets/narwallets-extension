@@ -15,17 +15,6 @@ export const IMPORT_OR_CREATE = "import-or-create";
 export const ACCOUNTS_LIST = "accounts-list";
 export const ACCOUNT_ITEM_TEMPLATE = "account-item-template";
 export const ACCOUNT_ITEM = "account-item";
-export let dolarValue = calculateDolarValue();
-let totalisimo;
-async function calculateDolarValue() {
-    let result = await fetch("https://api.diadata.org/v1/quotation/NEAR");
-    let response = await result.json();
-    let b = response.PromiseResult;
-    let a = Promise.resolve(response.Price);
-    console.log(b);
-    console.log(a.valueOf());
-    return a;
-}
 let draggingEl;
 function accountItem_drag(ev) {
     ev.preventDefault();

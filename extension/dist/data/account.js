@@ -1,3 +1,4 @@
+import { nearDollarPrice } from "./global.js";
 //user NEAR accounts info type
 export class Account {
     constructor() {
@@ -76,7 +77,7 @@ export class ExtendedAccountData {
             this.available = Math.max(0, this.available - 4);
         }
         this.total = accountInfo.lastBalance;
-        this.totalUSD = this.total * 4;
+        this.totalUSD = this.total * nearDollarPrice;
     }
     get isReadOnly() {
         return !this.accountInfo.privateKey;

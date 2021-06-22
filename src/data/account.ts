@@ -1,4 +1,5 @@
 import { timeStamp } from "node:console";
+import { nearDollarPrice } from "./global.js";
 
 //user NEAR accounts info type
 export class Account {
@@ -96,7 +97,7 @@ export class ExtendedAccountData {
     }
     this.total = accountInfo.lastBalance;
 
-    this.totalUSD = this.total * 4.7;
+    this.totalUSD = this.total * nearDollarPrice;
   }
 
   get isReadOnly() {

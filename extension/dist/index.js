@@ -7,6 +7,7 @@ import { addListeners as Import_addListeners } from "./pages/import.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { localStorageSet } from "./data/util.js";
 import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork, } from "./background/askBackground.js";
+import { calculateDollarValue } from "./data/global.js";
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 //--- content sections at MAIN popup.html
 const IMPORT_OR_CREATE = "import-or-create";
@@ -200,6 +201,7 @@ async function initPopup() {
     //update network indicator visual state
     const info = await askBackgroundGetNetworkInfo();
     updateNetworkIndicatorVisualState(info);
+    calculateDollarValue();
     //show main page
     return Pages.show();
 }

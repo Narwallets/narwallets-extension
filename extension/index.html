@@ -234,8 +234,8 @@
 				{total}
 			</div>
 
-			<div class="accountdetsfiat">
-				{totalUSD} usd
+			<div class="accountdetsfiat hidden">
+				{totalUSD} 
 			</div>
 
 		</div>
@@ -934,7 +934,7 @@
 			<div class="accountdetsbalance ">
 				{asset.balance} {asset.symbol}
 			</div>
-			<div class="accountdetscomment">
+			<div class="assetdetcontract">
 				{asset.contractId}
 			</div>
 		</div>
@@ -1083,6 +1083,7 @@
 
 	<div id="err-div"></div>
 
+	<a class="hidden" id="usd-price-link"></a>
 
 	<div id="wait">
 		<div class="lds-ring">

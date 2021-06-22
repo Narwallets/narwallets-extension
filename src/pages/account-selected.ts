@@ -61,6 +61,7 @@ import {
   showOKCancel,
   hideOkCancel,
 } from "../util/okCancel.js";
+import { nearDollarPrice } from "../data/global.js";
 
 const THIS_PAGE = "account-selected";
 export const STAKE_DEFAULT_SVG = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -142,6 +143,9 @@ function initPage() {
   OkCancelInit();
   removeButton.onClick(removeAccountClicked);
 
+  var target = document.querySelector("#usd-price-link");
+  target?.addEventListener("usdPriceReady", usdPriceReady);
+
   return;
 
   //accountAmount.onInput(amountInput);
@@ -156,6 +160,15 @@ function initPage() {
   d.onClickId("lockup-add-public-key", LockupAddPublicKey);
   d.onClickId("delete-account", DeleteAccount);
   //d.onClickId("assign-staking-pool", assignStakingPool);
+}
+
+function usdPriceReady() {
+  selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
+  let element = document.querySelector(
+    "#selected-account .accountdetsfiat"
+  ) as HTMLDivElement;
+  element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
+  element.classList.remove("hidden");
 }
 
 function selectFirstTab() {
@@ -354,6 +367,10 @@ function showSelectedAccount() {
     "asset-history-template",
     selectedAccountData.accountInfo.history
   );
+
+  if (nearDollarPrice != 0) {
+    usdPriceReady();
+  }
 
   // Muestro tab 1
   //d.qs("#liquid-stake-radio").el.checked = true;

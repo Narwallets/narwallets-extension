@@ -21,6 +21,7 @@ import { functionCall } from "./lib/near-api-lite/transaction.js";
 import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
 
 import type { NetworkInfo } from "./lib/near-api-lite/network.js";
+import { calculateDollarValue } from "./data/global.js";
 
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 
@@ -249,6 +250,8 @@ async function initPopup() {
   //update network indicator visual state
   const info = await askBackgroundGetNetworkInfo();
   updateNetworkIndicatorVisualState(info);
+
+  calculateDollarValue();
 
   //show main page
   return Pages.show();
