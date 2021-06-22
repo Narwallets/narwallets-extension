@@ -16,10 +16,16 @@ export class Account {
   lockedOther: number = 0; //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
   assets: Asset[] = []; //assets
   history: History[] = []; //history
+  contacts: Contact[] = [];
 
   // get totalInThePool(): number {
   //   return this.staked + this.unstaked;
   // }
+}
+
+export class Contact {
+  accountId: string = "";
+  alias: string = "";
 }
 
 export class Asset {
@@ -71,6 +77,7 @@ export class ExtendedAccountData {
     this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
 
     if (!this.accountInfo.assets) this.accountInfo.assets = [];
+    if (!this.accountInfo.contacts) this.accountInfo.contacts = [];
     // if (!this.accountInfo.staked) this.accountInfo.staked = 0;
     // if (!this.accountInfo.unstaked) this.accountInfo.unstaked = 0;
     // this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;

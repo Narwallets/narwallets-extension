@@ -1,4 +1,5 @@
 const THIS_PAGE = "AccountAssetDetail";
+
 import * as c from "../util/conversions.js";
 import {
   askBackgroundCallMethod,
@@ -18,6 +19,7 @@ import {
   showOKCancel,
 } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
+import { STAKE_DEFAULT_SVG, populateSendCombo } from "./account-selected.js";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -44,6 +46,11 @@ export async function show(
   asset_array = acc.accountInfo.assets;
   asset_index = assetIndex;
   asset_selected = acc.accountInfo.assets[asset_index];
+
+  if (asset_selected.symbol == "STAKE" && asset_selected.icon == "") {
+    asset_selected.icon = STAKE_DEFAULT_SVG;
+    await saveSelectedAccount();
+  }
   d.showPage(THIS_PAGE);
   d.onClickId("back-to-selected", backToSelectClicked);
   d.showSubPage("asset-history");
@@ -62,6 +69,8 @@ export async function show(
     "asset-history-template",
     asset_selected.history
   );
+
+  populateSendCombo("combo-send-asset");
 }
 
 function backToSelectClicked() {
@@ -82,6 +91,10 @@ function showAssetSendClicked() {
   console.log(accData);
   d.showSubPage("asset-send-subpage");
   d.byId("asset-symbol").innerText = asset_selected.symbol;
+  d.byId("max-amount-send-asset").innerText = c.toStringDec(
+    asset_selected.balance
+  );
+
   showOKCancel(sendOKClicked, showInitial);
 }
 

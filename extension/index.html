@@ -207,6 +207,7 @@
 		<button class="button back" id="back-to-account"></button>
 		<button class="button more" id="more"></button>
 
+
 		<div class="accountdetstopcenter" id="selected-account">
 		</div>
 
@@ -227,7 +228,7 @@
 			<div class="accountdetscomment">
 				{accountInfo.note}
 			</div>
-			<div class="accountdetsbalance ">
+			<div class="accountdetsbalance balance">
 				{total}
 			</div>
 
@@ -247,10 +248,8 @@
 				<h3>Send to Account Id</h3>
 
 				<div class="combotextbox">
-					<input id="send-to-account-name" type="text" list="combo" />
-					<datalist id="combo">
-						<option value="cuenta 1">memo de cuenta 1</option>
-						<option value="cuenta 2">memo de cuenta 2</option>
+					<input id="send-to-account-name" type="text" list="send-contact-combo" />
+					<datalist id="send-contact-combo">
 					</datalist>
 				</div>
 
@@ -273,6 +272,25 @@
 
 					<h3 class="warning">Send <span id="send-confirmation-amount"></span> NEAR
 						to <span id="send-confirmation-receiver"></span> ?</h3>
+
+				</div>
+
+			</div>
+
+		</div>
+
+		<!--#endregion -->
+
+		<!-- #region subpage ADD CONTACT -->
+		<div id="sure-add-contact" class="subpage hidden">
+
+			<div class="contentarea">
+
+				<h2>Add this contact to address book?</h2>
+
+				<div class="add-form-confirmation">
+
+					<h3 class="warning">Add ?</h3>
 
 				</div>
 
@@ -390,10 +408,17 @@
 				<h2>Add Token</h2>
 				<div class="combotextbox">
 
-					<input type="text" list="combo" id="combo-add-token" />
+					<input type="text" list="combo-add-token-datalis" id="combo-add-token" />
 					<datalist id="combo-add-token-datalis">
-						<option value="meta-v2.pool.testnet"></option>
-						<option value="value2"></option>
+						<option value="token.cheddar.testnet">CHDR</option>
+						<option value="wrap.near">wNEAR</option>
+						<option value="berryclub.ek.near">BANANA</option>
+						<option value="6b175...5271d0f.factory.bridge.near" data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
+						<option value="dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near">nUSDT</option>
+						<option value="1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near">nUNI</option>
+						<option value="514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near">nLINK</option>
+						<option value="a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near">nUSDC</option>
+						<option value="2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near">nWBTC</option>
 					</datalist>
 
 				</div>
@@ -532,8 +557,8 @@
 
 						<div id="asset-item-template" class="hidden asset-item" data-id="{key}">
 							<div class="accountdetsassets">
-								<div class="accountasseticon"></div>
-								<div class="accountassetcoin">{symbol}</div>
+								<div class="accountasseticon">{icon}</div>
+								<span class="accountassetcoin">{symbol}</span>
 								<div class="accountassettoken">{contractId}</div>
 								<div class="accountassetbalance">{balance}</div>
 								<div class="accountassetfiat"></div>
@@ -567,7 +592,7 @@
 		<!--#region MORE-->
 		<div id="more-subpage" class="subpage scroll hidden">
 
-			<button class="button morepage" id="">
+			<button class="button morepage" id="adress-book-button">
 				<h1>Account addressbook</h1>
 				<h2>Asdasdasdasdasdjga jahsg fajshgf dajhsgd fajhsg fhadsf fh affsahg hfsga sgdsajghd ahjsghasg gh da
 				</h2>
@@ -653,26 +678,37 @@
 
 		<!--#region AddressBook-->
 
-		<div class="subpage hidden" id="">
+		<div class="subpage hidden" id="addressbook-subpage">
 
 			<div class="wrapper">
 
-				<input class="radio" id="one" name="group" type="radio" checked>
+				<input class="radio one" id="address-book" name="address-book-contacts" type="radio" checked>
 
 
 				<div class="tabs">
-					<label class="tab" id="one-tab" for="one">Account Addressbook</label>
+					<label class="tab one" id="one-tab-address" for="address-book">Account Addressbook</label>
 				</div>
 
 				<div class="panels">
 
-					<div class="panel" id="one-panel">
+					<div class="panel one">
 
-						<div class="accountlistitem">
-							<div class="accountlistname">{name}</div>
-							<div class="accountlistbalance balance">{total}</div>
-							<div class="accountlistcomment">{accountInfo.note}</div>
+						<div id="contact-list"> </div>
+
+						<div id="contact-item-template" class="hidden contact-item" data-id="{key}">
+							<div class="accountdetsassets">
+								<div class="accountasseticon">{accountId}</div>
+								<span class="accountassetcoin">{alias}</span>
+								<button class="button send" id="send-to-this-contact"></button>
+								<button class="button more" id="remove-this-contact"></button>
+
+							</div>
 						</div>
+
+						<!-- <div class="accountlistitem">
+							<div class="accountlistname">{name}</div>
+							<div class="accountlistcomment">{accountInfo.note}</div>
+						</div> -->
 
 
 					</div>
@@ -894,10 +930,7 @@
 				{asset.icon}
 			</div>
 			<div class="accountdetsbalance ">
-				{asset.balance}
-			</div>
-			<div class="accountdetssymbol">
-				{asset.symbol}
+				{asset.balance} {asset.symbol}
 			</div>
 			<div class="accountdetscomment">
 				{asset.contractId}
@@ -948,17 +981,15 @@
 			<div class="contentarea">
 				<h2>Send</h2>
 
-				<h3>Send to ?</h3>
+				<h3>Send to Account Id</h3>
 
 				<div class="combotextbox">
-					<input id="send-to-asset-account" type="text" list="combo" />
+					<input id="send-to-asset-account" type="text" list="combo-send-asset" />
 					<datalist id="combo-send-asset">
-						<option value="cuenta 1">memo de cuenta 1</option>
-						<option value="cuenta 2">memo de cuenta 2</option>
 					</datalist>
 				</div>
 
-				<h3>Amount in <span id="asset-symbol"></span> (Max. <span id="max-amount-send"></span>)</h3>
+				<h3>Amount in <span id="asset-symbol"></span> (Max. <span id="max-amount-send-asset"></span>)</h3>
 				<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
 			</div>
 		</div>

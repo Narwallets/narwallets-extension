@@ -25,6 +25,7 @@ import {
   Asset,
   ExtendedAccountData,
   History,
+  Contact,
 } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
 import {
@@ -62,6 +63,21 @@ import {
 } from "../util/okCancel.js";
 
 const THIS_PAGE = "account-selected";
+export const STAKE_DEFAULT_SVG = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+viewBox="0 0 67.8 67.8" style="enable-background:new 0 0 67.8 67.8;" xml:space="preserve">
+<style type="text/css">	.st0{fill:#545454;}</style>
+<g id="Capa_1-2">
+<path class="st0" d="M33.9,0C15.2,0,0,15.2,0,33.9s15.2,33.9,33.9,33.9s33.9-15.2,33.9-33.9c0,0,0,0,0,0C67.8,15.2,52.6,0,33.9,0z
+  M29.9,29l0.9,0.5c4.5,2.4,9.2,4.1,14.1,5.3c-3.6,0.5-7.3,0.7-10.9,0.7c-9.6,0-17.4-1.5-17.4-3.2C16.5,30.6,22.2,29.3,29.9,29
+ L29.9,29z M51.4,53.6L51.4,53.6c0,0.1,0,0.2,0,0.2c0,1.8-7.8,3.2-17.4,3.2s-17.4-1.5-17.4-3.2c0-0.1,0-0.2,0-0.2h0v-5.2h0
+ c0.6,1.7,8.1,3,17.4,3s16.8-1.3,17.4-3l0,0L51.4,53.6z M51.4,46.4L51.4,46.4c0,0.1,0,0.2,0,0.2c0,1.8-7.8,3.2-17.4,3.2
+ s-17.4-1.5-17.4-3.2c0-0.1,0-0.2,0-0.2h0v-5.2h0c0.6,1.7,8.1,3,17.4,3s16.8-1.3,17.4-3l0,0L51.4,46.4z M51.4,39.3L51.4,39.3
+ c0,0.1,0,0.2,0,0.2c0,1.8-7.8,3.3-17.4,3.3s-17.4-1.5-17.4-3.3c0-0.1,0-0.2,0-0.2h0v-5.2h0c0.6,1.7,8.1,3,17.4,3s16.8-1.3,17.4-3
+ l0,0L51.4,39.3z M51,32L51,32c0,0.1,0,0.2,0,0.2c-0.7,1.6-8.5-0.2-17.2-4.1S18.3,19.7,19,18c0-0.1,0.1-0.1,0.1-0.2l0,0l2.1-4.7l0,0
+ c-0.1,1.8,6.2,6.1,14.6,9.8s15.9,5.6,17.1,4.3l0,0L51,32z M54.2,25.4c-0.7,1.6-8.5-0.2-17.2-4.1s-15.4-8.4-14.6-10.1
+ s8.5,0.2,17.2,4.1S54.8,23.8,54.2,25.4L54.2,25.4z"/>
+</g>
+</svg>`;
 
 let selectedAccountData: ExtendedAccountData;
 
@@ -110,14 +126,16 @@ function initPage() {
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
   d.onClickId("search-pools", searchPoolsButtonClicked);
-  d.onClickId("assets", showAssetDetailsClicked);
+  d.onClickId("assets-list", showAssetDetailsClicked);
   d.onClickId("acc-connect-to-page", connectToWebAppClicked);
   d.onClickId("one-tab-stake", selectFirstTab);
   d.onClickId("two-tab-stake", selectSecondTab);
+  d.onClickId("adress-book-button", showAdressBook);
+  d.onClickId("contact-list", contactOptions);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   seedTextElem = new d.El("#seed-phrase");
-  comboAdd = new d.El("#combo");
+  comboAdd = new d.El("#combo-add-token");
   removeButton = new d.El("button#remove");
   //lala_redesign
 
@@ -149,6 +167,7 @@ function selectSecondTab() {
 }
 
 function moreClicked() {
+  hideOkCancel();
   if (!isMoreOptionsOpen) {
     d.showSubPage("more-subpage");
     isMoreOptionsOpen = true;
@@ -191,15 +210,31 @@ async function addOKClicked() {
   disableOKCancel();
   d.showWait();
   try {
+    let contractValue = d.inputById("combo-add-token").value;
+    let lista =
+      document.querySelector("#combo-add-token-datalis")?.children || [];
+
+    for (let i = 0; i < lista?.length || 0; i++) {
+      let element = lista[i] as HTMLOptionElement;
+
+      if (contractValue == (element as HTMLOptionElement).value) {
+        contractValue =
+          element.attributes.getNamedItem("data-contract")?.value ||
+          contractValue;
+        break;
+      }
+    }
+
     selectedAccountData.accountInfo.assets.forEach((element) => {
-      if (element.contractId == d.inputById("combo-add-token").value) {
+      if (element.contractId == contractValue) {
         throw new Error("Asset already exist");
       }
     });
+
     let item = new Asset();
     item.type = "ft";
 
-    item.contractId = d.inputById("combo-add-token").value;
+    item.contractId = contractValue;
 
     let result = await askBackgroundViewMethod(
       item.contractId,
@@ -255,11 +290,27 @@ function getAccountRecord(accName: string): Promise<Account> {
   }); /*as Promise<Account>*/
 }
 
+export function populateSendCombo(combo: string) {
+  var opotions = "";
+
+  for (var i = 0; i < selectedAccountData.accountInfo.contacts.length; i++) {
+    opotions +=
+      '<option value="' +
+      selectedAccountData.accountInfo.contacts[i].accountId +
+      '" />';
+  }
+
+  d.byId(combo).innerHTML = opotions;
+}
+
 async function selectAndShowAccount(accName: string) {
   const accInfo = await getAccountRecord(accName);
   if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
 
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
+  populateSendCombo("send-contact-combo");
+
+  console.log(selectedAccountData);
 
   if (accInfo.ownerId && accInfo.type == "lock.c" && !accInfo.privateKey) {
     //lock.c is read-only, but do we have full access on the owner?
@@ -483,10 +534,48 @@ async function sendClicked() {
       d.showErr("Not enough balance to send");
     } else {
       d.byId("max-amount-send").innerText = c.toStringDec(maxAmountToSend);
+      //comento solo para probar la parte de contactos
       fullAccessSubPage("account-selected-send", sendOKClicked);
     }
   } catch (ex) {
     d.showErr(ex.message);
+  }
+}
+
+async function sendOKJustToTestContact() {
+  const toAccName = new d.El("#send-to-account-name").value;
+
+  if (selectedAccountData.accountInfo.contacts.length < 1) {
+    d.showSubPage("sure-add-contact");
+    showOKCancel(addContactToList, showInitial);
+  }
+
+  selectedAccountData.accountInfo.contacts.forEach((contact) => {
+    if (contact.accountId == toAccName) {
+      showInitial();
+      hideOkCancel();
+      return;
+    } else {
+      d.showSubPage("sure-add-contact");
+      showOKCancel(addContactToList, showInitial);
+    }
+  });
+}
+
+async function addContactToList() {
+  try {
+    let toAdd: Contact = new Contact();
+    toAdd.accountId = new d.El("#send-to-account-name").value;
+    toAdd.alias = "test";
+    selectedAccountData.accountInfo.contacts.push(toAdd);
+
+    await saveSelectedAccount();
+    d.showSuccess("Success");
+    hideOkCancel();
+    populateSendCombo("send-contact-combo");
+    showInitial();
+  } catch {
+    d.showErr("Error in save contact");
   }
 }
 
@@ -526,7 +615,9 @@ async function sendOKClicked() {
     d.byId("send-confirmation-amount").innerText = c.toStringDec(amountToSend);
     d.byId("send-confirmation-receiver").innerText = toAccName;
 
-    showOKCancel(performer, showInitial); //on OK clicked, send
+    //comento solo para probar contactos
+    //showOKCancel(performer, showInitial); //on OK clicked, send
+    await showOKCancel(sendOKJustToTestContact, showInitial);
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -777,7 +868,7 @@ async function performStake() {
           balance: c.yton(poolAccInfo.staked_balance),
           type: "stake",
           symbol: "STAKE",
-          icon: "",
+          icon: STAKE_DEFAULT_SVG,
           history: [],
         };
         asset.history.push(hist);
@@ -1095,6 +1186,15 @@ async function performSend() {
         "\u{24c3} to " +
         toAccName
     );
+
+    let hist: History;
+    hist = {
+      ammount: amountToSend,
+      date: new Date().toISOString(),
+      type: "send",
+    };
+    selectedAccountData.accountInfo.history.push(hist);
+
     hideOkCancel();
     displayReflectTransfer(amountToSend);
   } catch (ex) {
@@ -1321,11 +1421,35 @@ function addNoteClicked() {
   d.inputById("add-note").value = selectedAccountData.accountInfo.note || "";
   showOKCancel(addNoteOKClicked, showInitial);
 }
+
+function contactOptions(ev: Event) {
+  if (ev.target && ev.target instanceof HTMLElement) {
+    const li = ev.target.closest("li");
+    if (li) {
+      const quesoy = Number(li.id); // d.getClosestChildText(".account-item", ev.target, ".name");
+      console.log(quesoy);
+    }
+  }
+}
+
+function showAdressBook() {
+  isMoreOptionsOpen = false;
+  d.hideErr();
+  d.showSubPage("addressbook-subpage");
+  d.clearContainer("contact-list");
+  d.populateUL(
+    "contact-list",
+    "contact-item-template",
+    selectedAccountData.accountInfo.contacts
+  );
+}
+
 async function addNoteOKClicked() {
   d.hideErr();
   selectedAccountData.accountInfo.note = d.inputById("add-note").value.trim();
   await saveSelectedAccount();
   showSelectedAccount();
+  hideOkCancel();
   showInitial();
 }
 
@@ -1523,6 +1647,8 @@ async function makeFullAccessOKClicked() {
 }
 
 function showInitial() {
+  d.clearContainer("assets-list");
+  populateAssets();
   d.showSubPage("assets");
 }
 
