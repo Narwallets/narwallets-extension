@@ -143,12 +143,12 @@
   position: absolute;
   border-style: none;
   display: inline-block;
-  top: 0;
+  top: 15;
   left: 48px;
   width: 40px;
 
-  font-size: 10px;
-  font-weight: 400;
+  font-size: 16px;
+  font-weight: 200;
 }
 
 .accountassettoken {
@@ -170,7 +170,7 @@
   left: 1px;
   width: 46px;
   height: 46px;
-  background-color: var(--LightBorderDarkAccent);
+  /*background-color: var(--LightBorderDarkAccent);*/
 }
 
 .accountassetbalance {
