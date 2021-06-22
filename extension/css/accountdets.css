@@ -146,8 +146,8 @@
   left: 48px;
   width: 40px;
 
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 16px;
+  font-weight: 200;
 }
 
 .accountassettoken {
@@ -165,10 +165,11 @@
 
 .accountasseticon svg {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  width: 32px;
-  height: 32px;
+  top: 1px;
+  left: 1px;
+  width: 46px;
+  height: 46px;
+  /*background-color: var(--LightBorderDarkAccent);*/
 }
 
 .accountassetbalance {

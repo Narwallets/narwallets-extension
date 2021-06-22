@@ -85,12 +85,34 @@ label {
   top: 1px;
 }
 
+.combotextboxtoken {
+  width: 360px;
+  height: 40px;
+  display: block;
+  position: relative;
+  padding: 5px;
+}
+
+.combotextboxtoken input {
+  position: relative;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+  padding: 5px;
+  text-align: center;
+  width: 300px;
+  height: 40px;
+  margin:0px;
+  top: 1px;
+}
+
 input {
   border-style: solid;
   border-width: 1px;
   border-radius: 5px;
   padding: 5px;
   text-align: center;
+  margin:0px;
 }
 
 .appface {
@@ -145,6 +167,7 @@ input {
   position: relative;
   width: 100%;
   height: auto;
+  padding: 0px;
   padding-top: 10px;
   text-align: center;
   display: flexbox;
@@ -343,7 +366,7 @@ input {
 
 .bottombar {
   position: absolute;
-  width: 359px;
+  width: 361px;
   height: 55px;
   max-height: 55px;
   display: inline-block;
@@ -359,8 +382,7 @@ input {
     rgba(51, 46, 147, 1) 0%,
     rgba(53, 93, 168, 1) 100%
   );
-  border-style: solid;
-  border-width: 1px;
+ 
   border-top-color: var(--DarkBorderLightAcccent);
   border-left-color: var(--DarkBorderLightAcccent);
   border-right-color: var(--DarkBorderDarkAcccent);
