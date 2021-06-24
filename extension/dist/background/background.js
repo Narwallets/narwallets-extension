@@ -7,7 +7,9 @@ import { jsonRpc } from "../lib/near-api-lite/utils/json-rpc.js";
 import { localStorageSet, localStorageGet } from "../data/util.js";
 import * as TX from "../lib/near-api-lite/transaction.js";
 //version: major+minor+version, 3 digits each
-function semver(major, minor, version) { return major * 1e6 + minor * 1e3 + version; }
+function semver(major, minor, version) {
+    return major * 1e6 + minor * 1e3 + version;
+}
 const WALLET_VERSION = semver(2, 0, 0);
 //---------- working data
 let _connectedTabs = {};
@@ -22,11 +24,13 @@ let global_NearsSent = { from: "", to: "", amount: "0" };
 //https://developer.chrome.com/extensions/background_pages
 chrome.runtime.onMessage.addListener(runtimeMessageHandler);
 function runtimeMessageHandler(msg, sender, sendResponse) {
-    //check if it comes from the web-page or from this extension 
+    //check if it comes from the web-page or from this extension
     const url = sender.url ? sender.url : "";
     const fromPage = !url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
     //console.log("runtimeMessage received ",sender, url)
-    log("runtimeMessage received " + (fromPage ? "FROM PAGE " : "from popup ") + JSON.stringify(msg));
+    log("runtimeMessage received " +
+        (fromPage ? "FROM PAGE " : "from popup ") +
+        JSON.stringify(msg));
     if (msg.dest != "ext") {
         sendResponse({ err: "msg.dest must be 'ext'" });
     }
@@ -34,8 +38,10 @@ function runtimeMessageHandler(msg, sender, sendResponse) {
         // from web-app/tab -> content-script
         // process separated from internal requests for security
         msg.url = url; //add source
-        msg.tabId = (sender.tab ? sender.tab.id : -1); //add tab.id
-        setTimeout(() => { processMessageFromWebPage(msg); }, 100); //execute async
+        msg.tabId = sender.tab ? sender.tab.id : -1; //add tab.id
+        setTimeout(() => {
+            processMessageFromWebPage(msg);
+        }, 100); //execute async
     }
     else {
         //from internal pages like popup
@@ -43,6 +49,7 @@ function runtimeMessageHandler(msg, sender, sendResponse) {
         global_NearsSent = { from: "", to: "", amount: "0" };
         getActionPromise(msg)
             .then((data) => {
+            //promise resolved OK
             setTimeout(reflectTransfer, 200); //move amounts if accounts are in the wallet
             sendResponse({ data: data });
         })
@@ -139,7 +146,8 @@ function getActionPromise(msg) {
             global.saveSecureState();
             return Promise.resolve();
         }
-        else if (msg.code == "set-account-order") { //whe the user reorders the account list
+        else if (msg.code == "set-account-order") {
+            //whe the user reorders the account list
             try {
                 let accInfo = global.getAccount(msg.accountId);
                 accInfo.order = msg.order;
@@ -158,6 +166,16 @@ function getActionPromise(msg) {
         }
         else if (msg.code == "getNetworkAccountsCount") {
             return Promise.resolve(global.getNetworkAccountsCount());
+        }
+        else if (msg.code == "all-address-contacts") {
+            let result;
+            if (!global.SecureState.contacts) {
+                result = {};
+            }
+            else {
+                result = global.SecureState.contacts[Network.current];
+            }
+            return Promise.resolve(result || {});
         }
         else if (msg.code == "all-network-accounts") {
             const result = global.SecureState.accounts[Network.current];
@@ -192,7 +210,7 @@ function getActionPromise(msg) {
         }
         else if (msg.code == "apply") {
             //apply transaction request from popup
-            //{code:"apply", signerId:<account>, tx:BatchTransction} 
+            //{code:"apply", signerId:<account>, tx:BatchTransction}
             //when resolved, send msg to content-script->page
             const signerId = msg.signerId || "...";
             const accInfo = global.getAccount(signerId);
@@ -206,11 +224,19 @@ function getActionPromise(msg) {
                     case "call":
                         const f = item;
                         actions.push(TX.functionCall(f.method, f.args, BigInt(f.gas), BigInt(f.attached)));
-                        global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: f.attached };
+                        global_NearsSent = {
+                            from: signerId,
+                            to: msg.tx.receiver,
+                            amount: f.attached,
+                        };
                         break;
                     case "transfer":
                         actions.push(TX.transfer(BigInt(item.attached)));
-                        global_NearsSent = { from: signerId, to: msg.tx.receiver, amount: item.attached };
+                        global_NearsSent = {
+                            from: signerId,
+                            to: msg.tx.receiver,
+                            amount: item.attached,
+                        };
                         break;
                     case "delete":
                         const d = item;
@@ -242,7 +268,12 @@ async function processMessageFromWebPage(msg) {
     if (!_bgDataRecovered)
         await retrieveBgInfoFromStorage();
     //when resolved, send msg to content-script->page
-    let resolvedMsg = { dest: "page", code: "request-resolved", tabId: msg.tabId, requestId: msg.requestId };
+    let resolvedMsg = {
+        dest: "page",
+        code: "request-resolved",
+        tabId: msg.tabId,
+        requestId: msg.requestId,
+    };
     log(JSON.stringify(resolvedMsg));
     log("_connectedTabs[msg.tabId]", JSON.stringify(_connectedTabs[msg.tabId]));
     if (!_connectedTabs[msg.tabId]) {
@@ -254,42 +285,45 @@ async function processMessageFromWebPage(msg) {
     log(`processMessageFromWebPage _bgDataRecovered ${_bgDataRecovered}`, JSON.stringify(msg));
     switch (msg.code) {
         case "connected":
-            ctinfo.aceptedConnection = (!msg.err);
+            ctinfo.aceptedConnection = !msg.err;
             ctinfo.connectedResponse = msg;
             break;
         case "disconnect":
             ctinfo.aceptedConnection = false;
             break;
         case "get-account-balance":
-            near.queryAccount(msg.accountId)
-                .then(data => {
+            near
+                .queryAccount(msg.accountId)
+                .then((data) => {
                 resolvedMsg.data = data.amount; //if resolved ok, send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             })
-                .catch(ex => {
+                .catch((ex) => {
                 resolvedMsg.err = ex.message; //if error ok, also send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             });
             break;
         case "get-account-state":
-            near.queryAccount(msg.accountId)
-                .then(data => {
+            near
+                .queryAccount(msg.accountId)
+                .then((data) => {
                 resolvedMsg.data = data; //if resolved ok, send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             })
-                .catch(ex => {
+                .catch((ex) => {
                 resolvedMsg.err = ex.message; //if error ok, also send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             });
             break;
         case "view":
             //view-call request
-            near.view(msg.contract, msg.method, msg.args)
-                .then(data => {
+            near
+                .view(msg.contract, msg.method, msg.args)
+                .then((data) => {
                 resolvedMsg.data = data; //if resolved ok, send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             })
-                .catch(ex => {
+                .catch((ex) => {
                 resolvedMsg.err = ex.message; //if error ok, also send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             });
@@ -315,13 +349,13 @@ async function processMessageFromWebPage(msg) {
                 const width = 500;
                 const height = 540;
                 chrome.windows.create({
-                    url: 'popups/approve/approve.html',
-                    type: 'popup',
+                    url: "popups/approve/approve.html",
+                    type: "popup",
                     left: screen.width / 2 - width / 2,
                     top: screen.height / 2 - height / 2,
                     width: width,
                     height: height,
-                    focused: true
+                    focused: true,
                 });
             }
             catch (ex) {
@@ -334,11 +368,11 @@ async function processMessageFromWebPage(msg) {
         case "json-rpc":
             //low-level query
             jsonRpc(msg.method, msg.args)
-                .then(data => {
+                .then((data) => {
                 resolvedMsg.data = data; //if resolved ok, send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             })
-                .catch(ex => {
+                .catch((ex) => {
                 resolvedMsg.err = ex.message; //if error ok, also send msg to content-script->tab
                 chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
             });
@@ -381,7 +415,7 @@ function connectToWebPage(accountId, network) {
                 url: tabs[0].url,
                 ctinfo: _connectedTabs[activeTabId],
                 resolve: resolve,
-                reject: reject
+                reject: reject,
             };
             log("activeTabId", cpsData);
             cpsData.ctinfo = _connectedTabs[cpsData.activeTabId];
@@ -427,12 +461,12 @@ function continueCWP_2(cpsData) {
         return continueCWP_3(cpsData);
     }
     //not injected yet. Inject/execute contentScript on activeTab
-    //contentScript replies with a chrome.runtime.sendmessage 
-    //it also listens to page messages and relays via chrome.runtime.sendmessage 
+    //contentScript replies with a chrome.runtime.sendmessage
+    //it also listens to page messages and relays via chrome.runtime.sendmessage
     //basically contentScript.js acts as a proxy to pass messages from ext<->tab
     log("injecting");
     try {
-        chrome.tabs.executeScript({ file: 'dist/background/contentScript.js' }, function () {
+        chrome.tabs.executeScript({ file: "dist/background/contentScript.js" }, function () {
             if (chrome.runtime.lastError) {
                 log(JSON.stringify(chrome.runtime.lastError));
                 return cpsData.reject(chrome.runtime.lastError);
@@ -454,15 +488,25 @@ function continueCWP_3(cpsData) {
     cpsData.ctinfo.connectedResponse = { err: undefined };
     log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url);
     //send connect order via content script. a response will be received later
-    chrome.tabs.sendMessage(cpsData.activeTabId, { dest: "page", code: "connect", data: { accountId: cpsData.accountId, network: cpsData.network, version: WALLET_VERSION } });
+    chrome.tabs.sendMessage(cpsData.activeTabId, {
+        dest: "page",
+        code: "connect",
+        data: {
+            accountId: cpsData.accountId,
+            network: cpsData.network,
+            version: WALLET_VERSION,
+        },
+    });
     //wait 250 for response
     setTimeout(() => {
-        if (cpsData.ctinfo.aceptedConnection) { //page responded with connection info
+        if (cpsData.ctinfo.aceptedConnection) {
+            //page responded with connection info
             cpsData.ctinfo.connectedAccountId = cpsData.accountId; //register connected acount
             return cpsData.resolve();
         }
         else {
-            let errMsg = cpsData.ctinfo.connectedResponse.err || "not responding / Not a Narwallets-compatible Web App";
+            let errMsg = cpsData.ctinfo.connectedResponse.err ||
+                "not responding / Not a Narwallets-compatible Web App";
             return cpsData.reject(Error(cpsData.url + ": " + errMsg));
         }
     }, 250);
@@ -475,9 +519,13 @@ function disconnectFromWebPage() {
             if (!tabs || !tabs[0])
                 reject(Error("can access chrome tabs"));
             const activeTabId = tabs[0].id || -1;
-            if (_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection) {
+            if (_connectedTabs[activeTabId] &&
+                _connectedTabs[activeTabId].aceptedConnection) {
                 _connectedTabs[activeTabId].aceptedConnection = false;
-                chrome.tabs.sendMessage(activeTabId, { dest: "page", code: "disconnect" });
+                chrome.tabs.sendMessage(activeTabId, {
+                    dest: "page",
+                    code: "disconnect",
+                });
                 return resolve();
             }
             else {
@@ -498,7 +546,8 @@ function isConnected() {
             const activeTabId = tabs[0].id;
             if (!activeTabId)
                 return resolve(false);
-            return resolve(!!(_connectedTabs[activeTabId] && _connectedTabs[activeTabId].aceptedConnection));
+            return resolve(!!(_connectedTabs[activeTabId] &&
+                _connectedTabs[activeTabId].aceptedConnection));
         });
     });
 }
@@ -514,7 +563,7 @@ async function recoverWorkingData() {
     log("RECOVERED _connectedTabs", _connectedTabs);
     global.workingData.unlockSHA = await localStorageGet("_us");
     log("RECOVERED SHA", global.workingData.unlockSHA);
-    //@ts-ignore 
+    //@ts-ignore
     //_connectedTabs = await localStorageGet("_ct");
 }
 //------------------------
@@ -538,7 +587,7 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     if (alarm.name == UNLOCK_EXPIRED) {
         chrome.alarms.clearAll();
         global.lock("chrome.alarms.onAlarm " + JSON.stringify(alarm));
-        //window.close()//unload this background page 
+        //window.close()//unload this background page
         //chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
     }
 });
@@ -589,7 +638,7 @@ async function retrieveBgInfoFromStorage() {
         }
     }
     _bgDataRecovered = true;
-    const nw = await localStorageGet("selectedNetwork");
+    const nw = (await localStorageGet("selectedNetwork"));
     if (nw)
         Network.setCurrent(nw);
     log("NETWORK=", nw);
@@ -597,9 +646,9 @@ async function retrieveBgInfoFromStorage() {
 //returns true if loaded-upacked, developer mode
 //false if installed from the chrome store
 function isDeveloperMode() {
-    return !('update_url' in chrome.runtime.getManifest());
+    return !("update_url" in chrome.runtime.getManifest());
 }
-document.addEventListener('DOMContentLoaded', onLoad);
+document.addEventListener("DOMContentLoaded", onLoad);
 async function onLoad() {
     //WARNING:: if the background page wakes-up because a tx-apply
     //chrome will process "MessageFromPage" ASAP, meaning BEFORE the 2nd await.

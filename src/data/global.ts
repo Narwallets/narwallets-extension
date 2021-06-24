@@ -28,6 +28,7 @@ const INVALID_USER_OR_PASS = "Invalid User or Password";
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import type { StateStruct } from "./state-type.js";
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
+import { GContact } from "./Contact.js";
 
 //---- GLOBAL STATE ----
 
@@ -52,6 +53,7 @@ type NarwalletSecureData = {
   autoUnlockSeconds: number;
   advancedMode: boolean;
   accounts: Record<NetworkNameType, Record<AccountIdType, Account>>;
+  contacts: Record<NetworkNameType, Record<AccountIdType, GContact>>;
 };
 
 // SecureState.accounts => { network { accountId { ...info
@@ -62,6 +64,7 @@ const EmptySecureState: NarwalletSecureData = {
   autoUnlockSeconds: 1800,
   advancedMode: false,
   accounts: {},
+  contacts: {},
 };
 
 export var SecureState: NarwalletSecureData = Object.assign(

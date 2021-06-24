@@ -4,7 +4,7 @@ import { ExtendedAccountData } from "../data/account.js";
 import { show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 import { localStorageGetAndRemove, localStorageRemove, } from "../data/util.js";
-import { askBackground, askBackgroundAllNetworkAccounts, askBackgroundGetState, askBackgroundIsLocked, } from "../background/askBackground.js";
+import { askBackground, askBackgroundAllAddressContact, askBackgroundAllNetworkAccounts, askBackgroundGetState, askBackgroundIsLocked, } from "../background/askBackground.js";
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
 export const CREATE_USER = "create-user";
@@ -134,6 +134,8 @@ export async function show() {
             d.showPage(IMPORT_OR_CREATE);
             return;
         }
+        const contactos = await askBackgroundAllAddressContact();
+        console.log("ACA ESTOY", contactos);
         //here we have:
         //a user, unlocked, with accounts.
         //

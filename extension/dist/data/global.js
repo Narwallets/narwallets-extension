@@ -22,6 +22,7 @@ const EmptySecureState = {
     autoUnlockSeconds: 1800,
     advancedMode: false,
     accounts: {},
+    contacts: {},
 };
 export var SecureState = Object.assign({}, EmptySecureState);
 export function clearState() {

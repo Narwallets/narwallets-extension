@@ -13,6 +13,7 @@ import {
 } from "../data/util.js";
 import {
   askBackground,
+  askBackgroundAllAddressContact,
   askBackgroundAllNetworkAccounts,
   askBackgroundGetState,
   askBackgroundIsLocked,
@@ -156,6 +157,8 @@ export async function show() {
       d.showPage(IMPORT_OR_CREATE);
       return;
     }
+
+    const contactos = await askBackgroundAllAddressContact();
 
     //here we have:
     //a user, unlocked, with accounts.

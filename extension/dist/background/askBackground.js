@@ -1,11 +1,13 @@
-import { BatchTransaction, FunctionCall, Transfer } from "../lib/near-api-lite/batch-transaction.js";
+import { BatchTransaction, FunctionCall, Transfer, } from "../lib/near-api-lite/batch-transaction.js";
 import { log } from "../lib/log.js";
 //ask background, wait for response, return a Promise
 export function askBackground(requestPayload) {
     requestPayload.dest = "ext";
     return new Promise((resolve, reject) => {
         log("sendMessage", JSON.stringify(requestPayload));
-        const timeout = setTimeout(() => { return reject(Error("timeout")); }, 30000);
+        const timeout = setTimeout(() => {
+            return reject(Error("timeout"));
+        }, 30000);
         chrome.runtime.sendMessage(requestPayload, function (response) {
             clearTimeout(timeout);
             if (!response) {
@@ -19,7 +21,11 @@ export function askBackground(requestPayload) {
     });
 }
 export function askBackgroundSetAccount(accountId, accInfo) {
-    return askBackground({ code: "set-account", accountId: accountId, accInfo: accInfo });
+    return askBackground({
+        code: "set-account",
+        accountId: accountId,
+        accInfo: accInfo,
+    });
 }
 export function askBackgroundIsLocked() {
     return askBackground({ code: "is-locked" });
@@ -43,10 +49,22 @@ export function askBackgroundGetValidators() {
     return askBackground({ code: "get-validators" });
 }
 export function askBackgroundGetAccessKey(accountId, publicKey) {
-    return askBackground({ code: "access-key", accountId: accountId, publicKey: publicKey });
+    return askBackground({
+        code: "access-key",
+        accountId: accountId,
+        publicKey: publicKey,
+    });
 }
 export function askBackgroundViewMethod(contract, method, args) {
-    return askBackground({ code: "view", contract: contract, method: method, args: args });
+    return askBackground({
+        code: "view",
+        contract: contract,
+        method: method,
+        args: args,
+    });
+}
+export function askBackgroundAllAddressContact() {
+    return askBackground({ code: "all-address-contacts" });
 }
 export function askBackgroundCallMethod(contractId, method, params, signerId, gas, attached) {
     const batchTx = new BatchTransaction(contractId);
