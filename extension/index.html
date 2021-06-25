@@ -1073,8 +1073,8 @@
 		<div id="address-list">
 		</div>
 
-		<div id="address-item-template" class="hidden address-item" data-id="{name}">
-			<div class="addresslistitem">
+		<div id="address-item-template" class="hidden address-item" data-id="{key}">
+			<div class="accountlistitem">
 				<div class="addresslistname">{accountId}</div>
 				<div class="addresslistcomment">{note}</div>
 			</div>
@@ -1093,6 +1093,50 @@
 		<h2>Add Address </h2>
 		<input placeholder="Account ID" id="add-addresbook-id" type="text">
 		<input placeholder="Note" id="add-addresbook-note" type="text">
+	</div>
+	<!--#endregion -->
+
+	<!--#region Add address book-->
+	<div id="addressbook-details" class="appface slide-hide">
+
+		<button class="button back" id="back-to-addressbook"></button>
+
+
+		<div class="accountdetstopcenter" id="selected-contact">
+		</div>
+
+		<div class="accountdetsmidbar">
+			<button class="button remove" id="remove-contact">Remove</button>
+			<button class="button connect" id="edit-contact">Edit</button>
+		</div>
+
+		<!-- Template -->
+		<div id="selected-contact-template" class="hidden">
+
+			<div class="accountdetscuenta">
+				{accountId}
+			</div>
+			<div class="accountdetscomment">
+				{note}
+			</div>
+
+		</div>
+
+
+		<div id="contact-remove-selected" class="subpage hidden">
+			<div class="contentarea">
+				<h2>Remove this contact?</h2>
+			</div>
+		</div>
+
+		<div id="contact-edit-selected" class="subpage hidden">
+			<div class="contentarea">
+				<h2>Edit</h2>
+				<input id="edit-note-contact" type="text">
+			</div>
+		</div>
+
+		<div id="main-contact" class="subpage hidden"></div>
 	</div>
 	<!--#endregion -->
 

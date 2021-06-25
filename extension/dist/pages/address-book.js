@@ -4,9 +4,13 @@ import { GContact } from "../data/Contact.js";
 import * as d from "../util/document.js";
 import { hideOkCancel, OkCancelInit, showOKCancel, } from "../util/okCancel.js";
 let addressContacts = [];
+let selectedContactIndex = NaN;
 export async function show() {
     addressContacts = [];
     d.onClickId("add-contact", showAddContactPage);
+    d.onClickId("addressbook", showAddressDetails);
+    d.onClickId("remove-contact", deleteContact);
+    d.onClickId("edit-contact", editContact);
     OkCancelInit();
     d.clearContainer("address-list");
     const addressRecord = await askBackgroundAllAddressContact();
@@ -23,6 +27,7 @@ function showInitial() {
     d.clearContainer("address-list");
     d.populateUL("address-list", "address-item-template", addressContacts);
     d.showPage(ADDRESS_BOOK);
+    d.showSubPage("main-contact");
 }
 async function addOKClicked() {
     try {
@@ -50,5 +55,48 @@ async function addOKClicked() {
 }
 async function saveContactOnBook(name, contact) {
     return askBackgroundAddContact(name, contact);
+}
+function showAddressDetails(ev) {
+    d.showPage("addressbook-details");
+    d.clearContainer("selected-contact");
+    if (ev.target && ev.target instanceof HTMLElement) {
+        const li = ev.target.closest("li");
+        if (li) {
+            const index = Number(li.id);
+            if (isNaN(index))
+                return;
+            let contact = addressContacts[index];
+            d.appendTemplateLI("selected-contact", "selected-contact-template", contact);
+            selectedContactIndex = index;
+        }
+    }
+}
+function deleteContact() {
+    if (isNaN(selectedContactIndex))
+        return;
+    d.showSubPage("contact-remove-selected");
+    showOKCancel(okDeleteContact, showInitial);
+}
+function okDeleteContact() {
+    addressContacts.splice(selectedContactIndex, 1);
+    //Guardo
+    //TODO
+    showInitial();
+    hideOkCancel();
+}
+function editContact() {
+    d.showSubPage("contact-edit-selected");
+    d.inputById("edit-note-contact").value =
+        addressContacts[selectedContactIndex].note || "";
+    showOKCancel(addNoteOKClicked, showInitial);
+}
+function addNoteOKClicked() {
+    addressContacts[selectedContactIndex].note = d
+        .inputById("edit-note-contact")
+        .value.trim();
+    //Guardo
+    //TODO
+    showInitial();
+    hideOkCancel();
 }
 //# sourceMappingURL=address-book.js.map
