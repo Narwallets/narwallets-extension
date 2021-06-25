@@ -5,6 +5,7 @@ import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js"
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
 import { addListeners as Import_addListeners } from "./pages/import.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
+import { show as AddressBook_show } from "./pages/address-book.js";
 import { localStorageSet } from "./data/util.js";
 import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork, } from "./background/askBackground.js";
 import { calculateDollarValue } from "./data/global.js";
@@ -169,6 +170,11 @@ async function asideChangePassword() {
         d.showPage("change-password");
     }
 }
+async function asideAddressBook() {
+    if (await asideIsUnlocked()) {
+        AddressBook_show();
+    }
+}
 //-----------------------
 //executed after the background-page is available
 async function initPopup() {
@@ -190,6 +196,7 @@ async function initPopup() {
     d.qs("aside #options").onClick(asideOptions);
     d.qs("aside #contact").onClick(asideContact);
     d.qs("aside #about").onClick(asideAbout);
+    d.qs("aside #address-book-side").onClick(asideAddressBook);
     d.populateUL("network-items", "network-item-template", NetworkList);
     //--init other pages
     //lala_design temp commented

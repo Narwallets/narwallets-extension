@@ -8,6 +8,7 @@ import { addListeners as Import_addListeners } from "./pages/import.js";
 
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
+import { show as AddressBook_show } from "./pages/address-book.js";
 
 import { localStorageSet } from "./data/util.js";
 import {
@@ -22,6 +23,7 @@ import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
 
 import type { NetworkInfo } from "./lib/near-api-lite/network.js";
 import { calculateDollarValue } from "./data/global.js";
+import { D } from "./lib/tweetnacl/core/core.js";
 
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 
@@ -211,6 +213,12 @@ async function asideChangePassword() {
   }
 }
 
+async function asideAddressBook() {
+  if (await asideIsUnlocked()) {
+    AddressBook_show();
+  }
+}
+
 //-----------------------
 //executed after the background-page is available
 async function initPopup() {
@@ -235,6 +243,7 @@ async function initPopup() {
   d.qs("aside #options").onClick(asideOptions);
   d.qs("aside #contact").onClick(asideContact);
   d.qs("aside #about").onClick(asideAbout);
+  d.qs("aside #address-book-side").onClick(asideAddressBook);
 
   d.populateUL("network-items", "network-item-template", NetworkList);
 

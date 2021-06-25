@@ -27,6 +27,13 @@ export function askBackgroundSetAccount(accountId, accInfo) {
         accInfo: accInfo,
     });
 }
+export function askBackgroundAddContact(name, contact) {
+    return askBackground({
+        code: "add-contact",
+        name: name,
+        contact: contact,
+    });
+}
 export function askBackgroundIsLocked() {
     return askBackground({ code: "is-locked" });
 }

@@ -158,8 +158,6 @@ export async function show() {
       return;
     }
 
-    const contactos = await askBackgroundAllAddressContact();
-
     //here we have:
     //a user, unlocked, with accounts.
     //

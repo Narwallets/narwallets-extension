@@ -1,1 +1,1 @@
-{"version":3,"file":"Contact.js","sourceRoot":"","sources":["../../../src/data/Contact.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,QAAQ;IAArB;QACE,cAAS,GAAW,EAAE,CAAC;QACvB,SAAI,GAAW,EAAE,CAAC;IACpB,CAAC;CAAA"}
+{"version":3,"file":"Contact.js","sourceRoot":"","sources":["../../../src/data/Contact.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,QAAQ;IAInB,YAAY,IAAY,EAAE,IAAY;QAHtC,cAAS,GAAW,EAAE,CAAC;QACvB,SAAI,GAAW,EAAE,CAAC;QAGhB,IAAI,CAAC,SAAS,GAAG,IAAI,CAAC;QACtB,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;IACnB,CAAC;CACF"}

@@ -160,6 +160,14 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
       global.SecureState.accounts[Network.current][msg.accountId] = msg.accInfo;
       global.saveSecureState();
       return Promise.resolve();
+    } else if (msg.code == "add-contact") {
+      if (!msg.name) return Promise.reject(Error("!msg.name"));
+      if (!global.SecureState.contacts) global.SecureState.contacts = {};
+      if (!global.SecureState.contacts[Network.current])
+        global.SecureState.contacts[Network.current] = {};
+      global.SecureState.contacts[Network.current][msg.name] = msg.contact;
+      global.saveSecureState();
+      return Promise.resolve();
     } else if (msg.code == "set-account-order") {
       //whe the user reorders the account list
       try {

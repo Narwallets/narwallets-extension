@@ -1,7 +1,9 @@
 export class GContact {
-    constructor() {
+    constructor(name, note) {
         this.accountId = "";
         this.note = "";
+        this.accountId = name;
+        this.note = note;
     }
 }
 //# sourceMappingURL=Contact.js.map

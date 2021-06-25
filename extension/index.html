@@ -82,7 +82,7 @@
 			<hr>
 			<li id="add-account-side">Add Account</li>
 			<hr>
-			<li id="">Address Book</li>
+			<li id="address-book-side">Address Book</li>
 			<hr>
 			<!--<li id="change-password">Change your password</li>
 <hr>-->
@@ -180,20 +180,20 @@
 
 		<h2>Do you have an Account?</h2>
 
-		<h3>No, create a new NAMED account</h4>
-			<h4>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
-					temporary account</b> to complete the account creation</h4>
+		<h3>No, create a new NAMED account</h3>
+		<h4>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
+				temporary account</b> to complete the account creation</h4>
 
-			<button class="big" id="option-create">Create named account</button>
+		<button class="big" id="option-create">Create named account</button>
 
-			<h3>Yes, I already have an account</h3>
+		<h3>Yes, I already have an account</h3>
 
-			<button class="big" id="option-import">Import existing account</button>
+		<button class="big" id="option-import">Import existing account</button>
 
-			<h3>No, create a free implicit Account</h3>
-			<h4>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h4>
+		<h3>No, create a free implicit Account</h3>
+		<h4>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h4>
 
-			<button class="big" id="option-create-implicit">Create implicit account</button>
+		<button class="big" id="option-create-implicit">Create implicit account</button>
 
 
 
@@ -235,7 +235,7 @@
 			</div>
 
 			<div class="accountdetsfiat hidden">
-				{totalUSD} 
+				{totalUSD}
 			</div>
 
 		</div>
@@ -415,7 +415,8 @@
 						<option value="token.cheddar.testnet">CHDR</option>
 						<option value="wrap.near">wNEAR</option>
 						<option value="berryclub.ek.near">BANANA</option>
-						<option value="6b175...5271d0f.factory.bridge.near" data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
+						<option value="6b175...5271d0f.factory.bridge.near"
+							data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
 						<option value="dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near">nUSDT</option>
 						<option value="1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near">nUNI</option>
 						<option value="514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near">nLINK</option>
@@ -1068,6 +1069,30 @@
 
 	<div id="addressbook" class="appface slide-hide">
 		<h2>Address Book</h2>
+
+		<div id="address-list">
+		</div>
+
+		<div id="address-item-template" class="hidden address-item" data-id="{name}">
+			<div class="addresslistitem">
+				<div class="addresslistname">{accountId}</div>
+				<div class="addresslistcomment">{note}</div>
+			</div>
+		</div>
+
+		<div class="bottombar">
+			<button class="button addaccount" id="add-contact">Address</button>
+		</div>
+	</div>
+	<!--#endregion -->
+
+
+
+	<!--#region Add address book-->
+	<div id="add-addressbook" class="appface slide-hide">
+		<h2>Add Address </h2>
+		<input placeholder="Account ID" id="add-addresbook-id" type="text">
+		<input placeholder="Note" id="add-addresbook-note" type="text">
 	</div>
 	<!--#endregion -->
 

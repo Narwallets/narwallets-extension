@@ -41,6 +41,17 @@ export function askBackgroundSetAccount(
   });
 }
 
+export function askBackgroundAddContact(
+  name: string,
+  contact: GContact
+): Promise<any> {
+  return askBackground({
+    code: "add-contact",
+    name: name,
+    contact: contact,
+  });
+}
+
 export function askBackgroundIsLocked(): Promise<boolean> {
   return askBackground({ code: "is-locked" }) as Promise<boolean>;
 }

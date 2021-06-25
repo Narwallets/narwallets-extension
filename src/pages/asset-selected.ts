@@ -88,7 +88,6 @@ function showAssetReceiveClicked() {
 }
 
 function showAssetSendClicked() {
-  console.log(accData);
   d.showSubPage("asset-send-subpage");
   d.byId("asset-symbol").innerText = asset_selected.symbol;
   d.byId("max-amount-send-asset").innerText = c.toStringDec(
