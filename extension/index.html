@@ -922,6 +922,8 @@
 
 		</div>
 
+		<button class="button remove" id="asset-remove"></button>
+
 		<div id="selected-asset-template" class="hidden">
 			<div class="accountdetscuenta">
 				{acc.name}
@@ -929,11 +931,8 @@
 			<div class="accountdetscomment">
 				{accountInfo.note}
 			</div>
-			<div class="assetdeticon">
-				{asset.icon}
-			</div>
 			<div class="accountdetsbalance ">
-				{asset.balance} {asset.symbol}
+				{asset.icon} {asset.balance} {asset.symbol}
 			</div>
 			<div class="assetdetcontract">
 				{asset.contractId}
@@ -943,7 +942,7 @@
 		<div class="accountdetsmidbar">
 			<button class="button send" id="asset-send">Send</button>
 			<button class="button receive" id="asset-receive">Receive</button>
-			<button class="button remove" id="asset-remove">Remove</button>
+			<button class="button unstake" id="asset-unstake">Unstake</button>
 		</div>
 
 		<div class="subpage hide" id="asset-history">
@@ -1085,8 +1084,6 @@
 		</div>
 	</div>
 	<!--#endregion -->
-
-
 
 	<!--#region Add address book-->
 	<div id="add-addressbook" class="appface slide-hide">

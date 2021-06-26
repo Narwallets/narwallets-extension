@@ -302,13 +302,26 @@
 }
 
 .remove {
-  background-image: url("../icons/SVG/minus_light.svg");
+  
+    position:absolute;
+    top:5px;
+    left:305px;
+    background-image: url("../icons/SVG/minus_light.svg");
 }
 
 .remove:hover {
   background-image: url("../icons/SVG/minus_dark.svg");
 }
 
+.unstake
+{
+  background-image: url("../icons/SVG/unlink_light.svg");
+}
+
+.unstake:hover
+{
+  background-image: url("../icons/SVG/unlink_dark.svg");
+}
 .generic
 {
   width: 130px;

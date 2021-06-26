@@ -221,13 +221,13 @@ input {
   top: 0px;
   left: 0px;
   width: 361px;
-  height: 130px;
-  max-height: 130px;
-  background: rgb(214, 214, 214);
+  height: 132px;
+  max-height: 132px;
+  
   background: linear-gradient(
     131deg,
-    rgba(214, 214, 214, 1) 0%,
-    rgba(255, 255, 255, 1) 100%
+    var(--DarkBackgroundTop) 0%,
+    var(--DarkBackgroundBot) 100%
   );
   overflow-y: hidden;
 }
@@ -238,7 +238,7 @@ input {
   padding: 0px;
   font-size: 18px;
   font-weight: 300;
-  color: navy;
+  color: rgb(255, 255, 255);
 }
 
 .accountdetstopcenter h2 {
@@ -247,7 +247,7 @@ input {
   padding: 0px;
   font-size: 12px;
   font-weight: 200;
-  color: black;
+  color: rgb(18, 173, 245);
 }
 
 .accountdetstopcenter h3 {
@@ -256,7 +256,7 @@ input {
   padding: 0px;
   font-size: 23px;
   font-weight: 300;
-  color: darkgreen;
+  color: rgb(255, 255, 255);
 }
 
 .accountdetstopcenter h4 {
@@ -265,7 +265,7 @@ input {
   padding: 10px;
   font-size: 12px;
   font-weight: 200;
-  color: black;
+  color: rgb(255, 255, 255);
 }
 
 .accountdetsmidbar {
@@ -287,10 +287,7 @@ input {
     rgba(51, 46, 147, 1) 0%,
     rgba(53, 93, 168, 1) 100%
   );
-  border-top-color: var(--DarkBorderLightAcccent);
-  border-left-color: var(--DarkBorderLightAcccent);
-  border-right-color: var(--DarkBorderDarkAcccent);
-  border-bottom-color: var(--DarkBorderDarkAcccent);
+ 
 }
 
 .inputboxwithbutton {
