@@ -70,7 +70,7 @@ export async function show(
     asset_selected.history
   );
 
-  populateSendCombo("combo-send-asset");
+  await populateSendCombo("combo-send-asset");
 }
 
 function backToSelectClicked() {

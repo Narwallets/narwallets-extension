@@ -40,7 +40,7 @@ export async function show(acc, assetIndex, reposition) {
     d.appendTemplateLI("selected-asset", "selected-asset-template", templateData);
     d.clearContainer("asset-history-details");
     d.populateUL("asset-history-details", "asset-history-template", asset_selected.history);
-    populateSendCombo("combo-send-asset");
+    await populateSendCombo("combo-send-asset");
 }
 function backToSelectClicked() {
     d.showPage("account-selected");

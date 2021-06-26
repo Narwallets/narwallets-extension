@@ -1,9 +1,11 @@
 const ADDRESS_BOOK = "addressbook";
 import {
+  askBackground,
   askBackgroundAddContact,
   askBackgroundAllAddressContact,
 } from "../background/askBackground.js";
 import { GContact } from "../data/Contact.js";
+import { saveSecureState } from "../data/global.js";
 import { D } from "../lib/tweetnacl/core/core.js";
 import * as d from "../util/document.js";
 import {
@@ -14,7 +16,7 @@ import {
   showOKCancel,
 } from "../util/okCancel.js";
 
-let addressContacts: GContact[] = [];
+export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
 export async function show() {
@@ -23,15 +25,24 @@ export async function show() {
   d.onClickId("addressbook", showAddressDetails);
   d.onClickId("remove-contact", deleteContact);
   d.onClickId("edit-contact", editContact);
+  d.onClickId("back-to-addressbook", backToAddressBook);
   OkCancelInit();
+  hideOkCancel();
   d.clearContainer("address-list");
 
+  await initAddressArr();
+
+  showInitial();
+}
+export async function initAddressArr() {
   const addressRecord = await askBackgroundAllAddressContact();
 
   for (let key in addressRecord) {
     addressContacts.push(new GContact(key, addressRecord[key].note));
   }
+}
 
+function backToAddressBook() {
   showInitial();
 }
 
@@ -109,11 +120,12 @@ function deleteContact() {
   showOKCancel(okDeleteContact, showInitial);
 }
 
-function okDeleteContact() {
+async function okDeleteContact() {
+  await askBackground({
+    code: "remove-address",
+    accountId: addressContacts[selectedContactIndex].accountId,
+  });
   addressContacts.splice(selectedContactIndex, 1);
-
-  //Guardo
-  //TODO
   showInitial();
   hideOkCancel();
 }
@@ -125,13 +137,17 @@ function editContact() {
   showOKCancel(addNoteOKClicked, showInitial);
 }
 
-function addNoteOKClicked() {
+async function addNoteOKClicked() {
   addressContacts[selectedContactIndex].note = d
     .inputById("edit-note-contact")
     .value.trim();
 
   //Guardo
-  //TODO
+  await askBackground({
+    code: "set-address-book",
+    accountId: addressContacts[selectedContactIndex].accountId,
+    contact: addressContacts[selectedContactIndex],
+  });
   showInitial();
   hideOkCancel();
 }

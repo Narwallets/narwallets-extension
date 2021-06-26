@@ -215,6 +215,18 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
     } else if (msg.code == "view") {
       //view-call request
       return near.view(msg.contract, msg.method, msg.args);
+    } else if (msg.code == "set-address-book") {
+      if (!msg.accountId) return Promise.reject(Error("!msg.accountId"));
+      if (!global.SecureState.contacts[Network.current])
+        global.SecureState.contacts[Network.current] = {};
+      global.SecureState.contacts[Network.current][msg.accountId] = msg.contact;
+      global.saveSecureState();
+      return Promise.resolve();
+    } else if (msg.code == "remove-address") {
+      delete global.SecureState.contacts[Network.current][msg.accountId];
+      //persist
+      global.saveSecureState();
+      return Promise.resolve();
     } else if (msg.code == "apply") {
       //apply transaction request from popup
       //{code:"apply", signerId:<account>, tx:BatchTransction}

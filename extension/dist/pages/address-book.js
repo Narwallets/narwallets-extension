@@ -1,9 +1,9 @@
 const ADDRESS_BOOK = "addressbook";
-import { askBackgroundAddContact, askBackgroundAllAddressContact, } from "../background/askBackground.js";
+import { askBackground, askBackgroundAddContact, askBackgroundAllAddressContact, } from "../background/askBackground.js";
 import { GContact } from "../data/Contact.js";
 import * as d from "../util/document.js";
 import { hideOkCancel, OkCancelInit, showOKCancel, } from "../util/okCancel.js";
-let addressContacts = [];
+export let addressContacts = [];
 let selectedContactIndex = NaN;
 export async function show() {
     addressContacts = [];
@@ -11,12 +11,20 @@ export async function show() {
     d.onClickId("addressbook", showAddressDetails);
     d.onClickId("remove-contact", deleteContact);
     d.onClickId("edit-contact", editContact);
+    d.onClickId("back-to-addressbook", backToAddressBook);
     OkCancelInit();
+    hideOkCancel();
     d.clearContainer("address-list");
+    await initAddressArr();
+    showInitial();
+}
+export async function initAddressArr() {
     const addressRecord = await askBackgroundAllAddressContact();
     for (let key in addressRecord) {
         addressContacts.push(new GContact(key, addressRecord[key].note));
     }
+}
+function backToAddressBook() {
     showInitial();
 }
 function showAddContactPage() {
@@ -77,10 +85,12 @@ function deleteContact() {
     d.showSubPage("contact-remove-selected");
     showOKCancel(okDeleteContact, showInitial);
 }
-function okDeleteContact() {
+async function okDeleteContact() {
+    await askBackground({
+        code: "remove-address",
+        accountId: addressContacts[selectedContactIndex].accountId,
+    });
     addressContacts.splice(selectedContactIndex, 1);
-    //Guardo
-    //TODO
     showInitial();
     hideOkCancel();
 }
@@ -90,12 +100,16 @@ function editContact() {
         addressContacts[selectedContactIndex].note || "";
     showOKCancel(addNoteOKClicked, showInitial);
 }
-function addNoteOKClicked() {
+async function addNoteOKClicked() {
     addressContacts[selectedContactIndex].note = d
         .inputById("edit-note-contact")
         .value.trim();
     //Guardo
-    //TODO
+    await askBackground({
+        code: "set-address-book",
+        accountId: addressContacts[selectedContactIndex].accountId,
+        contact: addressContacts[selectedContactIndex],
+    });
     showInitial();
     hideOkCancel();
 }

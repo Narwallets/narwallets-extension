@@ -13,8 +13,10 @@ import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, ask
 import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
+import { initAddressArr, show as AddressBook_show } from "./address-book.js";
 import { OkCancelInit, disableOKCancel, enableOKCancel, showOKCancel, hideOkCancel, } from "../util/okCancel.js";
 import { nearDollarPrice } from "../data/global.js";
+import { addressContacts } from "./address-book.js";
 const THIS_PAGE = "account-selected";
 export const STAKE_DEFAULT_SVG = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 viewBox="0 0 67.8 67.8" style="enable-background:new 0 0 67.8 67.8;" xml:space="preserve">
@@ -210,13 +212,13 @@ function getAccountRecord(accName) {
         accountId: accName,
     }); /*as Promise<Account>*/
 }
-export function populateSendCombo(combo) {
+export async function populateSendCombo(combo) {
     var opotions = "";
-    for (var i = 0; i < selectedAccountData.accountInfo.contacts.length; i++) {
-        opotions +=
-            '<option value="' +
-                selectedAccountData.accountInfo.contacts[i].accountId +
-                '" />';
+    if (addressContacts.length == 0)
+        await initAddressArr();
+    console.log(addressContacts);
+    for (var i = 0; i < addressContacts.length; i++) {
+        opotions += '<option value="' + addressContacts[i].accountId + '" />';
     }
     d.byId(combo).innerHTML = opotions;
 }
@@ -1167,9 +1169,7 @@ function contactOptions(ev) {
 function showAdressBook() {
     isMoreOptionsOpen = false;
     d.hideErr();
-    d.showSubPage("addressbook-subpage");
-    d.clearContainer("contact-list");
-    d.populateUL("contact-list", "contact-item-template", selectedAccountData.accountInfo.contacts);
+    AddressBook_show();
 }
 async function addNoteOKClicked() {
     d.hideErr();

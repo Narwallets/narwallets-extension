@@ -49,6 +49,7 @@ import {
 
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
+import { initAddressArr, show as AddressBook_show } from "./address-book.js";
 
 import type { AnyElement, ClickHandler } from "../util/document.js";
 import { D } from "../lib/tweetnacl/core/core.js";
@@ -62,6 +63,7 @@ import {
   hideOkCancel,
 } from "../util/okCancel.js";
 import { nearDollarPrice } from "../data/global.js";
+import { addressContacts } from "./address-book.js";
 
 const THIS_PAGE = "account-selected";
 export const STAKE_DEFAULT_SVG = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -303,14 +305,13 @@ function getAccountRecord(accName: string): Promise<Account> {
   }); /*as Promise<Account>*/
 }
 
-export function populateSendCombo(combo: string) {
+export async function populateSendCombo(combo: string) {
   var opotions = "";
+  if (addressContacts.length == 0) await initAddressArr();
+  console.log(addressContacts);
 
-  for (var i = 0; i < selectedAccountData.accountInfo.contacts.length; i++) {
-    opotions +=
-      '<option value="' +
-      selectedAccountData.accountInfo.contacts[i].accountId +
-      '" />';
+  for (var i = 0; i < addressContacts.length; i++) {
+    opotions += '<option value="' + addressContacts[i].accountId + '" />';
   }
 
   d.byId(combo).innerHTML = opotions;
@@ -1452,13 +1453,7 @@ function contactOptions(ev: Event) {
 function showAdressBook() {
   isMoreOptionsOpen = false;
   d.hideErr();
-  d.showSubPage("addressbook-subpage");
-  d.clearContainer("contact-list");
-  d.populateUL(
-    "contact-list",
-    "contact-item-template",
-    selectedAccountData.accountInfo.contacts
-  );
+  AddressBook_show();
 }
 
 async function addNoteOKClicked() {
