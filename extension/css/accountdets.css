@@ -7,7 +7,7 @@
   text-align: center;
   display: block;
 
-  color: var(--DarkBackgroundTop);
+  color: var(--TextHightlight);
 
   margin: auto;
   margin-top: 5px;
@@ -35,7 +35,7 @@
   height: 15px;
   width: 260px;
   text-align: center;
-
+  color: var(--LightBorderLightAccent);
   font-size: 12px;
   font-weight: 200;
 }
@@ -73,7 +73,7 @@
   height: 15px;
   width: 260px;
   text-align: center;
-
+  color: var(--LightBorderLightAccent);
   font-size: 12px;
   font-weight: 200;
 }
@@ -85,7 +85,7 @@
   margin-bottom: 0px;
   max-height: 22px;
   height: 20px;
-  width: 260px;
+  width: 280px;
   text-align: center;
   margin-bottom: 15px;
 
@@ -94,6 +94,16 @@
 
   color: var(--TextHightlight);
 }
+
+.accountdetsbalance svg
+{
+  background-color: white;
+  border-radius: 11px;
+  width: 23px;
+  height: 23px;
+  background-position:center;
+}
+
 
 .accountdetsfiat {
   display: inline-block;
@@ -106,7 +116,7 @@
   align-items: center;
   width: 260px;
   background: transparent;
-
+  color: var(--LightBorderLightAccent);
   font-size: 15px;
   font-weight: 400;
 }
@@ -185,13 +195,14 @@
 
 .accountasseticon svg {
   position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 46px;
-  height: 46px;
+  top: 7px;
+  left: 7px;
+  width: 32;
+  height: 32px;
   /*background-color: var(--LightBorderDarkAccent);*/
 }
 
+d
 .accountassetbalance {
   position: absolute;
   display: block;
