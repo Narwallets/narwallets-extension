@@ -97,8 +97,11 @@
 
 .accountdetsbalance svg
 {
-  width: 22px;
-  height: 22px;
+  background-color: white;
+  border-radius: 11px;
+  width: 23px;
+  height: 23px;
+  background-position:center;
 }
 
 
