@@ -1,11 +1,13 @@
 const THIS_PAGE = "AccountAssetDetail";
 import * as c from "../util/conversions.js";
 import { askBackgroundCallMethod, askBackgroundSetAccount, } from "../background/askBackground.js";
+import { Asset } from "../data/account.js";
 import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/valid.js";
 import * as d from "../util/document.js";
 import { disableOKCancel, enableOKCancel, hideOkCancel, showOKCancel, } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import { STAKE_DEFAULT_SVG, populateSendCombo } from "./account-selected.js";
+import * as StakingPool from "../contracts/staking-pool.js";
 let asset_array;
 let asset_selected;
 let asset_index;
@@ -32,6 +34,26 @@ export async function show(acc, assetIndex, reposition) {
     d.onClickId("back-to-selected", backToSelectClicked);
     d.showSubPage("asset-history");
     d.byId("topbar").innerText = "Assets";
+    reloadDetails();
+    await populateSendCombo("combo-send-asset");
+    console.log(asset_selected);
+    switch (asset_selected.symbol) {
+        case "STNEAR": {
+            d.byId("asset-unstake").innerText = "Liquid Unstake";
+            break;
+        }
+        case "UNSTAKED": {
+            d.byId("asset-unstake").innerText = "Withdraw";
+            break;
+        }
+        default: {
+            d.byId("asset-unstake").innerText = "Unstake";
+            break;
+        }
+    }
+    d.onClickId("asset-unstake", UnstakeMiddle);
+}
+function reloadDetails() {
     d.clearContainer("selected-asset");
     var templateData = {
         acc: accData,
@@ -40,31 +62,152 @@ export async function show(acc, assetIndex, reposition) {
     d.appendTemplateLI("selected-asset", "selected-asset-template", templateData);
     d.clearContainer("asset-history-details");
     d.populateUL("asset-history-details", "asset-history-template", asset_selected.history);
-    await populateSendCombo("combo-send-asset");
-    console.log(asset_selected);
-    if (asset_selected.symbol == "STNEAR") {
-        d.byId("asset-unstake").innerText = "Liquid Unstake";
-    }
-    else {
-        d.byId("asset-unstake").innerText = "Unstake";
-    }
-    d.onClickId("asset-unstake", UnstakeMiddle);
 }
 function UnstakeMiddle() {
-    if (d.byId("asset-unstake").innerText == "Unstake") {
-        Unstake();
+    switch (d.byId("asset-unstake").innerText) {
+        case "Liquid Unstake": {
+            LiquidUnstake();
+            break;
+        }
+        case "Withdraw": {
+            Withdraw();
+            break;
+        }
+        default: {
+            DelayedUnstake();
+            break;
+        }
+    }
+}
+async function Withdraw() {
+    try {
+        const amount = c.toNum(d.inputById("liquid-unstake-mount").value);
+        const poolAccInfo = await StakingPool.getAccInfo(accData.name, asset_selected.contractId);
+        if (poolAccInfo.unstaked_balance == "0")
+            throw Error("No funds unstaked to withdraw");
+        if (!poolAccInfo.can_withdraw)
+            throw Error("Funds are unstaked but you must wait (36-48hs) after unstaking to withdraw");
+        // ok we've unstaked funds we can withdraw
+        let yoctosToWithdraw = fixUserAmountInY(amount, poolAccInfo.unstaked_balance); // round user amount
+        if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
+            await askBackgroundCallMethod(asset_selected.contractId, "withdraw_all", {}, accData.name);
+        }
+        else {
+            await askBackgroundCallMethod(asset_selected.contractId, "withdraw", { amount: yoctosToWithdraw }, accData.name);
+        }
+        d.showSuccess(c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool");
+        console.log(poolAccInfo);
+    }
+    catch (ex) {
+        d.showErr(ex);
+    }
+}
+async function DelayedUnstake() {
+    d.showSubPage("liquid-unstake");
+    await showOKCancel(DelayedUnstakeOk, showInitial);
+}
+async function LiquidUnstake() {
+    console.log("Hola, unstake normal");
+    const poolAccInfo = await StakingPool.getAccInfo(accData.name, asset_selected.contractId);
+    console.log(poolAccInfo);
+}
+async function DelayedUnstakeOk() {
+    d.showWait();
+    try {
+        if (!accData.isFullAccess)
+            throw Error("you need full access on " + accData.name);
+        const amount = c.toNum(d.inputById("liquid-unstake-mount").value);
+        if (!isValidAmount(amount))
+            throw Error("Amount is not valid");
+        const actualSP = asset_selected.contractId;
+        const poolAccInfo = await StakingPool.getAccInfo(accData.name, actualSP);
+        if (poolAccInfo.staked_balance == "0")
+            throw Error("No funds staked to unstake");
+        let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
+        if (yoctosToUnstake == poolAccInfo.staked_balance) {
+            await askBackgroundCallMethod(actualSP, "unstake_all", {}, accData.name);
+        }
+        else {
+            await askBackgroundCallMethod(actualSP, "unstake", { amount: yoctosToUnstake }, accData.name);
+        }
+        await createOrUpdateAssetUnstake(poolAccInfo);
+        hideOkCancel();
+        reloadDetails();
+        showInitial();
+        d.showSuccess("Unstaked");
+    }
+    catch (ex) {
+        d.showErr(ex.message);
+    }
+    finally {
+        d.hideWait();
+    }
+}
+async function createOrUpdateAssetUnstake(poolAccInfo) {
+    let existAssetWithThisPool = false;
+    let foundAsset = new Asset();
+    let amountToUnstake = c.toNum(d.inputById("liquid-unstake-mount").value);
+    let hist;
+    hist = {
+        ammount: amountToUnstake,
+        date: new Date().toISOString(),
+        type: "unstake",
+    };
+    accData.accountInfo.assets.forEach((asset) => {
+        if (asset.contractId == asset_selected.contractId &&
+            asset.symbol == "UNSTAKED") {
+            existAssetWithThisPool = true;
+            foundAsset = asset;
+        }
+    });
+    if (existAssetWithThisPool) {
+        foundAsset.history.push(hist);
+        foundAsset.balance = c.yton(poolAccInfo.unstaked_balance);
     }
     else {
-        LiquidUnstake();
+        let asset;
+        asset = {
+            spec: "",
+            url: "",
+            contractId: asset_selected.contractId,
+            balance: c.yton(poolAccInfo.unstaked_balance),
+            type: "unstake",
+            symbol: "UNSTAKED",
+            icon: STAKE_DEFAULT_SVG,
+            history: [],
+        };
+        asset.history.push(hist);
+        accData.accountInfo.assets.push(asset);
     }
+    let balance = await StakingPool.getAccInfo(accData.name, asset_selected.contractId);
+    asset_selected.balance = c.yton(balance.staked_balance);
+    asset_selected.history.push(hist);
+    //Agrego history de account
+    if (!accData.accountInfo.history) {
+        accData.accountInfo.history = [];
+    }
+    accData.accountInfo.history.push(hist);
+    console.log(accData);
+    refreshSaveSelectedAccount();
 }
-function Unstake() {
-    console.log("Hola, unstake normal");
+function fixUserAmountInY(amount, yoctosMax) {
+    let yoctosResult = yoctosMax; //default => all
+    if (amount + 2 < c.yton(yoctosResult)) {
+        yoctosResult = c.ntoy(amount); //only if it's less of what's available, we take the input amount
+    }
+    else if (amount > 2 + c.yton(yoctosMax)) {
+        //only if it's +1 above max
+        throw Error("Max amount is " + c.toStringDec(c.yton(yoctosMax)));
+        //----------------
+    }
+    return yoctosResult;
 }
-function LiquidUnstake() {
-    d.showSubPage("liquid-unstake");
+function reloadAssetsList() {
+    d.clearContainer("assets-list");
+    d.populateUL("assets-list", "asset-item-template", accData.accountInfo.assets);
 }
 function backToSelectClicked() {
+    reloadAssetsList();
     d.showPage("account-selected");
     d.showSubPage("assets");
     d.byId("ok-cancel-row").classList.add("hidden");

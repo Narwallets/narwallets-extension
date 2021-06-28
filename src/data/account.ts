@@ -34,7 +34,7 @@ export class Asset {
   url: string = "";
   contractId: string = "";
   balance: number = 0;
-  type: "stake" | "ft" = "ft";
+  type: string = "ft";
   symbol: string = "";
   history: History[] = [];
   icon: string = "";
