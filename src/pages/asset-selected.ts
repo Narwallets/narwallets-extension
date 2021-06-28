@@ -71,7 +71,34 @@ export async function show(
   );
 
   await populateSendCombo("combo-send-asset");
+  console.log(asset_selected);
+
+  if (asset_selected.symbol == "STNEAR") {
+    d.byId("asset-unstake").innerText = "Liquid Unstake";
+  } else {
+    d.byId("asset-unstake").innerText = "Unstake";
+  }
+  d.onClickId("asset-unstake", UnstakeMiddle);
 }
+
+function UnstakeMiddle() {
+  if (d.byId("asset-unstake").innerText == "Unstake") {
+    Unstake();
+  } else {
+    LiquidUnstake();
+  }
+}
+
+function Unstake() {
+  console.log("Hola, unstake normal");
+}
+
+function LiquidUnstake() {
+  d.showSubPage("liquid-unstake");
+  showOKCancel(LiquidUnstakeOk, showInitial);
+}
+
+function LiquidUnstakeOk() {}
 
 function backToSelectClicked() {
   d.showPage("account-selected");

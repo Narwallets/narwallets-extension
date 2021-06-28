@@ -8,7 +8,6 @@ let selectedContactIndex = NaN;
 export async function show() {
     addressContacts = [];
     d.onClickId("add-contact", showAddContactPage);
-    d.onClickId("addressbook", showAddressDetails);
     d.onClickId("remove-contact", deleteContact);
     d.onClickId("edit-contact", editContact);
     d.onClickId("back-to-addressbook", backToAddressBook);
@@ -34,6 +33,9 @@ function showAddContactPage() {
 function showInitial() {
     d.clearContainer("address-list");
     d.populateUL("address-list", "address-item-template", addressContacts);
+    document.querySelectorAll("#address-list .address-item").forEach((item) => {
+        item.addEventListener("click", showAddressDetails);
+    });
     d.showPage(ADDRESS_BOOK);
     d.showSubPage("main-contact");
 }
@@ -65,7 +67,6 @@ async function saveContactOnBook(name, contact) {
     return askBackgroundAddContact(name, contact);
 }
 function showAddressDetails(ev) {
-    d.showPage("addressbook-details");
     d.clearContainer("selected-contact");
     if (ev.target && ev.target instanceof HTMLElement) {
         const li = ev.target.closest("li");
@@ -78,6 +79,7 @@ function showAddressDetails(ev) {
             selectedContactIndex = index;
         }
     }
+    d.showPage("addressbook-details");
 }
 function deleteContact() {
     if (isNaN(selectedContactIndex))

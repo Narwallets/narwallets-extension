@@ -89,21 +89,20 @@
   text-align: center;
   margin-bottom: 15px;
 
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 400;
 
   color: var(--TextHightlight);
 }
 
-.accountdetsbalance svg
-{
+.accountdetsbalance svg {
   background-color: white;
-  border-radius: 11px;
-  width: 23px;
-  height: 23px;
-  background-position:center;
+  border-radius: 6px;
+  width: 15px;
+  height: 15px;
+  background-position: center;
+  padding: 2px;
 }
-
 
 .accountdetsfiat {
   display: inline-block;
@@ -202,7 +201,6 @@
   /*background-color: var(--LightBorderDarkAccent);*/
 }
 
-d
 .accountassetbalance {
   position: absolute;
   display: block;

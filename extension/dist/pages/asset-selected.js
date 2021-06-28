@@ -41,6 +41,28 @@ export async function show(acc, assetIndex, reposition) {
     d.clearContainer("asset-history-details");
     d.populateUL("asset-history-details", "asset-history-template", asset_selected.history);
     await populateSendCombo("combo-send-asset");
+    console.log(asset_selected);
+    if (asset_selected.symbol == "STNEAR") {
+        d.byId("asset-unstake").innerText = "Liquid Unstake";
+    }
+    else {
+        d.byId("asset-unstake").innerText = "Unstake";
+    }
+    d.onClickId("asset-unstake", UnstakeMiddle);
+}
+function UnstakeMiddle() {
+    if (d.byId("asset-unstake").innerText == "Unstake") {
+        Unstake();
+    }
+    else {
+        LiquidUnstake();
+    }
+}
+function Unstake() {
+    console.log("Hola, unstake normal");
+}
+function LiquidUnstake() {
+    d.showSubPage("liquid-unstake");
 }
 function backToSelectClicked() {
     d.showPage("account-selected");
