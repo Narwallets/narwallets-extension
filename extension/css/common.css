@@ -14,7 +14,7 @@ h2 {
 }
 
 h3 {
-  color: black;
+  color: var(--DarkGradientdark);
   font-weight: 200;
   font-size: 14px;
   padding: 5px;
@@ -25,7 +25,7 @@ h3 {
 }
 
 h4 {
-  color: black;
+  color:  var(--DarkGradientdark);
   font-weight: 100;
   font-size: 12;
   padding: 5px;
@@ -36,7 +36,7 @@ h4 {
 }
 
 h5 {
-  color: black;
+  color: var(--DarkGradientdark);
   font-weight: 300;
   font-size: 14;
   padding: 5px;
@@ -226,8 +226,8 @@ input {
   
   background: linear-gradient(
     131deg,
-    var(--DarkBackgroundTop) 0%,
-    var(--DarkBackgroundBot) 100%
+    var(--LightGradientBottom) 0%,
+    var(--LightGradientDarkBot) 100%
   );
   overflow-y: hidden;
 }
@@ -238,7 +238,7 @@ input {
   padding: 0px;
   font-size: 18px;
   font-weight: 300;
-  color: rgb(255, 255, 255);
+  color:var(--DarkBackgroundTop);
 }
 
 .accountdetstopcenter h2 {
@@ -247,7 +247,7 @@ input {
   padding: 0px;
   font-size: 12px;
   font-weight: 200;
-  color: rgb(18, 173, 245);
+  color: var(--DarkBackgroundTop);
 }
 
 .accountdetstopcenter h3 {
@@ -256,7 +256,7 @@ input {
   padding: 0px;
   font-size: 23px;
   font-weight: 300;
-  color: rgb(255, 255, 255);
+  color: var(--DarkBackgroundTop);
 }
 
 .accountdetstopcenter h4 {
@@ -265,7 +265,7 @@ input {
   padding: 10px;
   font-size: 12px;
   font-weight: 200;
-  color: rgb(255, 255, 255);
+  color: var(--DarkBorderDarkAccent);
 }
 
 .accountdetsmidbar {
