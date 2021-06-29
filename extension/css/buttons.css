@@ -315,13 +315,35 @@
 
 .unstake
 {
-  background-image: url("../icons/SVG/unlink_light.svg");
+  background-image: url("../icons/SVG/unstake.svg");
 }
 
 .unstake:hover
 {
-  background-image: url("../icons/SVG/unlink_dark.svg");
+  background-image: url("../icons/SVG/unstake_light.svg");
 }
+
+.liqunstake
+{
+  background-image: url("../icons/SVG/liqunstk.svg");
+}
+
+.liqunstake:hover
+{
+  background-image: url("../icons/SVG/liqunstk_light.svg");
+}
+
+.withdraw
+{
+  background-image: url("../icons/SVG/withdraw.svg");
+}
+
+.withdraw:hover
+{
+  background-image: url("../icons/SVG/withdraw_light.svg");
+}
+
+
 .generic
 {
   width: 130px;

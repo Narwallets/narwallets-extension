@@ -35,7 +35,7 @@
   height: 15px;
   width: 260px;
   text-align: center;
-  color: var(--LightBorderLightAccent);
+  color: var(--DarkBorderDarkAccent);
   font-size: 12px;
   font-weight: 200;
 }
@@ -73,7 +73,7 @@
   height: 15px;
   width: 260px;
   text-align: center;
-  color: var(--LightBorderLightAccent);
+  color: var(--DarkBorderDarkAccent);
   font-size: 12px;
   font-weight: 200;
 }
@@ -115,7 +115,7 @@
   align-items: center;
   width: 260px;
   background: transparent;
-  color: var(--LightBorderLightAccent);
+  color: var(--DarkBorderDarkAccent);
   font-size: 15px;
   font-weight: 400;
 }
