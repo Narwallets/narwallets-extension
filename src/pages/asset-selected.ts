@@ -164,12 +164,45 @@ async function DelayedUnstake() {
 }
 
 async function LiquidUnstake() {
-  console.log("Hola, unstake normal");
-  const poolAccInfo = await StakingPool.getAccInfo(
-    accData.name,
-    asset_selected.contractId
-  );
-  console.log(poolAccInfo);
+  await showOKCancel(LiquidUnstakeOk, showInitial);
+}
+
+async function LiquidUnstakeOk() {
+  d.showWait();
+
+  try {
+    if (!accData.isFullAccess)
+      throw Error("you need full access on " + accData.name);
+
+    const amount = c.toNum(d.inputById("liquid-unstake-mount").value);
+    if (!isValidAmount(amount)) throw Error("Amount is not valid");
+
+    const actualSP = asset_selected.contractId;
+
+    const poolAccInfo = await StakingPool.getAccInfo(accData.name, actualSP);
+
+    if (poolAccInfo.staked_balance == "0")
+      throw Error("No funds staked to unstake");
+
+    let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
+
+    await askBackgroundCallMethod(
+      actualSP,
+      "liquid_unstake",
+      { st_near_to_burn: yoctosToUnstake, min_expected_near: "0" },
+      accData.name
+    );
+
+    await createOrUpdateAssetUnstake(poolAccInfo);
+    hideOkCancel();
+    reloadDetails();
+    showInitial();
+    d.showSuccess("Liquid unstaked");
+  } catch (ex) {
+    d.showErr(ex.message);
+  } finally {
+    d.hideWait();
+  }
 }
 
 async function DelayedUnstakeOk() {
