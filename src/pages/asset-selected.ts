@@ -34,7 +34,7 @@ export async function show(
   assetIndex: number,
   reposition?: string
 ) {
-  // confirmBtn = new d.El("#account-selected-action-confirm");
+  hideInMiddle(); // confirmBtn = new d.El("#account-selected-action-confirm");
   // cancelBtn = new d.El("#account-selected-action-cancel");
   d.onClickId("asset-receive", showAssetReceiveClicked);
   d.onClickId("asset-send", showAssetSendClicked);
@@ -64,20 +64,37 @@ export async function show(
 
   switch (asset_selected.symbol) {
     case "STNEAR": {
-      d.byId("asset-unstake").innerText = "Liquid Unstake";
+      d.byId("asset-send").classList.remove("hidden");
+      d.byId("asset-receive").classList.remove("hidden");
+      d.byId("asset-liquid-unstake").classList.remove("hidden");
       break;
     }
     case "UNSTAKED": {
-      d.byId("asset-unstake").innerText = "Withdraw";
+      d.byId("asset-withdraw").classList.remove("hidden");
+      d.byId("asset-restake").classList.remove("hidden");
       break;
     }
     default: {
-      d.byId("asset-unstake").innerText = "Unstake";
+      d.byId("asset-send").classList.remove("hidden");
+      d.byId("asset-receive").classList.remove("hidden");
+      d.byId("asset-unstake").classList.remove("hidden");
       break;
     }
   }
 
-  d.onClickId("asset-unstake", UnstakeMiddle);
+  d.onClickId("asset-unstake", DelayedUnstake);
+  d.onClickId("asset-withdraw", Withdraw);
+  d.onClickId("asset-liquid-unstake", LiquidUnstake);
+  d.onClickId("asset-restake", ReStake);
+}
+
+function hideInMiddle() {
+  d.byId("asset-send").classList.add("hidden");
+  d.byId("asset-receive").classList.add("hidden");
+  d.byId("asset-liquid-unstake").classList.add("hidden");
+  d.byId("asset-withdraw").classList.add("hidden");
+  d.byId("asset-unstake").classList.add("hidden");
+  d.byId("asset-restake").classList.add("hidden");
 }
 
 function reloadDetails() {
@@ -96,21 +113,8 @@ function reloadDetails() {
   );
 }
 
-function UnstakeMiddle() {
-  switch (d.byId("asset-unstake").innerText) {
-    case "Liquid Unstake": {
-      LiquidUnstake();
-      break;
-    }
-    case "Withdraw": {
-      Withdraw();
-      break;
-    }
-    default: {
-      DelayedUnstake();
-      break;
-    }
-  }
+async function ReStake() {
+  return;
 }
 
 async function Withdraw() {
@@ -164,6 +168,7 @@ async function DelayedUnstake() {
 }
 
 async function LiquidUnstake() {
+  d.showSubPage("liquid-unstake");
   await showOKCancel(LiquidUnstakeOk, showInitial);
 }
 
@@ -186,18 +191,20 @@ async function LiquidUnstakeOk() {
 
     let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
 
-    await askBackgroundCallMethod(
+    var result = await askBackgroundCallMethod(
       actualSP,
       "liquid_unstake",
-      { st_near_to_burn: yoctosToUnstake, min_expected_near: "0" },
+      { stnear_to_burn: yoctosToUnstake, min_expected_near: "0" },
       accData.name
     );
+
+    console.log(result);
 
     await createOrUpdateAssetUnstake(poolAccInfo);
     hideOkCancel();
     reloadDetails();
     showInitial();
-    d.showSuccess("Liquid unstaked");
+    d.showSuccess("Liquid unstaked " + c.toStringDec(c.yton(result.near)));
   } catch (ex) {
     d.showErr(ex.message);
   } finally {

@@ -15,7 +15,7 @@ let accData;
 let isMoreOptionsOpen = false;
 // page init
 export async function show(acc, assetIndex, reposition) {
-    // confirmBtn = new d.El("#account-selected-action-confirm");
+    hideInMiddle(); // confirmBtn = new d.El("#account-selected-action-confirm");
     // cancelBtn = new d.El("#account-selected-action-cancel");
     d.onClickId("asset-receive", showAssetReceiveClicked);
     d.onClickId("asset-send", showAssetSendClicked);
@@ -39,19 +39,36 @@ export async function show(acc, assetIndex, reposition) {
     console.log(asset_selected);
     switch (asset_selected.symbol) {
         case "STNEAR": {
-            d.byId("asset-unstake").innerText = "Liquid Unstake";
+            d.byId("asset-send").classList.remove("hidden");
+            d.byId("asset-receive").classList.remove("hidden");
+            d.byId("asset-liquid-unstake").classList.remove("hidden");
             break;
         }
         case "UNSTAKED": {
-            d.byId("asset-unstake").innerText = "Withdraw";
+            d.byId("asset-withdraw").classList.remove("hidden");
+            d.byId("asset-restake").classList.remove("hidden");
             break;
         }
         default: {
-            d.byId("asset-unstake").innerText = "Unstake";
+            d.byId("asset-send").classList.remove("hidden");
+            d.byId("asset-receive").classList.remove("hidden");
+            d.byId("asset-unstake").classList.remove("hidden");
             break;
         }
     }
-    d.onClickId("asset-unstake", UnstakeMiddle);
+    d.onClickId("asset-unstake", DelayedUnstake);
+    d.onClickId("asset-withdraw", Withdraw);
+    d.onClickId("asset-liqunstake", LiquidUnstake);
+    d.onClickId("asset-restake", ReStake);
+    d.onClickId("asset-unstake", DelayedUnstake);
+}
+function hideInMiddle() {
+    d.byId("asset-send").classList.add("hidden");
+    d.byId("asset-receive").classList.add("hidden");
+    d.byId("asset-liquid-unstake").classList.add("hidden");
+    d.byId("asset-withdraw").classList.add("hidden");
+    d.byId("asset-unstake").classList.add("hidden");
+    d.byId("asset-restake").classList.add("hidden");
 }
 function reloadDetails() {
     d.clearContainer("selected-asset");
@@ -78,6 +95,10 @@ function UnstakeMiddle() {
             break;
         }
     }
+}
+async function ReStake() {
+    console.log("GOLA");
+    return;
 }
 async function Withdraw() {
     try {
@@ -107,6 +128,7 @@ async function DelayedUnstake() {
     await showOKCancel(DelayedUnstakeOk, showInitial);
 }
 async function LiquidUnstake() {
+    d.showSubPage("liquid-unstake");
     await showOKCancel(LiquidUnstakeOk, showInitial);
 }
 async function LiquidUnstakeOk() {
@@ -122,12 +144,13 @@ async function LiquidUnstakeOk() {
         if (poolAccInfo.staked_balance == "0")
             throw Error("No funds staked to unstake");
         let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
-        await askBackgroundCallMethod(actualSP, "liquid_unstake", { st_near_to_burn: yoctosToUnstake, min_expected_near: "0" }, accData.name);
+        var result = await askBackgroundCallMethod(actualSP, "liquid_unstake", { stnear_to_burn: yoctosToUnstake, min_expected_near: "0" }, accData.name);
+        console.log(result);
         await createOrUpdateAssetUnstake(poolAccInfo);
         hideOkCancel();
         reloadDetails();
         showInitial();
-        d.showSuccess("Liquid unstaked");
+        d.showSuccess("Liquid unstaked " + c.toStringDec(c.yton(result.near)));
     }
     catch (ex) {
         d.showErr(ex.message);
