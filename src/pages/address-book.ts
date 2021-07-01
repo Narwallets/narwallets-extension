@@ -63,8 +63,6 @@ function showInitial() {
 
 async function addOKClicked() {
   try {
-    console.log(addressContacts);
-
     const addressToSave = new d.El("#add-addresbook-id").value;
     const noteToSave = new d.El("#add-addresbook-note").value;
 
@@ -89,7 +87,7 @@ async function addOKClicked() {
   }
 }
 
-async function saveContactOnBook(
+export async function saveContactOnBook(
   name: string,
   contact: GContact
 ): Promise<any> {

@@ -49,7 +49,11 @@ import {
 
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
-import { initAddressArr, show as AddressBook_show } from "./address-book.js";
+import {
+  initAddressArr,
+  saveContactOnBook,
+  show as AddressBook_show,
+} from "./address-book.js";
 
 import type { AnyElement, ClickHandler } from "../util/document.js";
 import { D } from "../lib/tweetnacl/core/core.js";
@@ -64,6 +68,8 @@ import {
 } from "../util/okCancel.js";
 import { nearDollarPrice } from "../data/global.js";
 import { addressContacts } from "./address-book.js";
+import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
+import { GContact } from "../data/Contact.js";
 
 const THIS_PAGE = "account-selected";
 export const STAKE_DEFAULT_SVG = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -560,37 +566,43 @@ async function sendClicked() {
   }
 }
 
-async function sendOKJustToTestContact() {
+async function checkContactList() {
   const toAccName = new d.El("#send-to-account-name").value;
+  let found = false;
 
-  if (selectedAccountData.accountInfo.contacts.length < 1) {
+  if (addressContacts.length < 1) {
     d.showSubPage("sure-add-contact");
     showOKCancel(addContactToList, showInitial);
   }
 
-  selectedAccountData.accountInfo.contacts.forEach((contact) => {
+  addressContacts.forEach((contact) => {
     if (contact.accountId == toAccName) {
-      showInitial();
-      hideOkCancel();
-      return;
-    } else {
-      d.showSubPage("sure-add-contact");
-      showOKCancel(addContactToList, showInitial);
+      found = true;
     }
   });
+
+  if (found) {
+    showInitial();
+    hideOkCancel();
+  } else {
+    d.showSubPage("sure-add-contact");
+    showOKCancel(addContactToList, showInitial);
+  }
 }
 
 async function addContactToList() {
   try {
-    let toAdd: Contact = new Contact();
-    toAdd.accountId = new d.El("#send-to-account-name").value;
-    toAdd.alias = "test";
-    selectedAccountData.accountInfo.contacts.push(toAdd);
+    const contactToSave: GContact = {
+      accountId: new d.El("#send-to-account-name").value,
+      note: "",
+    };
 
-    await saveSelectedAccount();
+    addressContacts.push(contactToSave);
+
     d.showSuccess("Success");
     hideOkCancel();
     populateSendCombo("send-contact-combo");
+    await saveContactOnBook(contactToSave.accountId, contactToSave);
     showInitial();
   } catch {
     d.showErr("Error in save contact");
@@ -634,8 +646,7 @@ async function sendOKClicked() {
     d.byId("send-confirmation-receiver").innerText = toAccName;
 
     //comento solo para probar contactos
-    //showOKCancel(performer, showInitial); //on OK clicked, send
-    await showOKCancel(sendOKJustToTestContact, showInitial);
+    showOKCancel(performer, showInitial); //on OK clicked, send
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -671,6 +682,8 @@ async function performLockupContractSend() {
     );
 
     displayReflectTransfer(amountToSend);
+
+    await checkContactList();
 
     showInitial();
   } catch (ex) {
@@ -767,8 +780,6 @@ async function performStake() {
       d.showErr(ex.message);
     }
 
-    let actualSP = "";
-
     let poolAccInfo = {
       //empty info
       account_id: "",
@@ -776,48 +787,6 @@ async function performStake() {
       staked_balance: "0",
       can_withdraw: false,
     };
-
-    if (actualSP) {
-      //there's a selected SP
-
-      //ask the actual SP how much is staked
-      poolAccInfo = await StakingPool.getAccInfo(
-        selectedAccountData.name,
-        actualSP
-      );
-
-      if (actualSP != newStakingPool) {
-        //requesting a change of SP
-
-        if (
-          c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
-          c.yton(poolAccInfo.staked_balance) >= 0.005
-        ) {
-          const staked = c.yton(poolAccInfo.staked_balance);
-          const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
-          throw Error(
-            `Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(
-              staked
-            )}`
-          );
-          //----------------------
-        }
-
-        //if ZERO in the pool, remove current staking pool ref
-        actualSP = "";
-        //selectedAccountData.accountInfo.stakingPool = "";
-      }
-    }
-
-    if (!actualSP) {
-      //1st check the pool exists
-      poolAccInfo = await StakingPool.getAccInfo(
-        selectedAccountData.name,
-        newStakingPool
-      );
-      //2nd select the new staking pool. ONLY if the pool exists
-      //selectedAccountData.accountInfo.stakingPool = newStakingPool;
-    }
 
     if (c.yton(poolAccInfo.unstaked_balance) >= 10) {
       //at least 10 deposited but unstaked, stake that
@@ -862,13 +831,13 @@ async function performStake() {
       let hist: History;
       hist = {
         ammount: amountToStake,
-        date: new Date().toISOString(),
+        date: new Date().toLocaleDateString(),
         type: "stake",
       };
       let foundAsset: Asset = new Asset();
 
       selectedAccountData.accountInfo.assets.forEach((asset) => {
-        if (asset.contractId == newStakingPool) {
+        if (asset.symbol != "UNSTAKED" && asset.contractId == newStakingPool) {
           existAssetWithThisPool = true;
           foundAsset = asset;
         }
@@ -885,7 +854,7 @@ async function performStake() {
           contractId: newStakingPool,
           balance: c.yton(poolAccInfo.staked_balance),
           type: "stake",
-          symbol: "STAKE",
+          symbol: stakeTabSelected == 1 ? "STNEAR" : "STAKE",
           icon: STAKE_DEFAULT_SVG,
           history: [],
         };
@@ -1190,7 +1159,7 @@ async function performSend() {
       c.ntoy(amountToSend)
     );
 
-    showInitial();
+    await checkContactList();
 
     //TODO transaction history per network
     //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
@@ -1208,12 +1177,12 @@ async function performSend() {
     let hist: History;
     hist = {
       ammount: amountToSend,
-      date: new Date().toISOString(),
+      date: new Date().toLocaleDateString(),
       type: "send",
     };
     selectedAccountData.accountInfo.history.push(hist);
 
-    hideOkCancel();
+    //    hideOkCancel();
     displayReflectTransfer(amountToSend);
   } catch (ex) {
     d.showErr(ex.message);

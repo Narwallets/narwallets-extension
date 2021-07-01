@@ -7,13 +7,13 @@ import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/val
 import { checkSeedPhrase, parseSeedPhraseAsync, } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { KeyPairEd25519, } from "../lib/near-api-lite/utils/key-pair.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { Asset, ExtendedAccountData, Contact, } from "../data/account.js";
+import { Asset, ExtendedAccountData, } from "../data/account.js";
 import { localStorageSet } from "../data/util.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundGetOptions, askBackgroundGetValidators, askBackgroundTransferNear, askBackgroundGetAccessKey, askBackgroundAllNetworkAccounts, askBackgroundSetAccount, askBackgroundViewMethod, } from "../background/askBackground.js";
 import { DeleteAccountToBeneficiary, } from "../lib/near-api-lite/batch-transaction.js";
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
-import { initAddressArr, show as AddressBook_show } from "./address-book.js";
+import { initAddressArr, saveContactOnBook, show as AddressBook_show, } from "./address-book.js";
 import { OkCancelInit, disableOKCancel, enableOKCancel, showOKCancel, hideOkCancel, } from "../util/okCancel.js";
 import { nearDollarPrice } from "../data/global.js";
 import { addressContacts } from "./address-book.js";
@@ -420,34 +420,38 @@ async function sendClicked() {
         d.showErr(ex.message);
     }
 }
-async function sendOKJustToTestContact() {
+async function checkContactList() {
     const toAccName = new d.El("#send-to-account-name").value;
-    if (selectedAccountData.accountInfo.contacts.length < 1) {
+    let found = false;
+    if (addressContacts.length < 1) {
         d.showSubPage("sure-add-contact");
         showOKCancel(addContactToList, showInitial);
     }
-    selectedAccountData.accountInfo.contacts.forEach((contact) => {
+    addressContacts.forEach((contact) => {
         if (contact.accountId == toAccName) {
-            showInitial();
-            hideOkCancel();
-            return;
-        }
-        else {
-            d.showSubPage("sure-add-contact");
-            showOKCancel(addContactToList, showInitial);
+            found = true;
         }
     });
+    if (found) {
+        showInitial();
+        hideOkCancel();
+    }
+    else {
+        d.showSubPage("sure-add-contact");
+        showOKCancel(addContactToList, showInitial);
+    }
 }
 async function addContactToList() {
     try {
-        let toAdd = new Contact();
-        toAdd.accountId = new d.El("#send-to-account-name").value;
-        toAdd.alias = "test";
-        selectedAccountData.accountInfo.contacts.push(toAdd);
-        await saveSelectedAccount();
+        const contactToSave = {
+            accountId: new d.El("#send-to-account-name").value,
+            note: "",
+        };
+        addressContacts.push(contactToSave);
         d.showSuccess("Success");
         hideOkCancel();
         populateSendCombo("send-contact-combo");
+        await saveContactOnBook(contactToSave.accountId, contactToSave);
         showInitial();
     }
     catch {
@@ -487,8 +491,7 @@ async function sendOKClicked() {
         d.byId("send-confirmation-amount").innerText = c.toStringDec(amountToSend);
         d.byId("send-confirmation-receiver").innerText = toAccName;
         //comento solo para probar contactos
-        //showOKCancel(performer, showInitial); //on OK clicked, send
-        await showOKCancel(sendOKJustToTestContact, showInitial);
+        showOKCancel(performer, showInitial); //on OK clicked, send
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -517,6 +520,7 @@ async function performLockupContractSend() {
             "\u{24c3} to " +
             toAccName);
         displayReflectTransfer(amountToSend);
+        await checkContactList();
         showInitial();
     }
     catch (ex) {
@@ -604,7 +608,6 @@ async function performStake() {
         catch (ex) {
             d.showErr(ex.message);
         }
-        let actualSP = "";
         let poolAccInfo = {
             //empty info
             account_id: "",
@@ -612,30 +615,6 @@ async function performStake() {
             staked_balance: "0",
             can_withdraw: false,
         };
-        if (actualSP) {
-            //there's a selected SP
-            //ask the actual SP how much is staked
-            poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
-            if (actualSP != newStakingPool) {
-                //requesting a change of SP
-                if (c.yton(poolAccInfo.unstaked_balance) >= 0.005 ||
-                    c.yton(poolAccInfo.staked_balance) >= 0.005) {
-                    const staked = c.yton(poolAccInfo.staked_balance);
-                    const inThePool = c.yton(poolAccInfo.unstaked_balance) + staked;
-                    throw Error(`Already staking with ${actualSP}. Unstake & withdraw first. In the pool:${inThePool}, staked: ${c.toStringDec(staked)}`);
-                    //----------------------
-                }
-                //if ZERO in the pool, remove current staking pool ref
-                actualSP = "";
-                //selectedAccountData.accountInfo.stakingPool = "";
-            }
-        }
-        if (!actualSP) {
-            //1st check the pool exists
-            poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, newStakingPool);
-            //2nd select the new staking pool. ONLY if the pool exists
-            //selectedAccountData.accountInfo.stakingPool = newStakingPool;
-        }
         if (c.yton(poolAccInfo.unstaked_balance) >= 10) {
             //at least 10 deposited but unstaked, stake that
             //just re-stake (maybe the user asked unstaking but now regrets it)
@@ -656,12 +635,12 @@ async function performStake() {
             let hist;
             hist = {
                 ammount: amountToStake,
-                date: new Date().toISOString(),
+                date: new Date().toLocaleDateString(),
                 type: "stake",
             };
             let foundAsset = new Asset();
             selectedAccountData.accountInfo.assets.forEach((asset) => {
-                if (asset.contractId == newStakingPool) {
+                if (asset.symbol != "UNSTAKED" && asset.contractId == newStakingPool) {
                     existAssetWithThisPool = true;
                     foundAsset = asset;
                 }
@@ -678,7 +657,7 @@ async function performStake() {
                     contractId: newStakingPool,
                     balance: c.yton(poolAccInfo.staked_balance),
                     type: "stake",
-                    symbol: "STAKE",
+                    symbol: stakeTabSelected == 1 ? "STNEAR" : "STAKE",
                     icon: STAKE_DEFAULT_SVG,
                     history: [],
                 };
@@ -951,7 +930,7 @@ async function performSend() {
         disableOKCancel();
         d.showWait();
         await askBackgroundTransferNear(selectedAccountData.name, toAccName, c.ntoy(amountToSend));
-        showInitial();
+        await checkContactList();
         //TODO transaction history per network
         //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
         //global.state.transactions[Network.current].push(transactionInfo)
@@ -964,11 +943,11 @@ async function performSend() {
         let hist;
         hist = {
             ammount: amountToSend,
-            date: new Date().toISOString(),
+            date: new Date().toLocaleDateString(),
             type: "send",
         };
         selectedAccountData.accountInfo.history.push(hist);
-        hideOkCancel();
+        //    hideOkCancel();
         displayReflectTransfer(amountToSend);
     }
     catch (ex) {

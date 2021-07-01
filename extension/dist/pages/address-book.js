@@ -41,7 +41,6 @@ function showInitial() {
 }
 async function addOKClicked() {
     try {
-        console.log(addressContacts);
         const addressToSave = new d.El("#add-addresbook-id").value;
         const noteToSave = new d.El("#add-addresbook-note").value;
         const contactToSave = {
@@ -63,7 +62,7 @@ async function addOKClicked() {
         d.showErr(ex);
     }
 }
-async function saveContactOnBook(name, contact) {
+export async function saveContactOnBook(name, contact) {
     return askBackgroundAddContact(name, contact);
 }
 function showAddressDetails(ev) {

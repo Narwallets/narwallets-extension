@@ -78,6 +78,20 @@ export class ExtendedAccountData {
         }
         this.total = accountInfo.lastBalance;
         this.totalUSD = this.total * nearDollarPrice;
+        if (accountInfo.history) {
+            accountInfo.history.forEach((element) => {
+                element.date = new Date(element.date).toLocaleDateString();
+            });
+        }
+        if (accountInfo.assets) {
+            accountInfo.assets.forEach((element) => {
+                if (element.history) {
+                    element.history.forEach((elementInside) => {
+                        elementInside.date = new Date(elementInside.date).toLocaleDateString();
+                    });
+                }
+            });
+        }
     }
     get isReadOnly() {
         return !this.accountInfo.privateKey;

@@ -198,8 +198,6 @@ async function LiquidUnstakeOk() {
       accData.name
     );
 
-    console.log(result);
-
     await createOrUpdateAssetUnstake(poolAccInfo);
     hideOkCancel();
     reloadDetails();
@@ -263,7 +261,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any) {
   let hist: History;
   hist = {
     ammount: amountToUnstake,
-    date: new Date().toISOString(),
+    date: new Date().toLocaleDateString(),
     type: "unstake",
   };
 
@@ -281,19 +279,25 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any) {
     foundAsset.history.push(hist);
     foundAsset.balance = c.yton(poolAccInfo.unstaked_balance);
   } else {
-    let asset: Asset;
-    asset = {
-      spec: "",
-      url: "",
-      contractId: asset_selected.contractId,
-      balance: c.yton(poolAccInfo.unstaked_balance),
-      type: "unstake",
-      symbol: "UNSTAKED",
-      icon: STAKE_DEFAULT_SVG,
-      history: [],
-    };
-    asset.history.push(hist);
-    accData.accountInfo.assets.push(asset);
+    if (asset_selected.symbol != "STNEAR") {
+      let asset: Asset;
+      var result = c.yton(poolAccInfo.unstaked_balance);
+      asset = {
+        spec: "",
+        url: "",
+        contractId: asset_selected.contractId,
+        balance: result,
+        type: "unstake",
+        symbol: "UNSTAKED",
+        icon: STAKE_DEFAULT_SVG,
+        history: [],
+      };
+      asset.history.push(hist);
+      accData.accountInfo.assets.push(asset);
+    } else {
+      //TODO
+      //Tengo que agregar la actualizacion al inicio
+    }
   }
   let balance = await StakingPool.getAccInfo(
     accData.name,
@@ -306,8 +310,6 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any) {
     accData.accountInfo.history = [];
   }
   accData.accountInfo.history.push(hist);
-
-  console.log(accData);
 
   refreshSaveSelectedAccount();
 }

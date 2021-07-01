@@ -58,9 +58,8 @@ export async function show(acc, assetIndex, reposition) {
     }
     d.onClickId("asset-unstake", DelayedUnstake);
     d.onClickId("asset-withdraw", Withdraw);
-    d.onClickId("asset-liqunstake", LiquidUnstake);
+    d.onClickId("asset-liquid-unstake", LiquidUnstake);
     d.onClickId("asset-restake", ReStake);
-    d.onClickId("asset-unstake", DelayedUnstake);
 }
 function hideInMiddle() {
     d.byId("asset-send").classList.add("hidden");
@@ -80,24 +79,7 @@ function reloadDetails() {
     d.clearContainer("asset-history-details");
     d.populateUL("asset-history-details", "asset-history-template", asset_selected.history);
 }
-function UnstakeMiddle() {
-    switch (d.byId("asset-unstake").innerText) {
-        case "Liquid Unstake": {
-            LiquidUnstake();
-            break;
-        }
-        case "Withdraw": {
-            Withdraw();
-            break;
-        }
-        default: {
-            DelayedUnstake();
-            break;
-        }
-    }
-}
 async function ReStake() {
-    console.log("GOLA");
     return;
 }
 async function Withdraw() {
@@ -145,7 +127,6 @@ async function LiquidUnstakeOk() {
             throw Error("No funds staked to unstake");
         let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
         var result = await askBackgroundCallMethod(actualSP, "liquid_unstake", { stnear_to_burn: yoctosToUnstake, min_expected_near: "0" }, accData.name);
-        console.log(result);
         await createOrUpdateAssetUnstake(poolAccInfo);
         hideOkCancel();
         reloadDetails();
@@ -198,7 +179,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo) {
     let hist;
     hist = {
         ammount: amountToUnstake,
-        date: new Date().toISOString(),
+        date: new Date().toLocaleDateString(),
         type: "unstake",
     };
     accData.accountInfo.assets.forEach((asset) => {
@@ -213,19 +194,26 @@ async function createOrUpdateAssetUnstake(poolAccInfo) {
         foundAsset.balance = c.yton(poolAccInfo.unstaked_balance);
     }
     else {
-        let asset;
-        asset = {
-            spec: "",
-            url: "",
-            contractId: asset_selected.contractId,
-            balance: c.yton(poolAccInfo.unstaked_balance),
-            type: "unstake",
-            symbol: "UNSTAKED",
-            icon: STAKE_DEFAULT_SVG,
-            history: [],
-        };
-        asset.history.push(hist);
-        accData.accountInfo.assets.push(asset);
+        if (asset_selected.symbol != "STNEAR") {
+            let asset;
+            var result = c.yton(poolAccInfo.unstaked_balance);
+            asset = {
+                spec: "",
+                url: "",
+                contractId: asset_selected.contractId,
+                balance: result,
+                type: "unstake",
+                symbol: "UNSTAKED",
+                icon: STAKE_DEFAULT_SVG,
+                history: [],
+            };
+            asset.history.push(hist);
+            accData.accountInfo.assets.push(asset);
+        }
+        else {
+            //TODO
+            //Tengo que agregar la actualizacion al inicio
+        }
     }
     let balance = await StakingPool.getAccInfo(accData.name, asset_selected.contractId);
     asset_selected.balance = c.yton(balance.staked_balance);
@@ -235,7 +223,6 @@ async function createOrUpdateAssetUnstake(poolAccInfo) {
         accData.accountInfo.history = [];
     }
     accData.accountInfo.history.push(hist);
-    console.log(accData);
     refreshSaveSelectedAccount();
 }
 function fixUserAmountInY(amount, yoctosMax) {
