@@ -305,3 +305,21 @@
   width: 400px;
   height: 20px;
 }
+
+
+.addresslistname
+{
+ text-align: unset;
+ font-size: 20px;
+ position: absolute;
+ color:var(--DarkBackgroundTop);
+ left:5px;
+ top:2px;
+}
+
+.addresslistcomment
+{
+  position: absolute;
+  left:5px;
+  top:26px; 
+}

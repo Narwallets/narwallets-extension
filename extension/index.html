@@ -1001,8 +1001,9 @@
 
 		<!-- #region subpage LIQUID UNSTAKE -->
 		<div class="subpage hidden" id="liquid-unstake">
-
-			<input placeholder="Mount to unstake" id="liquid-unstake-mount" type="number">
+			<h2>Liquid Unstake</h2>
+			<h3>Ammount to unstake?</h3>
+			<input placeholder="" id="liquid-unstake-mount" type="number">
 
 		</div>
 		<!--#endregion -->
@@ -1111,42 +1112,38 @@
 
 		<button class="button back" id="back-to-addressbook"></button>
 
+		<h2>Address Details</h2>
 
 		<div id="selected-contact">
 		</div>
 
-		<div class="accountdetsmidbar">
-			<button class="button send" id="remove-contact">Remove</button>
-			<button class="button edit" id="edit-contact">Edit</button>
-		</div>
-
-
 		<div id="selected-contact-template" class="hidden">
-
-			<div class="accountdetscuenta">
-				{accountId}
-			</div>
-			<div class="accountdetscomment">
-				{note}
-			</div>
-
+			<h1>{accountId}<h1>
+			<h3>{note}<h3>
 		</div>
 
 
 		<div id="contact-remove-selected" class="subpage hidden">
 			<div class="contentarea">
-				<h2>Remove this contact?</h2>
+				<h3>Remove this contact?</h3>
 			</div>
 		</div>
 
 		<div id="contact-edit-selected" class="subpage hidden">
 			<div class="contentarea">
-				<h2>Edit</h2>
+				<h3>Edit Notes</h3>
 				<input id="edit-note-contact" type="text">
 			</div>
 		</div>
 
 		<div id="main-contact" class="subpage hidden"></div>
+
+		
+		<div class="bottombar">
+			<button class="button send" id="remove-contact">Remove</button>
+			<button class="button edit" id="edit-contact">Edit</button>
+		</div>
+
 	</div>
 	<!--#endregion -->
 
