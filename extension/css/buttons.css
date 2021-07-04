@@ -101,15 +101,16 @@
 {
   position: absolute;
   top:0px;
-  left:270px;
+  left:370px;
   width: 80px;
   color:white;
-  height: 34px;
+  height: 24px;
   margin:0px;
   display: block;
-  border-radius: 5px;
+  border-radius: 8px;
   border-style: none;
-  background-color: rgb(134, 21, 21);
+  background-color: rgb(148, 11, 11);
+  box-shadow:4px 4px 8px lightskyblue;
 }
 
 .cancel:hover
@@ -121,15 +122,16 @@
 {
   position: absolute;
   top:0px;
-  left:184px;
+  left:274px;
   width: 80px;
   color:white;
-  height: 34px;
+  height: 24px;
   margin:0px;
   display: block;
-  border-radius: 5px;
+  border-radius: 8px;
   border-style: none;
-  background-color: rgb(12, 73, 60);
+  background-color: rgb(14, 103, 84);
+  box-shadow:4px 4px 8px lightskyblue;
    
 }
 

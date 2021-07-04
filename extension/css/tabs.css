@@ -3,11 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: left;
-  background: linear-gradient(
-    131deg,
-    var(--DarkBackgroundTop) 0%,
-    var(--DarkBackgroundBot) 100%
-  );
+  background: transparent;
 }
 
 .tab {
@@ -17,29 +13,29 @@
   height: 7px;
   width: auto;
   margin: 0px 2px;
-  background: var(--DarkBackgroundTop);
+  background: lightblue;
   display: inline-block;
   color: white;
-  border-radius: 3px 3px 0px 0px;
+  border-radius: 5px 5px 0px 0px;
   border-style: solid;
   border-bottom-style: none;
   border-width: 1px;
+  border-color: lightblue;
 }
 
 .panels {
-  background: var(--LightBackground);
-  background: linear-gradient(
-    131deg,
-    var (--LightGradientTop) 0%,
-    var (--LightGradientBottom) 100%
-  );
+  background: transparent;
+
   min-height: 200px;
   width: 100%;
   max-width: 500px;
-  border-radius: 3px;
+  border-radius: 0px;
   max-height: 4000px;
   padding: 0px;
   border-style: none;
+  border-width: 1px;
+  border-top-style: solid;
+  border-color: lightblue;
   overflow-y: scroll;
   height: 500px;
 }
@@ -72,9 +68,9 @@
 .radio.one:checked ~ .tabs .tab.one,
 .radio.two:checked ~ .tabs .tab.two,
 .radio.three:checked ~ .tabs .tab.three {
-  background: var(--LightGradientTop);
+  background: transparent;
   color: var(--DarkBackgroundTop);
   border-style: solid;
   border-width: 1px;
-  border-color: var(--LightGradientTop);
+  
 }

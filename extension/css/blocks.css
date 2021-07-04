@@ -1,0 +1,175 @@
+.appface 
+{
+    position: absolute;
+    z-index: 95;
+    
+    left: 0px;
+    top: 40px;
+    width: 480px;
+    height: 560px;
+    
+    background: white;
+  
+    overflow: hidden;
+    text-align: center;
+    align-items: center;
+    
+}
+
+
+  .TopBlock {
+    position: absolute;
+    display: inline-block;
+    z-index: -1;
+    top: 0px;
+    left: 0px;
+    width: 470px;
+    height: 160px;
+    max-height: 160px;
+    margin:5px;
+
+    border-radius: 8px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: lightskyblue;
+    background: white;
+    box-shadow:4px 4px 8px lightskyblue;
+
+    overflow-y: hidden;
+  }
+  
+  .TopBlock h1 {
+    margin: 0px;
+    margin-bottom: 5px;
+    padding: 0px;
+    font-size: 18px;
+    font-weight: 300;
+    color:var(--DarkBackgroundTop);
+  }
+  
+  .TopBlock h2 {
+    margin: 0px;
+    margin-bottom: 5px;
+    padding: 0px;
+    font-size: 12px;
+    font-weight: 200;
+    color: var(--DarkBackgroundTop);
+  }
+  
+  .TopBlock h3 {
+    margin: 0px;
+    margin: 0px;
+    padding: 0px;
+    font-size: 23px;
+    font-weight: 300;
+    color: var(--DarkBackgroundTop);
+  }
+  
+  .TopBlock h4 {
+    margin: 0px;
+    margin-top: 5px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 200;
+    color: var(--DarkBorderDarkAccent);
+  }
+  
+
+  .MidBlock {
+
+    position: absolute;
+    top: 170px;
+    left: 0px;
+    width: 480px;
+    padding: 0px;
+    height: 51px;
+    margin:0px;
+    padding-top:5px;
+  
+    display: inline-flex;
+    justify-content: center;
+
+    border-color: lightskyblue;
+    background: lightskyblue;
+    box-shadow:4px 4px 8px lightskyblue;
+
+    overflow-y: hidden;
+
+  }
+
+  .subpage 
+  {
+    position: absolute;
+    
+    top: 226px;
+    left: 0px;
+    width: 470;
+    height: 320px;
+    margin:5px;
+
+    border-radius: 8px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: lightskyblue;
+    background: white;
+    box-shadow:4px 4px 8px lightskyblue;
+
+    text-align: center;
+    align-items: center;
+    
+  }
+
+  
+  
+  .contentarea {
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding: 0px;
+    padding-top: 10px;
+    text-align: center;
+    display: flexbox;
+    background-color: transparent;
+  }
+
+  .fullblock
+  {
+    position: absolute;
+    display: inline-block;
+    z-index: -1;
+    top: 0px;
+    left: 0px;
+    width: 470px;
+    height: 547px;
+    margin:5px;
+
+    border-radius: 8px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: lightskyblue;
+    background: white;
+    box-shadow:4px 4px 8px darkgrey;
+
+    overflow-y: hidden;
+  }
+
+  .bottombar {
+    position: absolute;
+    width: 471px;
+    height: 55px;
+    top: 495px;
+    left: 5px;
+
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+
+    display: inline-block;
+
+    padding-top: 4px;
+    display: inline-flex;
+    justify-content: flex-end;
+  
+    background: lightblue;
+    
+  }
+  

@@ -21,10 +21,48 @@ body { font-family: 'Inter', sans-serif; !important }
   }
 
 
+
+/*Colores */
+
+:root {
+
+	--Background:rgb(216, 216, 216);  
+	--PanelBackground: rgb(255,255,255);
+
+	--LightBackground: rgb(214,214,214);
+	--LightGradientTop: rgba(214,214,214,1);
+	--LightGradientBottom: rgba(255,255,255,1);
+
+	--LightBorderLightAccent: white;
+	--LightBorderDarkAccent: darkgrey;
+	
+	--lightGradientDarkTop: lightgray;
+	--LightGradientDarkBot: darkgray;
+
+
+	--DarkBackground: rgb(51,46,147);
+	--DarkBackgroundTop: rgba(51,46,147,1);
+	--DarkBackgroundBot: rgba(53,93,168,1);
+	--DarkBorderLightAccent:rgb(135, 170, 233) ;
+	--DarkBorderDarkAccent: rgb(31, 27, 104);
+	
+	--DarkGradientLight:rgba(153,210,247,1);
+	--DarkGradientdark:rgba(92,89,167,1);
+
+
+	/*Font Colors*/
+	--TextHightlight: rgb(163, 107, 22);
+
+	/*block colors*/
+
+  }
+
+
+
 body {
 	  /*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-	  width: 360px;
-	  height: 557px;
+	  width: 480;
+	  height: 640px;
 	  margin: 0px;
 	  overflow: hidden;
 	  padding:0px;
@@ -34,41 +72,6 @@ body {
   }
 
 
-
-/*Colores */
-
-:root {
-
-	  --Background:rgb(216, 216, 216);  
-	  --PanelBackground: rgb(255,255,255);
-
-	  --LightBackground: rgb(214,214,214);
-	  --LightGradientTop: rgba(214,214,214,1);
-	  --LightGradientBottom: rgba(255,255,255,1);
-
-	  --LightBorderLightAccent: white;
-	  --LightBorderDarkAccent: darkgrey;
-	  
-	  --lightGradientDarkTop: lightgray;
-	  --LightGradientDarkBot: darkgray;
-
-
-	  --DarkBackground: rgb(51,46,147);
-	  --DarkBackgroundTop: rgba(51,46,147,1);
-	  --DarkBackgroundBot: rgba(53,93,168,1);
-	  --DarkBorderLightAccent:rgb(135, 170, 233) ;
-	  --DarkBorderDarkAccent: rgb(31, 27, 104);
-	  
-	  --DarkGradientLight:rgba(153,210,247,1);
-	  --DarkGradientdark:rgba(92,89,167,1);
-
-
-	  /*Font Colors*/
-	  --TextHightlight: rgb(163, 107, 22);
-
-	  /*block colors*/
-
-	}
 
 
 	
