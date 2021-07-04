@@ -24,8 +24,8 @@
     top: 0px;
     left: 0px;
     width: 470px;
-    height: 160px;
-    max-height: 160px;
+    height: 140px;
+    max-height: 140px;
     margin:5px;
 
     border-radius: 8px;
@@ -74,15 +74,14 @@
     color: var(--DarkBorderDarkAccent);
   }
   
-
   .MidBlock {
 
     position: absolute;
-    top: 170px;
+    top: 155px;
     left: 0px;
     width: 480px;
     padding: 0px;
-    height: 51px;
+    height: 63px;
     margin:0px;
     padding-top:5px;
   
