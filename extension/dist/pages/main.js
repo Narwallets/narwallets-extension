@@ -188,6 +188,7 @@ export async function show() {
         //d.qs("#disconnect-line").hide();
         const isConnected = await askBackground({ code: "isConnected" });
         d.onClickId("back-to-account", backToAccountsClicked);
+        autoRefresh();
         //d.qs("#disconnect-line").showIf(isConnected);
         await tryReposition();
     }
@@ -243,5 +244,33 @@ export function accountItemClicked(ev) {
             AccountSelectedPage_show(accName, undefined);
         }
     }
+}
+async function autoRefresh() {
+    var intervalId = window.setInterval(function () {
+        refreshAllAccounts(); /// call your function here
+    }, 10000);
+}
+async function refreshAllAccounts() {
+    const accountsRecord = await askBackgroundAllNetworkAccounts();
+    const list = [];
+    for (let key in accountsRecord) {
+        list.push(new ExtendedAccountData(key, accountsRecord[key]));
+    }
+    console.log(list);
+    list.sort(sortByOrder);
+    d.clearContainer(ACCOUNTS_LIST);
+    d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list);
+    document.querySelectorAll("#accounts-list .account-item").forEach((item) => {
+        item.addEventListener("click", accountItemClicked);
+        //item.addEventListener("dragstart", accountItem_dragStart)
+        item.addEventListener("drag", accountItem_drag);
+        //item.addEventListener("dragenter", accountItem_dragEnter)
+        item.addEventListener("dragover", accountItem_dragOver);
+        //item.addEventListener("dragleave", accountItem_dragLeave)
+        item.addEventListener("drop", accountItem_drop);
+        item.addEventListener("dragend", accountItem_dragend);
+        //@ts-ignore
+        item.draggable = true;
+    });
 }
 //# sourceMappingURL=main.js.map

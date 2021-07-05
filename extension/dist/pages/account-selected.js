@@ -43,6 +43,7 @@ let comboAdd;
 let isMoreOptionsOpen = false;
 let stakeTabSelected = 1;
 export async function show(accName, reposition) {
+    d.byId("topbar").innerText = "Accounts";
     initPage();
     await selectAndShowAccount(accName);
     d.showPage(THIS_PAGE);
@@ -238,6 +239,7 @@ async function selectAndShowAccount(accName) {
     showSelectedAccount();
 }
 function populateAssets() {
+    d.clearContainer("assets-list");
     d.populateUL("assets-list", "asset-item-template", selectedAccountData.accountInfo.assets);
 }
 function showSelectedAccount() {
@@ -250,6 +252,7 @@ function showSelectedAccount() {
     d.appendTemplateLI(SELECTED_ACCOUNT, "selected-account-template", selectedAccountData);
     //lleno lista de assets
     populateAssets();
+    d.showSubPage("assets");
     //lleno lista de activity de account
     d.clearContainer("account-history-details");
     d.populateUL("account-history-details", "asset-history-template", selectedAccountData.accountInfo.history);
@@ -519,7 +522,7 @@ async function performLockupContractSend() {
             c.toStringDec(amountToSend) +
             "\u{24c3} to " +
             toAccName);
-        displayReflectTransfer(amountToSend);
+        displayReflectTransfer(amountToSend, toAccName);
         await checkContactList();
         showInitial();
     }
@@ -635,7 +638,7 @@ async function performStake() {
             let hist;
             hist = {
                 ammount: amountToStake,
-                date: new Date().toLocaleDateString(),
+                date: new Date().toLocaleString(),
                 type: "stake",
             };
             let foundAsset = new Asset();
@@ -646,7 +649,7 @@ async function performStake() {
                 }
             });
             if (existAssetWithThisPool) {
-                foundAsset.history.push(hist);
+                foundAsset.history.unshift(hist);
                 foundAsset.balance = c.yton(poolAccInfo.staked_balance);
             }
             else {
@@ -661,14 +664,14 @@ async function performStake() {
                     icon: STAKE_DEFAULT_SVG,
                     history: [],
                 };
-                asset.history.push(hist);
+                asset.history.unshift(hist);
                 selectedAccountData.accountInfo.assets.push(asset);
             }
             //Agrego history de account
             if (!selectedAccountData.accountInfo.history) {
                 selectedAccountData.accountInfo.history = [];
             }
-            selectedAccountData.accountInfo.history.push(hist);
+            selectedAccountData.accountInfo.history.unshift(hist);
             console.log(selectedAccountData.accountInfo.assets);
             // await near.call_method(newStakingPool, "deposit_and_stake", {},
             //     selectedAccountData.name,
@@ -914,7 +917,7 @@ async function performLockupContractUnstake() {
         enableOKCancel();
     }
 }
-function displayReflectTransfer(amountNear) {
+function displayReflectTransfer(amountNear, dest) {
     //sender and receiver .accountInfo.lastBalance are asnyc updated and saved by background.ts function reflectTransfer()
     //here we only refresh displayed account data
     if (amountNear == 0)
@@ -943,12 +946,13 @@ async function performSend() {
         let hist;
         hist = {
             ammount: amountToSend,
-            date: new Date().toLocaleDateString(),
+            date: new Date().toLocaleString(),
             type: "send",
         };
-        selectedAccountData.accountInfo.history.push(hist);
+        selectedAccountData.accountInfo.history.unshift(hist);
         //    hideOkCancel();
-        displayReflectTransfer(amountToSend);
+        displayReflectTransfer(amountToSend, toAccName);
+        await saveSelectedAccount();
     }
     catch (ex) {
         d.showErr(ex.message);
@@ -1335,7 +1339,6 @@ async function makeFullAccessOKClicked() {
     }
 }
 function showInitial() {
-    d.clearContainer("assets-list");
     populateAssets();
     d.showSubPage("assets");
 }
@@ -1362,8 +1365,6 @@ async function refreshSaveSelectedAccount() {
     await searchAccounts.asyncRefreshAccountInfo(selectedAccountData.name, selectedAccountData.accountInfo);
     await saveSelectedAccount(); //save
     showSelectedAccount();
-    d.clearContainer("assets-list");
-    populateAssets();
 }
 async function refreshClicked(ev) {
     d.showWait();

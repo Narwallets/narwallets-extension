@@ -102,6 +102,8 @@ let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
 export async function show(accName: string, reposition?: string) {
+  d.byId("topbar").innerText = "Accounts";
+
   initPage();
   await selectAndShowAccount(accName);
   d.showPage(THIS_PAGE);
@@ -343,6 +345,7 @@ async function selectAndShowAccount(accName: string) {
 }
 
 function populateAssets() {
+  d.clearContainer("assets-list");
   d.populateUL(
     "assets-list",
     "asset-item-template",
@@ -365,7 +368,9 @@ function showSelectedAccount() {
   );
 
   //lleno lista de assets
+
   populateAssets();
+  d.showSubPage("assets");
 
   //lleno lista de activity de account
   d.clearContainer("account-history-details");
@@ -681,7 +686,7 @@ async function performLockupContractSend() {
         toAccName
     );
 
-    displayReflectTransfer(amountToSend);
+    displayReflectTransfer(amountToSend, toAccName);
 
     await checkContactList();
 
@@ -831,7 +836,7 @@ async function performStake() {
       let hist: History;
       hist = {
         ammount: amountToStake,
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleString(),
         type: "stake",
       };
       let foundAsset: Asset = new Asset();
@@ -844,7 +849,7 @@ async function performStake() {
       });
 
       if (existAssetWithThisPool) {
-        foundAsset.history.push(hist);
+        foundAsset.history.unshift(hist);
         foundAsset.balance = c.yton(poolAccInfo.staked_balance);
       } else {
         let asset: Asset;
@@ -858,7 +863,7 @@ async function performStake() {
           icon: STAKE_DEFAULT_SVG,
           history: [],
         };
-        asset.history.push(hist);
+        asset.history.unshift(hist);
         selectedAccountData.accountInfo.assets.push(asset);
       }
 
@@ -866,7 +871,7 @@ async function performStake() {
       if (!selectedAccountData.accountInfo.history) {
         selectedAccountData.accountInfo.history = [];
       }
-      selectedAccountData.accountInfo.history.push(hist);
+      selectedAccountData.accountInfo.history.unshift(hist);
 
       console.log(selectedAccountData.accountInfo.assets);
 
@@ -1136,12 +1141,13 @@ async function performLockupContractUnstake() {
   }
 }
 
-function displayReflectTransfer(amountNear: number) {
+function displayReflectTransfer(amountNear: number, dest: string) {
   //sender and receiver .accountInfo.lastBalance are asnyc updated and saved by background.ts function reflectTransfer()
   //here we only refresh displayed account data
   if (amountNear == 0) return;
   selectedAccountData.accountInfo.lastBalance -= amountNear;
   selectedAccountData.available -= amountNear;
+
   showSelectedAccount();
 }
 
@@ -1177,13 +1183,14 @@ async function performSend() {
     let hist: History;
     hist = {
       ammount: amountToSend,
-      date: new Date().toLocaleDateString(),
+      date: new Date().toLocaleString(),
       type: "send",
     };
-    selectedAccountData.accountInfo.history.push(hist);
+    selectedAccountData.accountInfo.history.unshift(hist);
 
     //    hideOkCancel();
-    displayReflectTransfer(amountToSend);
+    displayReflectTransfer(amountToSend, toAccName);
+    await saveSelectedAccount();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1628,7 +1635,6 @@ async function makeFullAccessOKClicked() {
 }
 
 function showInitial() {
-  d.clearContainer("assets-list");
   populateAssets();
   d.showSubPage("assets");
 }
@@ -1661,8 +1667,6 @@ async function refreshSaveSelectedAccount() {
   await saveSelectedAccount(); //save
 
   showSelectedAccount();
-  d.clearContainer("assets-list");
-  populateAssets();
 }
 
 async function refreshClicked(ev: Event) {

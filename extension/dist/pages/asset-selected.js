@@ -6,7 +6,7 @@ import { isValidAccountID, isValidAmount, } from "../lib/near-api-lite/utils/val
 import * as d from "../util/document.js";
 import { disableOKCancel, enableOKCancel, hideOkCancel, showOKCancel, } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
-import { STAKE_DEFAULT_SVG, populateSendCombo } from "./account-selected.js";
+import { STAKE_DEFAULT_SVG, populateSendCombo, show as AccountSelectedPage_show, } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 let asset_array;
 let asset_selected;
@@ -16,12 +16,9 @@ let isMoreOptionsOpen = false;
 // page init
 export async function show(acc, assetIndex, reposition) {
     hideInMiddle(); // confirmBtn = new d.El("#account-selected-action-confirm");
-    // cancelBtn = new d.El("#account-selected-action-cancel");
     d.onClickId("asset-receive", showAssetReceiveClicked);
     d.onClickId("asset-send", showAssetSendClicked);
     d.onClickId("asset-remove", removeSelectedFromAssets);
-    // confirmBtn.onClick(confirmClicked);
-    // cancelBtn.onClick(cancelClicked);
     accData = acc;
     asset_array = acc.accountInfo.assets;
     asset_index = assetIndex;
@@ -113,6 +110,15 @@ async function LiquidUnstake() {
     d.showSubPage("liquid-unstake");
     await showOKCancel(LiquidUnstakeOk, showInitial);
 }
+function addAssetHistory(type, amount) {
+    let hist;
+    hist = {
+        ammount: amount,
+        date: new Date().toLocaleString(),
+        type: type,
+    };
+    asset_selected.history.unshift(hist);
+}
 async function LiquidUnstakeOk() {
     d.showWait();
     try {
@@ -127,7 +133,9 @@ async function LiquidUnstakeOk() {
             throw Error("No funds staked to unstake");
         let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
         var result = await askBackgroundCallMethod(actualSP, "liquid_unstake", { stnear_to_burn: yoctosToUnstake, min_expected_near: "0" }, accData.name);
-        await createOrUpdateAssetUnstake(poolAccInfo);
+        asset_selected.balance -= c.yton(yoctosToUnstake);
+        addAssetHistory("liquid-unstake", c.yton(yoctosToUnstake));
+        await refreshSaveSelectedAccount();
         hideOkCancel();
         reloadDetails();
         showInitial();
@@ -179,7 +187,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo) {
     let hist;
     hist = {
         ammount: amountToUnstake,
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleString(),
         type: "unstake",
     };
     accData.accountInfo.assets.forEach((asset) => {
@@ -190,11 +198,11 @@ async function createOrUpdateAssetUnstake(poolAccInfo) {
         }
     });
     if (existAssetWithThisPool) {
-        foundAsset.history.push(hist);
+        foundAsset.history.unshift(hist);
         foundAsset.balance = c.yton(poolAccInfo.unstaked_balance);
     }
     else {
-        if (asset_selected.symbol != "STNEAR") {
+        if (asset_selected.symbol == "STAKE") {
             let asset;
             var result = c.yton(poolAccInfo.unstaked_balance);
             asset = {
@@ -207,22 +215,22 @@ async function createOrUpdateAssetUnstake(poolAccInfo) {
                 icon: STAKE_DEFAULT_SVG,
                 history: [],
             };
-            asset.history.push(hist);
+            asset.history.unshift(hist);
             accData.accountInfo.assets.push(asset);
         }
-        else {
+        else if (asset_selected.symbol == "STNEAR") {
             //TODO
             //Tengo que agregar la actualizacion al inicio
         }
     }
     let balance = await StakingPool.getAccInfo(accData.name, asset_selected.contractId);
     asset_selected.balance = c.yton(balance.staked_balance);
-    asset_selected.history.push(hist);
+    asset_selected.history.unshift(hist);
     //Agrego history de account
     if (!accData.accountInfo.history) {
         accData.accountInfo.history = [];
     }
-    accData.accountInfo.history.push(hist);
+    accData.accountInfo.history.unshift(hist);
     refreshSaveSelectedAccount();
 }
 function fixUserAmountInY(amount, yoctosMax) {
@@ -242,11 +250,8 @@ function reloadAssetsList() {
     d.populateUL("assets-list", "asset-item-template", accData.accountInfo.assets);
 }
 function backToSelectClicked() {
-    reloadAssetsList();
-    d.showPage("account-selected");
-    d.showSubPage("assets");
-    d.byId("ok-cancel-row").classList.add("hidden");
-    d.byId("topbar").innerText = "Accounts";
+    AccountSelectedPage_show(accData.name, undefined);
+    hideOkCancel();
 }
 function showAssetReceiveClicked() {
     d.showSubPage("asset-receive-subpage");
@@ -298,9 +303,6 @@ async function performSend() {
         }, accData.name, undefined, "1");
         hideOkCancel();
         showInitial();
-        //TODO transaction history per network
-        //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
-        //global.state.transactions[Network.current].push(transactionInfo)
         d.showSuccess("Success: " +
             accData.name +
             " transferred " +
@@ -340,6 +342,9 @@ function showInitial() {
 async function refreshSaveSelectedAccount() {
     await searchAccounts.asyncRefreshAccountInfo(accData.name, accData.accountInfo);
     await saveSelectedAccount();
+    accData.available =
+        accData.accountInfo.lastBalance - accData.accountInfo.lockedOther;
+    accData.total = accData.available;
 }
 async function saveSelectedAccount() {
     return askBackgroundSetAccount(accData.name, accData.accountInfo);

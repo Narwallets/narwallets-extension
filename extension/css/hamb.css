@@ -220,6 +220,7 @@ li#current-network-display-name {
   max-height: 700px;
   opacity: 0.9;
   top: 40px;
+  z-index: 99;
 }
 
 .networks-list-content {

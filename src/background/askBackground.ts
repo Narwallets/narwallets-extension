@@ -12,8 +12,8 @@ import { GContact } from "../data/Contact.js";
 
 //ask background, wait for response, return a Promise
 export function askBackground(requestPayload: any): Promise<any> {
-  requestPayload.dest = "ext";
-  return new Promise((resolve, reject) => {
+requestPayload.dest = "ext";
+return new Promise((resolve, reject) => {
     log("sendMessage", JSON.stringify(requestPayload));
     const timeout = setTimeout(() => {
       return reject(Error("timeout"));

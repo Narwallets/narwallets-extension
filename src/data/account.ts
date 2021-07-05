@@ -100,16 +100,14 @@ export class ExtendedAccountData {
     this.totalUSD = this.total * nearDollarPrice;
     if (accountInfo.history) {
       accountInfo.history.forEach((element) => {
-        element.date = new Date(element.date).toLocaleDateString();
+        element.date = new Date(element.date).toLocaleString();
       });
     }
     if (accountInfo.assets) {
       accountInfo.assets.forEach((element) => {
         if (element.history) {
           element.history.forEach((elementInside) => {
-            elementInside.date = new Date(
-              elementInside.date
-            ).toLocaleDateString();
+            elementInside.date = new Date(elementInside.date).toLocaleString();
           });
         }
       });

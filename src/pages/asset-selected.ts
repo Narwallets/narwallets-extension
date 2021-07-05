@@ -2,6 +2,7 @@ const THIS_PAGE = "AccountAssetDetail";
 
 import * as c from "../util/conversions.js";
 import {
+  askBackground,
   askBackgroundCallMethod,
   askBackgroundSetAccount,
   askBackgroundTransferNear,
@@ -19,8 +20,13 @@ import {
   showOKCancel,
 } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
-import { STAKE_DEFAULT_SVG, populateSendCombo } from "./account-selected.js";
+import {
+  STAKE_DEFAULT_SVG,
+  populateSendCombo,
+  show as AccountSelectedPage_show,
+} from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
+import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -35,13 +41,9 @@ export async function show(
   reposition?: string
 ) {
   hideInMiddle(); // confirmBtn = new d.El("#account-selected-action-confirm");
-  // cancelBtn = new d.El("#account-selected-action-cancel");
   d.onClickId("asset-receive", showAssetReceiveClicked);
   d.onClickId("asset-send", showAssetSendClicked);
   d.onClickId("asset-remove", removeSelectedFromAssets);
-  // confirmBtn.onClick(confirmClicked);
-
-  // cancelBtn.onClick(cancelClicked);
 
   accData = acc;
   asset_array = acc.accountInfo.assets;
@@ -172,6 +174,16 @@ async function LiquidUnstake() {
   await showOKCancel(LiquidUnstakeOk, showInitial);
 }
 
+function addAssetHistory(type: string, amount: number) {
+  let hist: History;
+  hist = {
+    ammount: amount,
+    date: new Date().toLocaleString(),
+    type: type,
+  };
+
+  asset_selected.history.unshift(hist);
+}
 async function LiquidUnstakeOk() {
   d.showWait();
 
@@ -198,7 +210,10 @@ async function LiquidUnstakeOk() {
       accData.name
     );
 
-    await createOrUpdateAssetUnstake(poolAccInfo);
+    asset_selected.balance -= c.yton(yoctosToUnstake);
+
+    addAssetHistory("liquid-unstake", c.yton(yoctosToUnstake));
+    await refreshSaveSelectedAccount();
     hideOkCancel();
     reloadDetails();
     showInitial();
@@ -261,7 +276,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any) {
   let hist: History;
   hist = {
     ammount: amountToUnstake,
-    date: new Date().toLocaleDateString(),
+    date: new Date().toLocaleString(),
     type: "unstake",
   };
 
@@ -276,10 +291,10 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any) {
   });
 
   if (existAssetWithThisPool) {
-    foundAsset.history.push(hist);
+    foundAsset.history.unshift(hist);
     foundAsset.balance = c.yton(poolAccInfo.unstaked_balance);
   } else {
-    if (asset_selected.symbol != "STNEAR") {
+    if (asset_selected.symbol == "STAKE") {
       let asset: Asset;
       var result = c.yton(poolAccInfo.unstaked_balance);
       asset = {
@@ -292,9 +307,9 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any) {
         icon: STAKE_DEFAULT_SVG,
         history: [],
       };
-      asset.history.push(hist);
+      asset.history.unshift(hist);
       accData.accountInfo.assets.push(asset);
-    } else {
+    } else if (asset_selected.symbol == "STNEAR") {
       //TODO
       //Tengo que agregar la actualizacion al inicio
     }
@@ -304,12 +319,12 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any) {
     asset_selected.contractId
   );
   asset_selected.balance = c.yton(balance.staked_balance);
-  asset_selected.history.push(hist);
+  asset_selected.history.unshift(hist);
   //Agrego history de account
   if (!accData.accountInfo.history) {
     accData.accountInfo.history = [];
   }
-  accData.accountInfo.history.push(hist);
+  accData.accountInfo.history.unshift(hist);
 
   refreshSaveSelectedAccount();
 }
@@ -336,11 +351,8 @@ function reloadAssetsList() {
 }
 
 function backToSelectClicked() {
-  reloadAssetsList();
-  d.showPage("account-selected");
-  d.showSubPage("assets");
-  d.byId("ok-cancel-row").classList.add("hidden");
-  d.byId("topbar").innerText = "Accounts";
+  AccountSelectedPage_show(accData.name, undefined);
+  hideOkCancel();
 }
 
 function showAssetReceiveClicked() {
@@ -414,10 +426,6 @@ async function performSend() {
 
     showInitial();
 
-    //TODO transaction history per network
-    //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
-    //global.state.transactions[Network.current].push(transactionInfo)
-
     d.showSuccess(
       "Success: " +
         accData.name +
@@ -467,7 +475,12 @@ async function refreshSaveSelectedAccount() {
     accData.name,
     accData.accountInfo
   );
+
   await saveSelectedAccount();
+
+  accData.available =
+    accData.accountInfo.lastBalance - accData.accountInfo.lockedOther;
+  accData.total = accData.available;
 }
 
 async function saveSelectedAccount(): Promise<any> {
