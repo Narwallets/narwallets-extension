@@ -78,11 +78,13 @@ function showAddressDetails(ev) {
             selectedContactIndex = index;
         }
     }
+    d.byId("bottombar-addressbook").classList.remove("hidden");
     d.showPage("addressbook-details");
 }
 function deleteContact() {
     if (isNaN(selectedContactIndex))
         return;
+    d.byId("bottombar-addressbook").classList.add("hidden");
     d.showSubPage("contact-remove-selected");
     showOKCancel(okDeleteContact, showInitial);
 }
@@ -96,6 +98,7 @@ async function okDeleteContact() {
     hideOkCancel();
 }
 function editContact() {
+    d.byId("bottombar-addressbook").classList.add("hidden");
     d.showSubPage("contact-edit-selected");
     d.inputById("edit-note-contact").value =
         addressContacts[selectedContactIndex].note || "";
