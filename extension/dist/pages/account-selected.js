@@ -602,15 +602,6 @@ async function performStake() {
             throw Error("Amount should be a positive integer");
         if (amountToStake < 5)
             throw Error("Stake at least 5 Near");
-        //refresh status
-        // if there's an error during "refresh" still continue
-        //maybe current staking pool does not exists
-        try {
-            await refreshSaveSelectedAccount();
-        }
-        catch (ex) {
-            d.showErr(ex.message);
-        }
         let poolAccInfo = {
             //empty info
             account_id: "",
@@ -672,7 +663,6 @@ async function performStake() {
                 selectedAccountData.accountInfo.history = [];
             }
             selectedAccountData.accountInfo.history.unshift(hist);
-            console.log(selectedAccountData.accountInfo.assets);
             // await near.call_method(newStakingPool, "deposit_and_stake", {},
             //     selectedAccountData.name,
             //     selectedAccountData.accountInfo.privateKey,
@@ -987,7 +977,7 @@ async function detailedRewardsClicked() {
 export async function searchThePools(exAccData) {
     const doingDiv = d.showMsg("Searching Pools...", "info", -1);
     d.showWait();
-    let lastAmountFound = 0;
+    let found = false;
     try {
         let checked = {};
         const validators = await askBackgroundGetValidators();
@@ -1018,19 +1008,32 @@ export async function searchThePools(exAccData) {
                         c.yton(poolAccInfo.staked_balance);
                     if (amount > 0) {
                         d.showSuccess(`Found! ${c.toStringDec(amount)} on ${pool.account_id}`);
-                        if (amount > lastAmountFound) {
-                            //save only one
-                            // exAccData.accountInfo.stakingPool = pool.account_id;
-                            // exAccData.accountInfo.staked = c.yton(poolAccInfo.staked_balance);
-                            // exAccData.accountInfo.unstaked = c.yton(
-                            //   poolAccInfo.unstaked_balance
+                        found = false;
+                        exAccData.accountInfo.assets.forEach((asset) => {
+                            if (asset.contractId == pool.account_id) {
+                                asset.balance = amount;
+                                found = true;
+                            }
+                        });
+                        if (!found) {
+                            // DE DONDE SACO LOS DATOS DE ACA??
+                            // let result = await askBackgroundViewMethod(
+                            //   pool.account_id,
+                            //   "ft_metadata",
+                            //   {}
                             // );
-                            // exAccData.inThePool =
-                            //   exAccData.accountInfo.staked + exAccData.accountInfo.unstaked;
-                            // exAccData.accountInfo.stakingPoolPct = await StakingPool.getFee(
-                            //   pool.account_id
-                            // );
-                            lastAmountFound = amount;
+                            let newAsset;
+                            newAsset = {
+                                balance: amount,
+                                spec: "",
+                                url: "",
+                                contractId: pool.account_id,
+                                type: "ft",
+                                symbol: "",
+                                icon: "",
+                                history: [],
+                            };
+                            exAccData.accountInfo.assets.unshift(newAsset);
                         }
                     }
                 }
@@ -1044,7 +1047,7 @@ export async function searchThePools(exAccData) {
         doingDiv.remove();
         d.hideWait();
     }
-    return lastAmountFound > 0;
+    return found;
 }
 //-------------------------------
 async function searchPoolsButtonClicked() {

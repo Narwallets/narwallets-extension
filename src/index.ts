@@ -24,6 +24,7 @@ import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
 import type { NetworkInfo } from "./lib/near-api-lite/network.js";
 import { calculateDollarValue } from "./data/global.js";
 import { D } from "./lib/tweetnacl/core/core.js";
+import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 
@@ -55,6 +56,8 @@ function updateNetworkIndicatorVisualState(info: NetworkInfo) {
 
 async function networkItemClicked(e: Event) {
   try {
+    OkCancelInit();
+    hideOkCancel();
     //console.log("networkItemClicked",e)
     if (!e.target) return;
 

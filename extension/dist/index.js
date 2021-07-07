@@ -9,6 +9,7 @@ import { show as AddressBook_show } from "./pages/address-book.js";
 import { localStorageSet } from "./data/util.js";
 import { askBackground, askBackgroundGetNetworkInfo, askBackgroundIsLocked, askBackgroundSetNetwork, } from "./background/askBackground.js";
 import { calculateDollarValue } from "./data/global.js";
+import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 //--- content sections at MAIN popup.html
 const IMPORT_OR_CREATE = "import-or-create";
@@ -30,6 +31,8 @@ function updateNetworkIndicatorVisualState(info) {
 }
 async function networkItemClicked(e) {
     try {
+        OkCancelInit();
+        hideOkCancel();
         //console.log("networkItemClicked",e)
         if (!e.target)
             return;
