@@ -46,10 +46,13 @@ export async function show(acc, assetIndex, reposition) {
             d.byId("asset-restake").classList.remove("hidden");
             break;
         }
+        case "STAKE": {
+            d.byId("asset-unstake").classList.remove("hidden");
+            break;
+        }
         default: {
             d.byId("asset-send").classList.remove("hidden");
             d.byId("asset-receive").classList.remove("hidden");
-            d.byId("asset-unstake").classList.remove("hidden");
             break;
         }
     }

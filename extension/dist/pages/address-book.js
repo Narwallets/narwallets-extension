@@ -36,8 +36,15 @@ function showInitial() {
     document.querySelectorAll("#address-list .address-item").forEach((item) => {
         item.addEventListener("click", showAddressDetails);
     });
+    d.onClickId("address-back-to-account", backToAccountsClicked);
     d.showPage(ADDRESS_BOOK);
     d.showSubPage("main-contact");
+}
+function backToAccountsClicked() {
+    d.clearContainer("address-list");
+    d.showPage("account-list-main");
+    d.showSubPage("assets");
+    d.byId("ok-cancel-row").classList.add("hidden");
 }
 async function addOKClicked() {
     try {
