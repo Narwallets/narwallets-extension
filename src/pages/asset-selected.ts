@@ -168,12 +168,18 @@ async function Withdraw() {
 }
 
 async function DelayedUnstake() {
-  d.showSubPage("liquid-unstake");
+  d.showSubPage("delayed-unstake");
+  d.onClickId("delayed-unstake-max", function () {
+    d.maxClicked("delayed-unstake-amount", "#selected-asset #balance");
+  }); 
   await showOKCancel(DelayedUnstakeOk, showInitial);
 }
 
 async function LiquidUnstake() {
   d.showSubPage("liquid-unstake");
+  d.onClickId("liquid-unstake-max", function () {
+    d.maxClicked("liquid-unstake-mount", "#selected-asset #balance");
+  }); 
   await showOKCancel(LiquidUnstakeOk, showInitial);
 }
 
@@ -371,6 +377,9 @@ function showAssetSendClicked() {
   d.byId("max-amount-send-asset").innerText = c.toStringDec(
     asset_selected.balance
   );
+  d.onClickId("asset-send-max", function () {
+    d.maxClicked("send-to-asset-amount", "#selected-asset #balance");
+  }); 
 
   showOKCancel(sendOKClicked, showInitial);
 }

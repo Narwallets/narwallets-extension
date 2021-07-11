@@ -37,6 +37,19 @@ export function byId(id: string): HTMLElement {
     return new HTMLElement();
   }
 }
+
+/**
+ * gets checked radiobutton by name
+ * @param name
+ */
+ export function checkedRadioButton(name: string): HTMLElement {
+  try {
+    return document.querySelector('input[name=' + name + ']:checked') as HTMLElement;
+  } catch {
+    console.error(`document.getElementsByName(${name}) NOT FOUND`);
+    return new HTMLElement();
+  }
+}
 //---
 //-- seach button elements with the id and add click listener
 //---
@@ -58,6 +71,7 @@ export function onClickId(id: string, clickHandler: (ev: Event) => void) {
     console.error("ERR: onClickId('" + id + "') " + ex.message);
   }
 }
+
 /**
  * add an event when Enter is pressed in an input-box
  * @param textId
@@ -93,8 +107,15 @@ export function inputById(id: string): HTMLInputElement {
  */
 export function getNumber(selector: string) {
   const amountElem = new El(selector);
-  return c.toNum(amountElem.value);
+  return c.toNum(amountElem.value.trim());
 }
+
+export function maxClicked(id: string, selector: string) {
+  const amountElem = new El(selector);
+  console.log(amountElem.innerText);
+  inputById(id).value = amountElem.innerText;
+}
+
 //-------------------------------------------------------
 /**
  * showByClass(id)

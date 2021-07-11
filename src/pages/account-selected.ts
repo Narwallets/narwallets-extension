@@ -563,6 +563,9 @@ async function sendClicked() {
       d.showErr("Not enough balance to send");
     } else {
       d.byId("max-amount-send").innerText = c.toStringDec(maxAmountToSend);
+      d.onClickId("send-max", function () {
+        d.maxClicked("send-to-account-amount", "#selected-account .accountdetsbalance");
+      });
       //comento solo para probar la parte de contactos
       fullAccessSubPage("account-selected-send", sendOKClicked);
     }
@@ -732,6 +735,12 @@ async function stakeClicked() {
     d.inputById("stake-with-staking-pool").value = "";
     d.qs("#max-stake-amount-1").innerText = c.toStringDec(amountToStake);
     d.qs("#max-stake-amount-2").innerText = c.toStringDec(amountToStake);
+    d.onClickId("liquid-stake-max", function () {
+      d.maxClicked("stake-amount-liquid", "#selected-account .accountdetsbalance");
+    });
+    d.onClickId("delayed-stake-max", function () {
+      d.maxClicked("stake-amount", "#selected-account .accountdetsbalance");
+    });
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
     if (info.type == "lock.c")
       stakeAmountBox.value = c.toStringDec(amountToStake);
@@ -1642,6 +1651,11 @@ function showInitial() {
   populateAssets();
   d.showSubPage("assets");
 }
+
+/*function maxClicked(id: string, selector: string) {
+  const amountElem = new d.El(selector);
+  d.inputById(id).value = amountElem.innerText;
+}*/
 
 async function removeAccountClicked(ev: Event) {
   try {

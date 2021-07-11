@@ -29,6 +29,19 @@ export function byId(id) {
         return new HTMLElement();
     }
 }
+/**
+ * gets checked radiobutton by name
+ * @param name
+ */
+export function checkedRadioButton(name) {
+    try {
+        return document.querySelector('input[name=' + name + ']:checked');
+    }
+    catch {
+        console.error(`document.getElementsByName(${name}) NOT FOUND`);
+        return new HTMLElement();
+    }
+}
 //---
 //-- seach button elements with the id and add click listener
 //---
@@ -80,7 +93,12 @@ export function inputById(id) {
  */
 export function getNumber(selector) {
     const amountElem = new El(selector);
-    return c.toNum(amountElem.value);
+    return c.toNum(amountElem.value.trim());
+}
+export function maxClicked(id, selector) {
+    const amountElem = new El(selector);
+    console.log(amountElem.innerText);
+    inputById(id).value = amountElem.innerText;
 }
 //-------------------------------------------------------
 /**
