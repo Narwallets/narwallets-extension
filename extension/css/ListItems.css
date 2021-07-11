@@ -1,4 +1,4 @@
-/* account items -------------------------------------------------------------------*/
+/*#region account items -------------------------------------------------------------------*/
 
 .accountlistitem
 {
@@ -68,3 +68,33 @@
 	color: var(--NarDarkText);
 	
 }
+
+/*#endregion */
+
+
+/*#region account details -------------------------------------------------------*/
+
+.accountdetscuenta {
+    text-align: center;
+    display: block;
+  
+    color: var(--TextHightlight);
+    background-color: darkblue;
+    margin: auto;
+    max-height: 24px;
+    width: 460px;
+    height: auto;
+    max-height: 40px;
+
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: initial;
+    overflow: hidden;
+  
+    font-size: 18px;
+    font-weight: 400;
+
+  }
+
+
+/*#endregion*/
