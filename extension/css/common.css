@@ -1,50 +1,6 @@
 @charset "utf-8";
 /* Main div container -------------------------------------------------------------*/
 
-h2 {
-  color: var(--TextHightlight);
-  font-weight: 200;
-  font-size: 24px;
-
-  padding: 5px;
-  width: 300px;
-  height: auto;
-  overflow-wrap: break-word;
-  margin: auto;
-}
-
-h3 {
-  color: var(--DarkGradientdark);
-  font-weight: 200;
-  font-size: 14px;
-  padding: 5px;
-  width: 300px;
-  height: auto;
-  overflow-wrap: break-word;
-  margin: auto;
-}
-
-h4 {
-  color:  var(--DarkGradientdark);
-  font-weight: 100;
-  font-size: 12;
-  padding: 5px;
-  width: 300px;
-  height: auto;
-  overflow-wrap: break-word;
-  margin: auto;
-}
-
-h5 {
-  color: var(--DarkGradientdark);
-  font-weight: 300;
-  font-size: 14;
-  padding: 5px;
-  width: 300px;
-  height: auto;
-  overflow-wrap: break-word;
-  margin: auto;
-}
 
 label {
   color: black;
@@ -56,12 +12,6 @@ label {
   overflow-wrap: break-word;
   margin: auto;
   margin-top: 15px;
-}
-
-.biginput {
-  margin-top: 15px;
-  width: 300px;
-  height: 50px;
 }
 
 .combotextbox {
@@ -142,7 +92,7 @@ input {
   position: fixed;
   display: block;
   text-align: right;
-  top: 552px;
+  top: 512px;
   left: 5px;
   width: 470px;
   height: 45px;
@@ -176,58 +126,6 @@ input {
 
 
 
-.inputboxwithbutton {
-  width: 360px;
-  height: 30px;
-  display: block;
-  position: relative;
-  margin: auto;
-  padding: 5px;
-}
-
-.inputboxwithbutton input {
-  position: absolute;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 5px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
-  padding: 5px;
-  text-align: center;
-  width: 220px;
-  height: 28px;
-  left: 32px;
-  top: 1px;
-}
-
-.inputboxwithbutton button {
-  position: absolute;
-  border-style: solid;
-  border-width: 1px;
-
-  text-align: center;
-  width: 80px;
-  height: 28px;
-  left: 242px;
-  top: 1px;
-  color: var(--LightBorderLightAccent);
-
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-
-  background: rgb(51, 46, 147);
-  background: linear-gradient(
-    131deg,
-    rgba(51, 46, 147, 1) 0%,
-    rgba(53, 93, 168, 1) 100%
-  );
-  border-style: solid;
-  border-width: 1px;
-  border-top-color: var(--DarkBorderLightAcccent);
-  border-left-color: var(--DarkBorderLightAcccent);
-  border-right-color: var(--DarkBorderDarkAcccent);
-  border-bottom-color: var(--DarkBorderDarkAcccent);
-}
 
 .scroll {
   overflow-y: scroll;

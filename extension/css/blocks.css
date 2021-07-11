@@ -8,7 +8,7 @@
     width: 480px;
     height: 560px;
     
-    background: white;
+    background:var(--Background);
   
     overflow: hidden;
     text-align: center;
@@ -28,47 +28,13 @@
     max-height: 140px;
     margin:5px;
     
-    background: white;
+    border-radius: 5px;
+
+    background:var(--LightColor);
   
     overflow-y: hidden;
   }
   
-  .TopBlock h1 {
-    margin: 0px;
-    margin-bottom: 5px;
-    padding: 0px;
-    font-size: 18px;
-    font-weight: 300;
-    color:var(--DarkBackgroundTop);
-    background-color: black;
-  }
-  
-  .TopBlock h2 {
-    margin: 0px;
-    margin-bottom: 5px;
-    padding: 0px;
-    font-size: 12px;
-    font-weight: 200;
-    color: var(--DarkBackgroundTop);
-  }
-  
-  .TopBlock h3 {
-    margin: 0px;
-    margin: 0px;
-    padding: 0px;
-    font-size: 23px;
-    font-weight: 300;
-    color: var(--DarkBackgroundTop);
-  }
-  
-  .TopBlock h4 {
-    margin: 0px;
-    margin-top: 5px;
-    padding: 10px;
-    font-size: 12px;
-    font-weight: 200;
-    color: var(--DarkBorderDarkAccent);
-  }
   
   .MidBlock {
 
@@ -84,10 +50,9 @@
     display: inline-flex;
     justify-content: center;
 
-    border-color: lightskyblue;
-    background: lightskyblue;
-    box-shadow:4px 4px 8px lightskyblue;
-
+    
+    background: var(--DarkColor);
+    
     overflow-y: hidden;
 
   }
@@ -99,13 +64,14 @@
     top: 226px;
     left: 0px;
     width: 470;
-    height: 320px;
+    height: 280px;
     margin:5px;
 
-    background: white;
+    background:var(--LightColor);
     
     text-align: center;
     align-items: center;
+    border-radius: 5px;
     
   }
 
@@ -133,7 +99,7 @@
     height: 547px;
     margin:5px;
 
-    background: white;
+    background:var(--LightColor);
   
 
     overflow-y: hidden;
@@ -155,7 +121,142 @@
     display: inline-flex;
     justify-content: flex-end;
   
-    background: lightblue;
+    background:var(--DarkColor);
     
   }
   
+
+  /*#region account details -------------------------------------------------------*/
+
+.accountdetscuenta {
+	
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin:auto;
+
+    color: var(--LightColor);
+    background-color: var(--DarkColor);
+
+    height: 48px;	
+    width: 470px;   
+
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: initial;
+    overflow: hidden;
+
+    font-size: 22px;
+    font-weight: 200;
+
+    border-radius: 5px 5px 0 0;
+
+  }
+
+  .accountdetscomment {
+
+	display: block;
+	margin: auto;
+	margin-top: 2px;
+	margin-bottom: 0px;
+  
+	max-height: 24px;
+	height: 15px;
+	width: 260px;
+	text-align: center;
+	color: var(--DarkColor);
+	font-size: 12px;
+	font-weight: 200;
+
+  }
+  
+  .accountdetssymbol {
+	display: block;
+	margin: auto;
+	margin-top: 8px;
+	margin-bottom: 0px;
+	color: var(--HighLight);
+	max-height: 24px;
+	height: 15px;
+	width: 260px;
+	text-align: center;
+  
+	font-size: 12px;
+	font-weight: 400;
+  }
+  
+  .assetdeticon svg {
+	width: 24px;
+	height: 24px;
+	margin-top: 2px;
+	margin-left: auto;
+	margin-right: auto;
+  }
+  
+  .assetdetcontract {
+	display: block;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 0px;
+  
+	max-height: 24px;
+	height: 15px;
+	width: 260px;
+	text-align: center;
+	color: var(--DarkBorderDarkAccent);
+	font-size: 12px;
+	font-weight: 200;
+  }
+  
+  .accountdetsbalance {
+	display: block;
+	margin: auto;
+	margin-top: 1px;
+	margin-bottom: 0px;
+	max-height: 28px;
+	height: 28px;
+	width: 280px;
+	text-align: center;
+	margin-bottom: 15px;
+  
+	font-size: 26px;
+	font-weight: 400;
+  
+	color: var(--HighLight);
+  }
+  
+  .accountdetsbalance svg {
+	background-color: transparent;
+	border-radius: 6px;
+	width: 24px;
+	height: 24px;
+	background-position: center;
+	padding: 2px;
+	top: 6px;
+	left: -3px;
+	position: relative;
+  }
+  
+  .accountdetsfiat {
+	display: inline-block;
+	margin-bottom: 0px;
+	max-height: 24px;
+	height: 28px;
+	padding: 0px;
+	font-weight: 400;
+	text-align: center;
+	align-items: center;
+	width: 260px;
+	background: transparent;
+	color: var(--d);
+	font-size: 15px;
+	font-weight: 400;
+  }
+  
+  .accountdetsfiat::after {
+	content: " usd";
+  }
+
+
+
+/*#endregion*/
