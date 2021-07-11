@@ -8,7 +8,7 @@
     width: 480px;
     height: 560px;
     
-    background:var(--Background);
+    background:var(--LightColor);
   
     overflow: hidden;
     text-align: center;
@@ -64,7 +64,7 @@
     top: 226px;
     left: 0px;
     width: 470;
-    height: 280px;
+    height: 320px;
     margin:5px;
 
     background:var(--LightColor);

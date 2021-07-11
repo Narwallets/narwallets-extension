@@ -27,7 +27,7 @@ body { font-family: 'Inter', sans-serif; !important }
 :root {
 
 	--Background: lightgray;
-	--DarkColor:  black;
+	--DarkColor:  rgb(27, 130, 189);
 	--MedColor:darkgray;
 	--LightColor:white;
 
@@ -39,8 +39,8 @@ body { font-family: 'Inter', sans-serif; !important }
 
 body {
 	  /*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-	  width: 480;
-	  height: 560px;
+	  width: 480px;
+	  height: 600px;
 	  margin: 0px;
 	  overflow: hidden;
 	  padding:0px;

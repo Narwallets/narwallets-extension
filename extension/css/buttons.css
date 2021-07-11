@@ -245,11 +245,12 @@
 }
 
 .send {
-  background-image: url("../icons/SVG/send_light.svg");
+  background-image: url("../icons/SVG/send_dark.svg");
 }
 
 .send:hover {
-  background-image: url("../icons/SVG/send_dark.svg");
+ /* background-image: url("../icons/SVG/send_dark.svg");*/
+ cursor:hand;
 }
 
 .stake {
