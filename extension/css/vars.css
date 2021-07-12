@@ -21,54 +21,36 @@ body { font-family: 'Inter', sans-serif; !important }
   }
 
 
-body {
-	  /*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-	  width: 360px;
-	  height: 557px;
-	  margin: 0px;
-	  overflow: hidden;
-	  padding:0px;
-	  border-style: solid;
-	  border-width: 1px;
-	  background-color: white;
-  }
-
-
 
 /*Colores */
 
 :root {
 
-	  --Background:rgb(216, 216, 216);  
-	  --PanelBackground: rgb(255,255,255);
+	--Background: lightgray;
+	--DarkColor:  rgb(27, 130, 189);
+	--MedColor:darkgray;
+	--LightColor:white;
 
-	  --LightBackground: rgb(214,214,214);
-	  --LightGradientTop: rgba(214,214,214,1);
-	  --LightGradientBottom: rgba(255,255,255,1);
+	--HighLight: orange;
+	--Highlight2: red;
+  }
 
-	  --LightBorderLightAccent: white;
-	  --LightBorderDarkAccent: darkgrey;
+
+
+body {
+	  /*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
+	  width: 480px;
+	  height: 600px;
+	  margin: 0px;
+	  overflow: hidden;
+	  padding:0px;
+	  border-style: none;
+	  border-width: 1px;
+	  background-color: white;
 	  
-	  --lightGradientDarkTop: lightgray;
-	  --LightGradientDarkBot: darkgray;
+  }
 
 
-	  --DarkBackground: rgb(51,46,147);
-	  --DarkBackgroundTop: rgba(51,46,147,1);
-	  --DarkBackgroundBot: rgba(53,93,168,1);
-	  --DarkBorderLightAccent:rgb(135, 170, 233) ;
-	  --DarkBorderDarkAccent: rgb(31, 27, 104);
-	  
-	  --DarkGradientLight:rgba(153,210,247,1);
-	  --DarkGradientdark:rgba(92,89,167,1);
-
-
-	  /*Font Colors*/
-	  --TextHightlight: rgb(163, 107, 22);
-
-	  /*block colors*/
-
-	}
 
 
 	

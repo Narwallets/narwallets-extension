@@ -1,0 +1,167 @@
+/*#region account items -------------------------------------------------------------------*/
+
+.accountlistitem
+{
+	position: relative;
+	height: 48px;
+	width: 460px;
+	display: inline-block;
+	font-weight: lighter;
+	overflow: hidden;
+	margin:0px;
+    border-width: 1px;   
+    border-radius: 5px;
+    background-color:var(--MedColor);
+
+}
+
+.accountlistitem:hover 
+{
+	background-color: var(--Background);
+	background: linear-gradient(131deg, var (--LightGradientDarkTop)  0%, var (--LightGradientDarkBot)  100%);
+}
+
+.accountlistname 
+{
+	position:relative;
+
+	color:var(--LightColor);
+	font-size: 14px;
+    font-weight: 100;
+	overflow:auto;
+	display: inline-block;
+	text-align: left;
+	left: 0px;
+    padding-left: 6px;
+	width: 460px;
+	height:20px;
+	top:0px;
+	background-color: var(--DarkColor);;
+}
+
+.accountlistbalance 
+{
+	position:absolute;
+	text-align: right;
+	color:var(--DarkColor);
+	font-weight: 200;
+	font-size: 24px;
+	display: block;
+	width: 260px;
+	right: 5px;
+	height: 20px;
+	top:20px;
+
+}
+
+.accountlistcomment 
+{
+	position:absolute;
+	display: inline-block;
+	text-align: left;
+	width: 200px;
+    font-weight: 200;
+	height:16px;
+	top: 22px;
+	left:5px;
+	font-size: 12px;
+	color: var(--DarkColor);
+	
+}
+
+/*#endregion */
+
+/*#region asset*/
+
+.accountdetsassets {
+
+	position: relative;
+	width: 480px;
+	height: 48px;
+	display: block;
+  
+	background: var(--LightBackground);
+	border-style: solid;
+	border-width: 0px;
+	border-bottom-width: 1px;
+	border-color: var(--MedColor);
+
+  }
+  
+  .accountdetsassets:hover {
+	background-color: var(--Background);
+
+  }
+  
+  .accountassetcoin {
+	position: absolute;
+	border-style: none;
+	display: inline-block;
+	top: 22px;
+	left: 53px;
+	width: 40px;
+  
+	font-size: 14px;
+	font-weight: 200;
+  }
+  
+  .accountassettoken {
+	
+	position: absolute;
+	display: block;
+	font-size: 12px;
+	
+	top: 0px;
+	left: 0px;
+	width: 465px;
+	height: 14px;
+	padding-right:10px;
+
+	background-color: var(--DarkColor);
+
+	text-align: right;
+	font-weight: bold;
+	color:var(--LightColor);
+
+  }
+  
+  .accountasseticon svg {
+	position: absolute;
+	top: 20px;
+	left: 7px;
+	width: 24;
+	height: 24px;
+	/*background-color: var(--LightBorderDarkAccent);*/
+  }
+  
+  .accountassetbalance {
+	position: absolute;
+	display: block;
+	border-style: none;
+	font-weight: 200;
+  
+	font-size: 24px;
+	top: 16px;
+	right:15px;
+	width: 415px;
+	text-align: right;
+  
+	color: var(--HighLight);
+  }
+  
+  .accountassetfiat {
+	position: absolute;
+	display: block;
+	border-style: none;
+	color: black;
+	font-size: 12px;
+	font-weight: 500;
+	top: 45px;
+	right: 5px;
+	width: 200px;
+	text-align: right;
+  }
+
+
+/*#endregion*/
+
