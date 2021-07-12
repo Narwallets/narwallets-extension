@@ -1016,24 +1016,17 @@ export async function searchThePools(exAccData) {
                             }
                         });
                         if (!found) {
-                            // DE DONDE SACO LOS DATOS DE ACA??
-                            // let result = await askBackgroundViewMethod(
-                            //   pool.account_id,
-                            //   "ft_metadata",
-                            //   {}
-                            // );
-                            let newAsset;
-                            newAsset = {
+                            let newAsset = {
                                 balance: amount,
                                 spec: "",
                                 url: "",
                                 contractId: pool.account_id,
-                                type: "ft",
-                                symbol: "",
-                                icon: "",
+                                type: "stake",
+                                symbol: "STAKE",
+                                icon: STAKE_DEFAULT_SVG,
                                 history: [],
                             };
-                            exAccData.accountInfo.assets.unshift(newAsset);
+                            exAccData.accountInfo.assets.push(newAsset);
                         }
                     }
                 }
@@ -1052,9 +1045,7 @@ export async function searchThePools(exAccData) {
 //-------------------------------
 async function searchPoolsButtonClicked() {
     const found = await searchThePools(selectedAccountData);
-    if (found) {
-        await refreshSaveSelectedAccount();
-    }
+    await refreshSaveSelectedAccount();
 }
 // //-------------------------------
 // async function assignStakingPool() {
