@@ -36,10 +36,8 @@
     left: 242px;
     top: 1px;
     color: var(--LightColor);
-  
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
-  
     background:var(--DarkColor);
   }
   
@@ -123,9 +121,10 @@
 .combotextboxtoken {
   width: 480px;
   height: 40px;
-  display: block;
+  display: flexbox;
   position: relative;
   padding: 5px;
+  align-content: center;
 }
 
 .combotextboxtoken input {
@@ -139,6 +138,7 @@
   height: 24px;
   margin:0px;
   top: 1px;
+  border-color: var(--DarkColor);
 }
 
 
