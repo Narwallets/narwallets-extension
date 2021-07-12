@@ -151,7 +151,6 @@
   margin-left: auto;
   margin-right: auto;
   
-
   font-size: 14px;
   font-weight: 100;
 
@@ -159,18 +158,21 @@
   padding-top: 0px;
   
   display: block;
-  border-style: solid;
-  border-width: 1px;
+
   color:white;
-  border-radius: 5px;
+  border-radius: 8px;
+  
+  border-style: none;
+  background-color: var(--DarkColor);
 
   align-content: center;
 
 }
 
 .big:hover {
-  background: rgb(153,210,247);
-  background: linear-gradient(131deg, var(--DarkGradientLight) 0%, var(--DarkGradientdark) 100%);
+
+  cursor:hand;
+  
 }
 
 /*buttons that appear in light background*/

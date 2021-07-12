@@ -1,6 +1,49 @@
 @charset "utf-8";
 /* Main div container -------------------------------------------------------------*/
 
+h2
+{
+  color: var(--HighLight);
+  font-size: 24px;
+  font-weight: 200;
+  display: block;
+  width: 400px;
+  height: auto;
+  word-wrap: break-word;
+  margin: auto;
+  margin-top:20px;
+
+}
+
+h3
+{
+  color: var(--DarkColor);
+  
+  font-size: 16px;
+  font-weight: 200;
+  display: block;
+  width: 400px;
+  height: auto;
+  word-wrap: break-word;
+  margin: auto;
+  margin-top:20px;
+  
+}
+
+
+h4
+{
+
+  color: var(--MedColor);
+  font-size: 12px;
+  font-weight: 200;
+  display: block;
+  width: 400px;
+  height: auto;
+  word-wrap: break-word;
+  margin: auto;
+  margin-top:15px;
+}
 
 label {
   color: black;
@@ -14,63 +57,17 @@ label {
   margin-top: 15px;
 }
 
-.combotextbox {
-  width: 470px;
-  height: 30px;
-  display: block;
-  position: relative;
-  padding: 5px;
-}
-
-.combotextbox input {
-  /*position: relative;*/
-  border-style: solid;
-  border-color: lightblue;
-  border-width: 1px;
-  border-radius: 8px;
-  padding: 5px;
-  text-align: center;
-  width: 190px;
-  height: 24px;
-  margin: auto;
-  top: 1px;
-  box-shadow:2px 2px 8px lightskyblue;
-}
-
-.combotextboxtoken {
-  width: 480px;
-  height: 40px;
-  display: block;
-  position: relative;
-  padding: 5px;
-}
-
-.combotextboxtoken input {
-  position: relative;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 8px;
-  padding: 5px;
-  text-align: center;
-  width: 300px;
-  height: 24px;
-  margin:0px;
-  top: 1px;
-}
-
 input {
   border-style: solid;
   border-width: 1px;
   border-radius: 8px;
-  border-color: lightblue;
+  border-color: VAR(--DarkColor);
   height: 24px;
   padding: 5px;
   text-align: center;
   margin:0px;
-  box-shadow:2px 2px 8px lightskyblue;
+
 }
-
-
 
 .appface.show {
   left: 0px;
@@ -102,30 +99,25 @@ input {
 }
 
 
-
-
-
 .boximportante {
   position: relative;
-  width: 300px;
-  margin: 0px;
+  width: 400px;
+  margin: 20px;
   margin-left: auto;
   margin-right: auto;
 
+  padding: 10px;
+   
   height: auto;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 300;
-  padding: 5px;
-  background-color: lightblue;
+  
+  background-color:var(--HighLight);
   border-style: solid;
   border-width: 1px;
   overflow-wrap: break-word;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
 }
-
-
-
-
 
 .scroll {
   overflow-y: scroll;
@@ -142,9 +134,6 @@ input {
   margin: 1px;
   margin-top: 15px;
 }
-
-/* Bottom Bar ---------------------------------------------------------------------*/
-
 
 /* Top Bar ------------------------------------------------------------------------*/
 
@@ -209,8 +198,6 @@ input {
   padding: 0px;
   font-weight: 200;
 }
-
-
 
 .topbarhamburguer:hover {
   background-color: var(--NarTopeHighLight);
