@@ -3,49 +3,50 @@
   display: flex;
   flex-direction: column;
   align-items: left;
-  background: linear-gradient(
-    131deg,
-    var(--DarkBackgroundTop) 0%,
-    var(--DarkBackgroundBot) 100%
-  );
+  background: var(--LightColor);
+
 }
 
 .tab {
   cursor: pointer;
-  padding: 10px 20px;
-  padding-top: 3px;
-  height: 7px;
+  padding-top: 0px;
+  padding-bottom: 5px;
+  height: 10px;
   width: auto;
   margin: 0px 2px;
-  background: var(--DarkBackgroundTop);
+  margin-bottom: 5px;
+  background: transparent;
   display: inline-block;
-  color: white;
-  border-radius: 3px 3px 0px 0px;
-  border-style: solid;
-  border-bottom-style: none;
-  border-width: 1px;
+  color:var(--DarkColor);
+  border-width: 4px;
+  border-style: none;
+ 
+}
+
+.tab:hover {
+  border-width: 4px;
+  border-style: none;
+  border-bottom-style: solid;
+  border-color: var(--HighLight);
 }
 
 .panels {
-  background: var(--LightBackground);
-  background: linear-gradient(
-    131deg,
-    var (--LightGradientTop) 0%,
-    var (--LightGradientBottom) 100%
-  );
-  min-height: 200px;
+  background: var(--LightColor);
+
+  border-radius: 0 0 5px 5px;
+
+  min-height: 260px;
   width: 100%;
   max-width: 500px;
-  border-radius: 3px;
-  max-height: 4000px;
+  
+  max-height: 285px;
   padding: 0px;
-  border-style: none;
   overflow-y: scroll;
-  height: 500px;
+  height: 550px;
 }
 
 .panel {
-  height: 300px;
+  height: 285px;
   display: none;
 }
 
@@ -72,9 +73,7 @@
 .radio.one:checked ~ .tabs .tab.one,
 .radio.two:checked ~ .tabs .tab.two,
 .radio.three:checked ~ .tabs .tab.three {
-  background: var(--LightGradientTop);
-  color: var(--DarkBackgroundTop);
-  border-style: solid;
-  border-width: 1px;
-  border-color: var(--LightGradientTop);
+
+  border-bottom-style: solid;
+  
 }

@@ -724,46 +724,7 @@ button  {
 }
 
   
-.subpage .title {
-    flex-flow: row nowrap;
-    justify-content: space-around;
-    display: flex;
-    /* max-width: 400px; */
-    padding: 0px 0px;
-    font-size: 0.6em;
-    margin: 0px;
-    font-weight: 900;
-    min-width: 350px;
-}
-  
-.subpage .title h2 {
-    border-top: 1px solid var (--LightGradientDarkTop) ;
-    border-bottom: 1px solid var (--LightGradientDarkTop) ;
-    margin-top: 7px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1 0 90%;
-    font-size: 2em;
-}
-.subpage .title h2::before, 
-.subpage .title h2::after {
-    content: '';
-    display: block;
-    height: 0.09em;
-    min-width: 2vw;
-    flex: 1 1 10%;
-  }
-  
-.subpage .title h2::before {
-    background: linear-gradient(to right, rgba(240,240,240,0), #a55555);
-    margin-right: 4vh;
-  }
-  
-.subpage .title h2::after {
-    background: linear-gradient(to left, rgba(240,240,240,0), #a55555);
-    margin-left: 4vh;
-  } 
+
 
 .important-label {
     font-size: 1.1em;

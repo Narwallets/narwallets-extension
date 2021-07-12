@@ -1,0 +1,57 @@
+/*#region text with button */
+
+.inputboxwithbutton {
+    width: 360px;
+    height: 30px;
+    display: block;
+    position: relative;
+    margin: auto;
+    padding: 5px;
+  }
+  
+  .inputboxwithbutton input {
+    position: absolute;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding: 5px;
+    text-align: center;
+    width: 220px;
+    height: 28px;
+    left: 32px;
+    top: 1px;
+  }
+  
+  .inputboxwithbutton button {
+    position: absolute;
+    border-style: solid;
+    border-width: 1px;
+  
+    text-align: center;
+    width: 80px;
+    height: 28px;
+    left: 242px;
+    top: 1px;
+    color: var(--LightBorderLightAccent);
+  
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  
+    background: rgb(51, 46, 147);
+    background: linear-gradient(
+      131deg,
+      rgba(51, 46, 147, 1) 0%,
+      rgba(53, 93, 168, 1) 100%
+    );
+    border-style: solid;
+    border-width: 1px;
+    border-top-color: var(--DarkBorderLightAcccent);
+    border-left-color: var(--DarkBorderLightAcccent);
+    border-right-color: var(--DarkBorderDarkAcccent);
+    border-bottom-color: var(--DarkBorderDarkAcccent);
+  }
+  
+
+  /*#endregion*/
