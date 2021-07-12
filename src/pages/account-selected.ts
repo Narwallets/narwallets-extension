@@ -226,7 +226,7 @@ function showAssetDetailsClicked(ev: Event) {
 
 function addClicked() {
   d.showSubPage("add-subpage");
-  fullAccessSubPage("add-subpage", addOKClicked);
+  showOKCancel(addOKClicked, showInitial);
 }
 
 async function addOKClicked() {

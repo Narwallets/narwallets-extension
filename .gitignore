@@ -2,9 +2,6 @@ node_modules
 out
 z-attic-gitignore
 
-extension/dist/index.js
-extension/dist/index.js.map
-extension/dist/pages/account-selected.js
-extension/dist/pages/account-selected.js.map
-extension/dist/pages/main.js.map
+extension/dist/
+
 .vscode/launch.json
