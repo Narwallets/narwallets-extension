@@ -25,15 +25,13 @@ body { font-family: 'Inter', sans-serif; !important }
 /*Colores */
 
 :root {
-
-	--Background: lightgray;
-	--DarkColor:  rgb(27, 130, 189);
-	--MedColor:darkgray;
-	--LightColor:white;
-
-	--HighLight: orange;
-	--Highlight2: red;
-  }
+--Background: lightgray;
+--DarkColor:  rgb(27, 130, 189);
+--MedColor:darkgray;
+--LightColor:white;
+--HighLight: rgb(0 0 0);
+--Highlight2: #ec9528;
+}
 
 
 
