@@ -82,23 +82,24 @@
 	display: block;
   
 	background: var(--LightBackground);
-	border-style: solid;
+	border-style: none;
+	border-bottom-style: solid;
 	border-width: 1px;
+	border-radius: 0px;
 	border-color: var(--DarkColor);
-	margin-bottom: 2px;
-	border-radius: 8px;
+	margin-bottom: 0px;
+	
   }
   
   .accountdetsassets:hover {
 	background-color: var(--Background);
-
   }
   
   .accountassetcoin {
 	position: absolute;
 	border-style: none;
 	display: inline-block;
-	top: 36px;
+	top: 30px;
 	left: 53px;
 	width: 40px;
   
@@ -110,26 +111,26 @@
 	
 	position: absolute;
 	display: block;
-	font-size: 16px;
+	font-size: 12px;
 	
 	top: 0px;
 	left: 0px;
 	width: 464px;
-	height: 24px;
+	height: 16px;
 	padding-right:5px;
 	border-style: none;
-
+	border-radius: 0px;
+	
 	background-color: var(--DarkColor);
 	text-align: right;
 	font-weight: 100;
 	color:var(--LightColor);
-	border-radius: 7px 7px 0px 0px;
-
+	
   }
   
   .accountasseticon svg {
 	position: absolute;
-	top: 32px;
+	top: 28px;
 	left: 7px;
 	width: 24;
 	height: 24px;
@@ -143,7 +144,7 @@
 	font-weight: 200;
   
 	font-size: 24px;
-	top: 30px;
+	top: 24px;
 	right:15px;
 	width: 415px;
 	text-align: right;
