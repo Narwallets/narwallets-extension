@@ -96,9 +96,6 @@
   overflow-wrap: normal;
 }
 
-
-
-
 .cancel 
 {
   position: absolute;
@@ -106,13 +103,13 @@
   left:370px;
   width: 80px;
   color:white;
-  height: 24px;
+  height: 32px;
   margin:0px;
   display: block;
-  border-radius: 8px;
+  border-radius: 16px;
   border-style: none;
   background-color: red;
-  box-shadow:4px 4px 8px lightskyblue;
+  
 }
 
 .cancel:hover
@@ -127,13 +124,13 @@
   left:274px;
   width: 80px;
   color:white;
-  height: 24px;
+  height: 32px;
   margin:0px;
   display: block;
-  border-radius: 8px;
+  border-radius: 16px;
   border-style: none;
   background-color: rgb(0, 255, 136);
-  box-shadow:4px 4px 8px lightskyblue;
+ 
    
 }
 
@@ -145,14 +142,14 @@
 .big {
   
   width: 300px;
-  height: 35px;
+  height: 40px;
   
   margin: 10px;
   margin-left: auto;
   margin-right: auto;
   
-  font-size: 14px;
-  font-weight: 100;
+  font-size: 16px;
+  font-weight: 200;
 
   padding: 0px;
   padding-top: 0px;
@@ -160,7 +157,7 @@
   display: block;
 
   color:white;
-  border-radius: 8px;
+  border-radius: 20px;
   
   border-style: none;
   background-color: var(--DarkColor);
@@ -274,8 +271,8 @@
   padding:10px;
   
 
-  font-size: 12px;
-  font-weight: 100;
+  font-size: 16px;
+  font-weight: 200;
 
   padding: 0px;
   padding-top: 0px;
@@ -284,14 +281,9 @@
   border-style: solid;
   border-width: 1px;
   color:white;
-  border-radius: 5px;
+  border-radius: 8px;
 
-  background: var (--DarkBackground) ;
-	background: linear-gradient(131deg, var(--DarkBackgroundTop) 0%, var(--DarkBackgroundBot) 100%);
-  border-top-color:var(--DarkBorderLightAcccent) ;
-  border-left-color: var(--DarkBorderLightAcccent);
-  border-right-color: var(--DarkBorderDarkAcccent);
-  border-bottom-color: var(--DarkBorderDarkAcccent);
+  background: var(--DarkColor);
 
   align-content: center;
 }
@@ -299,8 +291,5 @@
 
 .generic:hover
 {
-
-  background: rgb(153,210,247);
-  background: linear-gradient(131deg, var(--DarkGradientLight) 0%, var(--DarkGradientdark) 100%);
-
+  cursor:hand;
 }

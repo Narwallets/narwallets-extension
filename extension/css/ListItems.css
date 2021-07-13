@@ -11,8 +11,9 @@
 	margin:0px;
     border-width: 1px;   
     border-radius: 5px;
-    background-color:var(--MedColor);
-
+    background-color:var(--lightcolor);
+	border-color: var(--DarkColor);
+	border-style: solid;
 }
 
 .accountlistitem:hover 
@@ -43,7 +44,7 @@
 {
 	position:absolute;
 	text-align: right;
-	color:var(--DarkColor);
+	color:var(--HighLight);
 	font-weight: 200;
 	font-size: 24px;
 	display: block;
@@ -76,16 +77,16 @@
 .accountdetsassets {
 
 	position: relative;
-	width: 480px;
-	height: 48px;
+	width: 468px;
+	height: 64px;
 	display: block;
   
 	background: var(--LightBackground);
 	border-style: solid;
-	border-width: 0px;
-	border-bottom-width: 1px;
-	border-color: var(--MedColor);
-
+	border-width: 1px;
+	border-color: var(--DarkColor);
+	margin-bottom: 2px;
+	border-radius: 8px;
   }
   
   .accountdetsassets:hover {
@@ -97,7 +98,7 @@
 	position: absolute;
 	border-style: none;
 	display: inline-block;
-	top: 22px;
+	top: 36px;
 	left: 53px;
 	width: 40px;
   
@@ -109,25 +110,26 @@
 	
 	position: absolute;
 	display: block;
-	font-size: 12px;
+	font-size: 16px;
 	
 	top: 0px;
 	left: 0px;
-	width: 465px;
-	height: 14px;
-	padding-right:10px;
+	width: 464px;
+	height: 24px;
+	padding-right:5px;
+	border-style: none;
 
 	background-color: var(--DarkColor);
-
 	text-align: right;
-	font-weight: bold;
+	font-weight: 100;
 	color:var(--LightColor);
+	border-radius: 7px 7px 0px 0px;
 
   }
   
   .accountasseticon svg {
 	position: absolute;
-	top: 20px;
+	top: 32px;
 	left: 7px;
 	width: 24;
 	height: 24px;
@@ -141,7 +143,7 @@
 	font-weight: 200;
   
 	font-size: 24px;
-	top: 16px;
+	top: 30px;
 	right:15px;
 	width: 415px;
 	text-align: right;

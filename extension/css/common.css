@@ -4,14 +4,14 @@
 h2
 {
   color: var(--HighLight);
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 200;
   display: block;
   width: 400px;
   height: auto;
   word-wrap: break-word;
   margin: auto;
-  margin-top:20px;
+  padding:5px;
 
 }
 
@@ -19,21 +19,19 @@ h3
 {
   color: var(--DarkColor);
   
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 200;
   display: block;
   width: 400px;
   height: auto;
   word-wrap: break-word;
   margin: auto;
-  margin-top:20px;
-  
+  padding: 2px;
+    
 }
-
 
 h4
 {
-
   color: var(--MedColor);
   font-size: 12px;
   font-weight: 200;
@@ -45,29 +43,7 @@ h4
   margin-top:15px;
 }
 
-label {
-  color: black;
-  font-weight: 300;
-  font-size: 12;
-  padding: 5px;
-  width: 300px;
-  height: auto;
-  overflow-wrap: break-word;
-  margin: auto;
-  margin-top: 15px;
-}
 
-input {
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 8px;
-  border-color: VAR(--DarkColor);
-  height: 24px;
-  padding: 5px;
-  text-align: center;
-  margin:0px;
-
-}
 
 .appface.show {
   left: 0px;
@@ -85,39 +61,7 @@ input {
   display: inline-block;
 }
 
-.button-group {
-  position: fixed;
-  display: block;
-  text-align: right;
-  top: 552px;
-  left: 5px;
-  width: 470px;
-  height: 45px;
 
-  margin: 0px;
-  z-index: 98;
-}
-
-
-.boximportante {
-  position: relative;
-  width: 400px;
-  margin: 20px;
-  margin-left: auto;
-  margin-right: auto;
-
-  padding: 10px;
-   
-  height: auto;
-  font-size: 17px;
-  font-weight: 300;
-  
-  background-color:var(--HighLight);
-  border-style: solid;
-  border-width: 1px;
-  overflow-wrap: break-word;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-}
 
 .scroll {
   overflow-y: scroll;
