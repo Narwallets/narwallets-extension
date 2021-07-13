@@ -4,7 +4,7 @@ import { NetworkList } from "./lib/near-api-lite/network.js";
 
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
-import { addListeners as Import_addListeners } from "./pages/import.js";
+import { addListeners as Import_addListeners, onNetworkChanged as Import_onNetworkChanged } from "./pages/import.js";
 
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
@@ -72,6 +72,7 @@ async function networkItemClicked(e: Event) {
     const info = await askBackgroundSetNetwork(networkName);
     //update indicator visual state
     updateNetworkIndicatorVisualState(info);
+    Import_onNetworkChanged(info);
 
     //on network-change restart the page-flow
     Pages.show(); //refresh account list

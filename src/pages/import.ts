@@ -275,7 +275,7 @@ async function searchClicked(ev: Event) {
 //   messageLine.hide()
 // }
 
-async function onNetworkChanged(info: NetworkInfo) {
+export async function onNetworkChanged(info: NetworkInfo) {
   if (!info) {
     //console.log("!info")
     return;
