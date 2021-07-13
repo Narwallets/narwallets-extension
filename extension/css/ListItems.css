@@ -9,11 +9,11 @@
 	font-weight: lighter;
 	overflow: hidden;
 	margin:0px;
-    border-width: 1px;   
-    border-radius: 5px;
-    background-color:var(--lightcolor);
+	border-width: 1px;
+	border-radius: 0px;
+	background-color:var(--lightcolor);
 	border-color: var(--DarkColor);
-	border-style: solid;
+	border-style: none;
 }
 
 .accountlistitem:hover 
