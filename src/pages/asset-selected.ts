@@ -171,7 +171,7 @@ async function DelayedUnstake() {
   d.showSubPage("delayed-unstake");
   d.onClickId("delayed-unstake-max", function () {
     d.maxClicked("delayed-unstake-amount", "#selected-asset #balance");
-  }); 
+  });
   await showOKCancel(DelayedUnstakeOk, showInitial);
 }
 
@@ -179,7 +179,7 @@ async function LiquidUnstake() {
   d.showSubPage("liquid-unstake");
   d.onClickId("liquid-unstake-max", function () {
     d.maxClicked("liquid-unstake-mount", "#selected-asset #balance");
-  }); 
+  });
   await showOKCancel(LiquidUnstakeOk, showInitial);
 }
 
@@ -379,7 +379,7 @@ function showAssetSendClicked() {
   );
   d.onClickId("asset-send-max", function () {
     d.maxClicked("send-to-asset-amount", "#selected-asset #balance");
-  }); 
+  });
 
   showOKCancel(sendOKClicked, showInitial);
 }
@@ -459,13 +459,18 @@ async function performSend() {
   }
 }
 
-function deleteAsset() {
+async function deleteAsset() {
   asset_array.splice(asset_index, 1);
+  accData.accountInfo.assets = asset_array;
+
+  await saveSelectedAccount();
+
+  refreshSaveSelectedAccount();
+
   d.clearContainer("assets-list");
   d.populateUL("assets-list", "asset-item-template", asset_array);
 
   //Guardo
-  refreshSaveSelectedAccount();
 
   //Salgo del asset detail eliminado
   backToSelectClicked();

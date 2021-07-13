@@ -564,7 +564,10 @@ async function sendClicked() {
     } else {
       d.byId("max-amount-send").innerText = c.toStringDec(maxAmountToSend);
       d.onClickId("send-max", function () {
-        d.maxClicked("send-to-account-amount", "#selected-account .accountdetsbalance");
+        d.maxClicked(
+          "send-to-account-amount",
+          "#selected-account .accountdetsbalance"
+        );
       });
       //comento solo para probar la parte de contactos
       fullAccessSubPage("account-selected-send", sendOKClicked);
@@ -736,7 +739,10 @@ async function stakeClicked() {
     d.qs("#max-stake-amount-1").innerText = c.toStringDec(amountToStake);
     d.qs("#max-stake-amount-2").innerText = c.toStringDec(amountToStake);
     d.onClickId("liquid-stake-max", function () {
-      d.maxClicked("stake-amount-liquid", "#selected-account .accountdetsbalance");
+      d.maxClicked(
+        "stake-amount-liquid",
+        "#selected-account .accountdetsbalance"
+      );
     });
     d.onClickId("delayed-stake-max", function () {
       d.maxClicked("stake-amount", "#selected-account .accountdetsbalance");
