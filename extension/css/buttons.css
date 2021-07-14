@@ -101,15 +101,14 @@
   position: absolute;
   top:0px;
   left:370px;
-  width: 80px;
+  width: 86px;
   color:white;
-  height: 32px;
+  height: 34px;
   margin:0px;
   display: block;
   border-radius: 16px;
   border-style: none;
-  background-color: red;
-  
+  background-color: #c13e3e;
 }
 
 .cancel:hover
@@ -122,16 +121,14 @@
   position: absolute;
   top:0px;
   left:274px;
-  width: 80px;
+  width: 86px;
   color:white;
-  height: 32px;
+  height: 34px;
   margin:0px;
   display: block;
   border-radius: 16px;
   border-style: none;
-  background-color: rgb(0, 255, 136);
- 
-   
+  background-color: rgb(14 138 80);
 }
 
 .ok:hover
