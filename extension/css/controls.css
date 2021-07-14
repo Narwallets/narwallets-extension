@@ -9,7 +9,7 @@ margin: auto;
 padding: 10px;
 }
 
-.inputboxwithbutton input {
+.inputboxwithbutton input[type="text"] {
 position: absolute;
 border-style: solid;
 border-width: 1px;
@@ -24,6 +24,7 @@ left: 32px;
 top: 1px;
 border-color: var(--DarkColor);
 }
+
 
 .inputboxwithbutton button {
 position: absolute;
@@ -103,7 +104,7 @@ position: relative;
 padding: 5px;
 }
 
-.combotextbox input {
+.combotextbox  input[type="text"]  {
 /*position: relative;*/
 border-style: solid;
 border-width: 1px;
@@ -127,7 +128,7 @@ padding: 5px;
 
 }
 
-.combotextboxtoken input {
+.combotextboxtoken  input[type="text"]  {
   
   border-style: solid;
   border-width: 1px;
@@ -176,7 +177,7 @@ overflow-wrap: break-word;
 margin: auto;
 }
 
-input {
+input[type="text"]  {
 border-style: solid;
 border-width: 1px;
 border-radius: 16px;
@@ -187,6 +188,18 @@ width: 300px;
 text-align: center;
 margin:10px;
 }
+
+input[type="password"]  {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 16px;
+  border-color: var(--DarkColor);
+  height: 32px;
+  padding: 5px;
+  width: 300px;
+  text-align: center;
+  margin:10px;
+  }
 
 .button-group {
 position: fixed;

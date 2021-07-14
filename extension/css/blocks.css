@@ -1,21 +1,17 @@
-.appface 
-{
+  .appface 
+  {
     position: absolute;
     z-index: 95;
-    
     left: 0px;
     top: 44px;
     width: 480px;
     height: 550px;
-    
-    /*background:var(--LightColor);*/
-    background:var(--midcolor);
-  
+    background:var(--LightColor);
+    /* background:var(--midcolor); */
     overflow: hidden;
     text-align: center;
     align-items: center;
-    
-}
+  }
 
 
   .TopBlock {
@@ -32,11 +28,11 @@
     border-radius: 5px;
 
     background:var(--LightColor);
-  
+
     overflow-y: hidden;
   }
-  
-  
+
+
   .MidBlock {
 
     position: absolute;
@@ -47,7 +43,7 @@
     height: 63px;
     margin:0px;
     padding-top:5px;
-  
+
     display: inline-flex;
     justify-content: center;
 
@@ -61,24 +57,19 @@
   .subpage 
   {
     position: absolute;
-    
     top: 226px;
     left: 0px;
     width: 470;
     height: 320px;
     margin:5px;
-
     background:var(--LightColor);
-    
     text-align: center;
     align-items: center;
     border-radius: 5px;
-    background:var(--medcolor);
-  
   }
 
-  
-  
+
+
   .contentarea {
     position: relative;
     width: 100%;
@@ -102,7 +93,7 @@
     margin:5px;
 
     background:var(--LightColor);
-  
+
 
     overflow-y: hidden;
   }
@@ -122,16 +113,16 @@
     padding-top: 4px;
     display: inline-flex;
     justify-content: flex-end;
-  
+
     background:var(--DarkColor);
     
   }
-  
+
 
   /*#region account details -------------------------------------------------------*/
 
-.accountdetscuenta {
-	
+  .accountdetscuenta {
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -157,108 +148,108 @@
 
   .accountdetscomment {
 
-	display: block;
-	margin: auto;
-	margin-top: 2px;
-	margin-bottom: 0px;
-  
-	max-height: 24px;
-	height: 15px;
-	width: 260px;
-	text-align: center;
-	color: var(--DarkColor);
-	font-size: 12px;
-	font-weight: 200;
+  display: block;
+  margin: auto;
+  margin-top: 2px;
+  margin-bottom: 0px;
+
+  max-height: 24px;
+  height: 15px;
+  width: 260px;
+  text-align: center;
+  color: var(--DarkColor);
+  font-size: 12px;
+  font-weight: 200;
 
   }
-  
+
   .accountdetssymbol {
-	display: block;
-	margin: auto;
-	margin-top: 8px;
-	margin-bottom: 0px;
-	color: var(--HighLight);
-	max-height: 24px;
-	height: 15px;
-	width: 260px;
-	text-align: center;
-  
-	font-size: 12px;
-	font-weight: 400;
+  display: block;
+  margin: auto;
+  margin-top: 8px;
+  margin-bottom: 0px;
+  color: var(--HighLight);
+  max-height: 24px;
+  height: 15px;
+  width: 260px;
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 400;
   }
-  
+
   .assetdeticon svg {
-	width: 24px;
-	height: 24px;
-	margin-top: 2px;
-	margin-left: auto;
-	margin-right: auto;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  margin-left: auto;
+  margin-right: auto;
   }
-  
+
   .assetdetcontract {
-	display: block;
-	margin: auto;
-	margin-top: 10px;
-	margin-bottom: 0px;
-  
-	max-height: 24px;
-	height: 15px;
-	width: 260px;
-	text-align: center;
-	color: var(--DarkBorderDarkAccent);
-	font-size: 12px;
-	font-weight: 200;
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 0px;
+
+  max-height: 24px;
+  height: 15px;
+  width: 260px;
+  text-align: center;
+  color: var(--DarkBorderDarkAccent);
+  font-size: 12px;
+  font-weight: 200;
   }
-  
+
   .accountdetsbalance {
-	display: block;
-	margin: auto;
-	margin-top: 1px;
-	margin-bottom: 0px;
-	max-height: 28px;
-	height: 28px;
-	width: 280px;
-	text-align: center;
-	margin-bottom: 15px;
-  
-	font-size: 28px;
-	font-weight: 200;
-  
-	color: var(--HighLight);
+  display: block;
+  margin: auto;
+  margin-top: 1px;
+  margin-bottom: 0px;
+  max-height: 28px;
+  height: 28px;
+  width: 280px;
+  text-align: center;
+  margin-bottom: 15px;
+
+  font-size: 28px;
+  font-weight: 200;
+
+  color: var(--HighLight);
   }
-  
+
   .accountdetsbalance svg {
-	background-color: transparent;
-	border-radius: 6px;
-	width: 24px;
-	height: 24px;
-	background-position: center;
-	padding: 2px;
-	top: 6px;
-	left: -3px;
-	position: relative;
+  background-color: transparent;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  background-position: center;
+  padding: 2px;
+  top: 6px;
+  left: -3px;
+  position: relative;
   }
-  
+
   .accountdetsfiat {
-	display: inline-block;
-	margin-bottom: 0px;
-	max-height: 24px;
-	height: 28px;
-	padding: 0px;
-	font-weight: 400;
-	text-align: center;
-	align-items: center;
-	width: 260px;
-	background: transparent;
-	color: var(--d);
-	font-size: 15px;
-	font-weight: 400;
+  display: inline-block;
+  margin-bottom: 0px;
+  max-height: 24px;
+  height: 28px;
+  padding: 0px;
+  font-weight: 400;
+  text-align: center;
+  align-items: center;
+  width: 260px;
+  background: transparent;
+  color: var(--d);
+  font-size: 15px;
+  font-weight: 400;
   }
-  
+
   .accountdetsfiat::after {
-	content: " usd";
+  content: " usd";
   }
 
 
 
-/*#endregion*/
+  /*#endregion*/
