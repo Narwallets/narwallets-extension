@@ -266,7 +266,7 @@ export function getAutoUnlockSeconds() {
   return aul;
 }
 
-//--background page
+//--LightColor page
 
 type BackgroundPage = {
   backgroundFunction(msg: string): void;

@@ -18,8 +18,7 @@
 
 .accountlistitem:hover 
 {
-	background-color: var(--Background);
-	background: linear-gradient(131deg, var (--LightGradientDarkTop)  0%, var (--LightGradientDarkBot)  100%);
+	background-color: var(--MedColor);
 }
 
 .accountlistname 
@@ -101,7 +100,7 @@ margin-bottom: 0px;
 }
   
   .accountdetsassets:hover {
-	background-color: var(--Background);
+	background-color: var(--MedColor);
   }
   
   .accountassetcoin {

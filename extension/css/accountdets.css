@@ -82,11 +82,16 @@
 .addresslistname
 {
  text-align: unset;
- font-size: 20px;
+ font-size: 15;
  position: absolute;
- color:var(--DarkBackgroundTop);
- left:5px;
- top:2px;
+ color: var(--LightColor);
+ left: 0px;
+ top:0px;
+ background-color: var(--DarkColor);
+ padding: 2px;
+ font-weight: 200;
+ width: 480px;
+ text-align: left;
 }
 
 .addresslistcomment
