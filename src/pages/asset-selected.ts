@@ -122,9 +122,10 @@ async function ReStake() {
   return;
 }
 
-async function Withdraw() {
+async function confirmWithdraw() {
   try {
-    const amount = c.toNum(d.inputById("liquid-unstake-mount").value);
+    d.showWait();
+    const amount = c.toNum(d.inputById("withdraw-amount").value);
 
     const poolAccInfo = await StakingPool.getAccInfo(
       accData.name,
@@ -158,13 +159,33 @@ async function Withdraw() {
         accData.name
       );
     }
+    addAssetHistory("withdraw", amount);
+    asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
+
+    if (asset_selected.balance == 0) {
+      await removeSelectedFromAssets();
+    }
+
+    await refreshSaveSelectedAccount();
+    reloadDetails();
+    showInitial();
+
     d.showSuccess(
       c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
     );
     console.log(poolAccInfo);
   } catch (ex) {
     d.showErr(ex);
+  } finally {
+    hideOkCancel();
+    d.hideWait();
+    showInitial();
   }
+}
+
+function Withdraw() {
+  d.showSubPage("withdraw");
+  showOKCancel(confirmWithdraw, showInitial);
 }
 
 async function DelayedUnstake() {
@@ -434,8 +455,13 @@ async function performSend() {
       undefined,
       "1"
     );
-    hideOkCancel();
 
+    asset_selected.balance -= amountToSend;
+
+    addAssetHistory("send", amountToSend);
+    reloadDetails();
+    await saveSelectedAccount();
+    hideOkCancel();
     showInitial();
 
     d.showSuccess(

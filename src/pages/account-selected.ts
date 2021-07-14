@@ -892,6 +892,7 @@ async function performStake() {
     // selectedAccountData.total -= selectedAccountData.total;
     // selectedAccountData.totalUSD = selectedAccountData.total * 4.7;
     //refresh status & save
+    selectedAccountData.total -= amountToStake;
     await refreshSaveSelectedAccount();
 
     d.showSuccess("Success");
@@ -1645,6 +1646,7 @@ async function makeFullAccessOKClicked() {
 }
 
 function showInitial() {
+  showSelectedAccount();
   populateAssets();
   d.showSubPage("assets");
 }

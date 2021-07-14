@@ -913,289 +913,300 @@
 
 		<button id="unlock" class="buttonextra unlocked">Unlock</button>
 
+	</div>
+
+	<!--#endregion -->
+
+	<!--#region Asset Detail -->
+
+	<div class="appface slide-hide" id="AccountAssetDetail">
+
+
+		<button class="button back" id="back-to-selected"></button>
+
+		<div class="accountdetstopcenter" id="selected-asset">
+
 		</div>
 
-			<!--#endregion -->
+		<button class="button remove" id="asset-remove"></button>
 
-			<!--#region Asset Detail -->
+		<div id="selected-asset-template" class="hidden">
+			<div class="accountdetscuenta">
+				{acc.name}
+			</div>
+			<div class="accountdetscomment">
+				{accountInfo.note}
+			</div>
+			<div class="accountdetsbalance ">
+				<span id="icon">{asset.icon}</span>
+				<span id="balance">{asset.balance}</span>
+				<span id="symbol">{asset.symbol}</span>
 
-			<div class="appface slide-hide" id="AccountAssetDetail">
+			</div>
+			<div class="assetdetcontract">
+				{asset.contractId}
+			</div>
+		</div>
+
+		<div class="midblock">
+			<button class="button send hidden" id="asset-send">Send</button>
+			<button class="button receive hidden" id="asset-receive">Receive</button>
+			<button class="button liqunstake hidden" id="asset-liquid-unstake">Liquid unstake</button>
+			<button class="button unstake hidden" id="asset-unstake">Unstake</button>
+			<button class="button withdraw hidden" id="asset-withdraw">Withdraw</button>
+			<button class="button stake hidden" id="asset-restake">Re-stake</button>
+		</div>
+
+		<div class="subpage hide" id="asset-history">
+
+			<div class="wrapper">
+
+				<input class="radio one" id="asset-activity" name="asset-details" type="radio" checked>
 
 
-				<button class="button back" id="back-to-selected"></button>
-
-				<div class="accountdetstopcenter" id="selected-asset">
-
+				<div class="tabs">
+					<label class="tab one" id="one-tab-history" for="asset-activty">Asset Activity</label>
 				</div>
 
-				<button class="button remove" id="asset-remove"></button>
+				<div class="panels">
 
-				<div id="selected-asset-template" class="hidden">
-					<div class="accountdetscuenta">
-						{acc.name}
-					</div>
-					<div class="accountdetscomment">
-						{accountInfo.note}
-					</div>
-					<div class="accountdetsbalance ">
-						<span id="icon">{asset.icon}</span>
-						<span id="balance">{asset.balance}</span>
-						<span id="symbol">{asset.symbol}</span>
+					<div class="panel one">
 
-					</div>
-					<div class="assetdetcontract">
-						{asset.contractId}
-					</div>
-				</div>
-
-				<div class="midblock">
-					<button class="button send hidden" id="asset-send">Send</button>
-					<button class="button receive hidden" id="asset-receive">Receive</button>
-					<button class="button liqunstake hidden" id="asset-liquid-unstake">Liquid unstake</button>
-					<button class="button unstake hidden" id="asset-unstake">Unstake</button>
-					<button class="button withdraw hidden" id="asset-withdraw">Withdraw</button>
-					<button class="button stake hidden" id="asset-restake">Re-stake</button>
-				</div>
-
-				<div class="subpage hide" id="asset-history">
-
-					<div class="wrapper">
-
-						<input class="radio one" id="asset-activity" name="asset-details" type="radio" checked>
-
-
-						<div class="tabs">
-							<label class="tab one" id="one-tab-history" for="asset-activty">Asset Activity</label>
+						<div id="asset-history-details">
 						</div>
+					</div>
 
-						<div class="panels">
-
-							<div class="panel one">
-
-								<div id="asset-history-details">
-								</div>
-							</div>
-
-							<div id="asset-history-template" class="hidden" data-id="{key}">
-								<div class="accountdetsassets">
-									<div class="accountasseticon"></div>
-									<div class="accountassetcoin">{type}</div>
-									<div class="accountassettoken">{date}</div>
-									<div class="accountassetbalance">{ammount}</div>
-									<div class="accountassetfiat"></div>
-								</div>
-							</div>
-
+					<div id="asset-history-template" class="hidden" data-id="{key}">
+						<div class="accountdetsassets">
+							<div class="accountasseticon"></div>
+							<div class="accountassetcoin">{type}</div>
+							<div class="accountassettoken">{date}</div>
+							<div class="accountassetbalance">{ammount}</div>
+							<div class="accountassetfiat"></div>
 						</div>
-
-					</div>
-				</div>
-
-				<div class="subpage hidden" id="asset-send-subpage">
-					<div class="contentarea">
-						<h2>Send</h2>
-
-						<h3>Send to Account Id</h3>
-
-						<div class="combotextbox">
-							<input id="send-to-asset-account" type="text" list="combo-send-asset" />
-							<datalist id="combo-send-asset">
-							</datalist>
-						</div>
-
-						<h3>Amount in <span id="asset-symbol"></span> (<a id="asset-send-max" class="max">Max. <span
-									id="max-amount-send-asset"></span></a>)</h3>
-						<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
-					</div>
-				</div>
-
-				<!-- #region subpage LIQUID UNSTAKE -->
-				<div class="subpage hidden" id="liquid-unstake">
-					<h2>Liquid Unstake</h2>
-					<h3>Ammount to unstake?</h3>
-					<span><a id="liquid-unstake-max" class="max">Max.</a></span>
-					<input placeholder="" id="liquid-unstake-mount" type="number">
-
-				</div>
-				<!--#endregion -->
-
-				<!-- #region subpage DELAYED UNSTAKE -->
-				<div class="subpage hidden" id="delayed-unstake">
-					<h2>Delayed Unstake</h2>
-					<h3>Ammount to unstake?</h3>
-					<span><a id="delayed-unstake-max" class="max">Max.</a></span>
-					<input placeholder="" id="delayed-unstake-amount" type="number">
-
-				</div>
-				<!--#endregion -->
-
-				<!-- #region subpage SEND CONFIRMATION -->
-
-				<div id="asset-selected-send-confirmation" class="subpage hidden">
-
-					<div class="contentarea">
-
-						<h2>Confirm Send</h2>
-
-						<div class="send-form-confirmation">
-
-							<h3 class="warning">Send <span id="asset-send-confirmation-amount"></span> <span
-									id="asset-symbol-confirmation"></span>
-								to <span id="asset-send-confirmation-receiver"></span> ?</h3>
-
-						</div>
-
 					</div>
 
-				</div>
-
-				<!--#endregion -->
-
-				<div class="subpage hidden" id="asset-receive-subpage">
-					<div class="contentarea">
-
-						<h2>Receive</h2>
-
-						<h3>Tell the other party to send </h3>
-						<h3 id="asset-receive-symbol"></h3>
-						<h3>to:</h3>
-
-						<h3 id="asset-receive-account">Usario.asdasdas.asdasdasd</h3>
-					</div>
-				</div>
-
-				<div id="asset-remove-selected" class="subpage hidden">
-					<div class="contentarea">
-						<h2>Remove this asset?</h2>
-						<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
-					</div>
-				</div>
-
-				<div id="selected-asset-template" class="hidden">
-
-					<div class="accountdetscuenta">
-						<h1>{name}</h1>
-					</div>
-					<div class="accountdetscomment">
-						<h2>{accountInfo.note}</h2>
-					</div>
-					<div class="accountdetsbalance ">
-						<h3 class="balance">{total}</h3>
-					</div>
-					<div class="accountdetsfiat">
-						<h4>{totalUSD} usd</h4>
-					</div>
-
-				</div>
-
-				<div class="subpage hidden"></div>
-
-
-
-			</div>
-
-
-
-			<!--#endregion -->
-
-			<!--#region address book-->
-
-			<div id="addressbook" class="appface slide-hide">
-				<h2>Address Book</h2>
-				<button class="button back" id="address-back-to-account"></button>
-
-				<div id="address-list">
-				</div>
-
-				<div id="address-item-template" class="hidden address-item" data-id="{key}">
-					<div class="accountlistitem">
-						<div class="addresslistname">{accountId}</div>
-						<div class="addresslistcomment">{note}</div>
-					</div>
-				</div>
-
-				<div class="bottombar">
-					<button class="button addaccount" id="add-contact">Address</button>
-				</div>
-			</div>
-			<!--#endregion -->
-
-			<!--#region Add address book-->
-			<div id="add-addressbook" class="appface slide-hide">
-				<h2>Add Address </h2>
-				<input placeholder="Account ID" id="add-addresbook-id" type="text">
-				<input placeholder="Note" id="add-addresbook-note" type="text">
-
-			</div>
-			<!--#endregion -->
-
-			<!--#region detail address book-->
-			<div id="addressbook-details" class="appface slide-hide">
-
-				<button class="button back" id="back-to-addressbook"></button>
-
-				<h2>Address Details</h2>
-
-				<div id="selected-contact">
-				</div>
-
-				<div id="selected-contact-template" class="hidden">
-					<h1>{accountId}<h1>
-							<h3>{note}<h3>
-				</div>
-
-
-				<div id="contact-remove-selected" class="subpage hidden">
-					<div class="contentarea">
-						<h3>Remove this contact?</h3>
-					</div>
-				</div>
-
-				<div id="contact-edit-selected" class="subpage hidden">
-					<div class="contentarea">
-						<h3>Edit Notes</h3>
-						<input id="edit-note-contact" type="text">
-					</div>
-				</div>
-
-				<div id="main-contact" class="subpage hidden"></div>
-
-
-				<div id="bottombar-addressbook" class="bottombar">
-					<button class="button send" id="remove-contact">Remove</button>
-					<button class="button edit" id="edit-contact">Edit</button>
 				</div>
 
 			</div>
-			<!--#endregion -->
+		</div>
 
-			<!--#region OK CANCEL buttons common to all subpages -->
-			<div class="button-group hidden" id="ok-cancel-row">
+		<div class="subpage hidden" id="asset-send-subpage">
+			<div class="contentarea">
+				<h2>Send</h2>
 
-				<button id="account-selected-action-confirm" class="ok">OK</button>
-				<button id="account-selected-action-cancel" class="cancel">Cancel</button>
-			</div>
-			<!--#endregion-->
+				<h3>Send to Account Id</h3>
 
-			<!--#region Error and wait div -->
-
-			<div id="err-div"></div>
-
-			<a class="hidden" id="usd-price-link"></a>
-
-			<div id="wait">
-				<div class="lds-ring">
-					<div></div>
-					<div></div>
-					<div></div>
-					<div></div>
+				<div class="combotextbox">
+					<input id="send-to-asset-account" type="text" list="combo-send-asset" />
+					<datalist id="combo-send-asset">
+					</datalist>
 				</div>
+
+				<h3>Amount in <span id="asset-symbol"></span> (<a id="asset-send-max" class="max">Max. <span
+							id="max-amount-send-asset"></span></a>)</h3>
+				<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+			</div>
+		</div>
+
+		<!-- #region subpage LIQUID UNSTAKE -->
+		<div class="subpage hidden" id="liquid-unstake">
+			<h2>Liquid Unstake</h2>
+			<h3>Ammount to unstake?</h3>
+			<span><a id="liquid-unstake-max" class="max">Max.</a></span>
+			<input placeholder="" id="liquid-unstake-mount" type="number">
+
+		</div>
+		<!--#endregion -->
+
+		<!-- #region subpage DELAYED UNSTAKE -->
+		<div class="subpage hidden" id="delayed-unstake">
+			<h2>Delayed Unstake</h2>
+			<h3>Amount to unstake?</h3>
+			<span><a id="delayed-unstake-max" class="max">Max.</a></span>
+			<input placeholder="" id="delayed-unstake-amount" type="number">
+
+		</div>
+		<!--#endregion -->
+
+		<!-- #region subpage WITHDRAW -->
+		<div class="subpage hidden" id="withdraw">
+			<h2>Withdraw</h2>
+			<h3>Amount to withdraw?</h3>
+			<span><a id="withdraw-max" class="max">Max.</a></span>
+			<input placeholder="" id="withdraw-amount" type="text">
+
+		</div>
+		<!--#endregion -->
+
+
+		<!-- #region subpage SEND CONFIRMATION -->
+
+		<div id="asset-selected-send-confirmation" class="subpage hidden">
+
+			<div class="contentarea">
+
+				<h2>Confirm Send</h2>
+
+				<div class="send-form-confirmation">
+
+					<h3 class="warning">Send <span id="asset-send-confirmation-amount"></span> <span
+							id="asset-symbol-confirmation"></span>
+						to <span id="asset-send-confirmation-receiver"></span> ?</h3>
+
+				</div>
+
 			</div>
 
+		</div>
 
-			<!--#endregion-->
+		<!--#endregion -->
 
-			<script src="bundled-libs.js"></script>
-			<script type="module" src="dist/index.js"></script>
+		<div class="subpage hidden" id="asset-receive-subpage">
+			<div class="contentarea">
+
+				<h2>Receive</h2>
+
+				<h3>Tell the other party to send </h3>
+				<h3 id="asset-receive-symbol"></h3>
+				<h3>to:</h3>
+
+				<h3 id="asset-receive-account">Usario.asdasdas.asdasdasd</h3>
+			</div>
+		</div>
+
+		<div id="asset-remove-selected" class="subpage hidden">
+			<div class="contentarea">
+				<h2>Remove this asset?</h2>
+				<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+			</div>
+		</div>
+
+		<div id="selected-asset-template" class="hidden">
+
+			<div class="accountdetscuenta">
+				<h1>{name}</h1>
+			</div>
+			<div class="accountdetscomment">
+				<h2>{accountInfo.note}</h2>
+			</div>
+			<div class="accountdetsbalance ">
+				<h3 class="balance">{total}</h3>
+			</div>
+			<div class="accountdetsfiat">
+				<h4>{totalUSD} usd</h4>
+			</div>
+
+		</div>
+
+		<div class="subpage hidden"></div>
+
+
+
+	</div>
+
+
+
+	<!--#endregion -->
+
+	<!--#region address book-->
+
+	<div id="addressbook" class="appface slide-hide">
+		<h2>Address Book</h2>
+		<button class="button back" id="address-back-to-account"></button>
+
+		<div id="address-list">
+		</div>
+
+		<div id="address-item-template" class="hidden address-item" data-id="{key}">
+			<div class="accountlistitem">
+				<div class="addresslistname">{accountId}</div>
+				<div class="addresslistcomment">{note}</div>
+			</div>
+		</div>
+
+		<div class="bottombar">
+			<button class="button addaccount" id="add-contact">Address</button>
+		</div>
+	</div>
+	<!--#endregion -->
+
+	<!--#region Add address book-->
+	<div id="add-addressbook" class="appface slide-hide">
+		<h2>Add Address </h2>
+		<input placeholder="Account ID" id="add-addresbook-id" type="text">
+		<input placeholder="Note" id="add-addresbook-note" type="text">
+
+	</div>
+	<!--#endregion -->
+
+	<!--#region detail address book-->
+	<div id="addressbook-details" class="appface slide-hide">
+
+		<button class="button back" id="back-to-addressbook"></button>
+
+		<h2>Address Details</h2>
+
+		<div id="selected-contact">
+		</div>
+
+		<div id="selected-contact-template" class="hidden">
+			<h1>{accountId}<h1>
+					<h3>{note}<h3>
+		</div>
+
+
+		<div id="contact-remove-selected" class="subpage hidden">
+			<div class="contentarea">
+				<h3>Remove this contact?</h3>
+			</div>
+		</div>
+
+		<div id="contact-edit-selected" class="subpage hidden">
+			<div class="contentarea">
+				<h3>Edit Notes</h3>
+				<input id="edit-note-contact" type="text">
+			</div>
+		</div>
+
+		<div id="main-contact" class="subpage hidden"></div>
+
+
+		<div id="bottombar-addressbook" class="bottombar">
+			<button class="button send" id="remove-contact">Remove</button>
+			<button class="button edit" id="edit-contact">Edit</button>
+		</div>
+
+	</div>
+	<!--#endregion -->
+
+	<!--#region OK CANCEL buttons common to all subpages -->
+	<div class="button-group hidden" id="ok-cancel-row">
+
+		<button id="account-selected-action-confirm" class="ok">OK</button>
+		<button id="account-selected-action-cancel" class="cancel">Cancel</button>
+	</div>
+	<!--#endregion-->
+
+	<!--#region Error and wait div -->
+
+	<div id="err-div"></div>
+
+	<a class="hidden" id="usd-price-link"></a>
+
+	<div id="wait">
+		<div class="lds-ring">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+	</div>
+
+
+	<!--#endregion-->
+
+	<script src="bundled-libs.js"></script>
+	<script type="module" src="dist/index.js"></script>
 
 </body>
