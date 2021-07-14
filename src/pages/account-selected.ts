@@ -709,7 +709,7 @@ async function performLockupContractSend() {
 async function stakeClicked() {
   try {
     //Crear asset
-
+    selectFirstTab();
     const info = selectedAccountData.accountInfo;
     const stakeAmountBox = d.inputById("stake-amount");
     let performer = performStake; //default
@@ -737,14 +737,14 @@ async function stakeClicked() {
     d.qs("#liquid-stake-radio").el.checked = true;
     d.inputById("stake-with-staking-pool").value = "";
     d.qs("#max-stake-amount-1").innerText = c.toStringDec(amountToStake);
-    d.qs("#max-stake-amount-2").innerText = c.toStringDec(amountToStake);
+    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(amountToStake);
     d.onClickId("liquid-stake-max", function () {
       d.maxClicked(
         "stake-amount-liquid",
         "#selected-account .accountdetsbalance"
       );
     });
-    d.onClickId("delayed-stake-max", function () {
+    d.onClickId("max-stake-amount-2-button", function () {
       d.maxClicked("stake-amount", "#selected-account .accountdetsbalance");
     });
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)

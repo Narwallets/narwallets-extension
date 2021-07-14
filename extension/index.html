@@ -253,8 +253,12 @@
 					</datalist>
 				</div>
 
-				<h3>Amount in NEAR (<a id="send-max" class="max">Max. <span id="max-amount-send"></span></a>)</h3>
-				<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+				<h3>Amount in NEAR (Max. <span id="max-amount-send"></span>)</h3>
+				<div class="inputboxwithbutton">
+					<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+					<button id="send-max">Max</button>
+				</div>
+				
 
 			</div>
 
@@ -368,9 +372,13 @@
 
 							<h2>Liquid Stake</h2>
 
-							<h3>Amount in NEAR to Stake (<a id="liquid-stake-max" class="max">Max. <span
-										id="max-stake-amount-1"></span></a>)</h3>
-							<input id="stake-amount-liquid" type="text">
+							<h3>Amount in NEAR to Stake (Max. <span
+										id="max-stake-amount-1"></span>)</h3>
+							
+							<div class="inputboxwithbutton">
+								<input id="stake-amount-liquid" type="text">
+								<button id="liquid-stake-max">Max</button>
+							</div>
 
 						</div>
 
@@ -388,9 +396,13 @@
 								<button id="list-pools">List Pools</button>
 							</div>
 
-							<h3>Amount in NEAR to Stake (<a id="delayed-stake-max">Max. <span
-										id="max-stake-amount-2"></span></a>)</h3>
-							<input id="stake-amount" type="text">
+							<h3>Amount in NEAR to Stake (Max. <span
+								id="max-stake-amount-2-label"></span>)</h3>
+							<div class="inputboxwithbutton">
+								
+								<input id="stake-amount" type="text">
+								<button id="max-stake-amount-2-button">Max</button>
+							</div>
 
 						</div>
 
@@ -1002,10 +1014,13 @@
 							<datalist id="combo-send-asset">
 							</datalist>
 						</div>
-
-						<h3>Amount in <span id="asset-symbol"></span> (<a id="asset-send-max" class="max">Max. <span
-									id="max-amount-send-asset"></span></a>)</h3>
-						<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+						
+						<h3>Amount in <span id="asset-symbol"></span> (Max. <span
+									id="max-amount-send-asset"></span>)</h3>
+						<div class="inputboxwithbutton">
+							<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+							<button id="asset-send-max">Max</button>
+						</div>
 					</div>
 				</div>
 
@@ -1013,8 +1028,11 @@
 				<div class="subpage hidden" id="liquid-unstake">
 					<h2>Liquid Unstake</h2>
 					<h3>Ammount to unstake?</h3>
-					<span><a id="liquid-unstake-max" class="max">Max.</a></span>
-					<input placeholder="" id="liquid-unstake-mount" type="number">
+					<span>Max.</span>
+					<div class="inputboxwithbutton">
+						<input placeholder="" id="liquid-unstake-mount" type="number">
+						<button id="liquid-unstake-max">Max</button>
+					</div>
 
 				</div>
 				<!--#endregion -->
@@ -1023,8 +1041,11 @@
 				<div class="subpage hidden" id="delayed-unstake">
 					<h2>Delayed Unstake</h2>
 					<h3>Ammount to unstake?</h3>
-					<span><a id="delayed-unstake-max" class="max">Max.</a></span>
-					<input placeholder="" id="delayed-unstake-amount" type="number">
+					<span>Max.</span>
+					<div class="inputboxwithbutton">
+						<input placeholder="" id="delayed-unstake-amount" type="number">
+						<button id="delayed-unstake-max">Max</button>
+					</div>
 
 				</div>
 				<!--#endregion -->
