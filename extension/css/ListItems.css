@@ -180,25 +180,27 @@ margin-bottom: 0px;
 	</div>
 */
 
-.name 
+.nameresult
 {
-	width: 480px;
+	width: 470px;
 	height: 16px;
 	font-size: 14px;
 	display: block;
 	background-color: var(--DarkColor);
 	color:var(--LightBackground);
-	
+	margin:auto;
 }
 
-.balance 
+.balanceresult
 {
-	width: 480px;
+	width: 470px;
 	height: 16px;
 	font-size: 14px;
 	display: block;
 	background-color: var(--MedColor);
 	color:var(--DarkColor);
+	margin: auto;
+	margin-bottom: 3px;
 }
 
 
