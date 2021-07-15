@@ -187,7 +187,7 @@ margin-bottom: 0px;
 	font-size: 14px;
 	display: block;
 	background-color: var(--DarkColor);
-	color:var(--LightBackground);
+	color:var(--lightcolor);
 	margin:auto;
 }
 
