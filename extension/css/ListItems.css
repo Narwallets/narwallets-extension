@@ -173,3 +173,33 @@ margin-bottom: 0px;
 
 /*#endregion*/
 
+/*#region search result 
+	<div id="account-line" class="flex-labeled-row small-labels">
+					<div class="name">{name}</div>
+					<div class="balance">{accountInfo.lastBalance}</div>
+	</div>
+*/
+
+.name 
+{
+	width: 480px;
+	height: 16px;
+	font-size: 14px;
+	display: block;
+	background-color: var(--DarkColor);
+	color:var(--LightBackground);
+	
+}
+
+.balance 
+{
+	width: 480px;
+	height: 16px;
+	font-size: 14px;
+	display: block;
+	background-color: var(--MedColor);
+	color:var(--DarkColor);
+}
+
+
+/*#endregion*/
