@@ -143,6 +143,7 @@ function initPage() {
   d.onClickId("two-tab-stake", selectSecondTab);
   d.onClickId("adress-book-button", showAdressBook);
   d.onClickId("contact-list", contactOptions);
+  d.onClickId("refresh-button", refreshSelectedAcc);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   seedTextElem = new d.El("#seed-phrase");
@@ -170,6 +171,29 @@ function initPage() {
   d.onClickId("lockup-add-public-key", LockupAddPublicKey);
   d.onClickId("delete-account", DeleteAccount);
   //d.onClickId("assign-staking-pool", assignStakingPool);
+}
+
+async function refreshSelectedAcc() {
+  let accName = selectedAccountData.name;
+  const netInfo = await askBackgroundGetNetworkInfo();
+  const root = netInfo.rootAccount;
+  if (
+    accName &&
+    accName.length < 60 &&
+    !accName.endsWith(root) &&
+    !(netInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
+  ) {
+    accName = accName + "." + root;
+  }
+
+  const mainAccInfo = await searchAccounts.searchAccount(accName);
+  console.log(mainAccInfo);
+
+  selectedAccountData.total = mainAccInfo.lastBalance;
+  selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
+  await refreshSaveSelectedAccount();
+
+  d.showSuccess("Refreshed");
 }
 
 function usdPriceReady() {

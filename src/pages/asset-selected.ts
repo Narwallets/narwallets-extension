@@ -262,7 +262,7 @@ async function DelayedUnstakeOk() {
     if (!accData.isFullAccess)
       throw Error("you need full access on " + accData.name);
 
-    const amount = c.toNum(d.inputById("liquid-unstake-mount").value);
+    const amount = c.toNum(d.inputById("delayed-unstake-amount").value);
     if (!isValidAmount(amount)) throw Error("Amount is not valid");
 
     const actualSP = asset_selected.contractId;
