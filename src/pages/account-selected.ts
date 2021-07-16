@@ -88,6 +88,88 @@ viewBox="0 0 67.8 67.8" style="enable-background:new 0 0 67.8 67.8;" xml:space="
 </g>
 </svg>`;
 
+export const STNEAR_SVG = `<svg viewBox="0 0 67.79 67.79" version="1.1" id="svg407" sodipodi:docname="stnear.svg" inkscape:version="1.1 (c68e22c387, 2021-05-23)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:svg="http://www.w3.org/2000/svg">
+<sodipodi:namedview
+  id="namedview409"
+  pagecolor="#505050"
+  bordercolor="#eeeeee"
+  borderopacity="1"
+  inkscape:pageshadow="0"
+  inkscape:pageopacity="0"
+  inkscape:pagecheckerboard="0"
+  showgrid="false"
+  showguides="true"
+  inkscape:guide-bbox="true"
+  inkscape:zoom="6.4390025"
+  inkscape:cx="-3.9602407"
+  inkscape:cy="32.380792"
+  inkscape:window-width="1842"
+  inkscape:window-height="983"
+  inkscape:window-x="-8"
+  inkscape:window-y="-8"
+  inkscape:window-maximized="1"
+  inkscape:current-layer="svg407">
+ <sodipodi:guide
+    position="150.56679,73.380928"
+    orientation="1,0"
+    id="guide616" />
+ <sodipodi:guide
+    position="-90.54197,102.11208"
+    orientation="0,-1"
+    id="guide618" />
+</sodipodi:namedview>
+<defs
+  id="defs389">
+ <linearGradient
+    inkscape:collect="always"
+    id="linearGradient4227">
+   <stop
+      style="stop-color:#ffd000;stop-opacity:1;"
+      offset="0"
+      id="stop4233" />
+   <stop
+      style="stop-color:#ffd000;stop-opacity:0.76862745;"
+      offset="0.23051181"
+      id="stop4690" />
+   <stop
+      style="stop-color:#ffffff;stop-opacity:1"
+      offset="0.37967724"
+      id="stop5976" />
+   <stop
+      style="stop-color:#00d000;stop-opacity:0.47450981"
+      offset="0.52420604"
+      id="stop4950" />
+   <stop
+      style="stop-color:#ffffff;stop-opacity:1"
+      offset="0.83414608"
+      id="stop4884" />
+   <stop
+      style="stop-color:#ffff00;stop-opacity:0"
+      offset="1"
+      id="stop4235" />
+ </linearGradient>
+ <style
+    id="style387">.cls-1{fill:#fff;}</style>
+ <linearGradient
+    inkscape:collect="always"
+    xlink:href="#linearGradient4227"
+    id="linearGradient4231"
+    x1="2.2210767"
+    y1="61.03474"
+    x2="62.23521"
+    y2="7.9209232"
+    gradientUnits="userSpaceOnUse" />
+</defs>
+<path
+  id="path505-7"
+  d="M 35.179894,0.11192182 A 33.9,33.9 0 1 0 69.068565,34.012312 33.9,33.9 0 0 0 35.179894,0.11192182 Z M 35.138878,11.957624 c 1.951547,5.823884 8.658203,9.761151 8.658203,14.521485 0,4.760334 -3.911666,8.61914 -8.736328,8.619141 -4.824663,-10e-7 -8.736328,-3.858807 -8.736328,-8.619141 0,-4.760335 6.785254,-8.852904 8.814453,-14.521485 z m 3.183594,10.095704 a 2.5236828,2.4460311 0 0 0 -0.654297,0.08203 2.5236828,2.4460311 0 0 0 -0.607422,0.246094 2.5236828,2.4460311 0 0 0 -0.523437,0.388671 2.5236828,2.4460311 0 0 0 -0.400391,0.50586 2.5236828,2.4460311 0 0 0 -0.251953,0.589844 2.5236828,2.4460311 0 0 0 -0.08594,0.632812 2.5236828,2.4460311 0 0 0 0.08594,0.632813 2.5236828,2.4460311 0 0 0 0.251953,0.589843 2.5236828,2.4460311 0 0 0 0.400391,0.507813 2.5236828,2.4460311 0 0 0 0.523437,0.388672 2.5236828,2.4460311 0 0 0 0.607422,0.24414 2.5236828,2.4460311 0 0 0 0.654297,0.08399 2.5236828,2.4460311 0 0 0 0.652344,-0.08399 2.5236828,2.4460311 0 0 0 0.609375,-0.24414 2.5236828,2.4460311 0 0 0 0.521484,-0.388672 2.5236828,2.4460311 0 0 0 0.402344,-0.507813 2.5236828,2.4460311 0 0 0 0.251953,-0.589843 2.5236828,2.4460311 0 0 0 0.08594,-0.632813 2.5236828,2.4460311 0 0 0 -0.01172,-0.240234 2.5236828,2.4460311 0 0 0 -0.03711,-0.236328 2.5236828,2.4460311 0 0 0 -0.06055,-0.232422 2.5236828,2.4460311 0 0 0 -0.08398,-0.226563 2.5236828,2.4460311 0 0 0 -0.105469,-0.216797 2.5236828,2.4460311 0 0 0 -0.126953,-0.207031 2.5236828,2.4460311 0 0 0 -0.146484,-0.191406 2.5236828,2.4460311 0 0 0 -0.167969,-0.177735 2.5236828,2.4460311 0 0 0 -0.183594,-0.162109 2.5236828,2.4460311 0 0 0 -0.197265,-0.142578 2.5236828,2.4460311 0 0 0 -0.212891,-0.123047 2.5236828,2.4460311 0 0 0 -0.224609,-0.103516 2.5236828,2.4460311 0 0 0 -0.232422,-0.08008 2.5236828,2.4460311 0 0 0 -0.240234,-0.05859 2.5236828,2.4460311 0 0 0 -0.246094,-0.03516 2.5236828,2.4460311 0 0 0 -0.246094,-0.01172 z m -13.650391,5.488281 a 10.48299,10.599467 0 0 0 1.132813,4.058594 16.578655,2.4848568 0 0 1 -7.634766,-2.09375 16.578655,2.4848568 0 0 1 6.501953,-1.964844 z m 20.847657,0.07813 a 16.578655,2.4848568 0 0 1 5.808593,1.886719 16.578655,2.4848568 0 0 1 -6.894531,2.017578 10.48299,10.599467 0 0 0 1.085938,-3.904297 z m 6.925781,3.210937 v 5.199219 a 0.69,0.69 0 0 1 0,0.240234 c 0,1.8 -7.809687,3.25 -17.429688,3.25 -9.619999,0 -17.429687,-1.45 -17.429687,-3.25 a 0.69,0.69 0 0 1 0.04883,-0.240234 h -0.04883 v -5.169922 h 0.04883 c 0.419781,1.142352 4.122404,2.133769 9.398437,2.640625 a 10.48299,10.599467 0 0 0 8.066407,3.84961 10.48299,10.599467 0 0 0 8.072265,-3.861329 c 5.1766,-0.504982 8.817849,-1.481832 9.273438,-2.658203 z m 0.03125,7.322266 v 5.199219 a 0.69,0.69 0 0 1 0,0.240234 c 0,1.8 -7.809687,3.25 -17.429688,3.25 -9.619999,0 -17.429687,-1.45 -17.429687,-3.25 a 0.69,0.69 0 0 1 0.04883,-0.240234 h -0.04883 v -5.169922 h 0.04883 c 0.61,1.66 8.15086,3 17.380859,3 9.210001,0 16.759688,-1.299297 17.429688,-3.029297 z m 0,7.208984 v 5.201172 a 0.69,0.69 0 0 1 0,0.240235 c 0,1.8 -7.809687,3.25 -17.429688,3.25 -9.619999,0 -17.429687,-1.45 -17.429687,-3.25 a 0.69,0.69 0 0 1 0.04883,-0.240235 h -0.04883 v -5.169922 h 0.04883 c 0.61,1.66 8.15086,3 17.380859,3 9.210001,0 16.759688,-1.34125 17.429688,-3.03125 z"
+  style="fill:url(#linearGradient4231);fill-opacity:1" />
+</svg>`;
+
 let selectedAccountData: ExtendedAccountData;
 
 let accountInfoName: d.El;
@@ -680,7 +762,6 @@ async function sendOKClicked() {
     d.byId("send-confirmation-amount").innerText = c.toStringDec(amountToSend);
     d.byId("send-confirmation-receiver").innerText = toAccName;
 
-    //comento solo para probar contactos
     showOKCancel(performer, showInitial); //on OK clicked, send
   } catch (ex) {
     d.showErr(ex.message);
@@ -719,6 +800,8 @@ async function performLockupContractSend() {
     displayReflectTransfer(amountToSend, toAccName);
 
     await checkContactList();
+
+    await refreshSelectedAcc();
 
     showInitial();
   } catch (ex) {
@@ -890,7 +973,7 @@ async function performStake() {
           balance: c.yton(poolAccInfo.staked_balance),
           type: "stake",
           symbol: stakeTabSelected == 1 ? "STNEAR" : "STAKE",
-          icon: STAKE_DEFAULT_SVG,
+          icon: stakeTabSelected == 1 ? STNEAR_SVG : STAKE_DEFAULT_SVG,
           history: [],
         };
         asset.history.unshift(hist);
@@ -1219,6 +1302,7 @@ async function performSend() {
 
     //    hideOkCancel();
     displayReflectTransfer(amountToSend, toAccName);
+    await refreshSelectedAcc();
     await saveSelectedAccount();
   } catch (ex) {
     d.showErr(ex.message);
