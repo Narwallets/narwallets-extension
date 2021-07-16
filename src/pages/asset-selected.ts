@@ -207,8 +207,8 @@ async function LiquidUnstake() {
 function addAssetHistory(type: string, amount: number) {
   let hist: History;
   hist = {
-    ammount: amount,
-    date: new Date(),
+    amount: amount,
+    date: new Date().toISOString(),
     type: type,
   };
 
@@ -303,8 +303,8 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   let hist: History;
   
   hist = {
-    ammount: amountToUnstake,
-    date: new Date(),
+    amount: amountToUnstake,
+    date: new Date().toISOString(), //so it's the same as when the data is JSON.parsed() from localStorage
     type: "unstake",
   };
 

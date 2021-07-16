@@ -954,8 +954,8 @@ async function performStake() {
 
       let hist: History;
       hist = {
-        ammount: amountToStake,
-        date: new Date(),
+        amount: amountToStake,
+        date: new Date().toISOString(),
         type: "stake",
       };
       let foundAsset: Asset = new Asset();
@@ -1072,7 +1072,7 @@ async function unstakeClicked() {
     d.byId("unstake-from-staking-pool").innerText = "";
     optionWU.hide();
     if (info.type == "lock.c") {
-      //lockup - allways full amount
+      //lockup - always full amount
       d.qs("#unstake-ALL-label").show();
       await checkOwnerAccessThrows("unstake");
       performer = performLockupContractUnstake;
@@ -1137,8 +1137,8 @@ async function performUnstake() {
     disableOKCancel();
     d.showWait();
 
-    const modeWithraw = d.inputById("radio-withdraw").checked;
-    const modeUnstake = !modeWithraw;
+    const modeWithdraw = d.inputById("radio-withdraw").checked;
+    const modeUnstake = !modeWithdraw;
 
     const amount = c.toNum(d.inputById("unstake-amount").value);
     if (!isValidAmount(amount)) throw Error("Amount is not valid");
@@ -1155,7 +1155,7 @@ async function performUnstake() {
     //   actualSP
     // );
 
-    if (modeWithraw) {
+    if (modeWithdraw) {
       // if (poolAccInfo.unstaked_balance == "0")
       //   throw Error("No funds unstaked to withdraw");
 
@@ -1301,8 +1301,8 @@ async function performSend() {
 
     let hist: History;
     hist = {
-      ammount: amountToSend,
-      date: new Date(),
+      amount: amountToSend,
+      date: new Date().toISOString(),
       type: "send",
     };
     selectedAccountData.accountInfo.history.unshift(hist);

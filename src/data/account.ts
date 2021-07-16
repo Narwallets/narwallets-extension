@@ -41,9 +41,9 @@ export class Asset {
 }
 
 export class History {
-  date: Date = new Date();
+  date: string = ""; //store as date.toISOString() so JSON.stringify/parse does not change the value
   type: string = "send";
-  ammount: number = 0;
+  amount: number = 0;
 }
 
 export class ExtendedAccountData {
