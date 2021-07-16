@@ -24,6 +24,7 @@ left: 32px;
 top: 1px;
 border-color: var(--DarkColor);
 background-color: var(--ControlBackgroud);
+color:var(--TextLightColor);
 }
 
 
@@ -41,6 +42,7 @@ color: var(--TextLightColor);
 border-top-right-radius: 16px;
 border-bottom-right-radius: 16px;
 background:var(--DarkColor);
+color:var(--TextLightColor);
 }
 
 
@@ -119,6 +121,7 @@ margin-bottom: 10px;
 top: 1px;
 border-color: var(--DarkColor);
 background-color: var(--ControlBackgroud);
+color:var(--TextLightColor);
 }
 
 .combotextboxtoken {
@@ -143,6 +146,7 @@ padding: 5px;
   top: 1px;
   border-color: var(--DarkColor);
   background-color: var(--ControlBackgroud);
+  color:var(--TextLightColor);
 }
 
 
@@ -191,6 +195,7 @@ padding: 5px;
 width: 300px;
 text-align: center;
 margin:10px;
+color:var(--TextLightColor);
 }
 
 input[type="password"]  {
@@ -204,6 +209,7 @@ input[type="password"]  {
   text-align: center;
   margin:10px;
   background-color: var(--ControlBackgroud);
+  color:var(--TextLightColor);
   }
 
 .button-group {
