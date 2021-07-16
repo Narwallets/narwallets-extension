@@ -48,7 +48,7 @@
     justify-content: center;
 
     
-    background: var(--DarkColor);
+    background: var(--DarkBlockColor);
     
     overflow-y: hidden;
 
@@ -114,7 +114,7 @@
     display: inline-flex;
     justify-content: flex-end;
 
-    background:var(--DarkColor);
+    background:var(--DarkBlockColor);
     
   }
 
@@ -128,8 +128,8 @@
     align-items: center;
     margin:auto;
 
-    color: var(--LightColor);
-    background-color: var(--DarkColor);
+    color: var(--TextLightColor);
+    background-color: var(--DarkBlockColor);
 
     height: 48px;	
     width: 470px;   
@@ -196,7 +196,7 @@
   height: 15px;
   width: 260px;
   text-align: center;
-  color: var(--DarkBorderDarkAccent);
+  color: var(--DarkColor);
   font-size: 12px;
   font-weight: 200;
   }
@@ -241,7 +241,7 @@
   align-items: center;
   width: 260px;
   background: transparent;
-  color: var(--d);
+  color: var(--DarkColor);
   font-size: 15px;
   font-weight: 400;
   }

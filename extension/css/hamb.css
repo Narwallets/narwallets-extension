@@ -147,7 +147,7 @@ NETWORK selection drop-down
 */
 
 .network-component.pointer {
-  border: 2px solid #bbc0c5;
+  border: 2px solid var(--DarkColor);
   border-radius: 24px;
   padding: 3px;
   width: 240px;
@@ -161,7 +161,7 @@ NETWORK selection drop-down
   width: 230px ;
   align-items: center;
   font-size: 14px;
-  color: #000000bf;
+  color: var(--DarkColor);
   font-weight: 400;
   flex-flow: row nowrap;
 }
@@ -176,6 +176,7 @@ li {
 li#current-network-display-name {
   max-height: 20px;
   width: 220px;
+  color:var(--DarkColor);
 }
 
 .circle:before {

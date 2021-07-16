@@ -115,7 +115,7 @@ h4
 
 .topbarcaption {
   position: absolute;
-  color: rgb(0, 0, 0);
+  color: var(--DarkColor);
   font-weight: 300;
   width: 150px;
   height: 16px;
@@ -130,7 +130,7 @@ h4
 
 .topbarpulldown {
   position: absolute;
-  color: var(--LightColor);
+  color: var(--TextLightColor);
   font-weight: lighter;
   font-size: 12px;
   width: 148px;
@@ -144,14 +144,14 @@ h4
 }
 
 .topbarhamburguer:hover {
-  background-color: var(--NarTopeHighLight);
+  background-color: var(--MedColor);
 }
 
 .serverpulldown {
   position: absolute;
   display: inline-block;
-  background-color: var(--NarTope);
-  color: var(--LightBorderLightAccent);
+  background-color: var(--DarkBlockColor);
+  color: var(--TextLightColor);
   width: 150px;
   top: 12px;
   border-style: none;
@@ -212,7 +212,7 @@ h4
 .listitem {
   position: relative;
   display: inline-block;
-  background-color: var(--NarListBack);
+  background-color: var(--DarkBlockColor);
   width: 359px;
   height: 40px;
   border-bottom: var(--lightcolor);
@@ -228,7 +228,7 @@ h4
 }
 
 .listitem:hover {
-  background-color: var(--NarListHoover);
+  background-color: var(--MedColor);
 }
 
 .flex-row {

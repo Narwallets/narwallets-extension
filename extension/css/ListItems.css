@@ -25,7 +25,7 @@
 {
 	position:relative;
 
-	color:var(--LightColor);
+	color:var(--TextLightColor);
 	font-size: 14px;
     font-weight: 100;
 	overflow:auto;
@@ -36,7 +36,7 @@
 	width: 460px;
 	height:20px;
 	top:0px;
-	background-color: var(--DarkColor);;
+	background-color: var(--DarkBlockColor);;
 }
 
 .accountlistbalance 
@@ -112,6 +112,7 @@ margin-bottom: 0px;
 	width: 40px;
 	font-size: 16px;
 	font-weight: 200;
+	color:var(--TextLightColor);
 	}
   
   .accountassettoken {
@@ -128,10 +129,10 @@ margin-bottom: 0px;
 	border-style: none;
 	border-radius: 0px;
 	
-	background-color: var(--DarkColor);
+	background-color: var(--DarkBlockColor);
 	text-align: right;
 	font-weight: 100;
-	color:var(--LightColor);
+	color:var(--TextLightColor);
 	
   }
   
@@ -186,8 +187,8 @@ margin-bottom: 0px;
 	height: 20px;
 	font-size: 14px;
 	display: block;
-	background-color: var(--DarkColor);
-	color:var(--LightColor);
+	background-color: var(--DarkBlockColor);
+	color:var(--TextLightColor);
 	margin:auto;
 }
 

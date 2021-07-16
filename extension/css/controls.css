@@ -23,6 +23,7 @@ height: 32px;
 left: 32px;
 top: 1px;
 border-color: var(--DarkColor);
+background-color: var(--ControlBackgroud);
 }
 
 
@@ -36,7 +37,7 @@ width: 80px;
 height: 32px;
 left: 260px;
 top: 11px;
-color: var(--LightColor);
+color: var(--TextLightColor);
 border-top-right-radius: 16px;
 border-bottom-right-radius: 16px;
 background:var(--DarkColor);
@@ -54,7 +55,7 @@ position:relative;
 
 .combobox select {
 background-color: #0563af;
-color:var(--LightBorderLightAccent);
+color:var(--TextLightColor);
 padding: 5px;
 width: 250px;
 border: none;
@@ -117,6 +118,7 @@ margin: auto;
 margin-bottom: 10px;
 top: 1px;
 border-color: var(--DarkColor);
+background-color: var(--ControlBackgroud);
 }
 
 .combotextboxtoken {
@@ -140,6 +142,7 @@ padding: 5px;
   margin: auto;
   top: 1px;
   border-color: var(--DarkColor);
+  background-color: var(--ControlBackgroud);
 }
 
 
@@ -167,7 +170,7 @@ top:-12px;
 /*#region misc */
 
 label {
-color: black;
+color:var(--DarkColor);
 font-weight: 300;
 font-size: 12;
 padding: 0px;
@@ -182,6 +185,7 @@ border-style: solid;
 border-width: 1px;
 border-radius: 16px;
 border-color: var(--DarkColor);
+background-color: var(--ControlBackgroud);
 height: 32px;
 padding: 5px;
 width: 300px;
@@ -199,6 +203,7 @@ input[type="password"]  {
   width: 300px;
   text-align: center;
   margin:10px;
+  background-color: var(--ControlBackgroud);
   }
 
 .button-group {
