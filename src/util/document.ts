@@ -42,7 +42,7 @@ export function byId(id: string): HTMLElement {
  * gets checked radiobutton by name
  * @param name
  */
- export function checkedRadioButton(name: string): HTMLElement {
+export function checkedRadioButton(name: string): HTMLElement {
   try {
     return document.querySelector('input[name=' + name + ']:checked') as HTMLElement;
   } catch {
@@ -201,7 +201,7 @@ function addShowErr() {
 export function hideErr() {
   try {
     byId(ERR_DIV).innerHTML = "";
-  } catch {}
+  } catch { }
 }
 
 var errorId = 0;
@@ -307,15 +307,12 @@ export function templateReplace(
     } else if (typeof value === "object") {
       result = templateReplace(result, value, key + "."); //recurse
       continue;
-    //} else if (!isNaN(Date.parse(value))) {
-      //text = new Date(Date.parse(value)).toLocaleString();
+      // check if its a date in ISO format. e.g. "2021-07-16T22:16:58.985"
+    } else if (/\d+-\d+-\d+T\d+:\d+:\.*/.test(value)) {
+      text = new Date(value).toLocaleString();
+      // assume string
     } else {
-      console.log("isNaN", !isNaN(Date.parse(value)));
-      if (!isNaN(Date.parse(value))) {
-        text = new Date(Date.parse(value)).toLocaleString();
-      } else {
-        text = value.toString();  
-      }
+      text = value.toString();
     }
     while (result.indexOf("{" + prefix + key + "}") !== -1) {
       result = result.replace("{" + prefix + key + "}", text);

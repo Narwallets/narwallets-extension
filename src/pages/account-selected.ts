@@ -206,10 +206,17 @@ export async function show(accName: string, reposition?: string) {
 function initPage() {
   const backLink = new d.El("#account-selected.appface .button.back");
   backLink.onClick(Pages.backToAccountsList);
-  d.onClickId("access", changeAccessClicked);
+  
+  d.onClickId("assets-list", showAssetDetailsClicked);
+
+  // icon bar
   d.onClickId("receive", receiveClicked);
   d.onClickId("send", sendClicked);
   d.onClickId("stake", stakeClicked);
+  d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+
+  // more tab
+  d.onClickId("access", changeAccessClicked);
   d.onClickId("list-pools", listPoolsClicked);
   d.onClickId("add", addClicked);
   d.onClickId("more", moreClicked);
@@ -219,15 +226,16 @@ function initPage() {
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
   d.onClickId("search-pools", searchPoolsButtonClicked);
-  d.onClickId("assets-list", showAssetDetailsClicked);
-  d.onClickId("acc-connect-to-page", connectToWebAppClicked);
-  d.onClickId("one-tab-stake", selectFirstTab);
-  d.onClickId("two-tab-stake", selectSecondTab);
   d.onClickId("adress-book-button", showAdressBook);
   d.onClickId("contact-list", contactOptions);
   d.onClickId("refresh-button", refreshSelectedAcc);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
+  // liquid/delayed stake
+  d.onClickId("one-tab-stake", selectFirstTab);
+  d.onClickId("two-tab-stake", selectSecondTab);
+  
+  
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo-add-token");
   removeButton = new d.El("button#remove");
