@@ -672,7 +672,8 @@ async function sendClicked() {
       d.onClickId("send-max", function () {
         d.maxClicked(
           "send-to-account-amount",
-          "#selected-account .accountdetsbalance"
+          "#selected-account .accountdetsbalance",
+          0.1
         );
       });
       //comento solo para probar la parte de contactos
@@ -843,16 +844,13 @@ async function stakeClicked() {
     await fullAccessSubPage("account-selected-stake", performer);
     d.qs("#liquid-stake-radio").el.checked = true;
     d.inputById("stake-with-staking-pool").value = "";
-    d.qs("#max-stake-amount-1").innerText = c.toStringDec(amountToStake);
-    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(amountToStake);
+    d.qs("#max-stake-amount-1").innerText = c.toStringDec(Math.max(0, amountToStake - 0.1));
+    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(Math.max(0, amountToStake - 0.1));
     d.onClickId("liquid-stake-max", function () {
-      d.maxClicked(
-        "stake-amount-liquid",
-        "#selected-account .accountdetsbalance"
-      );
+      d.maxClicked("stake-amount-liquid", "#selected-account .accountdetsbalance", 0.1);
     });
     d.onClickId("max-stake-amount-2-button", function () {
-      d.maxClicked("stake-amount", "#selected-account .accountdetsbalance");
+      d.maxClicked("stake-amount", "#selected-account .accountdetsbalance", 0.1);
     });
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
     if (info.type == "lock.c")
@@ -949,7 +947,7 @@ async function performStake() {
       let hist: History;
       hist = {
         ammount: amountToStake,
-        date: new Date().toLocaleString(),
+        date: new Date(),
         type: "stake",
       };
       let foundAsset: Asset = new Asset();
@@ -1259,6 +1257,7 @@ function displayReflectTransfer(amountNear: number, dest: string) {
   if (amountNear == 0) return;
   selectedAccountData.accountInfo.lastBalance -= amountNear;
   selectedAccountData.available -= amountNear;
+  selectedAccountData.total -= amountNear;
 
   showSelectedAccount();
 }
@@ -1295,7 +1294,7 @@ async function performSend() {
     let hist: History;
     hist = {
       ammount: amountToSend,
-      date: new Date().toLocaleString(),
+      date: new Date(),
       type: "send",
     };
     selectedAccountData.accountInfo.history.unshift(hist);

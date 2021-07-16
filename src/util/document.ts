@@ -110,10 +110,10 @@ export function getNumber(selector: string) {
   return c.toNum(amountElem.value.trim());
 }
 
-export function maxClicked(id: string, selector: string) {
+export function maxClicked(id: string, selector: string, subtract: number = 0) {
   const amountElem = new El(selector);
-  console.log(amountElem.innerText);
-  inputById(id).value = amountElem.innerText;
+  const maxValue = c.toNum(amountElem.innerText) - subtract;
+  inputById(id).value = c.toStringDec(Math.max(0, maxValue));
 }
 
 //-------------------------------------------------------
@@ -304,13 +304,18 @@ export function templateReplace(
       text = "";
     } else if (typeof value === "number") {
       text = numberFormatFunction(value, key);
-    } else if (value instanceof Date) {
-      text = value.toString();
     } else if (typeof value === "object") {
       result = templateReplace(result, value, key + "."); //recurse
       continue;
+    //} else if (!isNaN(Date.parse(value))) {
+      //text = new Date(Date.parse(value)).toLocaleString();
     } else {
-      text = value.toString();
+      console.log("isNaN", !isNaN(Date.parse(value)));
+      if (!isNaN(Date.parse(value))) {
+        text = new Date(Date.parse(value)).toLocaleString();
+      } else {
+        text = value.toString();  
+      }
     }
     while (result.indexOf("{" + prefix + key + "}") !== -1) {
       result = result.replace("{" + prefix + key + "}", text);

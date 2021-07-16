@@ -41,7 +41,7 @@ export class Asset {
 }
 
 export class History {
-  date: string = "";
+  date: Date = new Date();
   type: string = "send";
   ammount: number = 0;
 }
@@ -98,7 +98,7 @@ export class ExtendedAccountData {
     this.total = accountInfo.lastBalance;
 
     this.totalUSD = this.total * nearDollarPrice;
-    if (accountInfo.history) {
+    /*if (accountInfo.history) {
       accountInfo.history.forEach((element) => {
         element.date = new Date(element.date).toLocaleString();
       });
@@ -111,7 +111,7 @@ export class ExtendedAccountData {
           });
         }
       });
-    }
+    }*/
   }
 
   get isReadOnly() {

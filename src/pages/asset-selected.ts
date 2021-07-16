@@ -208,7 +208,7 @@ function addAssetHistory(type: string, amount: number) {
   let hist: History;
   hist = {
     ammount: amount,
-    date: new Date().toLocaleString(),
+    date: new Date(),
     type: type,
   };
 
@@ -283,8 +283,7 @@ async function DelayedUnstakeOk() {
         accData.name
       );
     }
-
-    await createOrUpdateAssetUnstake(poolAccInfo);
+    await createOrUpdateAssetUnstake(poolAccInfo, c.yton(yoctosToUnstake));
     hideOkCancel();
     reloadDetails();
     showInitial();
@@ -296,17 +295,16 @@ async function DelayedUnstakeOk() {
   }
 }
 
-async function createOrUpdateAssetUnstake(poolAccInfo: any) {
+async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   let existAssetWithThisPool = false;
   let foundAsset: Asset = new Asset();
-  let amountToUnstake: number = c.toNum(
-    d.inputById("liquid-unstake-mount").value
-  );
+  let amountToUnstake: number = amount;
 
   let hist: History;
+  
   hist = {
     ammount: amountToUnstake,
-    date: new Date().toLocaleString(),
+    date: new Date(),
     type: "unstake",
   };
 
