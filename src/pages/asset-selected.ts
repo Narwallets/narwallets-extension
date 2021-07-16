@@ -27,6 +27,7 @@ import {
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
+import { localStorageSet } from "../data/util.js";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -91,6 +92,8 @@ export async function show(
   d.onClickId("asset-withdraw", Withdraw);
   d.onClickId("asset-liquid-unstake", LiquidUnstake);
   d.onClickId("asset-restake", ReStake);
+
+  localStorageSet({ reposition: "asset", account: acc.name, assetIndex:assetIndex });
 }
 
 function hideInMiddle() {

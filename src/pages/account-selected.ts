@@ -183,7 +183,7 @@ let comboAdd: d.El;
 let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
-export async function show(accName: string, reposition?: string) {
+export async function show(accName: string, reposition?: string, assetIndex?:number) {
   d.byId("topbar").innerText = "Accounts";
 
   initPage();
@@ -193,6 +193,12 @@ export async function show(accName: string, reposition?: string) {
     switch (reposition) {
       case "stake": {
         stakeClicked();
+        break;
+      }
+      case "asset": {
+        if (assetIndex!==undefined) {
+          AssetSelected_show(selectedAccountData, assetIndex);
+        }
         break;
       }
     }

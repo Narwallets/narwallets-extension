@@ -250,12 +250,14 @@ async function tryReposition() {
       break;
     }
     case "account":
+    case "asset":
     case "stake": {
       const account = await localStorageGetAndRemove("account");
+      const assetIndex = await localStorageGetAndRemove("assetIndex");
       const isLocked = await askBackgroundIsLocked();
       if (!isLocked) {
         if (account) {
-          AccountSelectedPage_show(account, reposition);
+          AccountSelectedPage_show(account, reposition, assetIndex);
         }
       }
     }
