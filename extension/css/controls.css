@@ -27,6 +27,10 @@ background-color: var(--ControlBackgroud);
 color:var(--TextLightColor);
 }
 
+.inputboxwithbutton input[type="text"]:focus {
+  outline: none;
+  border-color: var(--HighLight);
+}
 
 .inputboxwithbutton button {
 position: absolute;
@@ -124,6 +128,10 @@ background-color: var(--ControlBackgroud);
 color:var(--TextLightColor);
 }
 
+.combotextbox  input[type="text"]:focus  {
+  outline: none;
+  border-color: var(--HighLight);
+}
 .combotextboxtoken {
 width: 480px;
 height: 40px;
@@ -147,6 +155,13 @@ padding: 5px;
   border-color: var(--DarkColor);
   background-color: var(--ControlBackgroud);
   color:var(--TextLightColor);
+}
+
+.combotextboxtoken  input[type="text"]:focus  {
+  
+  outline: none;
+  border-color: var(--HighLight);
+
 }
 
 
@@ -198,6 +213,12 @@ margin:10px;
 color:var(--TextLightColor);
 }
 
+input[type="text"]:focus 
+{
+  outline: none;
+  border-color: var(--HighLight);
+}
+
 input[type="password"]  {
   border-style: solid;
   border-width: 1px;
@@ -211,6 +232,13 @@ input[type="password"]  {
   background-color: var(--ControlBackgroud);
   color:var(--TextLightColor);
   }
+
+  input[type="password"]:focus 
+  {
+    outline: none;
+    border-color: var(--HighLight);
+  }
+
 
 .button-group {
 position: fixed;
