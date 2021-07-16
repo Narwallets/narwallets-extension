@@ -99,4 +99,5 @@
   position: absolute;
   left:5px;
   top:26px; 
+  color: var(--TextLightColor);
 }
