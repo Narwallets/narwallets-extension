@@ -183,19 +183,19 @@ margin-bottom: 0px;
 .nameresult
 {
 	width: 470px;
-	height: 16px;
+	height: 20px;
 	font-size: 14px;
 	display: block;
 	background-color: var(--DarkColor);
-	color:var(--lightcolor);
+	color:var(--LightColor);
 	margin:auto;
 }
 
 .balanceresult
 {
 	width: 470px;
-	height: 16px;
-	font-size: 14px;
+	height: 24px;
+	font-size: 20px;
 	display: block;
 	background-color: var(--MedColor);
 	color:var(--DarkColor);
