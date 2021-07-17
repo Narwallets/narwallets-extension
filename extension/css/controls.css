@@ -42,11 +42,17 @@ width: 80px;
 height: 32px;
 left: 260px;
 top: 11px;
-color: var(--TextLightColor);
 border-top-right-radius: 16px;
 border-bottom-right-radius: 16px;
-background:var(--DarkColor);
+background:var(--LightColor);
 color:var(--TextLightColor);
+border-color: var(--DarkColor);
+}
+
+.inputboxwithbutton button:hover {
+
+  cursor:hand;
+
 }
 
 
