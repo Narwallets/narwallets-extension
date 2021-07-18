@@ -23,14 +23,14 @@ body { font-family: 'Inter', sans-serif; !important }
 
 	--Background: rgb(255, 255, 255);
 
-	--Block: rgb(50, 146, 255);
+	--Block: rgb(4, 121, 255);
 	--BlockText: rgb(255, 255, 255); 
 
-	--TextColor:  rgb(0,0,0);
+	--TextColor:  rgb(3, 34, 80);
 	--TextRemark: rgb(255, 127, 42); 
-	--TextGeneric: rgb(14, 24, 39);
+	--TextGeneric: rgb(6, 31, 68);
 
-	--HoverColor:rgb(255, 250, 177); /* color de hover en las listas */
+	--HoverColor:rgb(144, 194, 177); /* color de hover en las listas */
 
     --HighLight: rgb(255, 123, 0); /* color para textos importantes */
     --ControlBackgroud: rgb(212, 219, 245); 
