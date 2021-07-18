@@ -1,0 +1,61 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+@import url('https://rsms.me/inter/inter.css');
+body { font-family: 'Inter', sans-serif; !important }
+@supports (font-variation-settings: normal) {
+  body { font-family: 'Inter var', sans-serif; !important }
+}
+
+
+::-webkit-scrollbar {
+	display: none;
+  }
+
+
+
+/*Colores */
+
+:root {
+
+	/*#region Color dark 3 */
+
+	--Background: rgb(255, 255, 255);
+
+	--Block: rgb(50, 146, 255);
+	--BlockText: rgb(255, 255, 255); 
+
+	--TextColor:  rgb(0,0,0);
+	--TextRemark: rgb(255, 127, 42); 
+	--TextGeneric: rgb(14, 24, 39);
+
+	--HoverColor:rgb(255, 250, 177); /* color de hover en las listas */
+
+    --HighLight: rgb(255, 123, 0); /* color para textos importantes */
+    --ControlBackgroud: rgb(212, 219, 245); 
+	--ControlText:rgb(255, 255, 255);
+	--ControlAltText:rgb(0,0,0);
+	--ControlAccent: rgb(0, 12, 78);
+	/*#endregion */
+
+}
+
+
+body {
+	  /*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
+	  width: 480px;
+	  height: 600px;
+	  margin: 0px;
+	  overflow: hidden;
+	  padding:0px;
+	  border-style: none;
+	  border-width: 1px;
+	  background-color:var(--LightColor);
+	  
+}
+
+
+
+
+	

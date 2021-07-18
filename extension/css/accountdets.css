@@ -84,7 +84,7 @@
  text-align: unset;
  font-size: 15;
  position: absolute;
- color: var(--TextLightColor);
+ color: var(--LightColor);
  left: 0px;
  top:0px;
  background-color: var(--DarkBlockColor);

@@ -42,7 +42,7 @@
 {
 	font-size: 25px;	
 	font-weight:200;
-	color:var(--DarkColor);
+	color:var(--Block);
 
 }
 
@@ -65,7 +65,7 @@
 	width:330px;
 	margin:10px;
 	text-align: center;
-	color:var(--DarkColor);
+	color:var(--Block);
 	overflow: hidden;
 	
 	
@@ -75,7 +75,7 @@
 {
 	font-size:15px;
 	line-height: 30px;
-	color: var(--DarkColor);
+	color: var(--Block);
 	font-weight: 200;
 	
 }
@@ -84,7 +84,7 @@
 {
 	font-size:10px;
 	line-height: 10px;
-	color:var(--DarkColor);
+	color:var(--Block);
 		
 }
 
@@ -104,7 +104,7 @@
 	border-width: 1px;
 	width: 200px;
 	height: 24px;
-	border-color: var(--LightColor) ;
+	border-color: var(--ControlAccent) ;
 	left:60px;
 	top:5px;
 }
@@ -120,14 +120,14 @@
 	height: 28px;
 	left:262px;
 	top:5px;
-	background-color: var(--DarkBlockColor);
+	background-color: var(--Block);
 
 }
 
 .searchboxbutton:hover
 {
 
-	background-color:var(--MedColor);
+	background-color:var(--HoverColor);
 
 }
 .resultarea
@@ -146,15 +146,15 @@
 	display: inline-block;
 	width: 360px;
 	height: 20px;
-	background-color:var(--lightcolor);
+	background-color:var(--Background);
 	border-top-style: solid;
 	border-top-width: 1px;
-	border-color: var(--DarkColor);
+	border-color: var(--ControlAccent);
 
 }
 
 .resultline:hover
 {
-	background-color:var(--NarListHoover);
+	background-color:var(--HoverColor);
 	);
 }

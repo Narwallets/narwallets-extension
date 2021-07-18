@@ -19,27 +19,27 @@
 	height:25px;
 	border-style: solid;
 	border-width: 1px;
-	border-color: var(--DarkColor);
+	border-color: var(--ControlAccent);
 	margin:5px;
 	border-radius: 5px;
 }
 
 .loginface label
 {
-	color:var(--TextLightColor) ;
+	color:var(--ControlText) ;
 	
 }
 
 .loginface h1
 { 
-	color: var(--DarkColor);
+	color: var(--TextRemark);
 	font-weight: lighter;
 	margin-bottom: -10px;
 }
 
 .loginface h3
 {
-	color: var(--DarkColor);
+	color: var(--TextColor);
 	font-weight:normal;
 	display:inline-block;
 	width:280px;

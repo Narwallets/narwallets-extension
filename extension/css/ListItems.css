@@ -11,21 +11,21 @@
 	margin:0px;
 	border-width: 1px;
 	border-radius: 0px;
-	background-color:var(--lightcolor);
-	border-color: var(--DarkColor);
+	background-color:var(--Background);
+	border-color: var(--Block);
 	border-style: none;
 }
 
 .accountlistitem:hover 
 {
-	background-color: var(--MedColor);
+	background-color: var(--HoverColor);
 }
 
 .accountlistname 
 {
 	position:relative;
 
-	color:var(--TextLightColor);
+	color:var(--BlockText);
 	font-size: 14px;
     font-weight: 100;
 	overflow:auto;
@@ -36,14 +36,14 @@
 	width: 460px;
 	height:20px;
 	top:0px;
-	background-color: var(--DarkBlockColor);;
+	background-color: var(--Block);;
 }
 
 .accountlistbalance 
 {
 	position:absolute;
 	text-align: right;
-	color:var(--HighLight);
+	color:var(--TextRemark);
 	font-weight: 200;
 	font-size: 24px;
 	display: block;
@@ -65,7 +65,7 @@
 	top: 22px;
 	left:5px;
 	font-size: 12px;
-	color: var(--DarkColor);
+	color: var(--TextColor);
 	
 }
 
@@ -83,7 +83,7 @@ height: 68px;
 
 display: block;
 
-background: var(--LightBackground);
+background: var(--Background);
 
 border-style: none;
 
@@ -93,14 +93,14 @@ border-width: 1px;
 
 border-radius: 0px;
 
-border-color: var(--DarkColor);
+border-color: var(--Block);
 
 margin-bottom: 0px;
 
 }
   
   .accountdetsassets:hover {
-	background-color: var(--MedColor);
+	background-color: var(--HoverColor);
   }
   
   .accountassetcoin {
@@ -112,7 +112,7 @@ margin-bottom: 0px;
 	width: 40px;
 	font-size: 16px;
 	font-weight: 200;
-	color:var(--TextLightColor);
+	color:var(--TextGeneric);
 	}
   
   .accountassettoken {
@@ -129,10 +129,10 @@ margin-bottom: 0px;
 	border-style: none;
 	border-radius: 0px;
 	
-	background-color: var(--DarkBlockColor);
+	background-color: var(--Block);
 	text-align: right;
 	font-weight: 100;
-	color:var(--TextLightColor);
+	color:var(--BlockText);
 	
   }
   
@@ -155,14 +155,14 @@ margin-bottom: 0px;
 	right:15px;
 	width: 415px;
 	text-align: right;
-	color: var(--HighLight);
+	color: var(--TextRemark);
 	}
   
   .accountassetfiat {
 	position: absolute;
 	display: block;
 	border-style: none;
-	color: black;
+	color:var(--TextGeneric);
 	font-size: 12px;
 	font-weight: 500;
 	top: 45px;
@@ -187,8 +187,8 @@ margin-bottom: 0px;
 	height: 20px;
 	font-size: 14px;
 	display: block;
-	background-color: var(--DarkBlockColor);
-	color:var(--TextLightColor);
+	background-color: var(--Block);
+	color:var(--BlockText);
 	margin:auto;
 }
 
@@ -198,8 +198,8 @@ margin-bottom: 0px;
 	height: 24px;
 	font-size: 20px;
 	display: block;
-	background-color: var(--MedColor);
-	color:var(--DarkColor);
+	background-color: var(--HoverColor);
+	color:var(--TextRemark);
 	margin: auto;
 	margin-bottom: 3px;
 }

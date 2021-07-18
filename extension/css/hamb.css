@@ -56,7 +56,7 @@ aside {
   top: 0;
   left: 481px;
   transition: transform 0.3s ease-in-out;
-  background-color: lightgray;
+  background-color:var(--Background);
   z-index: 99;
   opacity: 1;
   width: 100%;
@@ -114,7 +114,7 @@ aside > nav > li {
 }
 
 aside > nav > li:hover {
-  background-color: #939aa03b;
+  background-color:var(--HoverColor);
   cursor: pointer;
 }
 
@@ -147,7 +147,7 @@ NETWORK selection drop-down
 */
 
 .network-component.pointer {
-  border: 2px solid var(--DarkColor);
+  border: 2px solid var(--ControlAccent);
   border-radius: 24px;
   padding: 3px;
   width: 240px;
@@ -161,7 +161,7 @@ NETWORK selection drop-down
   width: 230px ;
   align-items: center;
   font-size: 14px;
-  color: var(--DarkColor);
+  color: var(--Block);
   font-weight: 400;
   flex-flow: row nowrap;
 }
@@ -169,14 +169,14 @@ NETWORK selection drop-down
 li {
   list-style-type: none;
   overflow-x: hidden;
-  color:black;
+  color:var(--TextGeneric);
   white-space:nowrap;
 }
 
 li#current-network-display-name {
   max-height: 20px;
   width: 220px;
-  color:var(--DarkColor);
+  color:var(--TextGeneric);
 }
 
 .circle:before {
@@ -238,7 +238,7 @@ li#current-network-display-name {
 }
 
 .network-box-header .title {
-  color: var(--LightBorderLightAccent) smoke;
+  color: var(--ControlAccent) smoke;
   color:white;
   font-size: 14pt;
   padding-bottom: 5px;
