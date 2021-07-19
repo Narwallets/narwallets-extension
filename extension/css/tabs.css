@@ -12,14 +12,15 @@
   padding-bottom: 5px;
   height: 10px;
   width: auto;
-  margin: 0px 2px;
+  margin: 0px;
+  margin-left: 15px;
+  margin-right:15px;
   margin-bottom: 7px;
   background: transparent;
   display: inline-block;
   color:var(--ControlAltText);
   border-width: 2px;
-  border-style: none;
- 
+  border-style: none; 
 }
 
 .tab:hover {

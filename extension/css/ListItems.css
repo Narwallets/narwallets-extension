@@ -9,6 +9,7 @@
 	font-weight: lighter;
 	overflow: hidden;
 	margin:0px;
+	margin-bottom: 10px;
 	border-width: 1px;
 	border-radius: 0px;
 	background-color:var(--Background);

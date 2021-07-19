@@ -32,7 +32,7 @@ h3
 
 h4
 {
-  color: var(--HoverColor);
+  color: var(--BlockText);
   font-size: 12px;
   font-weight: 200;
   display: block;
@@ -43,7 +43,18 @@ h4
   margin-top:15px;
 }
 
-
+h5
+{
+  color: var(--HoverColor);
+  font-size: 12px;
+  font-weight: 200;
+  display: block;
+  width: 400px;
+  height: auto;
+  word-wrap: break-word;
+  margin: auto;
+  margin-top:15px;
+}
 
 .appface.show {
   left: 0px;
@@ -377,7 +388,7 @@ h4
   position: absolute;
   left: 10px;
   right: 10px;
-  bottom: 20px;
+  bottom: 80px;
   z-index: 999;
 }
 

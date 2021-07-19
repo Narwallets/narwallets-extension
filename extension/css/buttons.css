@@ -33,7 +33,7 @@
   display: block;
   margin: auto;
   background-repeat: no-repeat;
-  color:var(--ControlBackgroud);
+  color:var(--TextGeneric);
   font-size: 10px;
   text-align: center; 
   border-style: none;
