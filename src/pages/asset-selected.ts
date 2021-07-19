@@ -27,12 +27,15 @@ import {
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
+import { addressContacts, saveContactOnBook } from "./address-book.js";
+import { GContact } from "../data/Contact.js";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
 let asset_index: number;
 let accData: ExtendedAccountData;
 let isMoreOptionsOpen = false;
+let contactToAdd: string;
 
 // page init
 export async function show(
@@ -435,6 +438,7 @@ async function sendOKClicked() {
 async function performSend() {
   try {
     const toAccName = d.byId("asset-send-confirmation-receiver").innerText;
+    contactToAdd = toAccName;
     const amountToSend = c.toNum(
       d.byId("asset-send-confirmation-amount").innerText
     );
@@ -475,8 +479,7 @@ async function performSend() {
         toAccName
     );
 
-    //Checkear
-    //displayReflectTransfer(amountToSend, toAccName);
+    checkContactList();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -528,6 +531,50 @@ async function refreshSaveSelectedAccount() {
 
 async function saveSelectedAccount(): Promise<any> {
   return askBackgroundSetAccount(accData.name, accData.accountInfo);
+}
+
+async function checkContactList() {
+  const toAccName = contactToAdd;
+  let found = false;
+
+  if (addressContacts.length < 1) {
+    d.showSubPage("sure-add-contact-asset");
+    showOKCancel(addContactToList, showInitial);
+  }
+
+  addressContacts.forEach((contact) => {
+    if (contact.accountId == toAccName) {
+      found = true;
+    }
+  });
+
+  if (found) {
+    showInitial();
+    hideOkCancel();
+  } else {
+    d.showSubPage("sure-add-contact-asset");
+    d.byId("asset-add-confirmation-name").innerText = contactToAdd;
+    showOKCancel(addContactToList, showInitial);
+  }
+}
+
+async function addContactToList() {
+  try {
+    const contactToSave: GContact = {
+      accountId: contactToAdd,
+      note: "",
+    };
+
+    addressContacts.push(contactToSave);
+
+    d.showSuccess("Success");
+    hideOkCancel();
+    populateSendCombo("combo-send-asset");
+    await saveContactOnBook(contactToSave.accountId, contactToSave);
+    showInitial();
+  } catch {
+    d.showErr("Error in save contact");
+  }
 }
 
 // function displayReflectTransfer(amountToSend: number, toAccName: string) {

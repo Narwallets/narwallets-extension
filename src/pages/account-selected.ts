@@ -703,6 +703,7 @@ async function checkContactList() {
     hideOkCancel();
   } else {
     d.showSubPage("sure-add-contact");
+    d.byId("add-confirmation-name").innerText = toAccName;
     showOKCancel(addContactToList, showInitial);
   }
 }
@@ -1277,8 +1278,6 @@ async function performSend() {
       c.ntoy(amountToSend)
     );
 
-    await checkContactList();
-
     //TODO transaction history per network
     //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
     //global.state.transactions[Network.current].push(transactionInfo)
@@ -1304,6 +1303,7 @@ async function performSend() {
     displayReflectTransfer(amountToSend, toAccName);
     await refreshSelectedAcc();
     await saveSelectedAccount();
+    await checkContactList();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
