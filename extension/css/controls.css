@@ -22,9 +22,15 @@ width: 220px;
 height: 32px;
 left: 32px;
 top: 1px;
-border-color: var(--DarkColor);
+border-color: var(--Block);
+background-color: var(--ControlBackgroud);
+color:var(--ControlAltText);
 }
 
+.inputboxwithbutton input[type="text"]:focus {
+  outline: none;
+  border-color: var(--HighLight);
+}
 
 .inputboxwithbutton button {
 position: absolute;
@@ -36,10 +42,17 @@ width: 80px;
 height: 32px;
 left: 260px;
 top: 11px;
-color: var(--LightColor);
 border-top-right-radius: 16px;
 border-bottom-right-radius: 16px;
-background:var(--DarkColor);
+background:var(--Block);
+color:var(--ControlText);
+border-color: var(--Block);
+}
+
+.inputboxwithbutton button:hover {
+
+  cursor:hand;
+
 }
 
 
@@ -53,8 +66,8 @@ position:relative;
 }
 
 .combobox select {
-background-color: #0563af;
-color:var(--LightBorderLightAccent);
+background-color:var(--ControlBackgroud);
+color:var(--ControlText);
 padding: 5px;
 width: 250px;
 border: none;
@@ -116,9 +129,15 @@ height: 32px;
 margin: auto;
 margin-bottom: 10px;
 top: 1px;
-border-color: var(--DarkColor);
+border-color: var(--Block);
+background-color: var(--ControlBackgroud);
+color:var(--ControlAltText);
 }
 
+.combotextbox  input[type="text"]:focus  {
+  outline: none;
+  border-color: var(--HighLight);
+}
 .combotextboxtoken {
 width: 480px;
 height: 40px;
@@ -139,7 +158,16 @@ padding: 5px;
   height: 32px;
   margin: auto;
   top: 1px;
-  border-color: var(--DarkColor);
+  border-color: var(--Block);
+  background-color: var(--ControlBackgroud);
+  color:var(--ControlAltText);
+}
+
+.combotextboxtoken  input[type="text"]:focus  {
+  
+  outline: none;
+  border-color: var(--HighLight);
+
 }
 
 
@@ -167,7 +195,7 @@ top:-12px;
 /*#region misc */
 
 label {
-color: black;
+color:var(--DarkColor);
 font-weight: 300;
 font-size: 12;
 padding: 0px;
@@ -181,25 +209,42 @@ input[type="text"]  {
 border-style: solid;
 border-width: 1px;
 border-radius: 16px;
-border-color: var(--DarkColor);
+border-color: var(--Block);
+background-color: var(--ControlBackgroud);
 height: 32px;
 padding: 5px;
 width: 300px;
 text-align: center;
 margin:10px;
+color:var(--ControlAltText);
+}
+
+input[type="text"]:focus 
+{
+  outline: none;
+  border-color: var(--HighLight);
 }
 
 input[type="password"]  {
   border-style: solid;
   border-width: 1px;
   border-radius: 16px;
-  border-color: var(--DarkColor);
+  border-color: var(--Block);
   height: 32px;
   padding: 5px;
   width: 300px;
   text-align: center;
   margin:10px;
+  background-color: var(--ControlBackgroud);
+  color:var(--ControlAltText);
   }
+
+  input[type="password"]:focus 
+  {
+    outline: none;
+    border-color: var(--HighLight);
+  }
+
 
 .button-group {
 position: fixed;

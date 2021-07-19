@@ -7,13 +7,14 @@
 const base1e=BigInt(10);
 function b1e(n:number){return base1e**BigInt(n)};
 const b1e12=b1e(12);
+const b1e18=b1e(18);
 const b1e24=b1e(24);
 
 export function TGas(tgas:number):string {
     return (BigInt(tgas)*b1e12).toString(); // tgas*1e12 // Note: gas is u64
   }
 export function ntoy(near:number):string {
-    return (BigInt(near)*b1e24).toString(); // near*1e24 // Note: YoctoNear is u128
+    return (BigInt(Math.trunc(near*1e6))*b1e18).toString(); // near*1e24 // Note: YoctoNear is u128
 }
 
 /**

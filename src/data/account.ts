@@ -41,9 +41,9 @@ export class Asset {
 }
 
 export class History {
-  date: string = "";
+  date: string = ""; //store as date.toISOString() so JSON.stringify/parse does not change the value
   type: string = "send";
-  ammount: number = 0;
+  amount: number = 0;
 }
 
 export class ExtendedAccountData {
@@ -98,7 +98,7 @@ export class ExtendedAccountData {
     this.total = accountInfo.lastBalance;
 
     this.totalUSD = this.total * nearDollarPrice;
-    if (accountInfo.history) {
+    /*if (accountInfo.history) {
       accountInfo.history.forEach((element) => {
         element.date = new Date(element.date).toLocaleString();
       });
@@ -111,7 +111,7 @@ export class ExtendedAccountData {
           });
         }
       });
-    }
+    }*/
   }
 
   get isReadOnly() {

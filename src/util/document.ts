@@ -42,7 +42,7 @@ export function byId(id: string): HTMLElement {
  * gets checked radiobutton by name
  * @param name
  */
- export function checkedRadioButton(name: string): HTMLElement {
+export function checkedRadioButton(name: string): HTMLElement {
   try {
     return document.querySelector('input[name=' + name + ']:checked') as HTMLElement;
   } catch {
@@ -110,10 +110,10 @@ export function getNumber(selector: string) {
   return c.toNum(amountElem.value.trim());
 }
 
-export function maxClicked(id: string, selector: string) {
+export function maxClicked(id: string, selector: string, subtract: number = 0) {
   const amountElem = new El(selector);
-  console.log(amountElem.innerText);
-  inputById(id).value = amountElem.innerText;
+  const maxValue = c.toNum(amountElem.innerText) - subtract;
+  inputById(id).value = c.toStringDec(Math.max(0, maxValue));
 }
 
 //-------------------------------------------------------
@@ -201,7 +201,7 @@ function addShowErr() {
 export function hideErr() {
   try {
     byId(ERR_DIV).innerHTML = "";
-  } catch {}
+  } catch { }
 }
 
 var errorId = 0;
@@ -304,11 +304,13 @@ export function templateReplace(
       text = "";
     } else if (typeof value === "number") {
       text = numberFormatFunction(value, key);
-    } else if (value instanceof Date) {
-      text = value.toString();
     } else if (typeof value === "object") {
       result = templateReplace(result, value, key + "."); //recurse
       continue;
+      // check if its a date in ISO format. e.g. "2021-07-16T22:16:58.985"
+    } else if (/\d+-\d+-\d+T\d+:\d+:\.*/.test(value)) {
+      text = new Date(value).toLocaleString();
+      // assume string
     } else {
       text = value.toString();
     }

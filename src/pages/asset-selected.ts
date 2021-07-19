@@ -29,6 +29,7 @@ import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { addressContacts, saveContactOnBook } from "./address-book.js";
 import { GContact } from "../data/Contact.js";
+import { localStorageSet } from "../data/util.js";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -94,6 +95,12 @@ export async function show(
   d.onClickId("asset-withdraw", Withdraw);
   d.onClickId("asset-liquid-unstake", LiquidUnstake);
   d.onClickId("asset-restake", ReStake);
+
+  localStorageSet({
+    reposition: "asset",
+    account: acc.name,
+    assetIndex: assetIndex,
+  });
 }
 
 function hideInMiddle() {
@@ -210,8 +217,8 @@ async function LiquidUnstake() {
 function addAssetHistory(type: string, amount: number) {
   let hist: History;
   hist = {
-    ammount: amount,
-    date: new Date().toLocaleString(),
+    amount: amount,
+    date: new Date().toISOString(),
     type: type,
   };
 
@@ -286,8 +293,7 @@ async function DelayedUnstakeOk() {
         accData.name
       );
     }
-
-    await createOrUpdateAssetUnstake(poolAccInfo);
+    await createOrUpdateAssetUnstake(poolAccInfo, c.yton(yoctosToUnstake));
     hideOkCancel();
     reloadDetails();
     showInitial();
@@ -299,17 +305,16 @@ async function DelayedUnstakeOk() {
   }
 }
 
-async function createOrUpdateAssetUnstake(poolAccInfo: any) {
+async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   let existAssetWithThisPool = false;
   let foundAsset: Asset = new Asset();
-  let amountToUnstake: number = c.toNum(
-    d.inputById("liquid-unstake-mount").value
-  );
+  let amountToUnstake: number = amount;
 
   let hist: History;
+
   hist = {
-    ammount: amountToUnstake,
-    date: new Date().toLocaleString(),
+    amount: amountToUnstake,
+    date: new Date().toISOString(), //so it's the same as when the data is JSON.parsed() from localStorage
     type: "unstake",
   };
 

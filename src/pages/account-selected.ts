@@ -183,7 +183,7 @@ let comboAdd: d.El;
 let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
-export async function show(accName: string, reposition?: string) {
+export async function show(accName: string, reposition?: string, assetIndex?:number) {
   d.byId("topbar").innerText = "Accounts";
 
   initPage();
@@ -193,6 +193,12 @@ export async function show(accName: string, reposition?: string) {
     switch (reposition) {
       case "stake": {
         stakeClicked();
+        break;
+      }
+      case "asset": {
+        if (assetIndex!==undefined) {
+          AssetSelected_show(selectedAccountData, assetIndex);
+        }
         break;
       }
     }
@@ -206,10 +212,17 @@ export async function show(accName: string, reposition?: string) {
 function initPage() {
   const backLink = new d.El("#account-selected.appface .button.back");
   backLink.onClick(Pages.backToAccountsList);
-  d.onClickId("access", changeAccessClicked);
+  
+  d.onClickId("assets-list", showAssetDetailsClicked);
+
+  // icon bar
   d.onClickId("receive", receiveClicked);
   d.onClickId("send", sendClicked);
   d.onClickId("stake", stakeClicked);
+  d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+
+  // more tab
+  d.onClickId("access", changeAccessClicked);
   d.onClickId("list-pools", listPoolsClicked);
   d.onClickId("add", addClicked);
   d.onClickId("more", moreClicked);
@@ -219,15 +232,16 @@ function initPage() {
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
   d.onClickId("search-pools", searchPoolsButtonClicked);
-  d.onClickId("assets-list", showAssetDetailsClicked);
-  d.onClickId("acc-connect-to-page", connectToWebAppClicked);
-  d.onClickId("one-tab-stake", selectFirstTab);
-  d.onClickId("two-tab-stake", selectSecondTab);
   d.onClickId("adress-book-button", showAdressBook);
   d.onClickId("contact-list", contactOptions);
   d.onClickId("refresh-button", refreshSelectedAcc);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
+  // liquid/delayed stake
+  d.onClickId("one-tab-stake", selectFirstTab);
+  d.onClickId("two-tab-stake", selectSecondTab);
+  
+  
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo-add-token");
   removeButton = new d.El("button#remove");
@@ -672,7 +686,8 @@ async function sendClicked() {
       d.onClickId("send-max", function () {
         d.maxClicked(
           "send-to-account-amount",
-          "#selected-account .accountdetsbalance"
+          "#selected-account .accountdetsbalance",
+          0.1
         );
       });
       //comento solo para probar la parte de contactos
@@ -844,16 +859,13 @@ async function stakeClicked() {
     await fullAccessSubPage("account-selected-stake", performer);
     d.qs("#liquid-stake-radio").el.checked = true;
     d.inputById("stake-with-staking-pool").value = "";
-    d.qs("#max-stake-amount-1").innerText = c.toStringDec(amountToStake);
-    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(amountToStake);
+    d.qs("#max-stake-amount-1").innerText = c.toStringDec(Math.max(0, amountToStake - 0.1));
+    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(Math.max(0, amountToStake - 0.1));
     d.onClickId("liquid-stake-max", function () {
-      d.maxClicked(
-        "stake-amount-liquid",
-        "#selected-account .accountdetsbalance"
-      );
+      d.maxClicked("stake-amount-liquid", "#selected-account .accountdetsbalance", 0.1);
     });
     d.onClickId("max-stake-amount-2-button", function () {
-      d.maxClicked("stake-amount", "#selected-account .accountdetsbalance");
+      d.maxClicked("stake-amount", "#selected-account .accountdetsbalance", 0.1);
     });
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
     if (info.type == "lock.c")
@@ -949,8 +961,8 @@ async function performStake() {
 
       let hist: History;
       hist = {
-        ammount: amountToStake,
-        date: new Date().toLocaleString(),
+        amount: amountToStake,
+        date: new Date().toISOString(),
         type: "stake",
       };
       let foundAsset: Asset = new Asset();
@@ -1067,7 +1079,7 @@ async function unstakeClicked() {
     d.byId("unstake-from-staking-pool").innerText = "";
     optionWU.hide();
     if (info.type == "lock.c") {
-      //lockup - allways full amount
+      //lockup - always full amount
       d.qs("#unstake-ALL-label").show();
       await checkOwnerAccessThrows("unstake");
       performer = performLockupContractUnstake;
@@ -1132,8 +1144,8 @@ async function performUnstake() {
     disableOKCancel();
     d.showWait();
 
-    const modeWithraw = d.inputById("radio-withdraw").checked;
-    const modeUnstake = !modeWithraw;
+    const modeWithdraw = d.inputById("radio-withdraw").checked;
+    const modeUnstake = !modeWithdraw;
 
     const amount = c.toNum(d.inputById("unstake-amount").value);
     if (!isValidAmount(amount)) throw Error("Amount is not valid");
@@ -1150,7 +1162,7 @@ async function performUnstake() {
     //   actualSP
     // );
 
-    if (modeWithraw) {
+    if (modeWithdraw) {
       // if (poolAccInfo.unstaked_balance == "0")
       //   throw Error("No funds unstaked to withdraw");
 
@@ -1260,6 +1272,7 @@ function displayReflectTransfer(amountNear: number, dest: string) {
   if (amountNear == 0) return;
   selectedAccountData.accountInfo.lastBalance -= amountNear;
   selectedAccountData.available -= amountNear;
+  selectedAccountData.total -= amountNear;
 
   showSelectedAccount();
 }
@@ -1293,8 +1306,8 @@ async function performSend() {
 
     let hist: History;
     hist = {
-      ammount: amountToSend,
-      date: new Date().toLocaleString(),
+      amount: amountToSend,
+      date: new Date().toISOString(),
       type: "send",
     };
     selectedAccountData.accountInfo.history.unshift(hist);

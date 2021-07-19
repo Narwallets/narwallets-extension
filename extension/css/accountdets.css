@@ -27,7 +27,7 @@
   width: 359px;
   height: 58px;
   display: block;
-  background-color: var(--NarListBack);
+  background-color: var(--LightColor);
   margin: 0px;
   padding: 0px;
   top: 0px;
@@ -84,10 +84,10 @@
  text-align: unset;
  font-size: 15;
  position: absolute;
- color: var(--LightColor);
+ color: var(--BlockText);
  left: 0px;
  top:0px;
- background-color: var(--DarkColor);
+ background-color: var(--Block);
  padding: 2px;
  font-weight: 200;
  width: 480px;
@@ -99,4 +99,5 @@
   position: absolute;
   left:5px;
   top:26px; 
+  color: var(--TextGeneric);
 }

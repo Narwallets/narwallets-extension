@@ -6,7 +6,7 @@
     top: 44px;
     width: 480px;
     height: 550px;
-    background:var(--LightColor);
+    background:var(--Background);
     /* background:var(--midcolor); */
     overflow: hidden;
     text-align: center;
@@ -27,7 +27,7 @@
     
     border-radius: 5px;
 
-    background:var(--LightColor);
+    background:var(--Block);
 
     overflow-y: hidden;
   }
@@ -48,7 +48,7 @@
     justify-content: center;
 
     
-    background: var(--DarkColor);
+    background: var(--Block);
     
     overflow-y: hidden;
 
@@ -62,7 +62,7 @@
     width: 470;
     height: 320px;
     margin:5px;
-    background:var(--LightColor);
+    background:var(--Background);
     text-align: center;
     align-items: center;
     border-radius: 5px;
@@ -92,7 +92,7 @@
     height: 547px;
     margin:5px;
 
-    background:var(--LightColor);
+    background:var(--Background);
 
 
     overflow-y: hidden;
@@ -114,7 +114,7 @@
     display: inline-flex;
     justify-content: flex-end;
 
-    background:var(--DarkColor);
+    background:var(--Block);
     
   }
 
@@ -128,8 +128,8 @@
     align-items: center;
     margin:auto;
 
-    color: var(--LightColor);
-    background-color: var(--DarkColor);
+    color: var(--BlockText);
+    background-color: var(--Block);
 
     height: 48px;	
     width: 470px;   
@@ -157,7 +157,7 @@
   height: 15px;
   width: 260px;
   text-align: center;
-  color: var(--DarkColor);
+  color: var(--TextGeneric);
   font-size: 12px;
   font-weight: 200;
 
@@ -168,7 +168,7 @@
   margin: auto;
   margin-top: 8px;
   margin-bottom: 0px;
-  color: var(--HighLight);
+  color: var(--TextGeneric);
   max-height: 24px;
   height: 15px;
   width: 260px;
@@ -196,7 +196,7 @@
   height: 15px;
   width: 260px;
   text-align: center;
-  color: var(--DarkBorderDarkAccent);
+  color: var(--BlockText);
   font-size: 12px;
   font-weight: 200;
   }
@@ -215,7 +215,7 @@
   font-size: 28px;
   font-weight: 200;
 
-  color: var(--HighLight);
+  color: var(--TextRemark);
   }
 
   .accountdetsbalance svg {
@@ -241,7 +241,7 @@
   align-items: center;
   width: 260px;
   background: transparent;
-  color: var(--d);
+  color: var(--TextGeneric);
   font-size: 15px;
   font-weight: 400;
   }
