@@ -41,6 +41,7 @@ import {
   askBackgroundAllNetworkAccounts,
   askBackgroundSetAccount,
   askBackgroundViewMethod,
+  askBackgroundGetState,
 } from "../background/askBackground.js";
 import {
   BatchTransaction,
@@ -1495,11 +1496,29 @@ export function showPrivateKeyClicked() {
     showOKCancel(makeFullAccessOKClicked, showInitial);
   } else {
     //normal acc priv key
-    d.showSubPage("account-selected-show-private-key");
-    d.byId("account-selected-private-key").innerText =
-      selectedAccountData.accountInfo.privateKey || "";
-    showOKCancel(showInitial, showInitial);
+    
+    d.showSubPage("request-password");
+    showOKCancel(showPrivateKeyValidationPasswordClicked, showInitial);  
   }
+}
+
+//---------------------------------------
+async function showPrivateKeyValidationPasswordClicked() {
+  const state = await askBackgroundGetState()
+  const inputEmail = state.currentUser;
+  
+  //const inputEmail = d.inputById("password-request-email");
+  const inputPassword = d.inputById("password-request-password").value;
+  try {
+    await askBackground({code:"unlockSecureState",email:inputEmail, password:inputPassword})
+  } catch(error) {
+    d.showErr(error);
+    return;
+  }
+  d.showSubPage("account-selected-show-private-key");
+  d.byId("account-selected-private-key").innerText =
+    selectedAccountData.accountInfo.privateKey || "";
+  showOKCancel(showInitial, showInitial);
 }
 
 //---------------------------------------
