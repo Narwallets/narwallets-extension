@@ -24,6 +24,7 @@ import {
   STAKE_DEFAULT_SVG,
   populateSendCombo,
   show as AccountSelectedPage_show,
+  UNSTAKE_DEFAULT_SVG,
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
@@ -342,7 +343,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
         balance: result,
         type: "unstake",
         symbol: "UNSTAKED",
-        icon: STAKE_DEFAULT_SVG,
+        icon: UNSTAKE_DEFAULT_SVG,
         history: [],
       };
       asset.history.unshift(hist);

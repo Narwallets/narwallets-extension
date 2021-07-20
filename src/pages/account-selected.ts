@@ -73,21 +73,57 @@ import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/Contact.js";
 
 const THIS_PAGE = "account-selected";
-export const STAKE_DEFAULT_SVG = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-viewBox="0 0 67.8 67.8" style="enable-background:new 0 0 67.8 67.8;" xml:space="preserve">
-<style type="text/css">	.st0{fill:#545454;}</style>
-<g id="Capa_1-2">
-<path class="st0" d="M33.9,0C15.2,0,0,15.2,0,33.9s15.2,33.9,33.9,33.9s33.9-15.2,33.9-33.9c0,0,0,0,0,0C67.8,15.2,52.6,0,33.9,0z
-  M29.9,29l0.9,0.5c4.5,2.4,9.2,4.1,14.1,5.3c-3.6,0.5-7.3,0.7-10.9,0.7c-9.6,0-17.4-1.5-17.4-3.2C16.5,30.6,22.2,29.3,29.9,29
- L29.9,29z M51.4,53.6L51.4,53.6c0,0.1,0,0.2,0,0.2c0,1.8-7.8,3.2-17.4,3.2s-17.4-1.5-17.4-3.2c0-0.1,0-0.2,0-0.2h0v-5.2h0
- c0.6,1.7,8.1,3,17.4,3s16.8-1.3,17.4-3l0,0L51.4,53.6z M51.4,46.4L51.4,46.4c0,0.1,0,0.2,0,0.2c0,1.8-7.8,3.2-17.4,3.2
- s-17.4-1.5-17.4-3.2c0-0.1,0-0.2,0-0.2h0v-5.2h0c0.6,1.7,8.1,3,17.4,3s16.8-1.3,17.4-3l0,0L51.4,46.4z M51.4,39.3L51.4,39.3
- c0,0.1,0,0.2,0,0.2c0,1.8-7.8,3.3-17.4,3.3s-17.4-1.5-17.4-3.3c0-0.1,0-0.2,0-0.2h0v-5.2h0c0.6,1.7,8.1,3,17.4,3s16.8-1.3,17.4-3
- l0,0L51.4,39.3z M51,32L51,32c0,0.1,0,0.2,0,0.2c-0.7,1.6-8.5-0.2-17.2-4.1S18.3,19.7,19,18c0-0.1,0.1-0.1,0.1-0.2l0,0l2.1-4.7l0,0
- c-0.1,1.8,6.2,6.1,14.6,9.8s15.9,5.6,17.1,4.3l0,0L51,32z M54.2,25.4c-0.7,1.6-8.5-0.2-17.2-4.1s-15.4-8.4-14.6-10.1
- s8.5,0.2,17.2,4.1S54.8,23.8,54.2,25.4L54.2,25.4z"/>
+export const STAKE_DEFAULT_SVG = `<svg
+version="1.1"
+id="Capa_1"
+x="0px"
+y="0px"
+viewBox="0 0 67.8 67.8"
+style="enable-background:new 0 0 67.8 67.8;"
+xml:space="preserve"
+sodipodi:docname="stake_icon.svg"
+inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:svg="http://www.w3.org/2000/svg"><defs
+id="defs10" /><sodipodi:namedview
+id="namedview8"
+pagecolor="#ffffff"
+bordercolor="#666666"
+borderopacity="1.0"
+inkscape:pageshadow="2"
+inkscape:pageopacity="0.0"
+inkscape:pagecheckerboard="0"
+showgrid="false"
+inkscape:zoom="8.3225839"
+inkscape:cx="22.048441"
+inkscape:cy="38.38952"
+inkscape:window-width="1842"
+inkscape:window-height="983"
+inkscape:window-x="-8"
+inkscape:window-y="-8"
+inkscape:window-maximized="1"
+inkscape:current-layer="Capa_1" />
+<style
+type="text/css"
+id="style2">	.st0{fill:#545454;}</style>
+<ellipse
+style="fill:#ffd2e6;fill-opacity:1"
+id="path849"
+cx="33.883709"
+cy="33.823631"
+rx="33.883709"
+ry="33.823631" /><g
+id="Capa_1-2"
+transform="matrix(0.89721254,0,0,0.89721254,3.4844948,3.4844948)">
+<path
+class="st0"
+d="M 33.9,0 C 15.2,0 0,15.2 0,33.9 c 0,18.7 15.2,33.9 33.9,33.9 18.7,0 33.9,-15.2 33.9,-33.9 0,0 0,0 0,0 C 67.8,15.2 52.6,0 33.9,0 Z m -4,29 0.9,0.5 c 4.5,2.4 9.2,4.1 14.1,5.3 -3.6,0.5 -7.3,0.7 -10.9,0.7 -9.6,0 -17.4,-1.5 -17.4,-3.2 -0.1,-1.7 5.6,-3 13.3,-3.3 z m 21.5,24.6 v 0 c 0,0.1 0,0.2 0,0.2 0,1.8 -7.8,3.2 -17.4,3.2 -9.6,0 -17.4,-1.5 -17.4,-3.2 0,-0.1 0,-0.2 0,-0.2 v 0 -5.2 0 c 0.6,1.7 8.1,3 17.4,3 9.3,0 16.8,-1.3 17.4,-3 v 0 z m 0,-7.2 v 0 c 0,0.1 0,0.2 0,0.2 0,1.8 -7.8,3.2 -17.4,3.2 -9.6,0 -17.4,-1.5 -17.4,-3.2 0,-0.1 0,-0.2 0,-0.2 v 0 -5.2 0 c 0.6,1.7 8.1,3 17.4,3 9.3,0 16.8,-1.3 17.4,-3 v 0 z m 0,-7.1 v 0 c 0,0.1 0,0.2 0,0.2 0,1.8 -7.8,3.3 -17.4,3.3 -9.6,0 -17.4,-1.5 -17.4,-3.3 0,-0.1 0,-0.2 0,-0.2 v 0 -5.2 0 c 0.6,1.7 8.1,3 17.4,3 9.3,0 16.8,-1.3 17.4,-3 v 0 z M 51,32 v 0 c 0,0.1 0,0.2 0,0.2 C 50.3,33.8 42.5,32 33.8,28.1 25.1,24.2 18.3,19.7 19,18 c 0,-0.1 0.1,-0.1 0.1,-0.2 v 0 l 2.1,-4.7 v 0 c -0.1,1.8 6.2,6.1 14.6,9.8 8.4,3.7 15.9,5.6 17.1,4.3 v 0 z m 3.2,-6.6 C 53.5,27 45.7,25.2 37,21.3 28.3,17.4 21.6,12.9 22.4,11.2 c 0.8,-1.7 8.5,0.2 17.2,4.1 8.7,3.9 15.2,8.5 14.6,10.1 z"
+id="path4" />
 </g>
 </svg>`;
+export const UNSTAKE_DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.8 67.8"><defs><style>  .cls-1{fill:#fff;}</style></defs><ellipse cx="33.8" cy="34" rx="33.8" ry="34" fill="#ffceda"/><path d="M33.8 5.2A28.9 28.9 0 1 0 62.7 34.2 28.9 28.9 0 0 0 33.8 5.2ZM33.4 14.7 43.7 25.1H39.3V37.4H27.6V25.1h-4.5zm7.8 13.9c4.4 0.5 7.4 1.3 7.4 2.4 0 1-3 1.9-7.4 2.4zm-15.2 0.1v4.8c-4.3-0.5-7.2-1.3-7.2-2.3 0-1 2.9-1.9 7.2-2.4zm22.6 3.8v4.4a0.6 0.6 0 0 1 0 0.2c0 1.5-6.7 2.8-14.9 2.8-8.2 0-14.9-1.2-14.9-2.8a0.6 0.6 0 0 1 0-0.2h0v-4.4h0c0.3 0.9 3.1 1.7 7.1 2.2v4.2h15.2v-4.1c4.2-0.5 7.1-1.3 7.4-2.2zm0 6.1v4.4a0.6 0.6 0 0 1 0 0.2c0 1.5-6.7 2.8-14.9 2.8-8.2 0-14.9-1.2-14.9-2.8a0.6 0.6 0 0 1 0-0.2h0v-4.4h0c0.5 1.4 7 2.6 14.8 2.6 7.9 0 14.3-1.1 14.9-2.6zm0 6.2v4.4a0.6 0.6 0 0 1 0 0.2c0 1.5-6.7 2.8-14.9 2.8-8.2 0-14.9-1.2-14.9-2.8a0.6 0.6 0 0 1 0-0.2h0v-4.4h0c0.5 1.4 7 2.6 14.8 2.6 7.9 0 14.3-1.1 14.9-2.6z" style="fill:#575655;stroke-width:0.9"/></svg>`;
 
 export const STNEAR_SVG = `<svg viewBox="0 0 67.79 67.79" version="1.1" id="svg407" sodipodi:docname="stnear.svg" inkscape:version="1.1 (c68e22c387, 2021-05-23)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
 xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -184,7 +220,7 @@ let comboAdd: d.El;
 let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
-export async function show(accName: string, reposition?: string, assetIndex?:number) {
+export async function show(accName: string, reposition?: string, assetIndex?: number) {
   d.byId("topbar").innerText = "Accounts";
 
   initPage();
@@ -197,7 +233,7 @@ export async function show(accName: string, reposition?: string, assetIndex?:num
         break;
       }
       case "asset": {
-        if (assetIndex!==undefined) {
+        if (assetIndex !== undefined) {
           AssetSelected_show(selectedAccountData, assetIndex);
         }
         break;
@@ -213,7 +249,7 @@ export async function show(accName: string, reposition?: string, assetIndex?:num
 function initPage() {
   const backLink = new d.El("#account-selected.appface .button.back");
   backLink.onClick(Pages.backToAccountsList);
-  
+
   d.onClickId("assets-list", showAssetDetailsClicked);
 
   // icon bar
@@ -241,8 +277,8 @@ function initPage() {
   // liquid/delayed stake
   d.onClickId("one-tab-stake", selectFirstTab);
   d.onClickId("two-tab-stake", selectSecondTab);
-  
-  
+
+
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo-add-token");
   removeButton = new d.El("button#remove");
@@ -566,8 +602,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-          selectedAccountData.accountInfo.ownerId +
-          " to operate this lockup account"
+        selectedAccountData.accountInfo.ownerId +
+        " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() //no hay  espacio
   } else {
@@ -656,11 +692,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-          info.ownerId +
-          " to " +
-          action +
-          " from this " +
-          selectedAccountData.typeFull
+        info.ownerId +
+        " to " +
+        action +
+        " from this " +
+        selectedAccountData.typeFull
       );
     }
   }
@@ -807,11 +843,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -1298,11 +1334,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     let hist: History;
@@ -1496,9 +1532,9 @@ export function showPrivateKeyClicked() {
     showOKCancel(makeFullAccessOKClicked, showInitial);
   } else {
     //normal acc priv key
-    
+
     d.showSubPage("request-password");
-    showOKCancel(showPrivateKeyValidationPasswordClicked, showInitial);  
+    showOKCancel(showPrivateKeyValidationPasswordClicked, showInitial);
   }
 }
 
@@ -1506,12 +1542,12 @@ export function showPrivateKeyClicked() {
 async function showPrivateKeyValidationPasswordClicked() {
   const state = await askBackgroundGetState()
   const inputEmail = state.currentUser;
-  
+
   //const inputEmail = d.inputById("password-request-email");
   const inputPassword = d.inputById("password-request-password").value;
   try {
-    await askBackground({code:"unlockSecureState",email:inputEmail, password:inputPassword})
-  } catch(error) {
+    await askBackground({ code: "unlockSecureState", email: inputEmail, password: inputPassword })
+  } catch (error) {
     d.showErr(error);
     return;
   }
