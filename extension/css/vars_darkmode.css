@@ -21,10 +21,10 @@ body { font-family: 'Inter', sans-serif; !important }
 
 	/*#region Color dark */
 
-	--Background: rgb(14, 29, 54);
+	--Background: rgb(8, 21, 44);
 
 	--Block: rgb(2, 6, 17);
-	--BlockText: rgb(134, 191, 255); 
+	--BlockText: rgb(255, 255, 255); 
 
 	--TextColor:  rgb(0,0,0);
 	--TextRemark: rgb(172, 159, 49); 

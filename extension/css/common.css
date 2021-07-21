@@ -415,17 +415,17 @@ h5
   word-break: break-word;
 }
 #err-div > div.success {
-  background-color: #8ead8e;
+  background-color: #446144;
   border-width: 1px;
   color: rgba(66, 24, 24, 0.19) smoke;
 }
 #err-div > div.info {
   background-color: #a3a3a3;
   border-width: 1px;
-  color: #3b3b3b;
+  color: #352f2f;
 }
 #err-div > div.warning {
-  background-color: #eef1bb;
+  background-color: #d9df6d;
   border-width: 1px;
   color: #3b3b3b;
 }
