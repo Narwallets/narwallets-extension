@@ -109,6 +109,7 @@ function sortByOrder(a: ExtendedAccountData, b: ExtendedAccountData) {
 }
 
 function addAccountClicked() {
+  d.onClickId("add-account-back-to-account", backToAccountsClicked);
   d.showPage(IMPORT_OR_CREATE);
 }
 
@@ -233,7 +234,7 @@ export async function show() {
   }
 }
 
-function backToAccountsClicked() {
+export function backToAccountsClicked() {
   d.clearContainer("assets-list");
   d.showPage("account-list-main");
   d.showSubPage("assets");

@@ -197,8 +197,8 @@ top:-12px;
 label {
 color:var(--TextGeneric);
 font-weight: 300;
-font-size: 12;
-padding: 0px;
+font-size: 14px;
+padding: 4px;
 width: 300px;
 height: auto;
 overflow-wrap: break-word;

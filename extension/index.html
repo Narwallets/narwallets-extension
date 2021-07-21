@@ -76,8 +76,7 @@
 			<!--<li id="expand">Expand</li>
 <hr>
 -->
-			<li id="darkmode">Switch Dark/Light Mode</li>
-			<hr> 
+			
 			<li id="accounts">Accounts</li>
 			<hr>
 			<li id="add-account-side">Add Account</li>
@@ -88,6 +87,8 @@
 <hr>-->
 			<li id="create-user">Create a new User</li>
 			<hr>
+			<li id="darkmode">Switch Dark/Light Mode</li>
+			<hr> 
 			<li id="options">Options</li>
 			<hr>
 			<li id="contact">Contact</li>
@@ -176,7 +177,7 @@
 	<!--#region AddAccount-->
 
 	<div class="appface slide-hide" id="import-or-create">
-
+		<button class="button back" id="add-account-back-to-account"></button>
 
 		<h2>Do you have an Account?</h2>
 
@@ -319,13 +320,12 @@
 					without the seed phrase. Please make sure you
 					have the seed phrase securely stored and available</h3>
 
-
+				<br/>
+				<h3>Type the account name to confirm</h3>
+				
 				<div class="make-read-only-form">
-					<div class="form-field-label">
 
-						<label for="account-name-confirm">
-							Type the account name to confirm
-						</label>
+					<div class="form-field-label">
 
 						<div class="form-control">
 							<input placeholder="" id="account-name-confirm" type="text" dir="auto" value="">
@@ -345,7 +345,9 @@
 			<div class="contentarea">
 
 
-				<h2>Type your password</h2>
+				<h2>Show private key</h2>
+				<h3>Type your password</h3>
+
 
 				<div class="request-password-form">
 					<div class="form-field-label">
@@ -815,7 +817,7 @@
 
 	<!--#region Existing user, unlock-->
 	<div id="display-seed-phrase" class="appface slide-hide">
-
+		<button class="button back" id="create-implicit-account-back-to-account"></button>
 		<h2>This is your Seed Phrase</h2>
 		<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed
 				phrase owns the account.</b></h3>
@@ -859,6 +861,7 @@
 	<!--#region import account-->
 
 	<div id="import-account" class="appface slide-hide">
+		<button class="button back" id="import-existing-account-back-to-account"></button>
 		<h2>Import existing account</h2>
 		<div class="form">
 
