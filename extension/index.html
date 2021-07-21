@@ -1068,7 +1068,18 @@
 
 		</div>
 
+		<!-- #region subpage RESTAKE -->
 
+		<div id="restake" class="subpage hidden">
+			<h2>Restake</h2>
+			<h3>Amount in NEAR to Restake (Max. <span id="max-restake-amount-1"></span>)</h3>
+			<div class="inputboxwithbutton">
+				<input id="restake-amount" type="text"/>
+				<button id="restake-max">Max</button>
+			</div>			
+		</div>
+
+		<!--#endregion -->
 
 		<!-- #region subpage LIQUID UNSTAKE -->
 		<div class="subpage hidden" id="liquid-unstake">
@@ -1098,9 +1109,10 @@
 		<div class="subpage hidden" id="withdraw">
 			<h2>Withdraw</h2>
 			<h3>Amount to withdraw?</h3>
-			<span><a id="withdraw-max" class="max">Max.</a></span>
-			<input placeholder="" id="withdraw-amount" type="text">
-
+			<div class="inputboxwithbutton">
+				<input placeholder="" id="withdraw-amount" type="text">
+				<button id="withdraw-max">Max</button>
+			</div>
 		</div>
 		<!--#endregion -->
 

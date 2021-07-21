@@ -7,7 +7,7 @@ import {
   askBackgroundSetAccount,
   askBackgroundTransferNear,
 } from "../background/askBackground.js";
-import { Asset, ExtendedAccountData, History } from "../data/account.js";
+import { Asset, ExtendedAccountData, History, addHistory } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -130,7 +130,11 @@ function reloadDetails() {
 }
 
 async function ReStake() {
-  return;
+  d.showSubPage("restake");
+  d.onClickId("restake-max", function () {
+    d.maxClicked("restake-amount", "#selected-asset #balance");
+  });
+  await showOKCancel(restakeOk, showInitial);
 }
 
 async function confirmWithdraw() {
@@ -196,6 +200,9 @@ async function confirmWithdraw() {
 
 function Withdraw() {
   d.showSubPage("withdraw");
+  d.onClickId("withdraw-max", function () {
+    d.maxClicked("withdraw-amount", "#selected-asset #balance");
+  });
   showOKCancel(confirmWithdraw, showInitial);
 }
 
@@ -264,6 +271,79 @@ async function LiquidUnstakeOk() {
   } finally {
     d.hideWait();
   }
+}
+
+async function restakeOk() {
+  d.showWait();
+
+  try {
+    if (!accData.isFullAccess)
+      throw Error("you need full access on " + accData.name);
+
+    const amount = c.toNum(d.inputById("restake-amount").value);
+    if (!isValidAmount(amount)) throw Error("Amount is not valid");
+
+    const actualSP = asset_selected.contractId;
+
+    const poolAccInfo = await StakingPool.getAccInfo(accData.name, actualSP);
+
+    if (poolAccInfo.unstaked_balance == "0")
+      throw Error("No funds unstaked to restake");
+
+    let yoctosToRestake = fixUserAmountInY(amount, poolAccInfo.unstaked_balance); // round user amount
+
+    await askBackgroundCallMethod(
+      actualSP,
+      "stake",
+      { amount: yoctosToRestake },
+      accData.name
+    );
+
+    asset_selected.balance -= c.yton(yoctosToRestake);
+
+    addHistory(asset_selected, "restake", c.yton(yoctosToRestake));
+
+    // Como estoy restakeando, necesito incrementar el saldo del stake (o inicializarlo)
+    let foundAsset: Asset = getOrCreateAsset("STAKE", actualSP, "stake", STAKE_DEFAULT_SVG);
+    foundAsset.balance += c.yton(yoctosToRestake);
+    addHistory(foundAsset, "stake", c.yton(yoctosToRestake));
+
+    await refreshSaveSelectedAccount();
+    hideOkCancel();
+    reloadDetails();
+    showInitial();
+    d.showSuccess("Restake " + c.toStringDec(c.yton(yoctosToRestake)));
+  } catch (ex) {
+    d.showErr(ex.message);
+  } finally {
+    d.hideWait();
+  }
+}
+
+function getOrCreateAsset(symbol: string, contractId: string, type: string, icon: string): Asset {
+  let existAssetWithThisPool = false;
+  let foundAsset: Asset = new Asset();
+  accData.accountInfo.assets.forEach((asset) => {
+    if (asset.symbol == symbol && asset.contractId == contractId) {
+      existAssetWithThisPool = true;
+      foundAsset = asset;
+    }
+  });
+
+  if (!existAssetWithThisPool) {
+    foundAsset = {
+      spec: "idk",
+      url: "",
+      contractId: contractId,
+      balance: 0,
+      type: type,
+      symbol: symbol,
+      icon: icon,
+      history: [],
+    };
+    accData.accountInfo.assets.push(foundAsset);
+  }
+  return foundAsset;
 }
 
 async function DelayedUnstakeOk() {

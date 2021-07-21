@@ -38,6 +38,19 @@ export class Asset {
   symbol: string = "";
   history: History[] = [];
   icon: string = "";
+
+  
+}
+
+export function addHistory(asset: Asset, type: string, amount: number) {
+  let hist: History;
+  hist = {
+    amount: amount,
+    date: new Date().toISOString(),
+    type: type,
+  };
+
+  asset.history.unshift(hist);
 }
 
 export class History {
