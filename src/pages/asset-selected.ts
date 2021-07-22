@@ -54,7 +54,7 @@ export async function show(
   d.onClickId("asset-receive", showAssetReceiveClicked);
   d.onClickId("asset-send", showAssetSendClicked);
   d.onClickId("asset-remove", removeSelectedFromAssets);
-  d.onChangeId("liquid-unstake-mount", inputChanged);
+  d.onChangeId("liquid-unstake-amount", inputChanged);
 
   accData = acc;
   asset_array = acc.accountInfo.assets;
@@ -112,7 +112,7 @@ export async function show(
 
 function inputChanged() {
   // TO DO: Agregar fee y receive
-  // let value = c.toNum(d.inputById("liquid-unstake-mount").value);
+  // let value = c.toNum(d.inputById("liquid-unstake-amount").value);
   // let fee_bp;
   // let extraMsg = "";
   // if (isNaN(value) || value <= 0) {
@@ -243,7 +243,7 @@ async function DelayedUnstake() {
 async function LiquidUnstake() {
   d.showSubPage("liquid-unstake");
   d.onClickId("liquid-unstake-max", function () {
-    d.maxClicked("liquid-unstake-mount", "#selected-asset #balance");
+    d.maxClicked("liquid-unstake-amount", "#selected-asset #balance");
   });
   await showOKCancel(LiquidUnstakeOk, showInitial);
 }
@@ -268,7 +268,7 @@ async function LiquidUnstakeOk() {
     if (!accData.isFullAccess)
       throw Error("you need full access on " + accData.name);
 
-    const amount = c.toNum(d.inputById("liquid-unstake-mount").value);
+    const amount = c.toNum(d.inputById("liquid-unstake-amount").value);
     if (!isValidAmount(amount)) throw Error("Amount is not valid");
 
     const actualSP = asset_selected.contractId;
