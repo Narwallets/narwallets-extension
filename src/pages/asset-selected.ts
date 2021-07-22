@@ -7,7 +7,12 @@ import {
   askBackgroundSetAccount,
   askBackgroundTransferNear,
 } from "../background/askBackground.js";
-import { Asset, ExtendedAccountData, History, addHistory } from "../data/account.js";
+import {
+  Asset,
+  ExtendedAccountData,
+  History,
+  addHistory,
+} from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -49,6 +54,7 @@ export async function show(
   d.onClickId("asset-receive", showAssetReceiveClicked);
   d.onClickId("asset-send", showAssetSendClicked);
   d.onClickId("asset-remove", removeSelectedFromAssets);
+  d.onChangeId("liquid-unstake-mount", inputChanged);
 
   accData = acc;
   asset_array = acc.accountInfo.assets;
@@ -102,6 +108,25 @@ export async function show(
     account: acc.name,
     assetIndex: assetIndex,
   });
+}
+
+function inputChanged() {
+  // TO DO: Agregar fee y receive
+  // let value = c.toNum(d.inputById("liquid-unstake-mount").value);
+  // let fee_bp;
+  // let extraMsg = "";
+  // if (isNaN(value) || value <= 0) {
+  //   fee_bp = contractState.nslp_current_discount_basis_points;
+  // }
+  // else {
+  //   const liquidity = BigInt(contractState.nslp_liquidity)
+  //   const receiveNear = BigInt(ntoy(value * stNearPrice()))
+  //   fee_bp = get_discount_basis_points(liquidity, receiveNear);
+  //   const realReceive: BigInt = receiveNear - receiveNear * BigInt(fee_bp) / BigInt(10000)
+  //   extraMsg = ` - receive ${toStringDec(yton(realReceive.toString()))} \u24c3`
+  //   if (liquidity < realReceive) extraMsg = " - Not enough liquidity"
+  // }
+  // qs("section#unstake #liquidity-unstake-fee").innerText = (fee_bp / 100).toString() + "%" + extraMsg;
 }
 
 function hideInMiddle() {
@@ -178,12 +203,13 @@ async function confirmWithdraw() {
     asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
     if (asset_selected.balance == 0) {
-      await removeSelectedFromAssets();
+      await deleteAsset();
+      backToSelectClicked();
+    } else {
+      await refreshSaveSelectedAccount();
+      reloadDetails();
+      showInitial();
     }
-
-    await refreshSaveSelectedAccount();
-    reloadDetails();
-    showInitial();
 
     d.showSuccess(
       c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
@@ -228,7 +254,10 @@ function addAssetHistory(type: string, amount: number) {
     amount: amount,
     date: new Date().toISOString(),
     type: type,
+    destination: "",
   };
+
+  if (type == "send") hist.destination = contactToAdd;
 
   asset_selected.history.unshift(hist);
 }
@@ -258,6 +287,10 @@ async function LiquidUnstakeOk() {
       accData.name
     );
 
+    if (result.meta > 0) {
+      await addMetaAsset(c.yton(result.meta));
+    }
+
     asset_selected.balance -= c.yton(yoctosToUnstake);
 
     addAssetHistory("liquid-unstake", c.yton(yoctosToUnstake));
@@ -270,6 +303,36 @@ async function LiquidUnstakeOk() {
     d.showErr(ex.message);
   } finally {
     d.hideWait();
+  }
+}
+
+async function addMetaAsset(amount: number) {
+  const asset = accData.accountInfo.assets.find((i) => i.symbol == "META");
+  let hist: History;
+  hist = {
+    amount: amount,
+    date: new Date().toISOString(),
+    type: "liquid",
+    destination: "",
+  };
+  if (!asset) {
+    let newAsset: Asset = new Asset();
+
+    newAsset = {
+      spec: "idk",
+      url: "",
+      contractId: asset_selected.contractId,
+      balance: amount,
+      type: "meta",
+      symbol: "META",
+      icon: STAKE_DEFAULT_SVG,
+      history: [],
+    };
+    newAsset.history.unshift(hist);
+    accData.accountInfo.assets.push(newAsset);
+  } else {
+    asset.balance += amount;
+    asset.history.unshift(hist);
   }
 }
 
@@ -290,7 +353,10 @@ async function restakeOk() {
     if (poolAccInfo.unstaked_balance == "0")
       throw Error("No funds unstaked to restake");
 
-    let yoctosToRestake = fixUserAmountInY(amount, poolAccInfo.unstaked_balance); // round user amount
+    let yoctosToRestake = fixUserAmountInY(
+      amount,
+      poolAccInfo.unstaked_balance
+    ); // round user amount
 
     await askBackgroundCallMethod(
       actualSP,
@@ -304,7 +370,12 @@ async function restakeOk() {
     addHistory(asset_selected, "restake", c.yton(yoctosToRestake));
 
     // Como estoy restakeando, necesito incrementar el saldo del stake (o inicializarlo)
-    let foundAsset: Asset = getOrCreateAsset("STAKE", actualSP, "stake", STAKE_DEFAULT_SVG);
+    let foundAsset: Asset = getOrCreateAsset(
+      "STAKE",
+      actualSP,
+      "stake",
+      STAKE_DEFAULT_SVG
+    );
     foundAsset.balance += c.yton(yoctosToRestake);
     addHistory(foundAsset, "stake", c.yton(yoctosToRestake));
 
@@ -320,7 +391,12 @@ async function restakeOk() {
   }
 }
 
-function getOrCreateAsset(symbol: string, contractId: string, type: string, icon: string): Asset {
+function getOrCreateAsset(
+  symbol: string,
+  contractId: string,
+  type: string,
+  icon: string
+): Asset {
   let existAssetWithThisPool = false;
   let foundAsset: Asset = new Asset();
   accData.accountInfo.assets.forEach((asset) => {
@@ -397,6 +473,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     amount: amountToUnstake,
     date: new Date().toISOString(), //so it's the same as when the data is JSON.parsed() from localStorage
     type: "unstake",
+    destination: "",
   };
 
   accData.accountInfo.assets.forEach((asset) => {
@@ -599,6 +676,8 @@ export function removeSelectedFromAssets() {
 }
 
 function showInitial() {
+  console.log(accData);
+
   d.showSubPage("asset-history");
 }
 

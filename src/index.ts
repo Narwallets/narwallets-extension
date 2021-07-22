@@ -4,7 +4,10 @@ import { NetworkList } from "./lib/near-api-lite/network.js";
 
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
-import { addListeners as Import_addListeners, onNetworkChanged as Import_onNetworkChanged } from "./pages/import.js";
+import {
+  addListeners as Import_addListeners,
+  onNetworkChanged as Import_onNetworkChanged,
+} from "./pages/import.js";
 
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
@@ -41,6 +44,8 @@ const AVAILABLE = "available";
 const SELECT_NETWORK = "select-network";
 const DATA_CODE = "data-code";
 const NETWORKS_LIST = "networks-list";
+
+let isDark = true;
 
 const hamb = new d.El(".hamb");
 const aside = new d.El("aside");
@@ -222,6 +227,23 @@ async function asideAddressBook() {
     AddressBook_show();
   }
 }
+function asideSwitchMode() {
+  const cssLinkIndex = 0;
+  var oldlink = document.getElementsByTagName("link").item(cssLinkIndex);
+  var cssFile = "";
+  if (isDark) {
+    cssFile = "css/styles_light.css";
+  } else {
+    cssFile = "css/styles_dark.css";
+  }
+  var newlink = document.createElement("link");
+  newlink.setAttribute("rel", "stylesheet");
+  newlink.setAttribute("href", cssFile);
+
+  if (oldlink) oldlink.href = cssFile;
+
+  isDark = !isDark;
+}
 
 //-----------------------
 //executed after the background-page is available
@@ -248,6 +270,7 @@ async function initPopup() {
   d.qs("aside #contact").onClick(asideContact);
   d.qs("aside #about").onClick(asideAbout);
   d.qs("aside #address-book-side").onClick(asideAddressBook);
+  d.qs("aside #darkmode").onClick(asideSwitchMode);
 
   d.populateUL("network-items", "network-item-template", NetworkList);
 

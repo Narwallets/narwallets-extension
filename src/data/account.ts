@@ -38,8 +38,6 @@ export class Asset {
   symbol: string = "";
   history: History[] = [];
   icon: string = "";
-
-  
 }
 
 export function addHistory(asset: Asset, type: string, amount: number) {
@@ -48,6 +46,7 @@ export function addHistory(asset: Asset, type: string, amount: number) {
     amount: amount,
     date: new Date().toISOString(),
     type: type,
+    destination: "",
   };
 
   asset.history.unshift(hist);
@@ -57,6 +56,7 @@ export class History {
   date: string = ""; //store as date.toISOString() so JSON.stringify/parse does not change the value
   type: string = "send";
   amount: number = 0;
+  destination: string = "";
 }
 
 export class ExtendedAccountData {

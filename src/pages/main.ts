@@ -288,7 +288,7 @@ export function accountItemClicked(ev: Event) {
 async function autoRefresh() {
   var intervalId = window.setInterval(function () {
     refreshAllAccounts(); /// call your function here
-  }, 10000);
+  }, 180000);
 }
 
 async function refreshAllAccounts() {

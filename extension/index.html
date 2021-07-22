@@ -295,7 +295,7 @@
 
 				<div class="add-form-confirmation">
 
-					<h3 class="warning">Add </h3> <span id="add-confirmation-name"></span>
+					<h3 class="warning">Add <span id="add-confirmation-name"></span></h3>
 
 				</div>
 
@@ -1021,7 +1021,7 @@
 					<div id="asset-history-template" class="hidden" data-id="{key}">
 						<div class="accountdetsassets">
 							<div class="accountasseticon"></div>
-							<div class="accountassetcoin">{type}</div>
+							<div class="accountassetcoin">{type} {destination}</div>
 							<div class="accountassettoken">{date}</div>
 							<div class="accountassetbalance">{amount}</div>
 							<div class="accountassetfiat"></div>
@@ -1089,6 +1089,10 @@
 			<div class="inputboxwithbutton">
 				<input placeholder="" id="liquid-unstake-mount" type="text">
 				<button id="liquid-unstake-max">Max</button>
+			</div>
+
+			<div class="fee-dynamic">
+				<h4>Fee: <span id="fee-amount"></span> </h4>
 			</div>
 		</div>
 

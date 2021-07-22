@@ -156,7 +156,11 @@ let comboAdd: d.El;
 let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
-export async function show(accName: string, reposition?: string, assetIndex?: number) {
+export async function show(
+  accName: string,
+  reposition?: string,
+  assetIndex?: number
+) {
   d.byId("topbar").innerText = "Accounts";
 
   initPage();
@@ -214,7 +218,6 @@ function initPage() {
   d.onClickId("one-tab-stake", selectFirstTab);
   d.onClickId("two-tab-stake", selectSecondTab);
 
-
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo-add-token");
   removeButton = new d.El("button#remove");
@@ -245,6 +248,7 @@ function initPage() {
 async function refreshSelectedAcc() {
   let accName = selectedAccountData.name;
   const netInfo = await askBackgroundGetNetworkInfo();
+
   const root = netInfo.rootAccount;
   if (
     accName &&
@@ -260,8 +264,35 @@ async function refreshSelectedAcc() {
 
   selectedAccountData.total = mainAccInfo.lastBalance;
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
-  await refreshSaveSelectedAccount();
 
+  selectedAccountData.accountInfo.assets.forEach(async (asset) => {
+    if (asset.contractId == "token.cheddar.testnet") {
+      let result = await askBackgroundViewMethod(
+        asset.contractId,
+        "ft_metadata",
+        {}
+      );
+      let resultBalance = await askBackgroundViewMethod(
+        asset.contractId,
+        "ft_balance_of",
+        { account_id: selectedAccountData.name }
+      );
+      console.log("Tenemos este log loco que tiene", result, resultBalance);
+    }
+
+    let poolAccInfo = await StakingPool.getAccInfo(
+      selectedAccountData.name,
+      asset.contractId
+    );
+    if (asset.symbol != "USNTAKED")
+      asset.balance = c.yton(poolAccInfo.staked_balance);
+    if (asset.symbol == "UNSTAKED")
+      asset.balance = c.yton(poolAccInfo.unstaked_balance);
+
+    console.log("ESTO ES", poolAccInfo, asset.symbol, asset.balance);
+  });
+  await refreshSaveSelectedAccount();
+  showInitial();
   d.showSuccess("Refreshed");
 }
 
@@ -538,8 +569,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-        selectedAccountData.accountInfo.ownerId +
-        " to operate this lockup account"
+          selectedAccountData.accountInfo.ownerId +
+          " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() //no hay  espacio
   } else {
@@ -628,11 +659,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-        info.ownerId +
-        " to " +
-        action +
-        " from this " +
-        selectedAccountData.typeFull
+          info.ownerId +
+          " to " +
+          action +
+          " from this " +
+          selectedAccountData.typeFull
       );
     }
   }
@@ -663,7 +694,6 @@ async function sendClicked() {
           0.1
         );
       });
-      //comento solo para probar la parte de contactos
       fullAccessSubPage("account-selected-send", sendOKClicked);
     }
   } catch (ex) {
@@ -779,11 +809,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -832,13 +862,25 @@ async function stakeClicked() {
     await fullAccessSubPage("account-selected-stake", performer);
     d.qs("#liquid-stake-radio").el.checked = true;
     d.inputById("stake-with-staking-pool").value = "";
-    d.qs("#max-stake-amount-1").innerText = c.toStringDec(Math.max(0, amountToStake - 0.1));
-    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(Math.max(0, amountToStake - 0.1));
+    d.qs("#max-stake-amount-1").innerText = c.toStringDec(
+      Math.max(0, amountToStake - 0.1)
+    );
+    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(
+      Math.max(0, amountToStake - 0.1)
+    );
     d.onClickId("liquid-stake-max", function () {
-      d.maxClicked("stake-amount-liquid", "#selected-account .accountdetsbalance", 0.1);
+      d.maxClicked(
+        "stake-amount-liquid",
+        "#selected-account .accountdetsbalance",
+        0.1
+      );
     });
     d.onClickId("max-stake-amount-2-button", function () {
-      d.maxClicked("stake-amount", "#selected-account .accountdetsbalance", 0.1);
+      d.maxClicked(
+        "stake-amount",
+        "#selected-account .accountdetsbalance",
+        0.1
+      );
     });
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
     if (info.type == "lock.c")
@@ -937,6 +979,7 @@ async function performStake() {
         amount: amountToStake,
         date: new Date().toISOString(),
         type: "stake",
+        destination: "",
       };
       let foundAsset: Asset = new Asset();
 
@@ -1270,11 +1313,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     let hist: History;
@@ -1282,6 +1325,7 @@ async function performSend() {
       amount: amountToSend,
       date: new Date().toISOString(),
       type: "send",
+      destination: toAccName,
     };
     selectedAccountData.accountInfo.history.unshift(hist);
 
@@ -1476,13 +1520,17 @@ export function showPrivateKeyClicked() {
 
 //---------------------------------------
 async function showPrivateKeyValidationPasswordClicked() {
-  const state = await askBackgroundGetState()
+  const state = await askBackgroundGetState();
   const inputEmail = state.currentUser;
 
   //const inputEmail = d.inputById("password-request-email");
   const inputPassword = d.inputById("password-request-password").value;
   try {
-    await askBackground({ code: "unlockSecureState", email: inputEmail, password: inputPassword })
+    await askBackground({
+      code: "unlockSecureState",
+      email: inputEmail,
+      password: inputPassword,
+    });
   } catch (error) {
     d.showErr(error);
     return;

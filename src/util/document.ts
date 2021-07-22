@@ -44,7 +44,9 @@ export function byId(id: string): HTMLElement {
  */
 export function checkedRadioButton(name: string): HTMLElement {
   try {
-    return document.querySelector('input[name=' + name + ']:checked') as HTMLElement;
+    return document.querySelector(
+      "input[name=" + name + "]:checked"
+    ) as HTMLElement;
   } catch {
     console.error(`document.getElementsByName(${name}) NOT FOUND`);
     return new HTMLElement();
@@ -81,6 +83,30 @@ export function onEnterKey(textId: string, clickHandler: (ev: Event) => void) {
   byId(textId).addEventListener("keyup", (event: KeyboardEvent) => {
     if (event.key === "Enter") clickHandler(event);
   });
+}
+
+/**
+ * add an event when is pressed in an input-box
+ * @param textId
+ * @param handler
+ */
+export function onChangeId(id: string, handler: (ev: Event) => void) {
+  try {
+    let elems = document.querySelectorAll("button#" + id);
+    if (elems.length > 1)
+      return console.error("more than one! querySelectorAll: button#" + id);
+    let elem = elems[0];
+    if (!elem) {
+      let elems = document.querySelectorAll("#" + id);
+      if (elems.length > 1)
+        return console.error("more than one! querySelectorAll: #" + id);
+      elem = elems[0];
+      if (!elem) throw new Error("NOT FOUND");
+    }
+    elem.addEventListener("keyup", handler);
+  } catch (ex) {
+    console.error("ERR: onClickId('" + id + "') " + ex.message);
+  }
 }
 
 export function onClickSelector(
@@ -201,7 +227,7 @@ function addShowErr() {
 export function hideErr() {
   try {
     byId(ERR_DIV).innerHTML = "";
-  } catch { }
+  } catch {}
 }
 
 var errorId = 0;
