@@ -42,6 +42,7 @@ export function showOKCancel(
   CancelHandler: d.ClickHandler
 ) {
   //normalizo funcionalidad
+  d.onGlobalKeyPress(OKHandler, d.ENTER);
   cancelBtn.innerText = "Cancel";
   confirmBtn.hidden = false;
 
@@ -54,9 +55,11 @@ export function showOKCancel(
     singleButton();
   }
 }
+
 export function disableOKCancel() {
   confirmBtn.disabled = true;
   cancelBtn.disabled = true;
+  d.removeGlobalKeyPress();
 }
 export function enableOKCancel() {
   confirmBtn.disabled = false;
@@ -75,4 +78,5 @@ export function unHideOKCancel() {
 
 export function hideOkCancel() {
   okCancelRow.hidden = true;
+  d.removeGlobalKeyPress();
 }

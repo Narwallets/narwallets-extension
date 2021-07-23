@@ -22,6 +22,9 @@ export const HIDDEN = "hidden";
 export const ERR_DIV = "err-div";
 export const WAIT = "wait";
 
+export const ENTER = "Enter";
+let globalEnterKeyPress: (event: KeyboardEvent) => void;
+
 export let activePage = "";
 
 //----DOM COMMON simple independent utility FUNCTIONS  -------
@@ -71,6 +74,37 @@ export function onClickId(id: string, clickHandler: (ev: Event) => void) {
     elem.addEventListener(CLICK, clickHandler);
   } catch (ex) {
     console.error("ERR: onClickId('" + id + "') " + ex.message);
+  }
+}
+
+//---
+//-- seach button elements with the id and add click listener
+//---
+export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
+  try {
+    document.removeEventListener("keypress", globalEnterKeyPress);    
+    globalEnterKeyPress = (event: KeyboardEvent) => {
+      var keyCode = event.key;
+      if(keyCode == key) {
+        handler(event);
+      }  
+    };
+    document.addEventListener("keypress", globalEnterKeyPress);
+    
+  } catch (ex) {
+    console.error("ERR: onGlobalKeyPress() " + ex.message);
+  }
+}
+
+//---
+//-- seach button elements with the id and add click listener
+//---
+export function removeGlobalKeyPress() {
+  try {
+    document.removeEventListener("keypress", globalEnterKeyPress);    
+    globalEnterKeyPress = () => {};
+  } catch (ex) {
+    console.error("ERR: removeGlobalKeyPress() " + ex.message);
   }
 }
 

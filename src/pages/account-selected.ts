@@ -672,6 +672,7 @@ async function checkOwnerAccessThrows(action: string) {
 //----------------------
 async function sendClicked() {
   try {
+    hideOkCancel();
     let maxAmountToSend = selectedAccountData.available;
 
     //if it's a lock.c and we didn't add a priv key yet, use contract method "trasnfer" (performLockupContractSend)
@@ -1806,6 +1807,7 @@ async function makeFullAccessOKClicked() {
 }
 
 function showInitial() {
+  d.removeGlobalKeyPress();
   showSelectedAccount();
   populateAssets();
   d.showSubPage("assets");

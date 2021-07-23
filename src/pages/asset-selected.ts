@@ -677,7 +677,7 @@ export function removeSelectedFromAssets() {
 
 function showInitial() {
   console.log(accData);
-
+  hideOkCancel();
   d.showSubPage("asset-history");
 }
 
