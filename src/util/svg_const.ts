@@ -1,26 +1,39 @@
 //META SVG
 
-export const META_SVG = `<svg viewBox="0 0 67.79 67.79" version="1.1" id="svg12" <defs id="defs4"> <style    id="style2">.cls-1{fill:#fff;}</style> </defs> <ellipse  style="fill:#fefefe;stroke-width:1.04998;fill-opacity:1"   id="path853"  cx="34.256039"  cy="33.937473"  rx="33.937473"  ry="33.895" />
+export const META_SVG = `<svg
+viewBox="0 0 67.79 67.79"
+version="1.1"
+id="svg407"
+<defs
+  id="defs389">
+ <style
+    id="style387">.cls-1{fill:#fff;}</style>
+</defs>
 <ellipse
-  style="fill:#ffcf3a;stroke-width:0.882963;fill-opacity:1"
-  id="path853-6"
-  cx="34.256039"
-  cy="33.937473"
-  rx="28.330782"
-  ry="28.713058" />
-<text
-  xml:space="preserve"
-  style="font-style:normal;font-weight:normal;font-size:63.9292px;line-height:1.25;font-family:sans-serif;fill:#fefefe;fill-opacity:1;stroke:none;stroke-width:1.59823"
-  x="8.7837772"
-  y="52.970394"
-  id="text1667"
-  transform="scale(1.0122546,0.98789371)"><tspan
-    sodipodi:role="line"
-    id="tspan1665"
-    x="8.7837772"
-    y="52.970394"
-    style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Frank Ruehl CLM';-inkscape-font-specification:'Frank Ruehl CLM';fill:#fefefe;fill-opacity:1;stroke-width:1.59823">M</tspan></text>
-</svg>`;
+  style="fill:#fefefe;stroke-width:1.0235"
+  id="path846"
+  cx="33.724285"
+  cy="33.996021"
+  rx="33.83276"
+  ry="33.840717" />
+<ellipse
+  style="fill:#ff9300;fill-opacity:1;stroke-width:0.790979"
+  id="path846-3"
+  cx="33.724285"
+  cy="33.996021"
+  rx="26.146585"
+  ry="26.152735" />
+<g
+  aria-label="M"
+  transform="scale(1.104448,0.9054297)"
+  id="text2422"
+  style="font-size:54.3279px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif';fill:#ffffff;stroke-width:1.3582">
+ <path
+    d="M 7.1379627,57.117722 V 54.83595 h 0.7062627 q 1.7928207,0 3.0966906,-0.597607 1.358197,-0.651935 1.358197,-3.042363 V 24.30367 q 0,-2.390428 -1.358197,-3.042362 Q 9.6370461,20.609373 7.8442254,20.609373 H 7.1379627 V 18.327601 H 19.524724 L 30.770599,49.40316 41.907819,18.327601 h 12.060793 v 2.281772 H 53.26235 q -1.847149,0 -3.151018,0.706263 -1.30387,0.651934 -1.30387,3.205346 v 26.403359 q 0,2.553411 1.30387,3.259674 1.303869,0.651935 3.151018,0.651935 h 0.706262 v 2.281772 H 39.517391 V 54.83595 h 0.162984 q 1.738493,0 2.770723,-0.597607 1.03223,-0.597607 1.140886,-2.825051 V 22.402194 L 31.150895,57.117722 H 28.217188 L 15.613115,22.510849 v 28.413492 q 0,2.553411 1.03223,3.259674 1.03223,0.651935 2.879379,0.651935 h 0.162984 v 2.281772 z"
+    id="path11388" />
+</g>
+</svg>
+`;
 
 //STAKE SVG
 export const STAKE_DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.79 67.79"
