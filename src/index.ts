@@ -12,6 +12,7 @@ import {
 import { show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { show as AddressBook_show } from "./pages/address-book.js";
+import { show as Options_show } from "./pages/options.js";
 
 import { localStorageSet } from "./data/util.js";
 import {
@@ -151,32 +152,32 @@ async function asideIsUnlocked() {
 
 async function securityOptions() {
   //close moreless because options can change behavior
-  const buttonsMore = new d.All(".buttons-more");
-  buttonsMore.addClass("hidden");
-  d.qs("#moreless").innerText = "More...";
-
-  d.showPage("security-options");
+  //const buttonsMore = new d.All(".buttons-more");
+  //buttonsMore.addClass("hidden");
+  //d.qs("#moreless").innerText = "More...";
+  Options_show();
+  /*d.showSubPage("security-options");
   const data = await askBackground({ code: "get-options" });
-  d.inputById("auto-unlock-seconds").value = data.autoUnlockSeconds.toString();
-  d.inputById("advanced-mode").checked = data.advancedMode ? true : false;
+  d.inputById("autolock-seconds-input").value = data.autoUnlockSeconds.toString();
+  //d.inputById("advanced-mode").checked = data.advancedMode ? true : false;
   d.onClickId("save-settings", saveSecurityOptions);
-  d.onClickId("cancel-security-settings", Pages.show);
+  d.onClickId("cancel-security-settings", Pages.show);*/
 }
 
 async function saveSecurityOptions(ev: Event) {
   try {
     ev.preventDefault();
 
-    const checkElem = document.getElementById(
-      "advanced-mode"
-    ) as HTMLInputElement;
-    const aulSecs = Number(d.inputById("auto-unlock-seconds").value);
+    //const checkElem = document.getElementById(
+    //     "advanced-mode"
+    //) as HTMLInputElement;
+    const aulSecs = Number(d.inputById("autolock-seconds-input").value);
     if (isNaN(aulSecs)) throw Error("Invalid auto unlock seconds");
 
     await askBackground({
       code: "set-options",
       autoUnlockSeconds: aulSecs,
-      advancedMode: checkElem.checked,
+      //advancedMode: checkElem.checked,
     });
 
     Pages.show();
