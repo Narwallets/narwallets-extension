@@ -1428,16 +1428,19 @@ export async function searchThePools(
               `Found! ${c.toStringDec(amount)} on ${pool.account_id}`
             );
             found = false;
-            exAccData.accountInfo.assets.forEach((asset) => {
-              if (asset.contractId == pool.account_id) {
-                asset.balance = amount;
-                found = true;
-              }
-            });
 
-            if (!found) {
+            const foundAssetStake = exAccData.accountInfo.assets.find(
+              (asset) =>
+                asset.contractId == pool.account_id && asset.symbol == "STAKE"
+            );
+            const foundAssetUnstake = exAccData.accountInfo.assets.find(
+              (asset) =>
+                asset.contractId == pool.account_id && asset.symbol == "UNSTAKED"
+            );
+
+            if (!foundAssetStake && c.yton(poolAccInfo.staked_balance) > 0) {
               let newAsset: Asset = {
-                balance: amount,
+                balance: c.yton(poolAccInfo.staked_balance),
                 spec: "",
                 url: "",
                 contractId: pool.account_id,
@@ -1446,8 +1449,46 @@ export async function searchThePools(
                 icon: STAKE_DEFAULT_SVG,
                 history: [],
               };
-
               exAccData.accountInfo.assets.push(newAsset);
+            }
+
+            if (!foundAssetUnstake && c.yton(poolAccInfo.unstaked_balance) > 0) {
+              let newAsset: Asset = {
+                balance: c.yton(poolAccInfo.unstaked_balance),
+                spec: "",
+                url: "",
+                contractId: pool.account_id,
+                type: "unstake",
+                symbol: "UNSTAKED",
+                icon: UNSTAKE_DEFAULT_SVG,
+                history: [],
+              };
+              exAccData.accountInfo.assets.push(newAsset);
+            
+
+            // exAccData.accountInfo.assets.forEach((asset) => {
+            //   if (
+            //     asset.contractId == pool.account_id &&
+            //     asset.symbol == "STAKE"
+            //   ) {
+            //     asset.balance = amount;
+            //     found = true;
+            //   }
+            // });
+
+            // if (!found) {
+            //   let newAsset: Asset = {
+            //     balance: amount,
+            //     spec: "",
+            //     url: "",
+            //     contractId: pool.account_id,
+            //     type: "stake",
+            //     symbol: "STAKE",
+            //     icon: STAKE_DEFAULT_SVG,
+            //     history: [],
+            //   };
+
+            //   exAccData.accountInfo.assets.push(newAsset);
             }
           }
         }
