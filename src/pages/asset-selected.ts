@@ -61,7 +61,7 @@ export async function show(
   asset_index = assetIndex;
   asset_selected = acc.accountInfo.assets[asset_index];
 
-  if (asset_selected.symbol == "STAKE" && asset_selected.icon == "") {
+  if (asset_selected.symbol == "STAKED" && asset_selected.icon == "") {
     asset_selected.icon = STAKE_DEFAULT_SVG;
     await saveSelectedAccount();
   }
@@ -87,7 +87,7 @@ export async function show(
       d.byId("asset-restake").classList.remove("hidden");
       break;
     }
-    case "STAKE": {
+    case "STAKED": {
       d.byId("asset-unstake").classList.remove("hidden");
       break;
     }
@@ -371,7 +371,7 @@ async function restakeOk() {
 
     // Como estoy restakeando, necesito incrementar el saldo del stake (o inicializarlo)
     let foundAsset: Asset = getOrCreateAsset(
-      "STAKE",
+      "STAKED",
       actualSP,
       "stake",
       STAKE_DEFAULT_SVG
@@ -490,7 +490,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     foundAsset.history.unshift(hist);
     foundAsset.balance = c.yton(poolAccInfo.unstaked_balance);
   } else {
-    if (asset_selected.symbol == "STAKE") {
+    if (asset_selected.symbol == "STAKED") {
       let asset: Asset;
       var result = c.yton(poolAccInfo.unstaked_balance);
       asset = {

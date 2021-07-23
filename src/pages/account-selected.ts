@@ -1002,7 +1002,7 @@ async function performStake() {
           contractId: newStakingPool,
           balance: c.yton(poolAccInfo.staked_balance),
           type: "stake",
-          symbol: stakeTabSelected == 1 ? "STNEAR" : "STAKE",
+          symbol: stakeTabSelected == 1 ? "STNEAR" : "STAKED",
           icon: stakeTabSelected == 1 ? STNEAR_SVG : STAKE_DEFAULT_SVG,
           history: [],
         };
@@ -1431,7 +1431,7 @@ export async function searchThePools(
 
             const foundAssetStake = exAccData.accountInfo.assets.find(
               (asset) =>
-                asset.contractId == pool.account_id && asset.symbol == "STAKE"
+                asset.contractId == pool.account_id && asset.symbol == "STAKED"
             );
             const foundAssetUnstake = exAccData.accountInfo.assets.find(
               (asset) =>
@@ -1445,7 +1445,7 @@ export async function searchThePools(
                 url: "",
                 contractId: pool.account_id,
                 type: "stake",
-                symbol: "STAKE",
+                symbol: "STAKED",
                 icon: STAKE_DEFAULT_SVG,
                 history: [],
               };
