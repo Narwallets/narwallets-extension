@@ -26,16 +26,19 @@ import {
 } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import {
-  STAKE_DEFAULT_SVG,
   populateSendCombo,
   show as AccountSelectedPage_show,
-  UNSTAKE_DEFAULT_SVG,
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { addressContacts, saveContactOnBook } from "./address-book.js";
 import { GContact } from "../data/Contact.js";
 import { localStorageSet } from "../data/util.js";
+import {
+  META_SVG,
+  STAKE_DEFAULT_SVG,
+  UNSTAKE_DEFAULT_SVG,
+} from "../util/svg_const.js";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -321,11 +324,11 @@ async function addMetaAsset(amount: number) {
     newAsset = {
       spec: "idk",
       url: "",
-      contractId: asset_selected.contractId,
+      contractId: "token.meta.pool.testnet",
       balance: amount,
       type: "meta",
       symbol: "META",
-      icon: STAKE_DEFAULT_SVG,
+      icon: META_SVG,
       history: [],
     };
     newAsset.history.unshift(hist);
