@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 67.79 67.79"
+   version="1.1"
+   id="svg12"
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#fff;}</style>
+  </defs>
+  <ellipse
+     style="fill:#fefefe;stroke-width:1.04998;fill-opacity:1"
+     id="path853"
+     cx="34.256039"
+     cy="33.937473"
+     rx="33.937473"
+     ry="33.895" />
+  <ellipse
+     style="fill:#ffcf3a;stroke-width:0.882963;fill-opacity:1"
+     id="path853-6"
+     cx="34.256039"
+     cy="33.937473"
+     rx="28.330782"
+     ry="28.713058" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:63.9292px;line-height:1.25;font-family:sans-serif;fill:#fefefe;fill-opacity:1;stroke:none;stroke-width:1.59823"
+     x="8.7837772"
+     y="52.970394"
+     id="text1667"
+     transform="scale(1.0122546,0.98789371)"><tspan
+       sodipodi:role="line"
+       id="tspan1665"
+       x="8.7837772"
+       y="52.970394"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Frank Ruehl CLM';-inkscape-font-specification:'Frank Ruehl CLM';fill:#fefefe;fill-opacity:1;stroke-width:1.59823">M</tspan></text>
+</svg>

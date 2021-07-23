@@ -9,7 +9,7 @@
 	font-weight: lighter;
 	overflow: hidden;
 	margin:0px;
-	margin-bottom: 10px;
+	margin-top: 10px;
 	border-width: 1px;
 	border-radius: 0px;
 	background-color:var(--Background);
@@ -34,8 +34,9 @@
 	text-align: left;
 	left: 0px;
     padding-left: 6px;
+	padding-top: 5px;
 	width: 460px;
-	height:20px;
+	height:15px;
 	top:0px;
 	background-color: var(--Block);;
 }
@@ -88,15 +89,7 @@ background: var(--Background);
 
 border-style: none;
 
-border-bottom-style: solid;
-
-border-width: 1px;
-
-border-radius: 0px;
-
-border-color: var(--Block);
-
-margin-bottom: 0px;
+margin-top: 10px;
 
 }
   
@@ -126,6 +119,7 @@ margin-bottom: 0px;
 	left: 0px;
 	width: 464px;
 	height: 16px;
+	padding-top: 5px;
 	padding-right:5px;
 	border-style: none;
 	border-radius: 0px;
@@ -192,6 +186,7 @@ margin-bottom: 0px;
 	background-color: var(--Block);
 	color:var(--BlockText);
 	margin:auto;
+	padding-top: 3px;
 }
 
 .balanceresult
