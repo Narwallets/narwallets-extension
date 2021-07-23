@@ -65,6 +65,8 @@ export function enableOKCancel() {
   confirmBtn.disabled = false;
   cancelBtn.disabled = false;
   cancelBtn.hidden = false;
+  d.onGlobalKeyPress(confirmFunction, d.ENTER);
+
 }
 
 export function singleButton() {
