@@ -9,7 +9,6 @@
 	font-weight: lighter;
 	overflow: hidden;
 	margin:0px;
-	margin-top: 10px;
 	border-width: 1px;
 	border-radius: 0px;
 	background-color:var(--Background);
@@ -35,8 +34,9 @@
 	left: 0px;
     padding-left: 6px;
 	padding-top: 5px;
+	padding-bottom: 1px;
 	width: 460px;
-	height:15px;
+	height:17px;
 	top:0px;
 	background-color: var(--Block);;
 }
@@ -89,7 +89,6 @@ background: var(--Background);
 
 border-style: none;
 
-margin-top: 10px;
 
 }
   
