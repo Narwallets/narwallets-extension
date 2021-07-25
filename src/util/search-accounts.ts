@@ -1,9 +1,9 @@
 import * as c from "./conversions.js";
 
-import * as StakingPool from "../contracts/staking-pool.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Account } from "../data/account.js";
 import { askBackground } from "../background/askBackground.js";
+
 
 async function checkNotLockup(accName: string) {
   const suffix = await LockupContract.getLockupSuffix();
@@ -50,6 +50,8 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
     }
 
     info.lastBalance = c.yton(stateResultYoctos.amount);
+
+    
     // if (info.stakingPool) {
     //     const previnThePool = info.staked + info.unstaked;
     //     const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool)

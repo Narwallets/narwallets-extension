@@ -4,6 +4,7 @@ import * as c from "../util/conversions.js";
 import {
   askBackground,
   askBackgroundCallMethod,
+  askBackgroundGetNetworkInfo,
   askBackgroundSetAccount,
   askBackgroundTransferNear,
 } from "../background/askBackground.js";
@@ -39,6 +40,10 @@ import {
   STAKE_DEFAULT_SVG,
   UNSTAKE_DEFAULT_SVG,
 } from "../util/svg_const.js";
+import { MetaPool } from "../contracts/meta-pool.js";
+import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
+import { nearDollarPrice } from "../data/global.js";
+
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -46,6 +51,8 @@ let asset_index: number;
 let accData: ExtendedAccountData;
 let isMoreOptionsOpen = false;
 let contactToAdd: string;
+let metaPoolContract: MetaPool;
+let metaPoolContractData: MetaPoolContractState;
 
 // page init
 export async function show(
@@ -115,21 +122,52 @@ export async function show(
 
 function inputChanged() {
   // TO DO: Agregar fee y receive
-  // let value = c.toNum(d.inputById("liquid-unstake-amount").value);
-  // let fee_bp;
-  // let extraMsg = "";
-  // if (isNaN(value) || value <= 0) {
-  //   fee_bp = contractState.nslp_current_discount_basis_points;
-  // }
-  // else {
-  //   const liquidity = BigInt(contractState.nslp_liquidity)
-  //   const receiveNear = BigInt(ntoy(value * stNearPrice()))
-  //   fee_bp = get_discount_basis_points(liquidity, receiveNear);
-  //   const realReceive: BigInt = receiveNear - receiveNear * BigInt(fee_bp) / BigInt(10000)
-  //   extraMsg = ` - receive ${toStringDec(yton(realReceive.toString()))} \u24c3`
-  //   if (liquidity < realReceive) extraMsg = " - Not enough liquidity"
-  // }
-  // qs("section#unstake #liquidity-unstake-fee").innerText = (fee_bp / 100).toString() + "%" + extraMsg;
+  let value = c.toNum(d.inputById("liquid-unstake-amount").value);
+  let fee_bp;
+  let extraMsg = "";
+  if (isNaN(value) || value <= 0) {
+    fee_bp = metaPoolContractData.nslp_current_discount_basis_points;
+  }
+  else {
+    const liquidity = BigInt(metaPoolContractData.nslp_liquidity);
+    const receiveNear = BigInt(c.ntoy(value * Number(c.ytonFull(metaPoolContractData.st_near_price))));
+    fee_bp = get_discount_basis_points(liquidity, receiveNear);
+    const realReceive: BigInt = receiveNear - receiveNear * BigInt(fee_bp) / BigInt(10000);
+    const nearAmount = c.yton(realReceive.toString());
+    extraMsg = ` - receive ${c.toStringDec(nearAmount)} \u24c3`;
+    extraMsg += ` ~  ${c.toStringDec(nearAmount * nearDollarPrice)} USD`;
+    if (liquidity < realReceive) extraMsg = " - Not enough liquidity";
+  }
+  d.byId("fee-amount").innerText = `Fee: ${(fee_bp / 100).toString()} % ${extraMsg}`;
+}
+
+function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
+
+  try {
+
+    if (sell > liquidity) {
+      //more asked than available => max discount
+      return metaPoolContractData.nslp_max_discount_basis_points
+    }
+
+    const target = BigInt(metaPoolContractData.nslp_target);
+    const liq_after = liquidity - sell;
+    if (liq_after >= target) {
+      //still >= target after swap => min discount
+      return metaPoolContractData.nslp_min_discount_basis_points
+    }
+
+    let range = BigInt(metaPoolContractData.nslp_max_discount_basis_points - metaPoolContractData.nslp_min_discount_basis_points);
+    //here 0<after<target, so 0<proportion<range
+    const proportion: bigint = range * liq_after / target;
+    return metaPoolContractData.nslp_max_discount_basis_points - Number(proportion);
+
+  }
+  catch (ex) {
+    console.error(ex);
+    return metaPoolContractData.nslp_current_discount_basis_points;
+  }
+
 }
 
 function hideInMiddle() {
@@ -244,11 +282,20 @@ async function DelayedUnstake() {
 }
 
 async function LiquidUnstake() {
-  d.showSubPage("liquid-unstake");
-  d.onClickId("liquid-unstake-max", function () {
-    d.maxClicked("liquid-unstake-amount", "#selected-asset #balance");
-  });
-  await showOKCancel(LiquidUnstakeOk, showInitial);
+  try{
+    d.showSubPage("liquid-unstake");
+    d.onClickId("liquid-unstake-max", function () {
+      d.maxClicked("liquid-unstake-amount", "#selected-asset #balance");
+    });
+    d.byId("fee-amount").innerText = "";
+    metaPoolContract = new MetaPool(asset_selected.contractId, accData.name);
+    metaPoolContractData = await metaPoolContract.get_contract_state();
+    
+    //searchAccounts.contractState;
+    await showOKCancel(LiquidUnstakeOk, showInitial);
+  } catch(error) {  
+    d.showErr(error);
+  }
 }
 
 function addAssetHistory(type: string, amount: number) {
@@ -286,7 +333,7 @@ async function LiquidUnstakeOk() {
     var result = await askBackgroundCallMethod(
       actualSP,
       "liquid_unstake",
-      { stnear_to_burn: yoctosToUnstake, min_expected_near: "0" },
+      { st_near_to_burn: yoctosToUnstake, min_expected_near: "0" },
       accData.name
     );
 
@@ -320,11 +367,11 @@ async function addMetaAsset(amount: number) {
   };
   if (!asset) {
     let newAsset: Asset = new Asset();
-
+    let networkInfo = await askBackgroundGetNetworkInfo();
     newAsset = {
       spec: "idk",
       url: "",
-      contractId: "token.meta.pool.testnet",
+      contractId: networkInfo.liquidStakingGovToken,
       balance: amount,
       type: "meta",
       symbol: "META",

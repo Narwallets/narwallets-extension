@@ -838,12 +838,14 @@ async function performStake() {
   disableOKCancel();
   d.showWait();
   let newStakingPool: string;
+
   try {
     let amountToStake: number;
     let existAssetWithThisPool = false;
 
     if (stakeTabSelected == 1) {
-      newStakingPool = "meta.pool.testnet";
+      let networkInfo = await askBackgroundGetNetworkInfo();
+      newStakingPool = networkInfo.liquidStakingContract;
       amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     } else {
       newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
