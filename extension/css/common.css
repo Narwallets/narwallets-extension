@@ -32,7 +32,7 @@ h3
 
 h4
 {
-  color: var(--BlockText);
+  color: var(--TextColor);
   font-size: 12px;
   font-weight: 200;
   display: block;
