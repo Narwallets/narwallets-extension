@@ -21,7 +21,7 @@ body { font-family: 'Inter', sans-serif; !important }
 
 	/*#region Color dark 3 */
 
-	--Background: rgb(255, 255, 255);
+	--Background: rgb(201, 201, 201);
 
 	--Block: rgb(0, 132, 172);
 	--BlockText: rgb(255, 255, 255); 
@@ -30,9 +30,10 @@ body { font-family: 'Inter', sans-serif; !important }
 	--TextRemark: rgb(2, 25, 54); 
 	--TextGeneric: rgb(6, 31, 68);
 
-	--HoverColor:rgb(157, 255, 255); /* color de hover en las listas */
+	/*--HoverColor:rgb(255, 238, 4); /* color de hover en las listas */
 
-    --HighLight: rgb(255, 123, 0); /* color para textos importantes */
+	--HoverColor: rgb(255, 196, 0);
+    --HighLight: rgb(255, 196, 0); /* color para textos importantes */
     --ControlBackgroud: rgb(147, 215, 255); 
 	--ControlText:rgb(255, 255, 255);
 	--ControlAltText:rgb(0,0,0);
