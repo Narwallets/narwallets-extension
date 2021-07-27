@@ -98,6 +98,19 @@ export function lock(source: string) {
   log("LOCKED call stack:" + JSON.stringify(new Error().stack));
 }
 
+export async function changePasswordAsync(
+  email: string,
+  password: string
+): Promise<void> {
+  if (!password || password.length < 8) {
+    throw Error("password must be at least 8 characters long");
+  }
+  lock("changePasswordAsync"); //log out current user
+  State.currentUser = email;
+  await createSecureStateAsync(password);
+  saveState();
+}
+
 export async function createUserAsync(
   email: string,
   password: string

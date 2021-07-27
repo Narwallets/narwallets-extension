@@ -3,6 +3,7 @@ import * as Pages from "./pages/main.js";
 import { NetworkList } from "./lib/near-api-lite/network.js";
 
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
+import { addListeners as ChangePass_addListeners } from "./pages/change-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
 import {
   addListeners as Import_addListeners,
@@ -207,6 +208,15 @@ async function asideOptions() {
   }
 }
 
+async function changePassword() {
+  if (await asideIsUnlocked()) {
+    d.showPage(Pages.CHANGE_PASSWORD);
+    ChangePass_addListeners();
+    //d.onClickId("confirm-change-password", ChangePass_addListeners);
+  }
+}
+
+
 function asideCreateUserClicked() {
   hambClicked();
   d.showPage(Pages.WELCOME_NEW_USER_PAGE);
@@ -269,6 +279,7 @@ async function initPopup() {
   //d.qs("aside #change-password").onClick(asideChangePassword);
   d.qs("aside #options").onClick(asideOptions);
   d.qs("aside #contact").onClick(asideContact);
+  d.qs("aside #change-password").onClick(changePassword);
   d.qs("aside #about").onClick(asideAbout);
   d.qs("aside #address-book-side").onClick(asideAddressBook);
   d.qs("aside #darkmode").onClick(asideSwitchMode);

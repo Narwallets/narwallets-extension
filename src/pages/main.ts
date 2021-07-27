@@ -23,6 +23,7 @@ import { D } from "../lib/tweetnacl/core/core.js";
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
 export const CREATE_USER = "create-user";
+export const CHANGE_PASSWORD = "change-password";
 
 export const UNLOCK = "unlock";
 

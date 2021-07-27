@@ -85,6 +85,8 @@
 			<hr>
 			<!--<li id="change-password">Change your password</li>
 <hr>-->
+			<li id="change-password">Change Password</li>
+			<hr>
 			<li id="create-user">Create a new User</li>
 			<hr>
 			<li id="darkmode">Switch Dark/Light Mode</li>
@@ -163,6 +165,52 @@
 			<p></p>
 
 			<button class="big" id="create-user">Create</button>
+
+
+		</div>
+
+
+
+
+	</div>
+
+	<!--#endregion-->
+
+	<!--#region change password-->
+	<div id="change-password" class="appface slide-hide">
+		<h2>Change Password</h2>
+		<div class="form">
+			<div class="form-field-label">
+				<label data-shrink="true" for="current-password">
+					<h3>Type your current password</h3>
+				</label>
+				<div class="form-control">
+					<input type="password" tabindex="0" autocomplete="password" id="current-pass" />
+				</div>
+			</div>
+			<div class="form-field-label">
+				<label class="" data-shrink="true" for="pass" id="new-password-label">
+					<h3>New password (min 8
+						chars)</h3>
+				</label>
+				<div class="form-control">
+					<input type="password" autocomplete="new-password" type="password" id="new-pass">
+				</div>
+			</div>
+			<div class="form-field-label">
+				<label class="form-field-label" data-shrink="true" for="pass-confirm" id="confirm-new-password-label">
+					<h3>Confirm password</h3>
+				</label>
+				<div class="form-control">
+					<input type="password" autocomplete="new-password" id="new-pass-confirm">
+				</div>
+			</div>
+
+			<p></p>
+			<p></p>
+
+			
+			<button class="big" id="confirm-change-password">Change Password</button>
 
 
 		</div>

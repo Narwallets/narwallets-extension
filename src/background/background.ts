@@ -136,6 +136,8 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
       return global.unlockSecureStateAsync(msg.email, msg.password);
     } else if (msg.code == "create-user") {
       return global.createUserAsync(msg.email, msg.password);
+    } else if(msg.code == "change-password") {
+      return global.changePasswordAsync(msg.email, msg.password)
     } else if (msg.code == "set-options") {
       global.SecureState.advancedMode = msg.advancedMode;
       global.SecureState.autoUnlockSeconds = msg.autoUnlockSeconds;
