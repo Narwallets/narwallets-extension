@@ -105,10 +105,12 @@ export async function changePasswordAsync(
   if (!password || password.length < 8) {
     throw Error("password must be at least 8 characters long");
   }
-  lock("changePasswordAsync"); //log out current user
+  
   State.currentUser = email;
-  await createSecureStateAsync(password);
-  saveState();
+  SecureState.hashedPass = await sha256PwdBase64Async(password);
+  saveSecureState();
+  
+  lock("changePasswordAsync"); //log out current user
 }
 
 export async function createUserAsync(

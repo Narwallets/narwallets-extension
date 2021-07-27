@@ -17,6 +17,10 @@ async function changeClicked(ev :Event) {
     const password = d.inputById(PASS).value;
     const confirm = d.inputById(PASS_CONFIRM).value;
     
+    if (!confirm || confirm != password) {
+      throw Error("passwords don't match")
+    }
+
     const state = await askBackgroundGetState()
     try {
         await askBackground({
@@ -28,9 +32,6 @@ async function changeClicked(ev :Event) {
         d.showErr(error);
         return;
       }
-    if (!confirm || confirm != password) {
-      throw Error("passwords don't match")
-    }
     
     //validate email,pwd,duplicates & Create SecureState store hashedPass
     await askBackground({code:"change-password", email: state.currentUser, password:password}) 

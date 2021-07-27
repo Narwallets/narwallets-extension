@@ -223,7 +223,7 @@ function asideCreateUserClicked() {
 }
 async function asideAddAccount() {
   if (await asideIsUnlocked()) {
-    d.showPage(IMPORT_OR_CREATE);
+    Pages.addAccountClicked();
   }
 }
 

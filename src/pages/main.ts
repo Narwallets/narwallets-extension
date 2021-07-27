@@ -109,7 +109,7 @@ function sortByOrder(a: ExtendedAccountData, b: ExtendedAccountData) {
   return -1;
 }
 
-function addAccountClicked() {
+export function addAccountClicked() {
   d.onClickId("add-account-back-to-account", backToAccountsClicked);
   d.showPage(IMPORT_OR_CREATE);
 }
