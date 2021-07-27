@@ -71,10 +71,14 @@ import { nearDollarPrice } from "../data/global.js";
 import { addressContacts } from "./address-book.js";
 import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/Contact.js";
-import { STAKE_DEFAULT_SVG, STNEAR_SVG, UNSTAKE_DEFAULT_SVG } from "../util/svg_const.js";
+import {
+  SEND_SVG,
+  STAKE_DEFAULT_SVG,
+  STNEAR_SVG,
+  UNSTAKE_DEFAULT_SVG,
+} from "../util/svg_const.js";
 
 const THIS_PAGE = "account-selected";
-
 
 let selectedAccountData: ExtendedAccountData;
 
@@ -838,14 +842,12 @@ async function performStake() {
   disableOKCancel();
   d.showWait();
   let newStakingPool: string;
-
   try {
     let amountToStake: number;
     let existAssetWithThisPool = false;
 
     if (stakeTabSelected == 1) {
-      let networkInfo = await askBackgroundGetNetworkInfo();
-      newStakingPool = networkInfo.liquidStakingContract;
+      newStakingPool = "meta.pool.testnet";
       amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     } else {
       newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
@@ -916,6 +918,7 @@ async function performStake() {
         date: new Date().toISOString(),
         type: "stake",
         destination: "",
+        icon: STAKE_DEFAULT_SVG,
       };
       let foundAsset: Asset = new Asset();
 
@@ -1262,6 +1265,7 @@ async function performSend() {
       date: new Date().toISOString(),
       type: "send",
       destination: toAccName,
+      icon: SEND_SVG,
     };
     selectedAccountData.accountInfo.history.unshift(hist);
 

@@ -40,13 +40,19 @@ export class Asset {
   icon: string = "";
 }
 
-export function addHistory(asset: Asset, type: string, amount: number) {
+export function addHistory(
+  asset: Asset,
+  type: string,
+  amount: number,
+  icon: string
+) {
   let hist: History;
   hist = {
     amount: amount,
     date: new Date().toISOString(),
     type: type,
     destination: "",
+    icon,
   };
 
   asset.history.unshift(hist);
@@ -57,6 +63,7 @@ export class History {
   type: string = "send";
   amount: number = 0;
   destination: string = "";
+  icon: string = "";
 }
 
 export class ExtendedAccountData {

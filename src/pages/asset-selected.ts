@@ -37,13 +37,15 @@ import { GContact } from "../data/Contact.js";
 import { localStorageSet } from "../data/util.js";
 import {
   META_SVG,
+  SEND_SVG,
   STAKE_DEFAULT_SVG,
+  STNEAR_SVG,
   UNSTAKE_DEFAULT_SVG,
+  WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { nearDollarPrice } from "../data/global.js";
-
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -127,47 +129,51 @@ function inputChanged() {
   let extraMsg = "";
   if (isNaN(value) || value <= 0) {
     fee_bp = metaPoolContractData.nslp_current_discount_basis_points;
-  }
-  else {
+  } else {
     const liquidity = BigInt(metaPoolContractData.nslp_liquidity);
-    const receiveNear = BigInt(c.ntoy(value * Number(c.ytonFull(metaPoolContractData.st_near_price))));
+    const receiveNear = BigInt(
+      c.ntoy(value * Number(c.ytonFull(metaPoolContractData.st_near_price)))
+    );
     fee_bp = get_discount_basis_points(liquidity, receiveNear);
-    const realReceive: BigInt = receiveNear - receiveNear * BigInt(fee_bp) / BigInt(10000);
+    const realReceive: BigInt =
+      receiveNear - (receiveNear * BigInt(fee_bp)) / BigInt(10000);
     const nearAmount = c.yton(realReceive.toString());
     extraMsg = ` - receive ${c.toStringDec(nearAmount)} \u24c3`;
     extraMsg += ` ~  ${c.toStringDec(nearAmount * nearDollarPrice)} USD`;
     if (liquidity < realReceive) extraMsg = " - Not enough liquidity";
   }
-  d.byId("fee-amount").innerText = `Fee: ${(fee_bp / 100).toString()} % ${extraMsg}`;
+  d.byId("fee-amount").innerText = `Fee: ${(
+    fee_bp / 100
+  ).toString()} % ${extraMsg}`;
 }
 
 function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
-
   try {
-
     if (sell > liquidity) {
       //more asked than available => max discount
-      return metaPoolContractData.nslp_max_discount_basis_points
+      return metaPoolContractData.nslp_max_discount_basis_points;
     }
 
     const target = BigInt(metaPoolContractData.nslp_target);
     const liq_after = liquidity - sell;
     if (liq_after >= target) {
       //still >= target after swap => min discount
-      return metaPoolContractData.nslp_min_discount_basis_points
+      return metaPoolContractData.nslp_min_discount_basis_points;
     }
 
-    let range = BigInt(metaPoolContractData.nslp_max_discount_basis_points - metaPoolContractData.nslp_min_discount_basis_points);
+    let range = BigInt(
+      metaPoolContractData.nslp_max_discount_basis_points -
+        metaPoolContractData.nslp_min_discount_basis_points
+    );
     //here 0<after<target, so 0<proportion<range
-    const proportion: bigint = range * liq_after / target;
-    return metaPoolContractData.nslp_max_discount_basis_points - Number(proportion);
-
-  }
-  catch (ex) {
+    const proportion: bigint = (range * liq_after) / target;
+    return (
+      metaPoolContractData.nslp_max_discount_basis_points - Number(proportion)
+    );
+  } catch (ex) {
     console.error(ex);
     return metaPoolContractData.nslp_current_discount_basis_points;
   }
-
 }
 
 function hideInMiddle() {
@@ -240,7 +246,7 @@ async function confirmWithdraw() {
         accData.name
       );
     }
-    addAssetHistory("withdraw", amount);
+    addAssetHistory("withdraw", amount, WITHDRAW_SVG);
     asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
     if (asset_selected.balance == 0) {
@@ -282,7 +288,7 @@ async function DelayedUnstake() {
 }
 
 async function LiquidUnstake() {
-  try{
+  try {
     d.showSubPage("liquid-unstake");
     d.onClickId("liquid-unstake-max", function () {
       d.maxClicked("liquid-unstake-amount", "#selected-asset #balance");
@@ -290,21 +296,22 @@ async function LiquidUnstake() {
     d.byId("fee-amount").innerText = "";
     metaPoolContract = new MetaPool(asset_selected.contractId, accData.name);
     metaPoolContractData = await metaPoolContract.get_contract_state();
-    
+
     //searchAccounts.contractState;
     await showOKCancel(LiquidUnstakeOk, showInitial);
-  } catch(error) {  
+  } catch (error) {
     d.showErr(error);
   }
 }
 
-function addAssetHistory(type: string, amount: number) {
+function addAssetHistory(type: string, amount: number, icon: string) {
   let hist: History;
   hist = {
     amount: amount,
     date: new Date().toISOString(),
     type: type,
     destination: "",
+    icon,
   };
 
   if (type == "send") hist.destination = contactToAdd;
@@ -343,7 +350,7 @@ async function LiquidUnstakeOk() {
 
     asset_selected.balance -= c.yton(yoctosToUnstake);
 
-    addAssetHistory("liquid-unstake", c.yton(yoctosToUnstake));
+    addAssetHistory("liquid-unstake", c.yton(yoctosToUnstake), STNEAR_SVG);
     await refreshSaveSelectedAccount();
     hideOkCancel();
     reloadDetails();
@@ -364,6 +371,7 @@ async function addMetaAsset(amount: number) {
     date: new Date().toISOString(),
     type: "liquid",
     destination: "",
+    icon: META_SVG,
   };
   if (!asset) {
     let newAsset: Asset = new Asset();
@@ -417,7 +425,12 @@ async function restakeOk() {
 
     asset_selected.balance -= c.yton(yoctosToRestake);
 
-    addHistory(asset_selected, "restake", c.yton(yoctosToRestake));
+    addHistory(
+      asset_selected,
+      "restake",
+      c.yton(yoctosToRestake),
+      STAKE_DEFAULT_SVG
+    );
 
     // Como estoy restakeando, necesito incrementar el saldo del stake (o inicializarlo)
     let foundAsset: Asset = getOrCreateAsset(
@@ -427,7 +440,7 @@ async function restakeOk() {
       STAKE_DEFAULT_SVG
     );
     foundAsset.balance += c.yton(yoctosToRestake);
-    addHistory(foundAsset, "stake", c.yton(yoctosToRestake));
+    addHistory(foundAsset, "stake", c.yton(yoctosToRestake), STAKE_DEFAULT_SVG);
 
     await refreshSaveSelectedAccount();
     hideOkCancel();
@@ -524,6 +537,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     date: new Date().toISOString(), //so it's the same as when the data is JSON.parsed() from localStorage
     type: "unstake",
     destination: "",
+    icon: "",
   };
 
   accData.accountInfo.assets.forEach((asset) => {
@@ -675,7 +689,7 @@ async function performSend() {
 
     asset_selected.balance -= amountToSend;
 
-    addAssetHistory("send", amountToSend);
+    addAssetHistory("send", amountToSend, SEND_SVG);
     reloadDetails();
     await saveSelectedAccount();
     hideOkCancel();

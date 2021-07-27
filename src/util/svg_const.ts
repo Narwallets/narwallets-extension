@@ -104,3 +104,82 @@ export const STNEAR_SVG = `<?xml version="1.0" encoding="UTF-8" standalone="no"?
      style="fill:#ffffff" />
 </svg>
 `;
+
+//SEND SVG
+export const SEND_SVG = `<svg
+viewBox="0 0 67.79 67.79"
+version="1.1"
+id="svg12"
+<defs
+  id="defs4">
+ <style
+    id="style2">.cls-1{fill:#fff;}</style>
+</defs>
+<ellipse
+  style="fill:#4d4d4d;stroke-width:0.99685"
+  id="path853"
+  cx="33.810051"
+  cy="33.512726"
+  rx="33.555199"
+  ry="33.087978" />
+<g
+  id="Capa_2"
+  data-name="Capa 2">
+ <g
+    id="Capa_1-2"
+    data-name="Capa 1">
+   <path
+      class="cls-1"
+      d="M57.87,9.93a33.9,33.9,0,1,0,0,47.94A33.9,33.9,0,0,0,57.87,9.93ZM33.55,63.82A29.93,29.93,0,1,1,63.48,33.9,29.93,29.93,0,0,1,33.55,63.82Z"
+      id="path6" />
+   <path
+      class="cls-1"
+      d="M51.35,15.46l-.17-.15a5.7,5.7,0,0,0-4.67-1.87L27.58,14.81a5.75,5.75,0,1,0,.84,11.47l4.3-.31L15.46,43.22a5.75,5.75,0,0,0,8.13,8.13L41.83,33.11v6.35a5.75,5.75,0,0,0,5.75,5.75h0a5.74,5.74,0,0,0,5.75-5.75v-19a5.6,5.6,0,0,0-.43-2.17A5.7,5.7,0,0,0,51.35,15.46Z"
+      id="path8" />
+ </g>
+</g>
+</svg>
+`;
+
+//WITHDRAW SVG
+export const WITHDRAW_SVG = `<svg
+viewBox="0 0 67.79 67.79"
+version="1.1"
+id="svg33"
+sodipodi:docname="withdraw.svg"
+inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:svg="http://www.w3.org/2000/svg">
+<sodipodi:namedview
+  id="namedview35"
+  pagecolor="#505050"
+  bordercolor="#eeeeee"
+  borderopacity="1"
+  inkscape:pageshadow="0"
+  inkscape:pageopacity="0"
+  inkscape:pagecheckerboard="0"
+  showgrid="false"
+  inkscape:zoom="12.878005"
+  inkscape:cx="33.895"
+  inkscape:cy="33.895"
+  inkscape:window-width="3840"
+  inkscape:window-height="2081"
+  inkscape:window-x="-9"
+  inkscape:window-y="-9"
+  inkscape:window-maximized="1"
+  inkscape:current-layer="svg33" />
+<defs
+  id="defs25">
+ <style
+    id="style23">.cls-1{fill:#fff;}</style>
+</defs>
+<path
+  id="path27"
+  d="M 33.822833,-0.15547565 A 33.9,33.9 0 1 0 67.711503,33.744915 33.9,33.9 0 0 0 33.822833,-0.15547565 Z M 33.471273,8.44804 h 0.22851 a 5.71,5.71 0 0 1 3.11133,0.9199219 5.69,5.69 0 0 1 1.83984,1.2402341 l 13.41993,13.419922 a 5.74,5.74 0 0 1 0,8.13086 5.76,5.76 0 0 1 -8.13086,0 l -4.49024,-4.490235 v 25.789063 a 5.75,5.75 0 0 1 -11.5,0 V 29.059368 l -2.81836,3.259766 A 5.7507187,5.7507187 0 1 1 16.430254,24.79765 L 28.850173,10.44804 a 5.73,5.73 0 0 1 4.6211,-2 z"
+  style="fill:#00ffff" />
+</svg>
+`;
+
+
