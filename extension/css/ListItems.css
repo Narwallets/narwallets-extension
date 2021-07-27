@@ -106,6 +106,8 @@ border-style: none;
 	font-size: 16px;
 	font-weight: 200;
 	color:var(--TextGeneric);
+	max-width: 250px;
+	text-overflow: clip;
 	}
   
   .accountassettoken {

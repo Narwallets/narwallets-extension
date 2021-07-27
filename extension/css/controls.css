@@ -276,10 +276,11 @@ font-size: 17px;
 font-weight: 300;
 
 background-color:var(--HighLight);
+color: var(--TextColor);
 border-style: solid;
 border-width: 1px;
 overflow-wrap: break-word;
-box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+
 }
 
 
