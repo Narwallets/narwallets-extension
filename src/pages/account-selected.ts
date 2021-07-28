@@ -847,7 +847,8 @@ async function performStake() {
     let existAssetWithThisPool = false;
 
     if (stakeTabSelected == 1) {
-      newStakingPool = "meta.pool.testnet";
+      let networkInfo = await askBackgroundGetNetworkInfo();
+      newStakingPool = networkInfo.liquidStakingContract;
       amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     } else {
       newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
@@ -907,10 +908,21 @@ async function performStake() {
         c.ntoy(amountToStake)
       );
 
-      poolAccInfo = await StakingPool.getAccInfo(
-        selectedAccountData.name,
-        newStakingPool
-      );
+      let newBalance;
+      if(stakeTabSelected == 1) {
+        let metaPoolResult = await askBackgroundViewMethod(
+          newStakingPool,
+          "get_account_info",
+          { account_id: selectedAccountData.name }
+        );
+        newBalance = metaPoolResult.st_near;
+      } else {
+        poolAccInfo = await StakingPool.getAccInfo(
+          selectedAccountData.name,
+          newStakingPool
+        );
+        newBalance = poolAccInfo.staked_balance;
+      }
 
       let hist: History;
       hist = {
@@ -931,14 +943,14 @@ async function performStake() {
 
       if (existAssetWithThisPool) {
         foundAsset.history.unshift(hist);
-        foundAsset.balance = c.yton(poolAccInfo.staked_balance);
+        foundAsset.balance = c.yton(newBalance);
       } else {
         let asset: Asset;
         asset = {
           spec: "idk",
           url: "",
           contractId: newStakingPool,
-          balance: c.yton(poolAccInfo.staked_balance),
+          balance: c.yton(newBalance),
           type: "stake",
           symbol: stakeTabSelected == 1 ? "STNEAR" : "STAKED",
           icon: stakeTabSelected == 1 ? STNEAR_SVG : STAKE_DEFAULT_SVG,
@@ -1081,11 +1093,11 @@ async function unstakeClicked() {
 }
 
 //-----------------------
-function fixUserAmountInY(amount: number, yoctosMax: string): string {
+export function fixUserAmountInY(amount: number, yoctosMax: string): string {
   let yoctosResult = yoctosMax; //default => all
-  if (amount + 2 < c.yton(yoctosResult)) {
+  if (amount + 0.001 <= c.yton(yoctosResult)) {
     yoctosResult = c.ntoy(amount); //only if it's less of what's available, we take the input amount
-  } else if (amount > 2 + c.yton(yoctosMax)) {
+  } else if (amount > 0.001 + c.yton(yoctosMax)) {
     //only if it's +1 above max
     throw Error("Max amount is " + c.toStringDec(c.yton(yoctosMax)));
     //----------------
@@ -1737,6 +1749,8 @@ async function makeReadOnlyOKClicked() {
     }
   } catch (ex) {
     d.showErr(ex.message);
+  } finally {
+    hideOkCancel();
   }
 }
 
@@ -1783,9 +1797,10 @@ async function makeFullAccessOKClicked() {
     showInitial();
   } catch (ex) {
     d.showErr(ex.message);
+    enableOKCancel();
   } finally {
     d.hideWait();
-    enableOKCancel();
+    hideOkCancel();
   }
 }
 

@@ -27,6 +27,7 @@ import {
 } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import {
+  fixUserAmountInY,
   populateSendCombo,
   show as AccountSelectedPage_show,
 } from "./account-selected.js";
@@ -587,18 +588,6 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   accData.accountInfo.history.unshift(hist);
 
   refreshSaveSelectedAccount();
-}
-
-function fixUserAmountInY(amount: number, yoctosMax: string): string {
-  let yoctosResult = yoctosMax; //default => all
-  if (amount + 2 < c.yton(yoctosResult)) {
-    yoctosResult = c.ntoy(amount); //only if it's less of what's available, we take the input amount
-  } else if (amount > 2 + c.yton(yoctosMax)) {
-    //only if it's +1 above max
-    throw Error("Max amount is " + c.toStringDec(c.yton(yoctosMax)));
-    //----------------
-  }
-  return yoctosResult;
 }
 
 function reloadAssetsList() {
