@@ -539,7 +539,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     date: new Date().toISOString(), //so it's the same as when the data is JSON.parsed() from localStorage
     type: "unstake",
     destination: "",
-    icon: "",
+    icon: UNSTAKE_DEFAULT_SVG,
   };
 
   accData.accountInfo.assets.forEach((asset) => {

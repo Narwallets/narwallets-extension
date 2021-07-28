@@ -182,7 +182,7 @@ function initPage() {
   //d.onClickId("assign-staking-pool", assignStakingPool);
 }
 
-async function refreshSelectedAcc() {
+async function refreshFunction() {
   let accName = selectedAccountData.name;
   const netInfo = await askBackgroundGetNetworkInfo();
 
@@ -197,38 +197,26 @@ async function refreshSelectedAcc() {
   }
 
   const mainAccInfo = await searchAccounts.searchAccount(accName);
-  console.log(mainAccInfo);
 
   selectedAccountData.total = mainAccInfo.lastBalance;
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
-    if (asset.contractId == "token.cheddar.testnet") {
-      let result = await askBackgroundViewMethod(
-        asset.contractId,
-        "ft_metadata",
-        {}
-      );
-      let resultBalance = await askBackgroundViewMethod(
-        asset.contractId,
-        "ft_balance_of",
-        { account_id: selectedAccountData.name }
-      );
-      console.log("Tenemos este log loco que tiene", result, resultBalance);
-    }
-
     let poolAccInfo = await StakingPool.getAccInfo(
       selectedAccountData.name,
       asset.contractId
     );
     if (asset.symbol != "USNTAKED")
       asset.balance = c.yton(poolAccInfo.staked_balance);
+
     if (asset.symbol == "UNSTAKED")
       asset.balance = c.yton(poolAccInfo.unstaked_balance);
-
-    console.log("ESTO ES", poolAccInfo, asset.symbol, asset.balance);
+    await refreshSaveSelectedAccount();
   });
-  await refreshSaveSelectedAccount();
+}
+
+async function refreshSelectedAcc() {
+  await refreshFunction();
   showInitial();
   d.showSuccess("Refreshed");
 }
@@ -377,7 +365,6 @@ function getAccountRecord(accName: string): Promise<Account> {
 export async function populateSendCombo(combo: string) {
   var opotions = "";
   if (addressContacts.length == 0) await initAddressArr();
-  console.log(addressContacts);
 
   for (var i = 0; i < addressContacts.length; i++) {
     opotions += '<option value="' + addressContacts[i].accountId + '" />';
@@ -417,7 +404,7 @@ export function populateAssets() {
 
 function assetSorter(asset1: Asset, asset2: Asset): number {
   const contractIdCompare = asset1.contractId.localeCompare(asset2.contractId);
-  if(contractIdCompare != 0) {
+  if (contractIdCompare != 0) {
     return contractIdCompare;
   } else {
     return asset1.symbol.localeCompare(asset2.symbol);
@@ -768,7 +755,7 @@ async function performLockupContractSend() {
 
     await checkContactList();
 
-    await refreshSelectedAcc();
+    await refreshFunction();
 
     showInitial();
   } catch (ex) {
@@ -919,7 +906,7 @@ async function performStake() {
       );
 
       let newBalance;
-      if(stakeTabSelected == 1) {
+      if (stakeTabSelected == 1) {
         let metaPoolResult = await askBackgroundViewMethod(
           newStakingPool,
           "get_account_info",
@@ -1293,7 +1280,7 @@ async function performSend() {
 
     //    hideOkCancel();
     displayReflectTransfer(amountToSend, toAccName);
-    await refreshSelectedAcc();
+    await refreshFunction();
     await saveSelectedAccount();
     await checkContactList();
   } catch (ex) {
