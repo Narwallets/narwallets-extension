@@ -405,13 +405,23 @@ async function selectAndShowAccount(accName: string) {
   showSelectedAccount();
 }
 
-function populateAssets() {
+export function populateAssets() {
   d.clearContainer("assets-list");
+  selectedAccountData.accountInfo.assets.sort(assetSorter);
   d.populateUL(
     "assets-list",
     "asset-item-template",
     selectedAccountData.accountInfo.assets
   );
+}
+
+function assetSorter(asset1: Asset, asset2: Asset): number {
+  const contractIdCompare = asset1.contractId.localeCompare(asset2.contractId);
+  if(contractIdCompare != 0) {
+    return contractIdCompare;
+  } else {
+    return asset1.symbol.localeCompare(asset2.symbol);
+  }
 }
 
 function showSelectedAccount() {

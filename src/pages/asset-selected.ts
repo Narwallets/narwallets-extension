@@ -28,6 +28,7 @@ import {
 import * as searchAccounts from "../util/search-accounts.js";
 import {
   fixUserAmountInY,
+  populateAssets,
   populateSendCombo,
   show as AccountSelectedPage_show,
 } from "./account-selected.js";
@@ -590,15 +591,6 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   refreshSaveSelectedAccount();
 }
 
-function reloadAssetsList() {
-  d.clearContainer("assets-list");
-  d.populateUL(
-    "assets-list",
-    "asset-item-template",
-    accData.accountInfo.assets
-  );
-}
-
 function backToSelectClicked() {
   AccountSelectedPage_show(accData.name, undefined);
   hideOkCancel();
@@ -712,8 +704,7 @@ async function deleteAsset() {
 
   refreshSaveSelectedAccount();
 
-  d.clearContainer("assets-list");
-  d.populateUL("assets-list", "asset-item-template", asset_array);
+  populateAssets();
 
   //Guardo
 
