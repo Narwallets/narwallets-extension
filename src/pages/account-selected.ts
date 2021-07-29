@@ -93,6 +93,8 @@ let comboAdd: d.El;
 let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
+let intervalIdShow: any;
+
 export async function show(
   accName: string,
   reposition?: string,
@@ -120,14 +122,14 @@ export async function show(
   localStorageSet({ reposition: "account", account: accName });
   checkConnectOrDisconnect();
   await refreshFunction();
+  intervalIdShow = window.setInterval(async function () {
+    refreshFunction();
+  }, 18000);
 }
 
 // page init
 
 function initPage() {
-  const backLink = new d.El("#account-selected.appface .button.back");
-  backLink.onClick(Pages.backToAccountsList);
-
   d.onClickId("assets-list", showAssetDetailsClicked);
 
   // icon bar
@@ -150,6 +152,7 @@ function initPage() {
   d.onClickId("adress-book-button", showAdressBook);
   d.onClickId("contact-list", contactOptions);
   d.onClickId("refresh-button", refreshSelectedAcc);
+  d.onClickId("back-to-account", backToAccountsClicked);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   // liquid/delayed stake
@@ -182,6 +185,11 @@ function initPage() {
   //d.onClickId("assign-staking-pool", assignStakingPool);
 }
 
+function backToAccountsClicked() {
+  window.clearInterval(intervalIdShow);
+  const backLink = new d.El("#account-selected.appface .button.back");
+  backLink.onClick(Pages.backToAccountsList);
+}
 async function refreshFunction() {
   let accName = selectedAccountData.name;
   const netInfo = await askBackgroundGetNetworkInfo();
