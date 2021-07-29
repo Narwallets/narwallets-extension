@@ -17,8 +17,11 @@ import {
   askBackgroundAllNetworkAccounts,
   askBackgroundGetState,
   askBackgroundIsLocked,
+  askBackgroundSetAccount,
 } from "../background/askBackground.js";
 import { D } from "../lib/tweetnacl/core/core.js";
+import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
+import { saveAccount } from "../data/global.js";
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
@@ -295,12 +298,19 @@ async function autoRefresh() {
 async function refreshAllAccounts() {
   const accountsRecord = await askBackgroundAllNetworkAccounts();
   const list: ExtendedAccountData[] = [];
-  for (let key in accountsRecord) {
-    list.push(new ExtendedAccountData(key, accountsRecord[key]));
-  }
-  console.log(list);
 
+  for (let key in accountsRecord) {
+    let acc: Account = new Account();
+    await asyncRefreshAccountInfo(key, acc);
+
+    accountsRecord[key].lastBalance = acc.lastBalance;
+
+    const extAcc = new ExtendedAccountData(key, accountsRecord[key]);
+    list.push(extAcc);
+    await askBackgroundSetAccount(key, accountsRecord[key]);
+  }
   list.sort(sortByOrder);
+
   d.clearContainer(ACCOUNTS_LIST);
 
   d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list);
