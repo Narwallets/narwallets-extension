@@ -119,6 +119,7 @@ export async function show(
   }
   localStorageSet({ reposition: "account", account: accName });
   checkConnectOrDisconnect();
+  await refreshFunction();
 }
 
 // page init
@@ -165,7 +166,6 @@ function initPage() {
 
   var target = document.querySelector("#usd-price-link");
   target?.addEventListener("usdPriceReady", usdPriceReady);
-
   return;
 
   //accountAmount.onInput(amountInput);
