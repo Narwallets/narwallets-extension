@@ -48,6 +48,7 @@ import {
 import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { nearDollarPrice } from "../data/global.js";
+import { setLastSelectedAsset } from "./main.js";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -74,6 +75,7 @@ export async function show(
   asset_array = acc.accountInfo.assets;
   asset_index = assetIndex;
   asset_selected = acc.accountInfo.assets[asset_index];
+  setLastSelectedAsset(asset_selected);
 
   if (asset_selected.symbol == "STAKED" && asset_selected.icon == "") {
     asset_selected.icon = STAKE_DEFAULT_SVG;

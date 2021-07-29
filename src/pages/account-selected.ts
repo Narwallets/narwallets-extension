@@ -77,6 +77,7 @@ import {
   STNEAR_SVG,
   UNSTAKE_DEFAULT_SVG,
 } from "../util/svg_const.js";
+import { NetworkInfo } from "../lib/near-api-lite/network.js";
 
 const THIS_PAGE = "account-selected";
 
@@ -122,9 +123,41 @@ export async function show(
   localStorageSet({ reposition: "account", account: accName });
   checkConnectOrDisconnect();
   await refreshFunction();
-  intervalIdShow = window.setInterval(async function () {
-    refreshFunction();
-  }, 18000);
+  // intervalIdShow = window.setInterval(async function () {
+  //   refreshFunction(true);
+  // }, 5000);
+}
+
+export function onNetworkChanged(info: NetworkInfo) {
+  let lista = document.querySelector("#combo-add-token-datalist");
+
+  let options = "";
+
+  if(info.name == "testnet") {
+    options = `<option value="token.cheddar.testnet">CHDR</option>
+		<option value="token.meta.pool.testnet">META</option>
+		<option value="meta-v2.pool.testnet">META V2</option>`;
+  } else if(info.name == "mainnet") {
+    options = `<option value="wrap.near">wNEAR</option>
+    <option value="token.meta.pool.near">META TOKEN</option>
+    <option value="meta.pool.near">META</option>
+    <option value="berryclub.ek.near">BANANA</option>
+    <option value="6b17...1d0f.factory.bridge.near"
+      data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
+    <option value="dac17...31ec7.factory.bridge.near"
+      data-contract="dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near">nUSDT</option>
+    <option value="1f98...f984.factory.bridge.near"
+      data-contract="1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near">nUNI</option>
+    <option value="5149...86ca.factory.bridge.near"
+      data-contract="514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near">nLINK</option>
+    <option value="a0b8...eb48.factory.bridge.near"
+      data-contract="a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near">nUSDC</option>
+    <option value="2260...c599.factory.bridge.near"
+      data-contract="2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near">nWBTC</option>`;
+  }
+  
+
+  if(lista) lista.innerHTML = options; 
 }
 
 // page init
@@ -190,7 +223,9 @@ function backToAccountsClicked() {
   const backLink = new d.El("#account-selected.appface .button.back");
   backLink.onClick(Pages.backToAccountsList);
 }
-async function refreshFunction() {
+
+async function refreshFunction(fromTimer?: boolean) {
+  
   let accName = selectedAccountData.name;
   const netInfo = await askBackgroundGetNetworkInfo();
 
@@ -210,22 +245,25 @@ async function refreshFunction() {
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
-    let poolAccInfo = await StakingPool.getAccInfo(
-      selectedAccountData.name,
-      asset.contractId
-    );
-    if (asset.symbol != "USNTAKED")
-      asset.balance = c.yton(poolAccInfo.staked_balance);
-
-    if (asset.symbol == "UNSTAKED")
-      asset.balance = c.yton(poolAccInfo.unstaked_balance);
-    await refreshSaveSelectedAccount();
+    if(asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
+      let poolAccInfo = await StakingPool.getAccInfo(
+        selectedAccountData.name,
+        asset.contractId
+      );
+      if (asset.symbol == "UNSTAKED") {
+        asset.balance = c.yton(poolAccInfo.unstaked_balance);
+      } else {
+        asset.balance = c.yton(poolAccInfo.staked_balance);
+      }  
+    }
   });
+  await refreshSaveSelectedAccount(fromTimer);
 }
 
 async function refreshSelectedAcc() {
   await refreshFunction();
   showInitial();
+  
   d.showSuccess("Refreshed");
 }
 
@@ -286,13 +324,14 @@ function addClicked() {
   showOKCancel(addOKClicked, showInitial);
 }
 
+
 async function addOKClicked() {
   disableOKCancel();
   d.showWait();
   try {
     let contractValue = d.inputById("combo-add-token").value;
     let lista =
-      document.querySelector("#combo-add-token-datalis")?.children || [];
+      document.querySelector("#combo-add-token-datalist")?.children || [];
 
     for (let i = 0; i < lista?.length || 0; i++) {
       let element = lista[i] as HTMLOptionElement;
@@ -371,14 +410,14 @@ function getAccountRecord(accName: string): Promise<Account> {
 }
 
 export async function populateSendCombo(combo: string) {
-  var opotions = "";
+  var options = "";
   if (addressContacts.length == 0) await initAddressArr();
 
   for (var i = 0; i < addressContacts.length; i++) {
-    opotions += '<option value="' + addressContacts[i].accountId + '" />';
+    options += '<option value="' + addressContacts[i].accountId + '" />';
   }
 
-  d.byId(combo).innerHTML = opotions;
+  d.byId(combo).innerHTML = options; 
 }
 
 async function selectAndShowAccount(accName: string) {
@@ -386,7 +425,9 @@ async function selectAndShowAccount(accName: string) {
   if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
 
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
+  Pages.setLastSelectedAccount(selectedAccountData);
   populateSendCombo("send-contact-combo");
+  
 
   console.log(selectedAccountData);
 
@@ -419,11 +460,23 @@ function assetSorter(asset1: Asset, asset2: Asset): number {
   }
 }
 
-function showSelectedAccount() {
+function showSelectedAccount(fromTimer?: boolean) {
   //make sure available is up to date before displaying
+  
   selectedAccountData.available =
     selectedAccountData.accountInfo.lastBalance -
     selectedAccountData.accountInfo.lockedOther;
+
+  if (nearDollarPrice != 0) {
+    usdPriceReady();
+  }
+  
+  // Debajo de esto son todas acciones que se deben realizar cuando el usuario realiza la acción
+  if(fromTimer) {
+    // Solo actualizo en monto
+    d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(selectedAccountData.total);
+    return;
+  }
 
   const SELECTED_ACCOUNT = "selected-account";
   d.clearContainer(SELECTED_ACCOUNT);
@@ -445,34 +498,6 @@ function showSelectedAccount() {
     "asset-history-template",
     selectedAccountData.accountInfo.history
   );
-
-  if (nearDollarPrice != 0) {
-    usdPriceReady();
-  }
-
-  // Muestro tab 1
-  //d.qs("#liquid-stake-radio").el.checked = true;
-
-  /* lala_design
-    accountBalance = new d.El(".selected-account-info .total.balance");
-    accountInfoName = new d.El(".selected-account-info .name");
-
-
-    if (selectedAccountData.accountInfo.ownerId) {
-        const oiLine = new d.El(".selected-account-info #owner-id-info-line");
-        oiLine.show()
-    }
-    if (selectedAccountData.accountInfo.lockedOther) {
-        const lockedOthLine = new d.El(".selected-account-info #locked-others-line");
-        lockedOthLine.show()
-    }
-    if (selectedAccountData.accountInfo.stakingPool) {
-        d.qs(".selected-account-info #staking-pool-info-line").show()
-        d.qs(".selected-account-info #staking-pool-balance-line").show()
-    }
-    
-    d.onClickSelector(".selected-account-info .access-status", accessLabelClicked)
-    */
 }
 
 type StateResult = {
@@ -1841,14 +1866,15 @@ async function removeAccountClicked(ev: Event) {
   }
 }
 
-async function refreshSaveSelectedAccount() {
+async function refreshSaveSelectedAccount(fromTimer?: boolean) {
   await searchAccounts.asyncRefreshAccountInfo(
     selectedAccountData.name,
     selectedAccountData.accountInfo
   );
   await saveSelectedAccount(); //save
 
-  showSelectedAccount();
+  showSelectedAccount(fromTimer);
+  
 }
 
 async function refreshClicked(ev: Event) {

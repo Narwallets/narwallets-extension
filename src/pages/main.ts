@@ -1,7 +1,7 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
-import { Account, ExtendedAccountData } from "../data/account.js";
+import { Account, Asset, ExtendedAccountData } from "../data/account.js";
 import { show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 
@@ -18,10 +18,12 @@ import {
   askBackgroundGetState,
   askBackgroundIsLocked,
   askBackgroundSetAccount,
+  askBackgroundViewMethod,
 } from "../background/askBackground.js";
 import { D } from "../lib/tweetnacl/core/core.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { saveAccount } from "../data/global.js";
+import * as StakingPool from "../contracts/staking-pool.js";
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
@@ -37,6 +39,17 @@ export const IMPORT_OR_CREATE = "import-or-create";
 export const ACCOUNTS_LIST = "accounts-list";
 export const ACCOUNT_ITEM_TEMPLATE = "account-item-template";
 export const ACCOUNT_ITEM = "account-item";
+
+let lastSelectedAccount: ExtendedAccountData;
+let lastSelectedAsset: Asset;
+
+export function setLastSelectedAccount(data: ExtendedAccountData) {
+  lastSelectedAccount = data;
+}
+
+export function setLastSelectedAsset(data: Asset) {
+  lastSelectedAsset = data;
+}
 
 let draggingEl: HTMLElement;
 function accountItem_drag(ev: Event) {
@@ -292,12 +305,11 @@ export function accountItemClicked(ev: Event) {
 async function autoRefresh() {
   var intervalId = window.setInterval(function () {
     refreshAllAccounts(); /// call your function here
-  }, 180000);
+  }, 5000);
 }
 
 async function refreshAllAccounts() {
   const accountsRecord = await askBackgroundAllNetworkAccounts();
-  const list: ExtendedAccountData[] = [];
 
   for (let key in accountsRecord) {
     let acc: Account = new Account();
@@ -306,25 +318,36 @@ async function refreshAllAccounts() {
     accountsRecord[key].lastBalance = acc.lastBalance;
 
     const extAcc = new ExtendedAccountData(key, accountsRecord[key]);
-    list.push(extAcc);
+    
+    if(key == lastSelectedAccount.name) {
+      d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(extAcc.total);
+      for(let i = 0; i < extAcc.accountInfo.assets.length; i++) {
+        let asset = extAcc.accountInfo.assets[i];
+        if(asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
+          let poolAccInfo = await StakingPool.getAccInfo(
+            extAcc.name,
+            asset.contractId
+          );
+          if (asset.symbol == "UNSTAKED") {
+            asset.balance = c.yton(poolAccInfo.unstaked_balance);
+          } else {
+            asset.balance = c.yton(poolAccInfo.staked_balance);
+          }  
+        } else {
+          let tokenAccBalance = await askBackgroundViewMethod(
+            asset.contractId,
+            "ft_balance_of",
+            { account_id: extAcc.name }
+          );
+          asset.balance = c.yton(tokenAccBalance);
+        }
+
+        if(asset.contractId == lastSelectedAsset.contractId && asset.symbol == lastSelectedAsset.symbol) {
+          d.qs("#selected-asset #balance").innerText = c.toStringDec(asset.balance);
+        }
+      }
+    }
     await askBackgroundSetAccount(key, accountsRecord[key]);
   }
-  list.sort(sortByOrder);
-
-  d.clearContainer(ACCOUNTS_LIST);
-
-  d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list);
-
-  document.querySelectorAll("#accounts-list .account-item").forEach((item) => {
-    item.addEventListener("click", accountItemClicked);
-    //item.addEventListener("dragstart", accountItem_dragStart)
-    item.addEventListener("drag", accountItem_drag);
-    //item.addEventListener("dragenter", accountItem_dragEnter)
-    item.addEventListener("dragover", accountItem_dragOver);
-    //item.addEventListener("dragleave", accountItem_dragLeave)
-    item.addEventListener("drop", accountItem_drop);
-    item.addEventListener("dragend", accountItem_dragend);
-    //@ts-ignore
-    item.draggable = true;
-  });
+  
 }

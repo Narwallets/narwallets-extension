@@ -10,7 +10,7 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { show as AccountSelectedPage_show } from "./pages/account-selected.js";
+import { onNetworkChanged as Account_onNetworkChanged, show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
@@ -30,6 +30,7 @@ import type { NetworkInfo } from "./lib/near-api-lite/network.js";
 import { calculateDollarValue } from "./data/global.js";
 import { D } from "./lib/tweetnacl/core/core.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
+import { Asset, ExtendedAccountData } from "./data/account.js";
 
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 
@@ -81,6 +82,7 @@ async function networkItemClicked(e: Event) {
     updateNetworkIndicatorVisualState(info);
     Import_onNetworkChanged(info);
 
+    Account_onNetworkChanged(info);
     //on network-change restart the page-flow
     Pages.show(); //refresh account list
   } catch (ex) {
@@ -104,6 +106,10 @@ function selectNetworkClicked(ev: Event) {
   selectionBox.querySelectorAll("div.circle").forEach((div: Element) => {
     div.addEventListener(d.CLICK, networkItemClicked);
   });
+}
+
+function populateAddTokenCombo() {
+
 }
 
 function welcomeCreatePassClicked() {
@@ -298,6 +304,8 @@ async function initPopup() {
   //update network indicator visual state
   const info = await askBackgroundGetNetworkInfo();
   updateNetworkIndicatorVisualState(info);
+  Import_onNetworkChanged(info);
+  Account_onNetworkChanged(info);
 
   calculateDollarValue();
 
