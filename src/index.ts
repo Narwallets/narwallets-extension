@@ -216,7 +216,6 @@ async function changePassword() {
   }
 }
 
-
 function asideCreateUserClicked() {
   hambClicked();
   d.showPage(Pages.WELCOME_NEW_USER_PAGE);
@@ -241,19 +240,20 @@ async function asideAddressBook() {
 function asideSwitchMode() {
   const cssLinkIndex = 0;
   var oldlink = document.getElementsByTagName("link").item(cssLinkIndex);
+
   var cssFile = "";
   if (isDark) {
     cssFile = "css/styles_light.css";
   } else {
     cssFile = "css/styles_dark.css";
   }
-  var newlink = document.createElement("link");
-  newlink.setAttribute("rel", "stylesheet");
-  newlink.setAttribute("href", cssFile);
 
-  if (oldlink) oldlink.href = cssFile;
-
-  isDark = !isDark;
+  setTimeout(() => {
+    if (oldlink) {
+      oldlink.href = cssFile;
+      isDark = !isDark;
+    }
+  }, 300);
 }
 
 //-----------------------
