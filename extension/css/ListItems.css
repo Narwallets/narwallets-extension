@@ -100,15 +100,19 @@ border-style: none;
 	position: absolute;
 	border-style: none;
 	display: inline-block;
+
+	text-align: left;
 	top: 30px;
 	left: 47px;
-	width: 40px;
+	width: 500px;
 	font-size: 16px;
 	font-weight: 200;
 	color:var(--TextGeneric);
-	max-width: 250px;
-	text-overflow: clip;
+	max-width: 230px;
+	overflow: hidden;
+	/* text-overflow: clip; */
 	}
+
   
   .accountassettoken {
 	

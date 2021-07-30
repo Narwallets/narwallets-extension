@@ -272,8 +272,8 @@ function usdPriceReady() {
   let element = document.querySelector(
     "#selected-account .accountdetsfiat"
   ) as HTMLDivElement;
-  element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
-  element.classList.remove("hidden");
+ // element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
+ // element.classList.remove("hidden");
 }
 
 function selectFirstTab() {
