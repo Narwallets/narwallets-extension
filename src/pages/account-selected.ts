@@ -133,11 +133,11 @@ export function onNetworkChanged(info: NetworkInfo) {
 
   let options = "";
 
-  if(info.name == "testnet") {
+  if (info.name == "testnet") {
     options = `<option value="token.cheddar.testnet">CHDR</option>
 		<option value="token.meta.pool.testnet">META</option>
 		<option value="meta-v2.pool.testnet">META V2</option>`;
-  } else if(info.name == "mainnet") {
+  } else if (info.name == "mainnet") {
     options = `<option value="wrap.near">wNEAR</option>
     <option value="token.meta.pool.near">META TOKEN</option>
     <option value="meta.pool.near">META</option>
@@ -155,9 +155,8 @@ export function onNetworkChanged(info: NetworkInfo) {
     <option value="2260...c599.factory.bridge.near"
       data-contract="2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near">nWBTC</option>`;
   }
-  
 
-  if(lista) lista.innerHTML = options; 
+  if (lista) lista.innerHTML = options;
 }
 
 // page init
@@ -225,7 +224,6 @@ function backToAccountsClicked() {
 }
 
 async function refreshFunction(fromTimer?: boolean) {
-  
   let accName = selectedAccountData.name;
   const netInfo = await askBackgroundGetNetworkInfo();
 
@@ -245,7 +243,7 @@ async function refreshFunction(fromTimer?: boolean) {
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
-    if(asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
+    if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
       let poolAccInfo = await StakingPool.getAccInfo(
         selectedAccountData.name,
         asset.contractId
@@ -254,7 +252,7 @@ async function refreshFunction(fromTimer?: boolean) {
         asset.balance = c.yton(poolAccInfo.unstaked_balance);
       } else {
         asset.balance = c.yton(poolAccInfo.staked_balance);
-      }  
+      }
     }
   });
   await refreshSaveSelectedAccount(fromTimer);
@@ -263,7 +261,7 @@ async function refreshFunction(fromTimer?: boolean) {
 async function refreshSelectedAcc() {
   await refreshFunction();
   showInitial();
-  
+
   d.showSuccess("Refreshed");
 }
 
@@ -272,8 +270,8 @@ function usdPriceReady() {
   let element = document.querySelector(
     "#selected-account .accountdetsfiat"
   ) as HTMLDivElement;
- // element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
- // element.classList.remove("hidden");
+  // element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
+  // element.classList.remove("hidden");
 }
 
 function selectFirstTab() {
@@ -323,7 +321,6 @@ function addClicked() {
   d.showSubPage("add-subpage");
   showOKCancel(addOKClicked, showInitial);
 }
-
 
 async function addOKClicked() {
   disableOKCancel();
@@ -417,7 +414,7 @@ export async function populateSendCombo(combo: string) {
     options += '<option value="' + addressContacts[i].accountId + '" />';
   }
 
-  d.byId(combo).innerHTML = options; 
+  d.byId(combo).innerHTML = options;
 }
 
 async function selectAndShowAccount(accName: string) {
@@ -427,7 +424,6 @@ async function selectAndShowAccount(accName: string) {
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Pages.setLastSelectedAccount(selectedAccountData);
   populateSendCombo("send-contact-combo");
-  
 
   console.log(selectedAccountData);
 
@@ -462,7 +458,7 @@ function assetSorter(asset1: Asset, asset2: Asset): number {
 
 function showSelectedAccount(fromTimer?: boolean) {
   //make sure available is up to date before displaying
-  
+
   selectedAccountData.available =
     selectedAccountData.accountInfo.lastBalance -
     selectedAccountData.accountInfo.lockedOther;
@@ -470,11 +466,13 @@ function showSelectedAccount(fromTimer?: boolean) {
   if (nearDollarPrice != 0) {
     usdPriceReady();
   }
-  
+
   // Debajo de esto son todas acciones que se deben realizar cuando el usuario realiza la acción
-  if(fromTimer) {
+  if (fromTimer) {
     // Solo actualizo en monto
-    d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(selectedAccountData.total);
+    d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(
+      selectedAccountData.total
+    );
     return;
   }
 
@@ -1306,7 +1304,8 @@ async function performSend() {
       amount: amountToSend,
       date: new Date().toISOString(),
       type: "send",
-      destination: toAccName,
+      destination:
+        toAccName.length > 27 ? toAccName.substring(0, 24) + "..." : toAccName,
       icon: SEND_SVG,
     };
     selectedAccountData.accountInfo.history.unshift(hist);
@@ -1874,7 +1873,6 @@ async function refreshSaveSelectedAccount(fromTimer?: boolean) {
   await saveSelectedAccount(); //save
 
   showSelectedAccount(fromTimer);
-  
 }
 
 async function refreshClicked(ev: Event) {

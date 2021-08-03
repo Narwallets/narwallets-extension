@@ -318,7 +318,11 @@ function addAssetHistory(type: string, amount: number, icon: string) {
     icon,
   };
 
-  if (type == "send") hist.destination = contactToAdd;
+  if (type == "send") {
+    contactToAdd.length > 27
+      ? (hist.destination = contactToAdd.substring(0, 24) + "...")
+      : (hist.destination = contactToAdd);
+  }
 
   asset_selected.history.unshift(hist);
 }
