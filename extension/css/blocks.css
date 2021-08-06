@@ -136,7 +136,7 @@
     background-color: var(--Block);
 
     height: 48px;	
-    width: 470px;   
+    width: 430px;   
 
     overflow-wrap: break-word;
     word-break: break-word;
@@ -147,6 +147,9 @@
     font-weight: 200;
 
     border-radius: 5px 5px 0 0;
+
+    padding-left: 30px;
+    padding-right: 30px;
 
   }
 
