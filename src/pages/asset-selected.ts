@@ -27,6 +27,7 @@ import {
 } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import {
+  addAssetToken,
   fixUserAmountInY,
   populateAssets,
   populateSendCombo,
@@ -49,6 +50,7 @@ import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { nearDollarPrice } from "../data/global.js";
 import { setLastSelectedAsset } from "./main.js";
+import { networkInterfaces } from "node:os";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -373,32 +375,9 @@ async function LiquidUnstakeOk() {
 
 async function addMetaAsset(amount: number) {
   const asset = accData.accountInfo.assets.find((i) => i.symbol == "META");
-  let hist: History;
-  hist = {
-    amount: amount,
-    date: new Date().toISOString(),
-    type: "liquid",
-    destination: "",
-    icon: META_SVG,
-  };
+  let networkInfo = await askBackgroundGetNetworkInfo();
   if (!asset) {
-    let newAsset: Asset = new Asset();
-    let networkInfo = await askBackgroundGetNetworkInfo();
-    newAsset = {
-      spec: "idk",
-      url: "",
-      contractId: networkInfo.liquidStakingGovToken,
-      balance: amount,
-      type: "meta",
-      symbol: "META",
-      icon: META_SVG,
-      history: [],
-    };
-    newAsset.history.unshift(hist);
-    accData.accountInfo.assets.push(newAsset);
-  } else {
-    asset.balance += amount;
-    asset.history.unshift(hist);
+    await addAssetToken(networkInfo.liquidStakingGovToken);
   }
 }
 

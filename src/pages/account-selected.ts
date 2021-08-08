@@ -243,16 +243,26 @@ async function refreshFunction(fromTimer?: boolean) {
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
-    if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
-      let poolAccInfo = await StakingPool.getAccInfo(
-        selectedAccountData.name,
-        asset.contractId
-      );
-      if (asset.symbol == "UNSTAKED") {
-        asset.balance = c.yton(poolAccInfo.unstaked_balance);
-      } else {
-        asset.balance = c.yton(poolAccInfo.staked_balance);
+    if (asset.type == "stake") {
+      if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
+        let poolAccInfo = await StakingPool.getAccInfo(
+          selectedAccountData.name,
+          asset.contractId
+        );
+        if (asset.symbol == "UNSTAKED") {
+          asset.balance = c.yton(poolAccInfo.unstaked_balance);
+        } else {
+          asset.balance = c.yton(poolAccInfo.staked_balance);
+        }
       }
+    }
+    if (asset.type == "ft") {
+      let resultBalance = await askBackgroundViewMethod(
+        asset.contractId,
+        "ft_balance_of",
+        { account_id: selectedAccountData.name }
+      );
+      asset.balance = c.yton(resultBalance);
     }
   });
   await refreshSaveSelectedAccount(fromTimer);
@@ -347,31 +357,7 @@ async function addOKClicked() {
       }
     });
 
-    let item = new Asset();
-    item.type = "ft";
-
-    item.contractId = contractValue;
-
-    let result = await askBackgroundViewMethod(
-      item.contractId,
-      "ft_metadata",
-      {}
-    );
-
-    item.symbol = result.symbol;
-    item.icon = result.icon;
-    item.url = result.reference;
-    item.spec = result.spec;
-
-    let resultBalance = await askBackgroundViewMethod(
-      item.contractId,
-      "ft_balance_of",
-      { account_id: selectedAccountData.name }
-    );
-    item.balance = c.yton(resultBalance);
-
-    selectedAccountData.accountInfo.assets.push(item);
-
+    await addAssetToken(contractValue);
     refreshSaveSelectedAccount();
     enableOKCancel();
     d.showSuccess("Success");
@@ -382,6 +368,33 @@ async function addOKClicked() {
     d.hideWait();
     enableOKCancel();
   }
+}
+
+export async function addAssetToken(contractId: string) {
+  let item = new Asset();
+  item.type = "ft";
+
+  item.contractId = contractId;
+
+  let result = await askBackgroundViewMethod(
+    item.contractId,
+    "ft_metadata",
+    {}
+  );
+
+  item.symbol = result.symbol;
+  item.icon = result.icon;
+  item.url = result.reference;
+  item.spec = result.spec;
+
+  let resultBalance = await askBackgroundViewMethod(
+    item.contractId,
+    "ft_balance_of",
+    { account_id: selectedAccountData.name }
+  );
+  item.balance = c.yton(resultBalance);
+
+  selectedAccountData.accountInfo.assets.push(item);
 }
 
 function showingMore() {
@@ -1356,6 +1369,7 @@ type PoolInfo = {
   fee?: number;
 };
 
+async function searchAssets(exAccData: ExtendedAccountData) {}
 //---------------------------------------------
 export async function searchThePools(
   exAccData: ExtendedAccountData
@@ -1490,18 +1504,10 @@ export async function searchThePools(
 //-------------------------------
 async function searchPoolsButtonClicked() {
   const found: boolean = await searchThePools(selectedAccountData);
+  await searchAssets(selectedAccountData);
   await refreshSaveSelectedAccount();
 }
 
-// //-------------------------------
-// async function assignStakingPool() {
-//     const found:boolean = await searchThePools(selectedAccountData)
-//     if (found) {
-//         await refreshSaveSelectedAccount()
-//     }
-// }
-
-//-------------------------------
 function getPublicKey(privateKey: string): string {
   const keyPair = KeyPairEd25519.fromString(privateKey);
   return keyPair.getPublicKey().toString();
