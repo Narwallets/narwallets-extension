@@ -342,7 +342,7 @@ async function refreshAllAccounts() {
           asset.balance = c.yton(tokenAccBalance);
         }
 
-        if(asset.contractId == lastSelectedAsset.contractId && asset.symbol == lastSelectedAsset.symbol) {
+        if(asset.contractId == lastSelectedAsset?.contractId && asset.symbol == lastSelectedAsset.symbol) {
           d.qs("#selected-asset #balance").innerText = c.toStringDec(asset.balance);
         }
       }
