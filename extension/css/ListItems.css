@@ -28,14 +28,14 @@
 	color:var(--BlockText);
 	font-size: 14px;
     font-weight: 100;
-	overflow:auto;
+	overflow-x:hidden;
 	display: inline-block;
 	text-align: left;
 	left: 0px;
     padding-left: 6px;
 	padding-top: 5px;
 	padding-bottom: 1px;
-	width: 460px;
+	width: 470px;
 	height:17px;
 	top:0px;
 	background-color: var(--Block);;
