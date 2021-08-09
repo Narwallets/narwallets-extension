@@ -1582,7 +1582,7 @@ function accessLabelClicked() {
 }
 
 //---------------------------------------
-function changeAccessClicked() {
+export function changeAccessClicked() {
   d.hideErr();
   seedTextElem.value = "";
 
@@ -1781,11 +1781,10 @@ async function makeReadOnlyOKClicked() {
       showSelectedAccount();
       d.showMsg("Account access removed", "success");
       showInitial();
+      hideOkCancel();
     }
   } catch (ex) {
-    d.showErr(ex.message);
-  } finally {
-    hideOkCancel();
+    d.showErr(ex.message);  
   }
 }
 

@@ -2,7 +2,7 @@ import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
 import { Account, Asset, ExtendedAccountData } from "../data/account.js";
-import { show as AccountSelectedPage_show } from "./account-selected.js";
+import { changeAccessClicked, show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 
 import {
@@ -147,7 +147,7 @@ async function disconnectFromWepPageClicked() {
 }
 
 //--------------------------
-export async function show() {
+export async function show(redirectFromImport: boolean = false) {
   try {
     d.hideErr();
 
@@ -233,17 +233,22 @@ export async function show() {
 
     //const disconnectButton = d.qs("#disconnect-from-web-page");
     //disconnectButton.onClick(disconnectFromWepPageClicked);
+    if(redirectFromImport) {
+      d.showPage("account-selected");
+      changeAccessClicked();
+    } else {
+      d.showPage(ACCOUNT_LIST_MAIN);
 
-    d.showPage(ACCOUNT_LIST_MAIN);
+      //d.qs("#disconnect-line").hide();
+      const isConnected = await askBackground({ code: "isConnected" });
+      d.onClickId("back-to-account", backToAccountsClicked);
+    }
+      autoRefresh();
 
-    //d.qs("#disconnect-line").hide();
-    const isConnected = await askBackground({ code: "isConnected" });
-    d.onClickId("back-to-account", backToAccountsClicked);
-    autoRefresh();
+      //d.qs("#disconnect-line").showIf(isConnected);
 
-    //d.qs("#disconnect-line").showIf(isConnected);
-
-    await tryReposition();
+      await tryReposition();
+    
   } catch (ex) {
     await UnlockPage_show(); //show the unlock-page
     d.showErr(ex.message);
