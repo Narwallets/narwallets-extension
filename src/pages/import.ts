@@ -7,7 +7,7 @@ import * as Pages from "../pages/main.js";
 
 import { Account, ExtendedAccountData } from "../data/account.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { searchThePools } from "./account-selected.js";
+import { askPrivateKey, searchThePools, show as AccountSelectedPage_show } from "./account-selected.js";
 import {
   askBackground,
   askBackgroundAllNetworkAccounts,
@@ -181,7 +181,7 @@ async function importIfNew(
     // }
     return false;
   } else {
-    d.showSuccess("Account added: " + accName); //new account
+    //d.showSuccess("Account added: " + accName); //new account
     accountInfo.order = order;
     //console.log("added ",order,accName)
     await askBackgroundSetAccount(accName, accountInfo);
@@ -224,7 +224,9 @@ async function importClicked(ev: Event) {
     //some time to see the error
     setTimeout(Pages.show, 5000);
   } else {
-    Pages.show(true);
+    //d.showPage("account-selected");
+    AccountSelectedPage_show(lastSearchResult.mainAccountName, "ask_private_key");
+    //Pages.show();
   }
 }
 

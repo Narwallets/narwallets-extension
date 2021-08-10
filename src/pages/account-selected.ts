@@ -118,6 +118,11 @@ export async function show(
         }
         break;
       }
+      case "ask_private_key": {
+        askPrivateKey();
+        // Se está mostrando ya una subpágina     
+        return;
+      }
     }
   }
   localStorageSet({ reposition: "account", account: accName });
@@ -1610,9 +1615,13 @@ export function changeAccessClicked() {
     showOKCancel(makeReadOnlyOKClicked, showInitial);
   } else {
     //is ReadOnly
-    d.showSubPage("account-selected-make-full-access");
-    showOKCancel(makeFullAccessOKClicked, showInitial);
+    askPrivateKey();  
   }
+}
+
+export function askPrivateKey() {
+  d.showSubPage("account-selected-make-full-access");
+  showOKCancel(makeFullAccessOKClicked, showInitial);
 }
 
 //---------------------------------------
@@ -1882,7 +1891,7 @@ async function removeAccountClicked(ev: Event) {
       accountId: selectedAccountData.name,
     });
     //return to main page
-    Pages.show();
+    await AccountPages_show();
   } catch (ex) {
     d.showErr(ex.message);
   }
