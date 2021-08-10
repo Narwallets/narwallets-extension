@@ -12,7 +12,7 @@ let selectedContactIndex: number = NaN;
 export async function show() {
   
   d.onClickId("save-settings", saveSecurityOptions);
-  d.onClickId("cancel-security-settings", Pages.show);  
+  d.onClickId("cancel-security-settings", function() {Pages.show(false)});  
 
   await showInitial();
 }

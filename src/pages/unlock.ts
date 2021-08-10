@@ -1,5 +1,5 @@
 import * as d from "../util/document.js"
-import { askBackground, askBackgroundGetState } from "../background/askBackground.js"
+import { askBackground, askBackgroundGetAccessKey, askBackgroundGetState } from "../background/askBackground.js"
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js"
 import {show as MainPage_show} from "./main.js"
 

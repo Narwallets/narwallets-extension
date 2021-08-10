@@ -278,10 +278,10 @@ async function refreshSelectedAcc() {
 function usdPriceReady() {
   selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
   let element = document.querySelector(
-    "#selected-account .accountdetsfiat"
+    ".accountdetsfiat"
   ) as HTMLDivElement;
-  // element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
-  // element.classList.remove("hidden");
+  element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
+  element.classList.remove("hidden");
 }
 
 function selectFirstTab() {
@@ -476,10 +476,6 @@ function showSelectedAccount(fromTimer?: boolean) {
     selectedAccountData.accountInfo.lastBalance -
     selectedAccountData.accountInfo.lockedOther;
 
-  if (nearDollarPrice != 0) {
-    usdPriceReady();
-  }
-
   // Debajo de esto son todas acciones que se deben realizar cuando el usuario realiza la acción
   if (fromTimer) {
     // Solo actualizo en monto
@@ -496,6 +492,10 @@ function showSelectedAccount(fromTimer?: boolean) {
     "selected-account-template",
     selectedAccountData
   );
+
+  if (nearDollarPrice != 0) {
+    usdPriceReady();
+  }
 
   //lleno lista de assets
 
@@ -1600,7 +1600,7 @@ function accessLabelClicked() {
 }
 
 //---------------------------------------
-function changeAccessClicked() {
+export function changeAccessClicked() {
   d.hideErr();
   seedTextElem.value = "";
 
@@ -1799,11 +1799,10 @@ async function makeReadOnlyOKClicked() {
       showSelectedAccount();
       d.showMsg("Account access removed", "success");
       showInitial();
+      hideOkCancel();
     }
   } catch (ex) {
-    d.showErr(ex.message);
-  } finally {
-    hideOkCancel();
+    d.showErr(ex.message);  
   }
 }
 

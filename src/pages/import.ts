@@ -224,7 +224,7 @@ async function importClicked(ev: Event) {
     //some time to see the error
     setTimeout(Pages.show, 5000);
   } else {
-    Pages.show();
+    Pages.show(true);
   }
 }
 
