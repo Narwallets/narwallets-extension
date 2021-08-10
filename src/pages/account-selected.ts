@@ -277,9 +277,7 @@ async function refreshSelectedAcc() {
 
 function usdPriceReady() {
   selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
-  let element = document.querySelector(
-    ".accountdetsfiat"
-  ) as HTMLDivElement;
+  let element = document.querySelector(".accountdetsfiat") as HTMLDivElement;
   element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
   element.classList.remove("hidden");
 }
@@ -1323,7 +1321,6 @@ async function performSend() {
     };
     selectedAccountData.accountInfo.history.unshift(hist);
 
-    //    hideOkCancel();
     displayReflectTransfer(amountToSend, toAccName);
     await refreshFunction();
     await saveSelectedAccount();
@@ -1375,8 +1372,16 @@ export async function searchThePools(
   exAccData: ExtendedAccountData
 ): Promise<boolean> {
   const doingDiv = d.showMsg("Searching Pools...", "info", -1);
-  d.showWait();
   let found = false;
+  let networkInfo = await askBackgroundGetNetworkInfo();
+  const tokenOptionsList =
+    networkInfo.name != "mainnet"
+      ? [
+        "token.cheddar.testnet",
+        "token.meta.pool.testnet",
+        "meta-v2.pool.testnet",
+      ]
+      : [];
   try {
     let checked: Record<string, boolean> = {};
 
@@ -1462,40 +1467,48 @@ export async function searchThePools(
                 history: [],
               };
               exAccData.accountInfo.assets.push(newAsset);
-
-              // exAccData.accountInfo.assets.forEach((asset) => {
-              //   if (
-              //     asset.contractId == pool.account_id &&
-              //     asset.symbol == "STAKE"
-              //   ) {
-              //     asset.balance = amount;
-              //     found = true;
-              //   }
-              // });
-
-              // if (!found) {
-              //   let newAsset: Asset = {
-              //     balance: amount,
-              //     spec: "",
-              //     url: "",
-              //     contractId: pool.account_id,
-              //     type: "stake",
-              //     symbol: "STAKE",
-              //     icon: STAKE_DEFAULT_SVG,
-              //     history: [],
-              //   };
-
-              //   exAccData.accountInfo.assets.push(newAsset);
             }
           }
         }
       }
     }
+    tokenOptionsList.forEach(async (tokenOption) => {
+      if (
+        !exAccData.accountInfo.assets.find((i) => i.contractId == tokenOption)
+      ) {
+        let item = new Asset();
+        item.type = "ft";
+        item.contractId = tokenOption;
+        let resultBalance = await askBackgroundViewMethod(
+          item.contractId,
+          "ft_balance_of",
+          { account_id: exAccData.name }
+        );
+
+        if (resultBalance > 0) {
+          let result = await askBackgroundViewMethod(
+            item.contractId,
+            "ft_metadata",
+            {}
+          );
+
+          item.symbol = result.symbol;
+          item.icon = result.icon;
+          item.url = result.reference;
+          item.spec = result.spec;
+
+          item.balance = c.yton(resultBalance);
+          exAccData.accountInfo.assets.push(item);
+          d.showSuccess(
+            `Found! ${c.toStringDec(item.balance)} on ${tokenOption}`
+          );
+        }
+      }
+    });
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
     doingDiv.remove();
-    d.hideWait();
   }
 
   return found;
@@ -1503,9 +1516,14 @@ export async function searchThePools(
 
 //-------------------------------
 async function searchPoolsButtonClicked() {
-  const found: boolean = await searchThePools(selectedAccountData);
-  await searchAssets(selectedAccountData);
-  await refreshSaveSelectedAccount();
+  d.showWait();
+  try {
+    const found: boolean = await searchThePools(selectedAccountData);
+    await refreshSaveSelectedAccount();
+    await refreshFunction();
+  } finally {
+    d.hideWait();
+  }
 }
 
 function getPublicKey(privateKey: string): string {
