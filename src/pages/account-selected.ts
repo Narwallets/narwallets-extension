@@ -277,9 +277,7 @@ async function refreshSelectedAcc() {
 
 function usdPriceReady() {
   selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
-  let element = document.querySelector(
-    ".accountdetsfiat"
-  ) as HTMLDivElement;
+  let element = document.querySelector(".accountdetsfiat") as HTMLDivElement;
   element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
   element.classList.remove("hidden");
 }
@@ -1482,7 +1480,7 @@ export async function searchThePools(
         let resultBalance = await askBackgroundViewMethod(
           item.contractId,
           "ft_balance_of",
-          { account_id: selectedAccountData.name }
+          { account_id: exAccData.name }
         );
 
         if (resultBalance > 0) {
@@ -1802,7 +1800,7 @@ async function makeReadOnlyOKClicked() {
       hideOkCancel();
     }
   } catch (ex) {
-    d.showErr(ex.message);  
+    d.showErr(ex.message);
   }
 }
 
