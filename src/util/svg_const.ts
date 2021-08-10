@@ -1,39 +1,6 @@
 //META SVG
 
-export const META_SVG = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   viewBox="0 0 67.79 67.79"
-   version="1.1"
-   id="svg407"
-  <defs
-     id="defs389">
-    <style
-       id="style387">.cls-1{fill:#fff;}</style>
-  </defs>
-  <ellipse
-     style="fill:#fefefe;stroke-width:1.0235"
-     id="path846"
-     cx="33.724285"
-     cy="33.996021"
-     rx="33.83276"
-     ry="33.840717" />
-  <ellipse
-     style="fill:#a0a0a0;fill-opacity:1;stroke-width:0.790979"
-     id="path846-3"
-     cx="33.724285"
-     cy="33.996021"
-     rx="26.146585"
-     ry="26.152735" />
-  <g
-     aria-label="M"
-     transform="scale(1.104448,0.9054297)"
-     id="text2422"
-     style="font-size:54.3279px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif';fill:#ffffff;stroke-width:1.3582">
-    <path
-       d="M 7.1379627,57.117722 V 54.83595 h 0.7062627 q 1.7928207,0 3.0966906,-0.597607 1.358197,-0.651935 1.358197,-3.042363 V 24.30367 q 0,-2.390428 -1.358197,-3.042362 Q 9.6370461,20.609373 7.8442254,20.609373 H 7.1379627 V 18.327601 H 19.524724 L 30.770599,49.40316 41.907819,18.327601 h 12.060793 v 2.281772 H 53.26235 q -1.847149,0 -3.151018,0.706263 -1.30387,0.651934 -1.30387,3.205346 v 26.403359 q 0,2.553411 1.30387,3.259674 1.303869,0.651935 3.151018,0.651935 h 0.706262 v 2.281772 H 39.517391 V 54.83595 h 0.162984 q 1.738493,0 2.770723,-0.597607 1.03223,-0.597607 1.140886,-2.825051 V 22.402194 L 31.150895,57.117722 H 28.217188 L 15.613115,22.510849 v 28.413492 q 0,2.553411 1.03223,3.259674 1.03223,0.651935 2.879379,0.651935 h 0.162984 v 2.281772 z"
-       id="path11388" />
-  </g>
-</svg>`;
+export const META_SVG = `<svg viewBox="0 0 67.79 67.79"><ellipse style="fill:#fefefe;stroke-width:1.0235" cx="33.724" cy="33.996" rx="33.833" ry="33.841"/><ellipse style="fill:#a0a0a0;fill-opacity:1;stroke-width:.790979" cx="33.724" cy="33.996" rx="26.147" ry="26.153"/><path d="M7.884 51.716V49.65h.78q1.98 0 3.42-.541 1.5-.59 1.5-2.755V22.005q0-2.164-1.5-2.754-1.44-.59-3.42-.59h-.78v-2.067h13.68l12.42 28.137 12.301-28.137h13.32v2.066h-.78q-2.04 0-3.48.64-1.44.59-1.44 2.902v23.906q0 2.312 1.44 2.952 1.44.59 3.48.59h.78v2.066h-15.96V49.65h.18q1.92 0 3.06-.541 1.14-.541 1.26-2.558V20.284l-13.74 31.432h-3.24L17.243 20.382v25.726q0 2.312 1.14 2.952 1.14.59 3.18.59h.18v2.066z" aria-label="M" style="fill:#ffffff"/></svg>`;
 
 //STAKE SVG
 export const STAKE_DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 67.79 67.79"
@@ -82,11 +49,10 @@ export const UNSTAKE_DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" view
 
 //STNEAR SVG
 export const STNEAR_SVG = `
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    viewBox="0 0 67.79 67.79"
    version="1.1"
-   id="svg407"
+   id="svg407">
   <defs
      id="defs389">
     <style
@@ -101,7 +67,7 @@ export const STNEAR_SVG = `
      d="m 11.80307,27.799337 12.386823,0.359399 2.361328,5.95899 7.615562,3.310432 8.52311,-3.322151 2.347657,-5.869141 12.269463,0.02838 -2.484857,25.935694 -22.984927,4.659107 -18.947034,-6.212143 z"
      id="path1051" />
   <path
-     style="fill:#ffb6ff;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+     style="fill:#a0a0ff;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
      d="m 34.65669,12.574752 -10.429335,9.633657 1.095351,10.008921 8.844077,5.210828 9.784829,-5.286995 1.08642,-11.330486 z"
      id="path1815" />
   <path
@@ -116,7 +82,7 @@ export const STNEAR_SVG = `
 export const SEND_SVG = `<svg
 viewBox="0 0 67.79 67.79"
 version="1.1"
-id="svg12"
+id="svg12">
 <defs
   id="defs4">
  <style

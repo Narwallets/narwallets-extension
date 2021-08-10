@@ -136,11 +136,11 @@ export function onNetworkChanged(info: NetworkInfo) {
   if (info.name == "testnet") {
     options = `<option value="token.cheddar.testnet">CHDR</option>
 		<option value="token.meta.pool.testnet">META</option>
-		<option value="meta-v2.pool.testnet">META V2</option>`;
+		<option value="meta-v2.pool.testnet">STNEAR</option>`;
   } else if (info.name == "mainnet") {
     options = `<option value="wrap.near">wNEAR</option>
     <option value="token.meta.pool.near">META TOKEN</option>
-    <option value="meta.pool.near">META</option>
+    <option value="meta.pool.near">STNEAR</option>
     <option value="berryclub.ek.near">BANANA</option>
     <option value="6b17...1d0f.factory.bridge.near"
       data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
@@ -547,8 +547,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-          selectedAccountData.accountInfo.ownerId +
-          " to operate this lockup account"
+        selectedAccountData.accountInfo.ownerId +
+        " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() //no hay  espacio
   } else {
@@ -637,11 +637,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-          info.ownerId +
-          " to " +
-          action +
-          " from this " +
-          selectedAccountData.typeFull
+        info.ownerId +
+        " to " +
+        action +
+        " from this " +
+        selectedAccountData.typeFull
       );
     }
   }
@@ -788,11 +788,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -1305,11 +1305,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     let hist: History;
@@ -1369,7 +1369,7 @@ type PoolInfo = {
   fee?: number;
 };
 
-async function searchAssets(exAccData: ExtendedAccountData) {}
+async function searchAssets(exAccData: ExtendedAccountData) { }
 //---------------------------------------------
 export async function searchThePools(
   exAccData: ExtendedAccountData
@@ -1784,7 +1784,7 @@ async function makeReadOnlyOKClicked() {
       hideOkCancel();
     }
   } catch (ex) {
-    d.showErr(ex.message);  
+    d.showErr(ex.message);
   }
 }
 
