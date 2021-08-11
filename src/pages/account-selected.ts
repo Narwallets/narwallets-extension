@@ -1386,7 +1386,18 @@ export async function searchThePools(
           "token.meta.pool.testnet",
           "meta-v2.pool.testnet",
         ]
-      : [];
+      : [
+          "wrap.near",
+          "token.meta.pool.near",
+          "meta.pool.near",
+          "berryclub.ek.near",
+          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+        ];
   try {
     let checked: Record<string, boolean> = {};
 
