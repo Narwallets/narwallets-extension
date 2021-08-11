@@ -241,6 +241,20 @@ input[type="text"]:focus
   border-color: var(--HighLight);
 }
 
+.formgeneric
+{
+  display:block;
+  text-align: left;
+  margin-left: 140px;
+}
+
+input[type='radio'], label{   
+  vertical-align: baseline;
+  left:50px;
+  padding: 5px;
+  margin: 2px;
+}
+
 input[type="password"]  {
   border-style: solid;
   border-width: 1px;

@@ -18,7 +18,6 @@ h2
 h3
 {
   color: var(--TextGeneric);
-  
   font-size: 18px;
   font-weight: 200;
   display: block;
@@ -27,8 +26,22 @@ h3
   word-wrap: break-word;
   margin: auto;
   padding: 2px;
-    
 }
+
+.sep30
+{
+  display: block;
+  height: 30px;
+  width: auto;
+}
+
+.sep10
+{
+  display: block;
+  height: 10px;
+  width: auto;
+}
+
 
 h4
 {
@@ -192,6 +205,7 @@ h5
   margin: 0px;
   padding-top: 8px;
 }
+
 
 .titulo {
   position: absolute;
