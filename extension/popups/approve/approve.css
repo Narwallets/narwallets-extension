@@ -62,9 +62,28 @@ body {
   text-align: center;
   top:0px;
   left:0px;
-  width: 400px;
-  height: 500px;
+  width: 480px;
+  height: 600px;
 
+}
+
+.hidden {
+  display: none;
+}
+
+li {
+  list-style: none;
+  font-size: 18px;
+  font-weight: 200;
+}
+
+ul {
+  border: 1px solid white;
+  border-radius: 8px;
+  margin: 20px;
+  padding: 10px;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
 .sep30
@@ -113,7 +132,7 @@ h3
 {
   position: absolute;
   top:0px;
-  left:220px;
+  left:345px;
   width: 86px;
   color:white;
   height: 34px;
@@ -133,7 +152,7 @@ h3
 {
   position: absolute;
   top:0px;
-  left:104px;
+  left:240px;
   width: 86px;
   color:white;
   height: 34px;
@@ -153,7 +172,7 @@ h3
   position: fixed;
   display: block;
   text-align: right;
-  top: 310px;
+  top: 466px;
   left: 5px;
   width: 150px;
   height: 45px;
