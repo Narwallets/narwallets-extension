@@ -237,33 +237,43 @@ async function importClicked(ev: Event) {
   }
 }
 
+function nullFunc() {
+  //Do nothing
+  return;
+}
+
 async function searchClicked(ev: Event) {
-  ev.preventDefault();
-  hideSearchResultExtraData();
-  // accountBalance.innerText = ""
-  // LockupContractLine.hide()
-  // accountStakedLine.hide()
+  try {
+    (<HTMLInputElement>d.byId("search-account-name")).disabled = true;
+    ev.preventDefault();
+    hideSearchResultExtraData();
+    // accountBalance.innerText = ""
+    // LockupContractLine.hide()
+    // accountStakedLine.hide()
 
-  // let accName = accountInfoName.innerText; //d.byId(ACCOUNT_INFO_NAME).innerText;
-  const input = d.inputById("search-account-name");
-  let accName = input.value.trim().toLowerCase();
-  const netInfo = await askBackgroundGetNetworkInfo();
-  const root = netInfo.rootAccount;
-  if (
-    accName &&
-    accName.length < 60 &&
-    !accName.endsWith(root) &&
-    !(netInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
-  ) {
-    accName = accName + "." + root;
-  }
+    // let accName = accountInfoName.innerText; //d.byId(ACCOUNT_INFO_NAME).innerText;
+    const input = d.inputById("search-account-name");
+    let accName = input.value.trim().toLowerCase();
+    const netInfo = await askBackgroundGetNetworkInfo();
+    const root = netInfo.rootAccount;
+    if (
+      accName &&
+      accName.length < 60 &&
+      !accName.endsWith(root) &&
+      !(netInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
+    ) {
+      accName = accName + "." + root;
+    }
 
-  if (!accName) {
-    d.showErr("Enter the account to search for");
-  } else if (!isValidAccountID(accName)) {
-    d.showErr("The account name is invalid");
-  } else {
-    searchTheAccountName(accName);
+    if (!accName) {
+      d.showErr("Enter the account to search for");
+    } else if (!isValidAccountID(accName)) {
+      d.showErr("The account name is invalid");
+    } else {
+      searchTheAccountName(accName);
+    }
+  } finally {
+    (<HTMLInputElement>d.byId("search-account-name")).disabled = false;
   }
 }
 
