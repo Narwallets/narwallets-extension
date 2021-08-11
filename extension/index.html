@@ -722,8 +722,8 @@
 								TODO
 							</h2>
 						</button> -->
-						<button class="button morepage">
-							<h1>Delete Account</h1>
+						<button class="button morepage" id="delete-account">
+							<h1>Delete Account</h1>|
 							<h2>
 								Delete the account from the blockchain. Requests a beneficiary account to transfer all your near token.
 							</h2>
@@ -765,6 +765,40 @@
 		</div>
 
 		<!--#endregion -->
+
+		<!--#region Ask For Password-->
+		<div id="account-selected-delete" class="subpage hidden">
+			<div class="title">
+				<h2>Delete Account</h2>
+			</div>
+			<div class="delete-account">
+				<div class="form-field-label">
+					<label for="send-balance-to-account-name">
+						Balance beneficiary Account Id
+					</label>
+					<div class="form-control">
+						<input  id="send-balance-to-account-name" type="text" dir="auto"
+							value="">
+					</div>
+				</div>
+				<div class="subtitle">
+					<h3 class="warning">WARNING: Deleting an account is irreversible.
+						The account balance will be transferred to the beneficiary above.
+						Please make sure the beneficiary account is correct</h3>
+				</div>
+				<div class="form-field-label">
+					<label for="delete-account-name-confirm">
+						Type the account name you want to Delete to confirm
+					</label>
+					<div class="form-control">
+						<input  placeholder="" id="delete-account-name-confirm"
+							type="text" dir="auto" value="">
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--#endregion -->
+
 
 		<!--#region AddressBook-->
 

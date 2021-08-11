@@ -120,7 +120,7 @@ export async function show(
       }
       case "ask_private_key": {
         askPrivateKey();
-        // Se está mostrando ya una subpágina     
+        // Se está mostrando ya una subpágina
         return;
       }
     }
@@ -190,6 +190,7 @@ function initPage() {
   d.onClickId("contact-list", contactOptions);
   d.onClickId("refresh-button", refreshSelectedAcc);
   d.onClickId("back-to-account", backToAccountsClicked);
+  d.onClickId("delete-account", DeleteAccount);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   // liquid/delayed stake
@@ -218,7 +219,6 @@ function initPage() {
   d.onClickId("moreless", moreLessClicked);
 
   d.onClickId("lockup-add-public-key", LockupAddPublicKey);
-  d.onClickId("delete-account", DeleteAccount);
   //d.onClickId("assign-staking-pool", assignStakingPool);
 }
 
@@ -550,8 +550,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-        selectedAccountData.accountInfo.ownerId +
-        " to operate this lockup account"
+          selectedAccountData.accountInfo.ownerId +
+          " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() //no hay  espacio
   } else {
@@ -640,11 +640,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-        info.ownerId +
-        " to " +
-        action +
-        " from this " +
-        selectedAccountData.typeFull
+          info.ownerId +
+          " to " +
+          action +
+          " from this " +
+          selectedAccountData.typeFull
       );
     }
   }
@@ -791,11 +791,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -1308,11 +1308,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     let hist: History;
@@ -1371,7 +1371,7 @@ type PoolInfo = {
   fee?: number;
 };
 
-async function searchAssets(exAccData: ExtendedAccountData) { }
+async function searchAssets(exAccData: ExtendedAccountData) {}
 //---------------------------------------------
 export async function searchThePools(
   exAccData: ExtendedAccountData
@@ -1382,10 +1382,10 @@ export async function searchThePools(
   const tokenOptionsList =
     networkInfo.name != "mainnet"
       ? [
-        "token.cheddar.testnet",
-        "token.meta.pool.testnet",
-        "meta-v2.pool.testnet",
-      ]
+          "token.cheddar.testnet",
+          "token.meta.pool.testnet",
+          "meta-v2.pool.testnet",
+        ]
       : [];
   try {
     let checked: Record<string, boolean> = {};
@@ -1615,7 +1615,7 @@ export function changeAccessClicked() {
     showOKCancel(makeReadOnlyOKClicked, showInitial);
   } else {
     //is ReadOnly
-    askPrivateKey();  
+    askPrivateKey();
   }
 }
 
@@ -1722,6 +1722,7 @@ async function AccountDeleteOKClicked() {
     await AccountPages_show();
 
     d.showSuccess("Account Deleted, remaining funds sent to " + beneficiary);
+    hideOkCancel();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
