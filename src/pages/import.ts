@@ -7,7 +7,11 @@ import * as Pages from "../pages/main.js";
 
 import { Account, ExtendedAccountData } from "../data/account.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { askPrivateKey, searchThePools, show as AccountSelectedPage_show } from "./account-selected.js";
+import {
+  askPrivateKey,
+  searchThePools,
+  show as AccountSelectedPage_show,
+} from "./account-selected.js";
 import {
   askBackground,
   askBackgroundAllNetworkAccounts,
@@ -225,7 +229,10 @@ async function importClicked(ev: Event) {
     setTimeout(Pages.show, 5000);
   } else {
     //d.showPage("account-selected");
-    AccountSelectedPage_show(lastSearchResult.mainAccountName, "ask_private_key");
+    AccountSelectedPage_show(
+      lastSearchResult.mainAccountName,
+      "ask_private_key"
+    );
     //Pages.show();
   }
 }
@@ -306,6 +313,7 @@ export async function addListeners() {
 
   d.onClickId("option-import", importExistingAccount);
   d.onClickId("option-create", createAccountClicked);
+  d.onEnterKey("search-account-name", searchClicked);
 
   //accountName.onInput(accountNameInput);
 
@@ -313,6 +321,10 @@ export async function addListeners() {
   importButton.onClick(importClicked);
 
   onNetworkChanged(await askBackgroundGetNetworkInfo());
+}
+
+function func() {
+  console.log("HOLA HOLA HOLA");
 }
 
 //listen to extension messages
