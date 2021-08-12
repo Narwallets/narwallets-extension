@@ -149,7 +149,7 @@ NETWORK selection drop-down
 .network-component.pointer {
   border: 2px solid var(--HoverColor);
   border-radius: 24px;
-  margin-left: 70px;
+  margin-left: 83px;
   padding: 3px;
   width: 170px;
   flex: 0 0 auto;
@@ -176,7 +176,7 @@ li {
 
 li#current-network-display-name {
   max-height: 20px;
-  width: 220px;
+  width: 148px;
   color:var(--TextGeneric);
 }
 
