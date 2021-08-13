@@ -174,6 +174,7 @@ function initPage() {
   d.onClickId("send", sendClicked);
   d.onClickId("stake", stakeClicked);
   d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+  d.onClickId("acc-disconnect-to-page", disconnectFromPageClicked);
 
   // more tab
   d.onClickId("access", changeAccessClicked);
@@ -308,15 +309,19 @@ function moreClicked() {
 }
 
 async function checkConnectOrDisconnect() {
-  await askBackground({
-    code: "connect",
-    accountId: selectedAccountData.name,
+  var a = await askBackground({
+    code: "isConnected",
   });
-
   const connectButton = d.byId("acc-connect-to-page");
-  connectButton.classList.remove("connect");
-  connectButton.classList.add("disconnect");
-  connectButton.innerText = "Disconnect";
+  const disconnectButton = d.byId("acc-disconnect-to-page");
+
+  if (a) {
+    disconnectButton.classList.remove("hidden");
+    connectButton.classList.add("hidden");
+  } else {
+    disconnectButton.classList.add("hidden");
+    connectButton.classList.remove("hidden");
+  }
 }
 
 function showAssetDetailsClicked(ev: Event) {
@@ -610,10 +615,11 @@ async function connectToWebAppClicked(): Promise<any> {
       accountId: selectedAccountData.name,
     });
     d.showSuccess("connected");
-    window.close();
+    //window.close();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
+    await checkConnectOrDisconnect();
     d.hideWait();
   }
 }
@@ -627,6 +633,8 @@ async function disconnectFromPageClicked() {
     buttonClass.classList.add("connect");
   } catch (ex) {
     d.showErr(ex.message);
+  } finally {
+    await checkConnectOrDisconnect();
   }
 }
 
