@@ -611,6 +611,12 @@ async function sendOKClicked() {
     if (!isValidAmount(amountToSend))
       throw Error("Amount should be a positive integer");
 
+    await askBackgroundTransferNear(
+      accData.name,
+      toAccName,
+      c.ntoy(amountToSend)
+    );
+
     if (accData.isReadOnly) throw Error("Account is read-only");
 
     if (amountToSend > asset_selected.balance)
