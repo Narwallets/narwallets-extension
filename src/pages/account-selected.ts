@@ -180,7 +180,7 @@ function initPage() {
   d.onClickId("access", changeAccessClicked);
   d.onClickId("list-pools", listPoolsClicked);
   d.onClickId("add", addClicked);
-  d.onClickId("more", moreClicked);
+  //d.onClickId("more", moreClicked);
   d.onClickId("show-public-key", showPublicKeyClicked);
   d.onClickId("show-private-key", showPrivateKeyClicked);
   d.onClickId("add-note", addNoteClicked);
@@ -217,7 +217,6 @@ function initPage() {
   d.onClickId("unstake", unstakeClicked);
 
   refreshButton.onClick(refreshClicked);
-  d.onClickId("moreless", moreLessClicked);
 
   d.onClickId("lockup-add-public-key", LockupAddPublicKey);
   //d.onClickId("assign-staking-pool", assignStakingPool);
@@ -405,20 +404,6 @@ export async function addAssetToken(contractId: string) {
   selectedAccountData.accountInfo.assets.push(item);
 }
 
-function showingMore() {
-  const buttonsMore = new d.All(".buttons-more");
-  if (buttonsMore.elems.length == 0) return false;
-  return !buttonsMore.elems[0].classList.contains("hidden");
-}
-async function moreLessClicked() {
-  const options = await askBackgroundGetOptions();
-  const selector = options.advancedMode
-    ? ".buttons-more"
-    : ".buttons-more:not(.advanced)";
-  const buttonsMore = new d.All(selector);
-  buttonsMore.toggleClass("hidden");
-  d.qs("#moreless").innerText = showingMore() ? "Less..." : "More...";
-}
 
 function getAccountRecord(accName: string): Promise<Account> {
   return askBackground({
@@ -555,8 +540,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-          selectedAccountData.accountInfo.ownerId +
-          " to operate this lockup account"
+        selectedAccountData.accountInfo.ownerId +
+        " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() //no hay  espacio
   } else {
@@ -615,7 +600,7 @@ async function connectToWebAppClicked(): Promise<any> {
       accountId: selectedAccountData.name,
     });
     d.showSuccess("connected");
-    //window.close();
+    window.close();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -648,11 +633,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-          info.ownerId +
-          " to " +
-          action +
-          " from this " +
-          selectedAccountData.typeFull
+        info.ownerId +
+        " to " +
+        action +
+        " from this " +
+        selectedAccountData.typeFull
       );
     }
   }
@@ -799,11 +784,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -1316,11 +1301,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     let hist: History;
@@ -1379,7 +1364,7 @@ type PoolInfo = {
   fee?: number;
 };
 
-async function searchAssets(exAccData: ExtendedAccountData) {}
+async function searchAssets(exAccData: ExtendedAccountData) { }
 //---------------------------------------------
 export async function searchThePools(
   exAccData: ExtendedAccountData
@@ -1390,22 +1375,22 @@ export async function searchThePools(
   const tokenOptionsList =
     networkInfo.name != "mainnet"
       ? [
-          "token.cheddar.testnet",
-          "token.meta.pool.testnet",
-          "meta-v2.pool.testnet",
-        ]
+        "token.cheddar.testnet",
+        "token.meta.pool.testnet",
+        "meta-v2.pool.testnet",
+      ]
       : [
-          "wrap.near",
-          "token.meta.pool.near",
-          "meta.pool.near",
-          "berryclub.ek.near",
-          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-        ];
+        "wrap.near",
+        "token.meta.pool.near",
+        "meta.pool.near",
+        "berryclub.ek.near",
+        "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+        "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+        "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+        "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+        "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+        "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+      ];
   try {
     let checked: Record<string, boolean> = {};
 

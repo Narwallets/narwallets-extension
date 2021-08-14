@@ -82,15 +82,15 @@ export function onClickId(id: string, clickHandler: (ev: Event) => void) {
 //---
 export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
   try {
-    document.removeEventListener("keypress", globalEnterKeyPress);    
+    document.removeEventListener("keypress", globalEnterKeyPress);
     globalEnterKeyPress = (event: KeyboardEvent) => {
       var keyCode = event.key;
-      if(keyCode == key) {
+      if (keyCode == key) {
         handler(event);
-      }  
+      }
     };
     document.addEventListener("keypress", globalEnterKeyPress);
-    
+
   } catch (ex) {
     console.error("ERR: onGlobalKeyPress() " + ex.message);
   }
@@ -101,8 +101,8 @@ export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
 //---
 export function removeGlobalKeyPress() {
   try {
-    document.removeEventListener("keypress", globalEnterKeyPress);    
-    globalEnterKeyPress = () => {};
+    document.removeEventListener("keypress", globalEnterKeyPress);
+    globalEnterKeyPress = () => { };
   } catch (ex) {
     console.error("ERR: removeGlobalKeyPress() " + ex.message);
   }
@@ -232,6 +232,10 @@ export function showPage(id: string) {
   showByClass(id, "appface");
 }
 export function showSubPage(id: string) {
+  console.log(`showSubPage(${id})`);
+  var stackTrace = Error().stack;
+  console.log(stackTrace);
+
   showByClass(id, "subpage");
   let primerRadio = document.querySelectorAll("#" + id + ".subpage .radio.one");
   if (primerRadio.length > 0) {
@@ -261,7 +265,7 @@ function addShowErr() {
 export function hideErr() {
   try {
     byId(ERR_DIV).innerHTML = "";
-  } catch {}
+  } catch { }
 }
 
 var errorId = 0;

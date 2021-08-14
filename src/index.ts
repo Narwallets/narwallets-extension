@@ -162,10 +162,6 @@ async function asideIsUnlocked() {
 }
 
 async function securityOptions() {
-  //close moreless because options can change behavior
-  //const buttonsMore = new d.All(".buttons-more");
-  //buttonsMore.addClass("hidden");
-  //d.qs("#moreless").innerText = "More...";
   Options_show();
   /*d.showSubPage("security-options");
   const data = await askBackground({ code: "get-options" });

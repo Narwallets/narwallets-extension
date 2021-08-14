@@ -169,7 +169,7 @@ function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
 
     let range = BigInt(
       metaPoolContractData.nslp_max_discount_basis_points -
-        metaPoolContractData.nslp_min_discount_basis_points
+      metaPoolContractData.nslp_min_discount_basis_points
     );
     //here 0<after<target, so 0<proportion<range
     const proportion: bigint = (range * liq_after) / target;
@@ -589,16 +589,23 @@ function showAssetReceiveClicked() {
 }
 
 function showAssetSendClicked() {
-  d.showSubPage("asset-send-subpage");
-  d.byId("asset-symbol").innerText = asset_selected.symbol;
-  d.byId("max-amount-send-asset").innerText = c.toStringDec(
-    asset_selected.balance
-  );
-  d.onClickId("asset-send-max", function () {
-    d.maxClicked("send-to-asset-amount", "#selected-asset #balance");
-  });
+  try {
 
-  showOKCancel(sendOKClicked, showInitial);
+    if (accData.isReadOnly) throw Error("Account is read-only");
+
+    d.showSubPage("asset-send-subpage");
+    d.byId("asset-symbol").innerText = asset_selected.symbol;
+    d.byId("max-amount-send-asset").innerText = c.toStringDec(
+      asset_selected.balance
+    );
+    d.onClickId("asset-send-max", function () {
+      d.maxClicked("send-to-asset-amount", "#selected-asset #balance");
+    });
+
+    showOKCancel(sendOKClicked, showInitial);
+  } catch (ex) {
+    d.showErr(ex.message);
+  }
 }
 
 async function sendOKClicked() {
@@ -611,24 +618,15 @@ async function sendOKClicked() {
     if (!isValidAmount(amountToSend))
       throw Error("Amount should be a positive integer");
 
-    await askBackgroundTransferNear(
-      accData.name,
-      toAccName,
-      c.ntoy(amountToSend)
-    );
-
-    if (accData.isReadOnly) throw Error("Account is read-only");
-
     if (amountToSend > asset_selected.balance)
       throw Error("Amount exceeds available balance");
 
     //show confirmation subpage
     d.showSubPage("asset-selected-send-confirmation");
-    d.byId("asset-send-confirmation-amount").innerText =
-      c.toStringDec(amountToSend);
+    d.byId("asset-send-confirmation-amount").innerText = c.toStringDec(amountToSend);
     d.byId("asset-send-confirmation-receiver").innerText = toAccName;
-
     showOKCancel(performSend, showInitial); //on OK clicked, send
+    
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -669,13 +667,13 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        accData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        " " +
-        asset_selected.symbol +
-        " to " +
-        toAccName
+      accData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      " " +
+      asset_selected.symbol +
+      " to " +
+      toAccName
     );
 
     checkContactList();
