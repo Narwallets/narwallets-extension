@@ -62,6 +62,10 @@ function updateNetworkIndicatorVisualState(info: NetworkInfo) {
   currentNetworkDisplayName.el.className = "circle " + info.color; //set indicator color
 }
 
+export function setIsDark(d: boolean) {
+  isDark = d
+}
+
 async function networkItemClicked(e: Event) {
   try {
     OkCancelInit();
@@ -243,29 +247,42 @@ async function asideAddressBook() {
     AddressBook_show();
   }
 }
-function asideSwitchMode() {
+export async function asideSwitchMode(delay: number = 300) {
   const cssLinkIndex = 0;
   var oldlink = document.getElementsByTagName("link").item(cssLinkIndex);
 
+  var colorMode;
   var cssFile = "";
   if (isDark) {
     cssFile = "css/styles_light.css";
+    colorMode = "light"
   } else {
     cssFile = "css/styles_dark.css";
+    colorMode = "dark"
   }
+
+  await askBackground({
+    code: "set-color-mode",
+    colorMode: colorMode,
+  });
 
   setTimeout(() => {
     if (oldlink) {
       oldlink.href = cssFile;
       isDark = !isDark;
     }
-  }, 300);
+  }, delay);
 }
 
 //-----------------------
 //executed after the background-page is available
 async function initPopup() {
   chrome.alarms.clear("unlock-expired");
+
+  const state = await askBackgroundGetState();
+  // Se usa la función que cambia el modo, con lo que hay que ponerlo con el modo opuesto al que hay que dejar
+  setIsDark(state.colorMode != "dark")
+  asideSwitchMode(10);
 
   hamb.onClick(hambClicked);
 

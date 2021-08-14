@@ -35,6 +35,7 @@ import { GContact } from "./Contact.js";
 export const EmptyState: StateStruct = {
   dataVersion: DATA_VERSION,
   usersList: [],
+  colorMode: "",
   currentUser: "",
 };
 

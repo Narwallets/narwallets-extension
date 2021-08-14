@@ -138,6 +138,10 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
       return global.createUserAsync(msg.email, msg.password);
     } else if(msg.code == "change-password") {
       return global.changePasswordAsync(msg.email, msg.password)
+    } else if(msg.code == "set-color-mode") {
+      global.State.colorMode = msg.colorMode;
+      global.saveState();
+      return Promise.resolve();
     } else if (msg.code == "set-options") {
       global.SecureState.advancedMode = msg.advancedMode;
       global.SecureState.autoUnlockSeconds = msg.autoUnlockSeconds;

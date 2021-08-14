@@ -24,6 +24,7 @@ import { D } from "../lib/tweetnacl/core/core.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
+import { asideSwitchMode, setIsDark } from "../index.js";
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
@@ -156,6 +157,8 @@ export async function show() {
     if (locked) {
       //do a user exists?
       const state = await askBackgroundGetState();
+
+
       if (state.usersList.length == 0) {
         //no users => welcome new User
         d.showPage(WELCOME_NEW_USER_PAGE);
