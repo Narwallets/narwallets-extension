@@ -2,7 +2,6 @@
 export type StateStruct= {
     dataVersion: string;
     usersList: string[];
-    colorMode: string;
     currentUser: string;
   }
   

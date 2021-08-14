@@ -127,7 +127,8 @@ export async function show(
   }
   localStorageSet({ reposition: "account", account: accName });
   checkConnectOrDisconnect();
-  await refreshFunction();
+
+  //await refreshFunction();
   // intervalIdShow = window.setInterval(async function () {
   //   refreshFunction(true);
   // }, 5000);
@@ -190,7 +191,7 @@ function initPage() {
   d.onClickId("adress-book-button", showAdressBook);
   d.onClickId("contact-list", contactOptions);
   d.onClickId("refresh-button", refreshSelectedAcc);
-  d.onClickId("back-to-account", backToAccountsClicked);
+  d.onClickId("back-to-account", backLinkClicked);
   d.onClickId("delete-account", DeleteAccount);
   // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
@@ -222,13 +223,11 @@ function initPage() {
   //d.onClickId("assign-staking-pool", assignStakingPool);
 }
 
-function backToAccountsClicked() {
-  window.clearInterval(intervalIdShow);
-  const backLink = new d.El("#account-selected.appface .button.back");
-  backLink.onClick(Pages.backToAccountsList);
+function backLinkClicked() {
+  Pages.backToAccountsList();
 }
 
-async function refreshFunction(fromTimer?: boolean) {
+export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
   let accName = selectedAccountData.name;
   const netInfo = await askBackgroundGetNetworkInfo();
 
@@ -248,7 +247,7 @@ async function refreshFunction(fromTimer?: boolean) {
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
-    if (asset.type == "stake") {
+    if (asset.type == "stake" || asset.type == "unstake") {
       if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
         let poolAccInfo = await StakingPool.getAccInfo(
           selectedAccountData.name,
@@ -274,7 +273,7 @@ async function refreshFunction(fromTimer?: boolean) {
 }
 
 async function refreshSelectedAcc() {
-  await refreshFunction();
+  await refreshSelectedAccountAndAssets();
   showInitial();
 
   d.showSuccess("Refreshed");
@@ -795,7 +794,7 @@ async function performLockupContractSend() {
 
     await checkContactList();
 
-    await refreshFunction();
+    await refreshSelectedAccountAndAssets();
 
     showInitial();
   } catch (ex) {
@@ -1320,9 +1319,9 @@ async function performSend() {
     selectedAccountData.accountInfo.history.unshift(hist);
 
     displayReflectTransfer(amountToSend, toAccName);
-    await refreshFunction();
-    await saveSelectedAccount();
+    await refreshSelectedAccountAndAssets();
     await checkContactList();
+
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1353,8 +1352,8 @@ async function detailedRewardsClicked() {
   }
 }
 
-//---------------------------------------------
 
+//---------------------------------------------
 type PoolInfo = {
   name: string;
   slashed: string;
@@ -1366,32 +1365,31 @@ type PoolInfo = {
 
 async function searchAssets(exAccData: ExtendedAccountData) { }
 //---------------------------------------------
-export async function searchThePools(
-  exAccData: ExtendedAccountData
-): Promise<boolean> {
-  const doingDiv = d.showMsg("Searching Pools...", "info", -1);
-  let found = false;
-  let networkInfo = await askBackgroundGetNetworkInfo();
-  const tokenOptionsList =
-    networkInfo.name != "mainnet"
-      ? [
-        "token.cheddar.testnet",
-        "token.meta.pool.testnet",
-        "meta-v2.pool.testnet",
-      ]
-      : [
-        "wrap.near",
-        "token.meta.pool.near",
-        "meta.pool.near",
-        "berryclub.ek.near",
-        "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-        "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-        "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-        "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-        "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-        "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-      ];
+export async function searchThePools(exAccData: ExtendedAccountData) {
+  let doingDiv;
   try {
+    doingDiv = d.showMsg("Searching Pools...", "info", -1);
+    let networkInfo = await askBackgroundGetNetworkInfo();
+    const tokenOptionsList =
+      networkInfo.name != "mainnet"
+        ? [
+          "token.cheddar.testnet",
+          "token.meta.pool.testnet",
+          "meta-v2.pool.testnet",
+        ]
+        : [
+          "wrap.near",
+          "token.meta.pool.near",
+          "meta.pool.near",
+          "berryclub.ek.near",
+          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+        ];
+
     let checked: Record<string, boolean> = {};
 
     const validators = await askBackgroundGetValidators();
@@ -1435,101 +1433,111 @@ export async function searchThePools(
             d.showSuccess(
               `Found! ${c.toStringDec(amount)} on ${pool.account_id}`
             );
-            found = false;
 
-            const foundAssetStake = exAccData.accountInfo.assets.find(
-              (asset) =>
-                asset.contractId == pool.account_id && asset.symbol == "STAKED"
-            );
-            const foundAssetUnstake = exAccData.accountInfo.assets.find(
-              (asset) =>
-                asset.contractId == pool.account_id &&
-                asset.symbol == "UNSTAKED"
-            );
+            // has staked?
+            if (c.yton(poolAccInfo.staked_balance) > 0) {
+              let asset = exAccData.accountInfo.findAsset(pool.account_id, "STAKED");
+              if (asset) {
+                asset.balance = c.yton(poolAccInfo.staked_balance);
+              }
+              else {
+                // need to create
+                let newAsset: Asset = {
+                  balance: c.yton(poolAccInfo.staked_balance),
+                  spec: "",
+                  url: "",
+                  contractId: pool.account_id,
+                  type: "stake",
+                  symbol: "STAKED",
+                  icon: STAKE_DEFAULT_SVG,
+                  history: [],
+                };
+                exAccData.accountInfo.assets.push(newAsset);
+              }
 
-            if (!foundAssetStake && c.yton(poolAccInfo.staked_balance) > 0) {
-              let newAsset: Asset = {
-                balance: c.yton(poolAccInfo.staked_balance),
-                spec: "",
-                url: "",
-                contractId: pool.account_id,
-                type: "stake",
-                symbol: "STAKED",
-                icon: STAKE_DEFAULT_SVG,
-                history: [],
-              };
-              exAccData.accountInfo.assets.push(newAsset);
-            }
-
-            if (
-              !foundAssetUnstake &&
-              c.yton(poolAccInfo.unstaked_balance) > 0
-            ) {
-              let newAsset: Asset = {
-                balance: c.yton(poolAccInfo.unstaked_balance),
-                spec: "",
-                url: "",
-                contractId: pool.account_id,
-                type: "unstake",
-                symbol: "UNSTAKED",
-                icon: UNSTAKE_DEFAULT_SVG,
-                history: [],
-              };
-              exAccData.accountInfo.assets.push(newAsset);
+              // has unstaked balance?
+              if (c.yton(poolAccInfo.unstaked_balance) > 0) {
+                let asset = exAccData.accountInfo.findAsset(pool.account_id, "UNSTAKED");
+                if (asset) {
+                  asset.balance = c.yton(poolAccInfo.unstaked_balance);
+                }
+                else {
+                  // need to create
+                  let newAsset: Asset = {
+                    balance: c.yton(poolAccInfo.unstaked_balance),
+                    spec: "",
+                    url: "",
+                    contractId: pool.account_id,
+                    type: "unstake",
+                    symbol: "UNSTAKED",
+                    icon: UNSTAKE_DEFAULT_SVG,
+                    history: [],
+                  };
+                  exAccData.accountInfo.assets.push(newAsset);
+                }
+              }
             }
           }
         }
       }
     }
-    tokenOptionsList.forEach(async (tokenOption) => {
-      if (
-        !exAccData.accountInfo.assets.find((i) => i.contractId == tokenOption)
-      ) {
-        let item = new Asset();
-        item.type = "ft";
-        item.contractId = tokenOption;
-        let resultBalance = await askBackgroundViewMethod(
-          item.contractId,
+
+    // search tokens
+    for (let tokenOption of tokenOptionsList) {
+
+      let resultBalance;
+      try {
+        resultBalance = await askBackgroundViewMethod(
+          tokenOption,
           "ft_balance_of",
           { account_id: exAccData.name }
         );
+      }
+      catch (ex) {
+        continue;
+      }
 
-        if (resultBalance > 0) {
-          let result = await askBackgroundViewMethod(
+      if (resultBalance > 0) {
+        d.showSuccess(
+          `Found! ${c.toStringDec(c.yton(resultBalance))} in ${tokenOption}`
+        );
+        let asset = exAccData.accountInfo.findAsset(tokenOption)
+        if (asset) {
+          asset.balance = c.yton(resultBalance);
+        }
+        else {
+          // must create
+          let item = new Asset();
+          item.type = "ft";
+          item.contractId = tokenOption;
+          item.balance = c.yton(resultBalance);
+          let metadata = await askBackgroundViewMethod(
             item.contractId,
             "ft_metadata",
             {}
           );
-
-          item.symbol = result.symbol;
-          item.icon = result.icon;
-          item.url = result.reference;
-          item.spec = result.spec;
-
-          item.balance = c.yton(resultBalance);
+          item.symbol = metadata.symbol;
+          item.icon = metadata.icon;
+          item.url = metadata.reference;
+          item.spec = metadata.spec;
           exAccData.accountInfo.assets.push(item);
-          d.showSuccess(
-            `Found! ${c.toStringDec(item.balance)} on ${tokenOption}`
-          );
         }
       }
-    });
+    };
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
-    doingDiv.remove();
+    doingDiv?.remove();
   }
 
-  return found;
 }
 
 //-------------------------------
 async function searchPoolsButtonClicked() {
   d.showWait();
   try {
-    const found: boolean = await searchThePools(selectedAccountData);
-    await refreshSaveSelectedAccount();
-    await refreshFunction();
+    await searchThePools(selectedAccountData);
+    await refreshSelectedAccountAndAssets();
   } finally {
     d.hideWait();
   }

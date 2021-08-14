@@ -35,7 +35,6 @@ import { GContact } from "./Contact.js";
 export const EmptyState: StateStruct = {
   dataVersion: DATA_VERSION,
   usersList: [],
-  colorMode: "",
   currentUser: "",
 };
 
@@ -85,6 +84,7 @@ type callbackERR = (err: string) => void;
 
 export async function recoverState(): Promise<void> {
   State = await recoverFromLocalStorage("State", "S", EmptyState);
+  console.log("Recover state", State)
 }
 
 export async function sha256PwdBase64Async(password: string): Promise<string> {

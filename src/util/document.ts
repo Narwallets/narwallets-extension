@@ -56,7 +56,7 @@ export function checkedRadioButton(name: string): HTMLElement {
   }
 }
 //---
-//-- seach button elements with the id and add click listener
+//-- search button elements with the id and add click listener
 //---
 export function onClickId(id: string, clickHandler: (ev: Event) => void) {
   try {
@@ -78,7 +78,7 @@ export function onClickId(id: string, clickHandler: (ev: Event) => void) {
 }
 
 //---
-//-- seach button elements with the id and add click listener
+//-- search button elements with the id and add click listener
 //---
 export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
   try {
@@ -97,7 +97,7 @@ export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
 }
 
 //---
-//-- seach button elements with the id and add click listener
+//-- search button elements with the id and add click listener
 //---
 export function removeGlobalKeyPress() {
   try {
@@ -228,6 +228,7 @@ export function showByClass(id: string, className: string) {
  * @param id
  */
 export function showPage(id: string) {
+  console.log(`showPage(${id})`);
   activePage = id;
   showByClass(id, "appface");
 }

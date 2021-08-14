@@ -63,7 +63,20 @@
 	<!-- -->
 	<div id="wait">
 
-		<div class="lds-ring"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		<div class="lds-ring">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
 
 	</div>
 
@@ -76,7 +89,7 @@
 			<!--<li id="expand">Expand</li>
 <hr>
 -->
-			
+
 			<li id="accounts">Accounts</li>
 			<hr>
 			<li id="add-account-side">Add Account</li>
@@ -90,7 +103,7 @@
 			<li id="create-user">Create a new User</li>
 			<hr>
 			<li id="darkmode">Switch Dark/Light Mode</li>
-			<hr> 
+			<hr>
 			<li id="options">Options</li>
 			<hr>
 			<li id="contact">Contact</li>
@@ -209,7 +222,7 @@
 			<p></p>
 			<p></p>
 
-			
+
 			<button class="big" id="confirm-change-password">Change Password</button>
 
 
@@ -240,7 +253,7 @@
 		<button class="big" id="option-import">Import existing account</button>
 
 		<h3>No, create a free implicit Account</h3>
-		<h4>Create a new implicit account. It's free to create but it's a large string of numbers and leters</h4>
+		<h4>Create a new implicit account. It's free to create but it's a large string of numbers and letters</h4>
 
 		<button class="big" id="option-create-implicit">Create implicit account</button>
 
@@ -253,7 +266,7 @@
 
 	<!--#region Account details -->
 
-	<div class="appface slide-show" id="account-selected">
+	<div class="appface slide-hide" id="account-selected">
 
 		<button class="button back" id="back-to-account"></button>
 
@@ -288,7 +301,7 @@
 
 
 		<!--#region subpage SEND -->
-		<div id="account-selected-send" class="subpage show">
+		<div id="account-selected-send" class="subpage hidden">
 
 			<div class="contentarea">
 
@@ -367,9 +380,9 @@
 					without the seed phrase. Please make sure you
 					have the seed phrase securely stored and available</h3>
 
-				<br/>
+				<br />
 				<h3>Type the account name to confirm</h3>
-				
+
 				<div class="make-read-only-form">
 
 					<div class="form-field-label">
@@ -610,7 +623,7 @@
 		<!--#endregion -->
 
 		<!--#region subpage asset list-->
-		<div class="subpage" id="assets">
+		<div class="subpage hidden" id="assets">
 
 
 			<div class="wrapper">
@@ -658,7 +671,7 @@
 						<button class="button morepage" id="refresh-button">
 							<h1>Refresh</h1>
 							<h2>
-								Updates your balances from you account, such as your general balance and assets balance.
+								Updates account balance and assets balances from the blockchain.
 							</h2>
 						</button>
 
@@ -684,7 +697,8 @@
 						<button class="button morepage" id="detailed-rewards">
 							<h1>Detailed Rewards</h1>
 							<h2>
-								Opens near-staking.com in a separate browser window providing information about your staking rewards.
+								Opens near-staking.com in a separate browser window providing information about your
+								staking rewards.
 							</h2>
 						</button>
 						<button class="button morepage" id="add-note">
@@ -696,7 +710,8 @@
 						<button class="button morepage" id="access">
 							<h1>Make Read Only / Make Full Access</h1>
 							<h2>
-								Add or remove the private key for this account in this wallet. You need the private key to send near or other assets.
+								Add or remove the private key for this account in this wallet. You need the private key
+								to send near or other assets.
 							</h2>
 						</button>
 						<button class="button morepage" id="show-public-key">
@@ -714,7 +729,7 @@
 						<button class="button morepage" id="remove">
 							<h1>Remove Account from Wallet</h1>
 							<h2>
-								Removes this account data from this wallet.
+								Removes the account data from this wallet.
 							</h2>
 						</button>
 						<!-- <button class="button morepage">
@@ -726,7 +741,8 @@
 						<button class="button morepage" id="delete-account">
 							<h1>Delete Account</h1>|
 							<h2>
-								Delete the account from the blockchain. Requests a beneficiary account to transfer all your near token.
+								Delete the account from the blockchain. Requests a beneficiary account to transfer all
+								your near tokens.
 							</h2>
 						</button>
 					</div>
@@ -778,8 +794,7 @@
 						Balance beneficiary Account Id
 					</label>
 					<div class="form-control">
-						<input  id="send-balance-to-account-name" type="text" dir="auto"
-							value="">
+						<input id="send-balance-to-account-name" type="text" dir="auto" value="">
 					</div>
 				</div>
 				<div class="subtitle">
@@ -792,8 +807,7 @@
 						Type the account name you want to Delete to confirm
 					</label>
 					<div class="form-control">
-						<input  placeholder="" id="delete-account-name-confirm"
-							type="text" dir="auto" value="">
+						<input placeholder="" id="delete-account-name-confirm" type="text" dir="auto" value="">
 					</div>
 				</div>
 			</div>
@@ -854,7 +868,7 @@
 	<!--#endregion -->
 
 	<!--#region All Accounts page, Account Item Template -->
-	<div class="appface slide-hide" id="account-list-main">
+	<div class="appface hidden slide-hide" id="account-list-main">
 
 		<div class="accountlistscrollarea">
 
@@ -1073,7 +1087,7 @@
 			<button class="button stake hidden" id="asset-restake">Re-stake</button>
 		</div>
 
-		<div class="subpage hide" id="asset-history">
+		<div class="subpage hidden" id="asset-history">
 
 			<div class="wrapper">
 
@@ -1152,9 +1166,10 @@
 
 				<div class="send-form-confirmation">
 
-					<h3 class="warning">Send <span id="asset-send-confirmation-amount"></span> <span
-							id="asset-symbol-confirmation"></span>
-						to <span id="asset-send-confirmation-receiver"></span> ?</h3>
+					<h3 class="warning">Send <span id="asset-send-confirmation-amount"></span>
+						<span id="asset-symbol-confirmation"></span>
+						to <span id="asset-send-confirmation-receiver"></span> ?
+					</h3>
 
 				</div>
 
@@ -1170,9 +1185,9 @@
 			<h2>Restake</h2>
 			<h3>Amount in NEAR to Restake (Max. <span id="max-restake-amount-1"></span>)</h3>
 			<div class="inputboxwithbutton">
-				<input id="restake-amount" type="text"/>
+				<input id="restake-amount" type="text" />
 				<button id="restake-max">Max</button>
-			</div>			
+			</div>
 		</div>
 
 		<!--#endregion -->
@@ -1181,7 +1196,7 @@
 		<div class="subpage hidden" id="liquid-unstake">
 			<h2>Liquid Unstake</h2>
 			<h3>Amount to unstake?</h3>
-			
+
 			<div class="inputboxwithbutton">
 				<input placeholder="" id="liquid-unstake-amount" type="text">
 				<button id="liquid-unstake-max">Max</button>
@@ -1336,12 +1351,12 @@
 	<!--#endregion -->
 
 	<!--#region OPTIONS -->
-	<div id="options" class="appface hidden">
-			<h2>Options</h1>
-			<h3>Auto-Lock(seconds):</h3>
-			<h4>The wallet will auto-lock after x seconds of you closing the popup extension</h4>
-			<input id="autolock-seconds-input" type="text"/>
-		
+	<div id="options" class="appface hidden slide-hide">
+		<h2>Options</h2>
+		<h3>Auto-Lock(seconds):</h3>
+		<h4>The wallet will auto-lock after x seconds of you closing the popup extension</h4>
+		<input id="autolock-seconds-input" type="text" />
+
 		<div class="button-group">
 			<button class="ok" id="save-settings">Save Settings</button>
 			<button class="cancel" id="cancel-security-settings">Cancel</button>
@@ -1364,7 +1379,20 @@
 	<a class="hidden" id="usd-price-link"></a>
 
 	<div id="wait">
-		<div class="lds-ring"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		<div class="lds-ring">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
 	</div>
 
 

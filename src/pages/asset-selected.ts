@@ -539,16 +539,15 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
 
   if (existAssetWithThisPool) {
     foundAsset.history.unshift(hist);
-    foundAsset.balance = c.yton(poolAccInfo.unstaked_balance);
+    foundAsset.balance = c.yton(poolAccInfo.unstaked_balance) + amountToUnstake;
   } else {
     if (asset_selected.symbol == "STAKED") {
       let asset: Asset;
-      var result = c.yton(poolAccInfo.unstaked_balance);
       asset = {
         spec: "",
         url: "",
         contractId: asset_selected.contractId,
-        balance: result,
+        balance: amountToUnstake,
         type: "unstake",
         symbol: "UNSTAKED",
         icon: UNSTAKE_DEFAULT_SVG,
@@ -561,6 +560,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
       //Tengo que agregar la actualizacion al inicio
     }
   }
+  // update balance of currently selected
   let balance = await StakingPool.getAccInfo(
     accData.name,
     asset_selected.contractId
@@ -624,6 +624,7 @@ async function sendOKClicked() {
     //show confirmation subpage
     d.showSubPage("asset-selected-send-confirmation");
     d.byId("asset-send-confirmation-amount").innerText = c.toStringDec(amountToSend);
+    d.byId("asset-symbol-confirmation").innerText = asset_selected.symbol;
     d.byId("asset-send-confirmation-receiver").innerText = toAccName;
     showOKCancel(performSend, showInitial); //on OK clicked, send
     
