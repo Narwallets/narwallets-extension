@@ -236,19 +236,19 @@ export async function show() {
 
     //const disconnectButton = d.qs("#disconnect-from-web-page");
     //disconnectButton.onClick(disconnectFromWepPageClicked);
-    
+
     d.showPage(ACCOUNT_LIST_MAIN);
 
     //d.qs("#disconnect-line").hide();
     const isConnected = await askBackground({ code: "isConnected" });
     d.onClickId("back-to-account", backToAccountsClicked);
-    
+
     autoRefresh();
 
     //d.qs("#disconnect-line").showIf(isConnected);
 
     await tryReposition();
-    
+
   } catch (ex) {
     await UnlockPage_show(); //show the unlock-page
     d.showErr(ex.message);
@@ -280,6 +280,7 @@ async function tryReposition() {
       const isLocked = await askBackgroundIsLocked();
       if (!isLocked) {
         if (account) {
+          console.log("reposition ",account,reposition,assetIndex)
           AccountSelectedPage_show(account, reposition, assetIndex);
         }
       }
@@ -307,13 +308,14 @@ export function accountItemClicked(ev: Event) {
   }
 }
 
+
 async function autoRefresh() {
-  var intervalId = window.setInterval(function () {
-    refreshAllAccounts(); /// call your function here
-  }, 5000);
+  // var intervalId = window.setInterval(function () {
+  //   refreshAllAccounts(); /// call your function here
+  // }, 5000);
 }
 
-async function refreshAllAccounts() {
+export async function refreshAllAccounts() {
   const accountsRecord = await askBackgroundAllNetworkAccounts();
 
   for (let key in accountsRecord) {
@@ -323,12 +325,12 @@ async function refreshAllAccounts() {
     accountsRecord[key].lastBalance = acc.lastBalance;
 
     const extAcc = new ExtendedAccountData(key, accountsRecord[key]);
-    
-    if(key == lastSelectedAccount?.name) {
+
+    if (key == lastSelectedAccount?.name) {
       d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(extAcc.total);
-      for(let i = 0; i < extAcc.accountInfo.assets.length; i++) {
+      for (let i = 0; i < extAcc.accountInfo.assets.length; i++) {
         let asset = extAcc.accountInfo.assets[i];
-        if(asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
+        if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
           let poolAccInfo = await StakingPool.getAccInfo(
             extAcc.name,
             asset.contractId
@@ -337,7 +339,7 @@ async function refreshAllAccounts() {
             asset.balance = c.yton(poolAccInfo.unstaked_balance);
           } else {
             asset.balance = c.yton(poolAccInfo.staked_balance);
-          }  
+          }
         } else {
           let tokenAccBalance = await askBackgroundViewMethod(
             asset.contractId,
@@ -347,12 +349,12 @@ async function refreshAllAccounts() {
           asset.balance = c.yton(tokenAccBalance);
         }
 
-        if(asset.contractId == lastSelectedAsset?.contractId && asset.symbol == lastSelectedAsset.symbol) {
+        if (asset.contractId == lastSelectedAsset?.contractId && asset.symbol == lastSelectedAsset.symbol) {
           d.qs("#selected-asset #balance").innerText = c.toStringDec(asset.balance);
         }
       }
     }
     await askBackgroundSetAccount(key, accountsRecord[key]);
   }
-  
+
 }

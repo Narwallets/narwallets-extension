@@ -49,6 +49,7 @@ export function showOKCancel(
   //isMoreOptionsOpen = false;
   confirmFunction = OKHandler;
   cancelFunction = CancelHandler;
+  console.log("showOkCancel")
   okCancelRow.show();
   enableOKCancel();
   if (OKHandler === CancelHandler) {
@@ -66,7 +67,6 @@ export function enableOKCancel() {
   cancelBtn.disabled = false;
   cancelBtn.hidden = false;
   d.onGlobalKeyPress(confirmFunction, d.ENTER);
-
 }
 
 export function singleButton() {
@@ -75,6 +75,7 @@ export function singleButton() {
 }
 
 export function unHideOKCancel() {
+  console.log("unHideOkCancel")
   okCancelRow.hidden = false;
 }
 

@@ -2,6 +2,7 @@ import * as d from "./util/document.js";
 import * as Pages from "./pages/main.js";
 import { NetworkList } from "./lib/near-api-lite/network.js";
 
+import { refreshAllAccounts } from "./pages/main.js";
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ChangePass_addListeners } from "./pages/change-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
@@ -10,11 +11,12 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { onNetworkChanged as Account_onNetworkChanged, show as AccountSelectedPage_show } from "./pages/account-selected.js";
+import { onNetworkChanged as Account_onNetworkChanged, refreshSelectedAccountAndAssets, show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
 
+import { recoverState, State } from "./data/global.js";
 import { localStorageSet } from "./data/util.js";
 import {
   askBackground,
@@ -162,10 +164,6 @@ async function asideIsUnlocked() {
 }
 
 async function securityOptions() {
-  //close moreless because options can change behavior
-  //const buttonsMore = new d.All(".buttons-more");
-  //buttonsMore.addClass("hidden");
-  //d.qs("#moreless").innerText = "More...";
   Options_show();
   /*d.showSubPage("security-options");
   const data = await askBackground({ code: "get-options" });
@@ -247,7 +245,19 @@ async function asideAddressBook() {
     AddressBook_show();
   }
 }
+
 export async function asideSwitchMode(delay: number = 300) {
+  //close aside
+  hambClicked();
+
+  let colorMode = switchDarkLight(10);
+
+  localStorageSet({ popupConfig: { lightMode: colorMode == "light" } })
+
+}
+
+export function switchDarkLight(delay: number = 300): string {
+
   const cssLinkIndex = 0;
   var oldlink = document.getElementsByTagName("link").item(cssLinkIndex);
 
@@ -260,29 +270,22 @@ export async function asideSwitchMode(delay: number = 300) {
     cssFile = "css/styles_dark.css";
     colorMode = "dark"
   }
+  isDark = !isDark;
 
-  await askBackground({
-    code: "set-color-mode",
-    colorMode: colorMode,
-  });
+  console.log(oldlink?.href, cssFile);
+  //setTimeout(() => {
+  if (oldlink && !oldlink.href.includes(cssFile)) {
+    oldlink.href = cssFile;
+  }
+  //}, delay);
 
-  setTimeout(() => {
-    if (oldlink) {
-      oldlink.href = cssFile;
-      isDark = !isDark;
-    }
-  }, delay);
+  return colorMode;
 }
 
 //-----------------------
 //executed after the background-page is available
 async function initPopup() {
   chrome.alarms.clear("unlock-expired");
-
-  const state = await askBackgroundGetState();
-  // Se usa la función que cambia el modo, con lo que hay que ponerlo con el modo opuesto al que hay que dejar
-  setIsDark(state.colorMode != "dark")
-  asideSwitchMode(10);
 
   hamb.onClick(hambClicked);
 
@@ -326,49 +329,83 @@ async function initPopup() {
 
   calculateDollarValue();
 
+  // set auto-refresh based on page shown
+  window.setInterval(async function () {
+    autoRefresh();
+  }, 5000);
+
   //show main page
   return Pages.show();
 }
 
-function openTermsOfUseOnNewWindow() {
-  localStorageSet({
-    reposition: "create-user",
-    email: d.inputById("email").value,
-  });
-  chrome.windows.create({
-    url: "https://narwallets.com/terms.html",
-  });
-  return false;
+function autoRefresh() {
+  if (d.activePage == "account-list-main") {
+    refreshAllAccounts();
+  }
+  else if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
+    refreshSelectedAccountAndAssets(true);
+  }
 }
 
-//event to inform background.js we're unloading (starts auto-lock timer)
-addEventListener(
-  "unload",
-  function (event) {
-    //@ts-ignore
-    background.postMessage({ code: "popupUnloading" }, "*");
-  },
-  true
-);
-
-//listen to background messages
-chrome.runtime.onMessage.addListener(function (msg) {
-  if (msg.code == "can-init-popup") {
-    initPopup();
+function openTermsOfUseOnNewWindow() {
+    localStorageSet({
+      reposition: "create-user",
+      email: d.inputById("email").value,
+    });
+    chrome.windows.create({
+      url: "https://narwallets.com/terms.html",
+    });
+    return false;
   }
-});
 
-var background: Window | undefined;
-//wake-up background page
-//WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
-chrome.runtime.getBackgroundPage((bgpage) => {
-  if (chrome.runtime.lastError) {
-    console.error(JSON.stringify(chrome.runtime.lastError));
-    alert(chrome.runtime.lastError);
-  } else {
-    background = bgpage;
-    //@ts-ignore
-    background.postMessage({ code: "popupLoading" }, "*");
-    //will reply with "can-init-popup" after retrieving data from localStorage
-  }
-});
+  //event to inform background.js we're unloading (starts auto-lock timer)
+  addEventListener(
+    "unload",
+    function (event) {
+      //@ts-ignore
+      background.postMessage({ code: "popupUnloading" }, "*");
+    },
+    true
+  );
+
+  //listen to background messages
+  chrome.runtime.onMessage.addListener(function (msg) {
+    if (msg.code == "can-init-popup") {
+      initPopup();
+    }
+  });
+
+  window.onload = function () {
+    // dark light mode
+    // default is dark
+    chrome.storage.local.get("popupConfig", (obj) => {
+      if (chrome.runtime.lastError) {
+        console.log(JSON.stringify(chrome.runtime.lastError));
+      }
+      else {
+        console.log(obj);
+        if (obj?.popupConfig.lightMode) {
+          switchDarkLight(10);
+        }
+      }
+    });
+
+  };
+
+  var background: Window | undefined;
+  //wake-up background page
+  //WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
+  chrome.runtime.getBackgroundPage((bgpage) => {
+    if (chrome.runtime.lastError) {
+      console.error(JSON.stringify(chrome.runtime.lastError));
+      alert(chrome.runtime.lastError);
+    } else {
+      background = bgpage;
+
+      //@ts-ignore
+      background.postMessage({ code: "popupLoading" }, "*");
+      //will reply with "can-init-popup" after retrieving data from localStorage
+    }
+  });
+
+
