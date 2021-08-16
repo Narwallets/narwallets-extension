@@ -1,42 +1,94 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 185.344 185.344" style="enable-background:new 0 0 185.344 185.344;" xml:space="preserve">
-<g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="Capa_1" inkscape:version="1.1 (c68e22c387, 2021-05-23)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 185.3 185.3"
+	 style="enable-background:new 0 0 185.3 185.3;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#010002;}
+	.st1{fill:#CCCCCC;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" id="namedview39" inkscape:current-layer="Capa_1" inkscape:cx="92.555867" inkscape:cy="92.788127" inkscape:pagecheckerboard="0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="983" inkscape:window-maximized="1" inkscape:window-width="1842" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:zoom="4.3055077" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="g8">
+</g>
+<g id="g10">
+</g>
+<g id="g12">
+</g>
+<g id="g14">
+</g>
+<g id="g16">
+</g>
+<g id="g18">
+</g>
+<g id="g20">
+</g>
+<g id="g22">
+</g>
+<g id="g24">
+</g>
+<g id="g26">
+</g>
+<g id="g28">
+</g>
+<g id="g30">
+</g>
+<g id="g32">
+</g>
+<g id="g34">
+</g>
+<g id="g36">
+</g>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" id="namedview39" inkscape:current-layer="Capa_1" inkscape:cx="92.555867" inkscape:cy="92.788127" inkscape:pagecheckerboard="0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="983" inkscape:window-maximized="1" inkscape:window-width="1842" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:zoom="4.3055077" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="g4_1_">
 	<g>
-		<path style="fill:#010002;" d="M92.672,144.373c-2.752,0-5.493-1.044-7.593-3.138L3.145,59.301c-4.194-4.199-4.194-10.992,0-15.18
-			c4.194-4.199,10.987-4.199,15.18,0l74.347,74.341l74.347-74.341c4.194-4.199,10.987-4.199,15.18,0
-			c4.194,4.194,4.194,10.981,0,15.18l-81.939,81.934C98.166,143.329,95.419,144.373,92.672,144.373z"/>
+		<path class="st0" d="M92.7,152.8c-3.7,0-7.1-1.4-9.7-4L1,66.9c-2.6-2.6-4-6-4-9.7c0-3.7,1.4-7.1,4-9.7c2.6-2.6,6-4,9.7-4
+			s7.1,1.4,9.7,4l72.2,72.2l72.2-72.2c2.6-2.6,6-4,9.7-4s7.1,1.4,9.7,4c5.4,5.4,5.4,14.1,0,19.4l-81.9,81.9
+			C99.8,151.4,96.3,152.8,92.7,152.8z"/>
+		<path id="path2_2_" class="st0" d="M92.7,149.8c-2.8,0-5.5-1-7.6-3.1L3.2,64.8c-4.2-4.2-4.2-11,0-15.2c4.2-4.2,11-4.2,15.2,0
+			l74.3,74.3L167,49.6c4.2-4.2,11-4.2,15.2,0c4.2,4.2,4.2,11,0,15.2l-81.9,81.9C98.2,148.8,95.4,149.8,92.7,149.8z"/>
+		<path class="st1" d="M92.7,153.1c-3.7,0-7.2-1.5-9.9-4.1L0.9,67.1c-2.6-2.6-4.1-6.2-4.1-9.9c0-3.7,1.5-7.2,4.1-9.9
+			c2.6-2.6,6.2-4.1,9.9-4.1s7.2,1.5,9.9,4.1l72,72l72-72c2.6-2.6,6.2-4.1,9.9-4.1s7.2,1.5,9.9,4.1c5.4,5.4,5.4,14.3,0,19.8
+			L102.6,149C99.9,151.6,96.4,153.1,92.7,153.1z M10.7,49.7c-2,0-3.9,0.8-5.3,2.2c-1.4,1.4-2.2,3.3-2.2,5.3c0,2,0.8,3.9,2.2,5.3
+			l81.9,81.9c1.4,1.4,3.3,2.2,5.3,2.2c2,0,3.9-0.8,5.3-2.2l81.9-81.9c2.9-2.9,2.9-7.7,0-10.6c-1.4-1.4-3.3-2.2-5.3-2.2
+			c-2,0-3.9,0.8-5.3,2.2l-76.6,76.6L16,51.9C14.6,50.5,12.7,49.7,10.7,49.7L10.7,49.7z"/>
+		<path class="st1" d="M92.7,150.1c-2.9,0-5.7-1.1-7.8-3.2L3,64.9c-2.1-2.1-3.2-4.8-3.2-7.8s1.1-5.7,3.2-7.8
+			c2.1-2.1,4.8-3.2,7.8-3.2c0,0,0,0,0,0c2.9,0,5.7,1.1,7.8,3.2l74.2,74.2l74.2-74.2c2.1-2.1,4.8-3.2,7.8-3.2c0,0,0,0,0,0
+			c2.9,0,5.7,1.1,7.8,3.2c4.3,4.3,4.3,11.2,0,15.5l-81.9,81.9C98.4,148.9,95.6,150.1,92.7,150.1z M10.7,46.7c-2.8,0-5.4,1.1-7.4,3.1
+			c-2,2-3.1,4.6-3.1,7.4s1.1,5.4,3.1,7.4l81.9,81.9c2,2,4.6,3.1,7.4,3.1c2.8,0,5.4-1.1,7.4-3.1L182,64.6c4.1-4.1,4.1-10.7,0-14.8
+			c-2-2-4.6-3.1-7.4-3.1h0c-2.8,0-5.4,1.1-7.4,3.1l-74.5,74.5L18.2,49.7C16.2,47.8,13.5,46.7,10.7,46.7L10.7,46.7z"/>
 	</g>
 </g>
-<g>
+<g id="g8_1_">
 </g>
-<g>
+<g id="g10_1_">
 </g>
-<g>
+<g id="g12_1_">
 </g>
-<g>
+<g id="g14_1_">
 </g>
-<g>
+<g id="g16_1_">
 </g>
-<g>
+<g id="g18_1_">
 </g>
-<g>
+<g id="g20_1_">
 </g>
-<g>
+<g id="g22_1_">
 </g>
-<g>
+<g id="g24_1_">
 </g>
-<g>
+<g id="g26_1_">
 </g>
-<g>
+<g id="g28_1_">
 </g>
-<g>
+<g id="g30_1_">
 </g>
-<g>
+<g id="g32_1_">
 </g>
-<g>
+<g id="g34_1_">
 </g>
-<g>
+<g id="g36_1_">
 </g>
 </svg>
