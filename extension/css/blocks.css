@@ -1,160 +1,154 @@
-  .appface 
-  {
-    position: absolute;
-    z-index: 95;
-    left: 0px;
-    top: 44px;
-    width: 480px;
-    height: 550px;
-    background:var(--Background);
-    /* background:var(--midcolor); */
-    overflow: hidden;
-    text-align: center;
-    align-items: center;
-  }
+.appface {
+  position: absolute;
+  z-index: 95;
+  left: 0px;
+  top: 44px;
+  width: 480px;
+  height: 550px;
+  background: var(--Background);
+  /* background:var(--midcolor); */
+  overflow: hidden;
+  text-align: center;
+  align-items: center;
+}
 
-  .appface.approve
-  {
-    top:0px;
-  }
-  
-  .TopBlock {
-    position: absolute;
-    display: inline-block;
-    z-index: -1;
-    top: 0px;
-    left: 0px;
-    width: 470px;
-    height: 140px;
-    max-height: 140px;
-    margin:5px;
-    
-    border-radius: 5px;
+.appface.approve {
+  top: 0px;
+}
 
-    background:var(--Block);
+.TopBlock {
+  position: absolute;
+  display: inline-block;
+  z-index: -1;
+  top: 0px;
+  left: 0px;
+  width: 470px;
+  height: 140px;
+  max-height: 140px;
+  margin: 5px;
 
-    overflow-y: hidden;
-  }
+  border-radius: 5px;
 
+  background: var(--Block);
 
-  .MidBlock {
+  overflow-y: hidden;
+}
 
-    position: absolute;
-    top: 155px;
-    left: 0px;
-    width: 480px;
-    padding: 0px;
-    height: 63px;
-    margin:0px;
-    padding-top:5px;
+.MidBlock {
+  position: absolute;
+  top: 155px;
+  left: 0px;
+  width: 480px;
+  padding: 0px;
+  height: 63px;
+  margin: 0px;
+  padding-top: 5px;
 
-    display: inline-flex;
-    justify-content: center;
+  display: inline-flex;
+  justify-content: center;
 
-    
-    background: var(--Block);
-    
-    overflow-y: hidden;
+  background: var(--Block);
 
-  }
+  overflow-y: hidden;
+}
 
-  .subpage 
-  {
-    position: absolute;
-    top: 226px;
-    left: 0px;
-    width: 470;
-    height: 320px;
-    margin:5px;
-    background:var(--Background);
-    text-align: center;
-    align-items: center;
-    border-radius: 5px;
-  }
+.subpage {
+  position: absolute;
+  top: 226px;
+  left: 0px;
+  width: 470;
+  height: 320px;
+  margin: 5px;
+  background: var(--Background);
+  text-align: center;
+  align-items: center;
+  border-radius: 5px;
+}
 
+.contentarea {
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding: 0px;
+  padding-top: 10px;
+  text-align: center;
+  display: flexbox;
+  background-color: transparent;
+}
 
+.fullblock {
+  position: absolute;
+  display: inline-block;
+  z-index: -1;
+  top: 0px;
+  left: 0px;
+  width: 470px;
+  height: 547px;
+  margin: 5px;
 
-  .contentarea {
-    position: relative;
-    width: 100%;
-    height: auto;
-    padding: 0px;
-    padding-top: 10px;
-    text-align: center;
-    display: flexbox;
-    background-color: transparent;
-  }
+  background: var(--Background);
 
-  .fullblock
-  {
-    position: absolute;
-    display: inline-block;
-    z-index: -1;
-    top: 0px;
-    left: 0px;
-    width: 470px;
-    height: 547px;
-    margin:5px;
+  overflow-y: hidden;
+}
 
-    background:var(--Background);
+.bottombar {
+  position: absolute;
+  width: 471px;
+  height: 55px;
+  top: 495px;
+  left: 5px;
 
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 
-    overflow-y: hidden;
-  }
+  display: inline-block;
 
-  .bottombar {
-    position: absolute;
-    width: 471px;
-    height: 55px;
-    top: 495px;
-    left: 5px;
+  padding-top: 4px;
+  display: inline-flex;
+  justify-content: flex-end;
 
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+  background: var(--Block);
+}
 
-    display: inline-block;
+.addresslistscrollarea {
+  overflow-y: scroll;
+  height: 444px;
+}
 
-    padding-top: 4px;
-    display: inline-flex;
-    justify-content: flex-end;
+.accountlistscrollarea {
+  overflow-y: scroll;
+  height: 490px;
+}
 
-    background:var(--Block);
-    
-  }
+/*#region account details -------------------------------------------------------*/
 
+.accountdetscuenta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
 
-  /*#region account details -------------------------------------------------------*/
+  color: var(--BlockText);
+  background-color: var(--Block);
 
-  .accountdetscuenta {
+  height: 48px;
+  width: 430px;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin:auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: initial;
+  overflow: hidden;
 
-    color: var(--BlockText);
-    background-color: var(--Block);
+  font-size: 22px;
+  font-weight: 200;
 
-    height: 48px;	
-    width: 430px;   
+  border-radius: 5px 5px 0 0;
 
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: initial;
-    overflow: hidden;
+  padding-left: 30px;
+  padding-right: 30px;
+}
 
-    font-size: 22px;
-    font-weight: 200;
-
-    border-radius: 5px 5px 0 0;
-
-    padding-left: 30px;
-    padding-right: 30px;
-
-  }
-
-  .accountdetscomment {
-
+.accountdetscomment {
   display: block;
   margin: auto;
   margin-top: 2px;
@@ -167,10 +161,9 @@
   color: var(--TextGeneric);
   font-size: 12px;
   font-weight: 200;
+}
 
-  }
-
-  .accountdetssymbol {
+.accountdetssymbol {
   display: block;
   margin: auto;
   margin-top: 8px;
@@ -183,17 +176,17 @@
 
   font-size: 12px;
   font-weight: 400;
-  }
+}
 
-  .assetdeticon svg {
+.assetdeticon svg {
   width: 24px;
   height: 24px;
   margin-top: 2px;
   margin-left: auto;
   margin-right: auto;
-  }
+}
 
-  .assetdetcontract {
+.assetdetcontract {
   display: block;
   margin: auto;
   margin-top: 10px;
@@ -206,9 +199,9 @@
   color: var(--BlockText);
   font-size: 12px;
   font-weight: 200;
-  }
+}
 
-  .accountdetsbalance {
+.accountdetsbalance {
   display: block;
   margin: auto;
   margin-top: 1px;
@@ -223,9 +216,9 @@
   font-weight: 200;
 
   color: var(--TextRemark);
-  }
+}
 
-  .accountdetsbalance svg {
+.accountdetsbalance svg {
   background-color: transparent;
   border-radius: 6px;
   width: 24px;
@@ -235,9 +228,9 @@
   top: 6px;
   left: -3px;
   position: relative;
-  }
+}
 
-  .accountdetsfiat {
+.accountdetsfiat {
   display: inline-block;
   margin-bottom: 0px;
   max-height: 24px;
@@ -251,12 +244,10 @@
   color: var(--TextGeneric);
   font-size: 15px;
   font-weight: 400;
-  }
+}
 
-  .accountdetsfiat::after {
+.accountdetsfiat::after {
   content: " usd";
-  }
+}
 
-
-
-  /*#endregion*/
+/*#endregion*/

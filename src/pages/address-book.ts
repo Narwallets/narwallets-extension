@@ -15,6 +15,7 @@ import {
   OkCancelInit,
   showOKCancel,
 } from "../util/okCancel.js";
+import { checkIfAccountExists } from "../util/search-accounts.js";
 
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
@@ -68,10 +69,13 @@ function backToAccountsClicked() {
   d.byId("ok-cancel-row").classList.add("hidden");
 }
 
-
 async function addOKClicked() {
   try {
     const addressToSave = new d.El("#add-addresbook-id").value;
+    let existAccount = await checkIfAccountExists(addressToSave);
+    if (!existAccount) {
+      throw Error("Account ID does not exists");
+    }
     const noteToSave = new d.El("#add-addresbook-note").value;
 
     const contactToSave: GContact = {
