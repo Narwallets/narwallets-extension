@@ -91,7 +91,6 @@ export async function show(
   reloadDetails();
 
   await populateSendCombo("combo-send-asset");
-  console.log(asset_selected);
 
   switch (asset_selected.symbol) {
     case "STNEAR": {
@@ -169,7 +168,7 @@ function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
 
     let range = BigInt(
       metaPoolContractData.nslp_max_discount_basis_points -
-      metaPoolContractData.nslp_min_discount_basis_points
+        metaPoolContractData.nslp_min_discount_basis_points
     );
     //here 0<after<target, so 0<proportion<range
     const proportion: bigint = (range * liq_after) / target;
@@ -523,7 +522,10 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     amount: amountToUnstake,
     date: new Date().toISOString(), //so it's the same as when the data is JSON.parsed() from localStorage
     type: "unstake",
-    destination: "",
+    destination:
+      asset_selected.contractId.length > 23
+        ? asset_selected.contractId.substring(0, 20) + "..."
+        : asset_selected.contractId,
     icon: UNSTAKE_DEFAULT_SVG,
   };
 
@@ -590,7 +592,6 @@ function showAssetReceiveClicked() {
 
 function showAssetSendClicked() {
   try {
-
     if (accData.isReadOnly) throw Error("Account is read-only");
 
     d.showSubPage("asset-send-subpage");
@@ -620,14 +621,17 @@ async function sendOKClicked() {
 
     if (amountToSend > asset_selected.balance)
       throw Error("Amount exceeds available balance");
-
+    let accountExists = await searchAccounts.checkIfAccountExists(toAccName);
+    if (!accountExists) {
+      throw Error("Receiver Account does not exists");
+    }
     //show confirmation subpage
     d.showSubPage("asset-selected-send-confirmation");
-    d.byId("asset-send-confirmation-amount").innerText = c.toStringDec(amountToSend);
+    d.byId("asset-send-confirmation-amount").innerText =
+      c.toStringDec(amountToSend);
     d.byId("asset-symbol-confirmation").innerText = asset_selected.symbol;
     d.byId("asset-send-confirmation-receiver").innerText = toAccName;
     showOKCancel(performSend, showInitial); //on OK clicked, send
-    
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -668,13 +672,13 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-      accData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      " " +
-      asset_selected.symbol +
-      " to " +
-      toAccName
+        accData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        " " +
+        asset_selected.symbol +
+        " to " +
+        toAccName
     );
 
     checkContactList();

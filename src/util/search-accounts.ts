@@ -4,7 +4,6 @@ import { LockupContract } from "../contracts/LockupContract.js";
 import { Account } from "../data/account.js";
 import { askBackground } from "../background/askBackground.js";
 
-
 async function checkNotLockup(accName: string) {
   const suffix = await LockupContract.getLockupSuffix();
   if (accName.endsWith(suffix)) {
@@ -51,7 +50,6 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
 
     info.lastBalance = c.yton(stateResultYoctos.amount);
 
-    
     // if (info.stakingPool) {
     //     const previnThePool = info.staked + info.unstaked;
     //     const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool)
@@ -65,6 +63,19 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
     //     info.staked = 0
     //     info.unstaked = 0
     // }
+  }
+}
+
+export async function checkIfAccountExists(accName: string): Promise<boolean> {
+  try {
+    await askBackground({
+      code: "query-near-account",
+      accountId: accName,
+    });
+    return true;
+  } catch (ex) {
+    // const reason = ex.message.replace("while viewing", "");
+    return false;
   }
 }
 
