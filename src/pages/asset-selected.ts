@@ -6,7 +6,6 @@ import {
   askBackgroundCallMethod,
   askBackgroundGetNetworkInfo,
   askBackgroundSetAccount,
-  askBackgroundTransferNear,
 } from "../background/askBackground.js";
 import {
   Asset,
@@ -779,13 +778,3 @@ async function addContactToList() {
     d.showErr("Error in save contact");
   }
 }
-
-// function displayReflectTransfer(amountToSend: number, toAccName: string) {
-
-//   if (amountToSend == 0) return;
-
-//   .forEach(accData => {
-
-//   });
-//   selectedAccountData.accountInfo.lastBalance -= amountNear;
-//   selectedAccountData.available -= amountNear;}

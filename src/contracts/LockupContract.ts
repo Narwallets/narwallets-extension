@@ -14,7 +14,6 @@ import {
 import {
   askBackground,
   askBackgroundApplyTxAction,
-  askBackgroundCallMethod,
   askBackgroundGetNetworkInfo,
   askBackgroundViewMethod,
 } from "../background/askBackground.js";

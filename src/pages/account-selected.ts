@@ -209,18 +209,7 @@ function initPage() {
 
   var target = document.querySelector("#usd-price-link");
   target?.addEventListener("usdPriceReady", usdPriceReady);
-  return;
-
-  //accountAmount.onInput(amountInput);
-
-  refreshButton = new d.El("button#refresh");
-
-  d.onClickId("unstake", unstakeClicked);
-
-  refreshButton.onClick(refreshClicked);
-
-  d.onClickId("lockup-add-public-key", LockupAddPublicKey);
-  //d.onClickId("assign-staking-pool", assignStakingPool);
+  
 }
 
 function backLinkClicked() {
@@ -292,18 +281,6 @@ function selectFirstTab() {
 
 function selectSecondTab() {
   stakeTabSelected = 2;
-}
-
-function moreClicked() {
-  hideOkCancel();
-  if (!isMoreOptionsOpen) {
-    d.showSubPage("more-subpage");
-    isMoreOptionsOpen = true;
-    return;
-  }
-  isMoreOptionsOpen = false;
-  d.showPage("account-selected");
-  d.showSubPage("assets");
 }
 
 async function checkConnectOrDisconnect() {
@@ -1156,71 +1133,7 @@ async function performUnstake() {
     if (!selectedAccountData.isFullAccess)
       throw Error("you need full access on " + selectedAccountData.name);
 
-    //const actualSP = selectedAccountData.accountInfo.stakingPool;
-    // if (!actualSP) throw Error("No staking pool selected in this account");
-
-    //check if it's staked or just in the pool but unstaked
-    // const poolAccInfo = await StakingPool.getAccInfo(
-    //   selectedAccountData.name,
-    //   actualSP
-    // );
-
     if (modeWithdraw) {
-      // if (poolAccInfo.unstaked_balance == "0")
-      //   throw Error("No funds unstaked to withdraw");
-
-      //if (!poolAccInfo.can_withdraw) throw Error("Funds are unstaked but you must wait (36-48hs) after unstaking to withdraw")
-
-      //ok we've unstaked funds we can withdraw
-      // let yoctosToWithdraw = fixUserAmountInY(
-      //   amount,
-      //   poolAccInfo.unstaked_balance
-      // ); // round user amount
-      // if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
-      //   await askBackgroundCallMethod(
-      //     actualSP,
-      //     "withdraw_all",
-      //     {},
-      //     selectedAccountData.name
-      //   );
-      // } else {
-      //   await askBackgroundCallMethod(
-      //     actualSP,
-      //     "withdraw",
-      //     { amount: yoctosToWithdraw },
-      //     selectedAccountData.name
-      //   );
-      // }
-      // d.showSuccess(
-      //   c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
-      // );
-      //----------------
-      // } else {
-      //   //mode unstake
-      //   //here we've staked balance in the pool, call unstake
-
-      //   if (poolAccInfo.staked_balance == "0")
-      //     throw Error("No funds staked to unstake");
-
-      //   let yoctosToUnstake = fixUserAmountInY(
-      //     amount,
-      //     poolAccInfo.staked_balance
-      //   ); // round user amount
-      //   if (yoctosToUnstake == poolAccInfo.staked_balance) {
-      //     await askBackgroundCallMethod(
-      //       actualSP,
-      //       "unstake_all",
-      //       {},
-      //       selectedAccountData.name
-      //     );
-      //   } else {
-      //     await askBackgroundCallMethod(
-      //       actualSP,
-      //       "unstake",
-      //       { amount: yoctosToUnstake },
-      //       selectedAccountData.name
-      //     );
-      //   }
       d.showSuccess("Unstake requested, you must wait (36-48hs) to withdraw");
     }
 
