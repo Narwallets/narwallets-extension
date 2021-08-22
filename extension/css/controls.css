@@ -233,7 +233,7 @@ input[type="text"]:focus
   margin-left: 140px;
 }
 
-input[type='radio'], label{   
+input[type='radio'], label{
   vertical-align: baseline;
   left:50px;
   padding: 5px;

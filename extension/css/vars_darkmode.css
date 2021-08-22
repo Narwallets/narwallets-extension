@@ -20,26 +20,20 @@ body { font-family: 'Inter', sans-serif; !important }
 :root {
 
 	/*#region Color dark */
-
-	--Background: rgb(8, 21, 44);
-
-	--Block: rgb(2, 6, 17);
-	--BlockText: rgb(255, 255, 255); 
-
-	--TextColor:  rgb(93, 142, 216);
-	--TextRemark: rgb(172, 159, 49); 
-	--TextGeneric: rgb(93, 142, 216);
-
-	--HoverColor:rgb(36, 51, 100); /* color de hover en las listas */
-
-    --HighLight: rgb(189, 139, 1); /* color para textos importantes */
-    --ControlBackgroud: rgb(36, 51, 100); 
-	--ControlText:rgb(255,255,255);
-	--ControlAltText:rgb(255, 255, 255);
-	--ControlAccent:  rgb(32, 106, 216);
+--Background: rgb(8, 21, 44);
+--Block: rgb(2, 6, 17);
+--BlockText: rgb(255, 255, 255);
+--TextColor:  rgb(93, 142, 216);
+--TextRemark: rgb(197 187 99);
+--TextGeneric: rgb(203 223 255);
+--HoverColor:rgb(36, 51, 100); /* color de hover en las listas */
+--HighLight: rgb(189, 139, 1); /* color para textos importantes */
+--ControlBackgroud: rgb(36, 51, 100);
+--ControlText:rgb(255,255,255);
+--ControlAltText:rgb(255, 255, 255);
+--ControlAccent:  rgb(32, 106, 216);
 
 	/*#endregion */
-
 }
 
 
