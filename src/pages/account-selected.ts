@@ -234,6 +234,8 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
   selectedAccountData.total = mainAccInfo.lastBalance;
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
+  
+
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
     if (asset.type == "stake" || asset.type == "unstake") {
       if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
@@ -243,9 +245,16 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
         );
         if (asset.symbol == "UNSTAKED") {
           asset.balance = c.yton(poolAccInfo.unstaked_balance);
-        } else {
+        } else if(asset.symbol == "STAKED") {
           asset.balance = c.yton(poolAccInfo.staked_balance);
         }
+      } else if(asset.symbol == "STNEAR") {
+        let metaPoolResult = await askBackgroundViewMethod(
+          asset.contractId,
+          "get_account_info",
+          { account_id: selectedAccountData.name }
+        );
+        asset.balance = c.yton(metaPoolResult.st_near);
       }
     }
     if (asset.type == "ft") {
@@ -1780,12 +1789,12 @@ async function makeFullAccessOKClicked() {
     selectAndShowAccount(selectedAccountData.name);
     d.showMsg("Seed Phrase is correct. Access granted", "success");
     showInitial();
+    hideOkCancel();
   } catch (ex) {
     d.showErr(ex.message);
     enableOKCancel();
   } finally {
     d.hideWait();
-    hideOkCancel();
   }
 }
 
