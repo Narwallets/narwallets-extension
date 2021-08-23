@@ -209,7 +209,6 @@ function initPage() {
 
   var target = document.querySelector("#usd-price-link");
   target?.addEventListener("usdPriceReady", usdPriceReady);
-  
 }
 
 function backLinkClicked() {
@@ -380,7 +379,6 @@ export async function addAssetToken(contractId: string) {
   selectedAccountData.accountInfo.assets.push(item);
 }
 
-
 function getAccountRecord(accName: string): Promise<Account> {
   return askBackground({
     code: "get-account",
@@ -516,8 +514,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-        selectedAccountData.accountInfo.ownerId +
-        " to operate this lockup account"
+          selectedAccountData.accountInfo.ownerId +
+          " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() //no hay  espacio
   } else {
@@ -609,11 +607,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-        info.ownerId +
-        " to " +
-        action +
-        " from this " +
-        selectedAccountData.typeFull
+          info.ownerId +
+          " to " +
+          action +
+          " from this " +
+          selectedAccountData.typeFull
       );
     }
   }
@@ -760,11 +758,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -1213,11 +1211,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     let hist: History;
@@ -1234,7 +1232,6 @@ async function performSend() {
     displayReflectTransfer(amountToSend, toAccName);
     await refreshSelectedAccountAndAssets();
     await checkContactList();
-
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1265,7 +1262,6 @@ async function detailedRewardsClicked() {
   }
 }
 
-
 //---------------------------------------------
 type PoolInfo = {
   name: string;
@@ -1275,8 +1271,6 @@ type PoolInfo = {
   uptime: number;
   fee?: number;
 };
-
-async function searchAssets(exAccData: ExtendedAccountData) { }
 //---------------------------------------------
 export async function searchThePools(exAccData: ExtendedAccountData) {
   let doingDiv;
@@ -1286,22 +1280,22 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
     const tokenOptionsList =
       networkInfo.name != "mainnet"
         ? [
-          "token.cheddar.testnet",
-          "token.meta.pool.testnet",
-          "meta-v2.pool.testnet",
-        ]
+            "token.cheddar.testnet",
+            "token.meta.pool.testnet",
+            "meta-v2.pool.testnet",
+          ]
         : [
-          "wrap.near",
-          "token.meta.pool.near",
-          "meta.pool.near",
-          "berryclub.ek.near",
-          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-        ];
+            "wrap.near",
+            "token.meta.pool.near",
+            "meta.pool.near",
+            "berryclub.ek.near",
+            "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+            "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+            "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+            "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+            "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+            "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+          ];
 
     let checked: Record<string, boolean> = {};
 
@@ -1349,11 +1343,14 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
 
             // has staked?
             if (c.yton(poolAccInfo.staked_balance) > 0) {
-              let asset = exAccData.accountInfo.findAsset(pool.account_id, "STAKED");
+              let asset =
+                // exAccData.accountInfo.assets.find(
+                //   (i) => i.contractId == pool.account_id && i.symbol == "STAKED"
+                // );
+                exAccData.findAsset(pool.account_id, "STAKED");
               if (asset) {
                 asset.balance = c.yton(poolAccInfo.staked_balance);
-              }
-              else {
+              } else {
                 // need to create
                 let newAsset: Asset = {
                   balance: c.yton(poolAccInfo.staked_balance),
@@ -1370,11 +1367,16 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
 
               // has unstaked balance?
               if (c.yton(poolAccInfo.unstaked_balance) > 0) {
-                let asset = exAccData.accountInfo.findAsset(pool.account_id, "UNSTAKED");
+                let asset =
+                  // exAccData.accountInfo.assets.find(
+                  //   (i) =>
+                  //     i.contractId == pool.account_id && i.symbol == "UNSTAKED"
+                  // );
+
+                  exAccData.findAsset(pool.account_id, "UNSTAKED");
                 if (asset) {
                   asset.balance = c.yton(poolAccInfo.unstaked_balance);
-                }
-                else {
+                } else {
                   // need to create
                   let newAsset: Asset = {
                     balance: c.yton(poolAccInfo.unstaked_balance),
@@ -1397,7 +1399,6 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
 
     // search tokens
     for (let tokenOption of tokenOptionsList) {
-
       let resultBalance;
       try {
         resultBalance = await askBackgroundViewMethod(
@@ -1405,8 +1406,7 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
           "ft_balance_of",
           { account_id: exAccData.name }
         );
-      }
-      catch (ex) {
+      } catch (ex) {
         continue;
       }
 
@@ -1414,11 +1414,10 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
         d.showSuccess(
           `Found! ${c.toStringDec(c.yton(resultBalance))} in ${tokenOption}`
         );
-        let asset = exAccData.accountInfo.findAsset(tokenOption)
+        let asset = exAccData.findAsset(tokenOption);
         if (asset) {
           asset.balance = c.yton(resultBalance);
-        }
-        else {
+        } else {
           // must create
           let item = new Asset();
           item.type = "ft";
@@ -1436,13 +1435,12 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
           exAccData.accountInfo.assets.push(item);
         }
       }
-    };
+    }
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
     doingDiv?.remove();
   }
-
 }
 
 //-------------------------------

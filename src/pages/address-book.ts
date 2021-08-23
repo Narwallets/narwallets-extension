@@ -93,7 +93,6 @@ async function addOKClicked() {
 
     hideOkCancel();
     showInitial();
-    d.showSuccess("Contact added correctly");
   } catch (ex) {
     d.showErr(ex);
   }

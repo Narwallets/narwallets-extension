@@ -22,13 +22,6 @@ export class Account {
   // get totalInThePool(): number {
   //   return this.staked + this.unstaked;
   // }
-
-  findAsset(contractId: string, symbol?: string): Asset | undefined {
-    for (var asset of this.assets) {
-      if (asset.contractId == contractId && (symbol == undefined || asset.symbol == symbol)) return asset;
-    }
-    return undefined;
-  }
 }
 
 export class Contact {
@@ -84,6 +77,18 @@ export class ExtendedAccountData {
   unlockedOther: number;
   available: number;
   // inThePool: number;
+  findAsset(contractId: string, symbol?: string): Asset | undefined {
+    //console.log("HOLA");
+
+    for (var asset of this.accountInfo.assets) {
+      if (
+        asset.contractId == contractId &&
+        (symbol == undefined || asset.symbol == symbol)
+      )
+        return asset;
+    }
+    return undefined;
+  }
 
   constructor(name: string, accountInfo: Account) {
     this.name = name;
