@@ -188,8 +188,8 @@ function initPage() {
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
   d.onClickId("search-pools", searchPoolsButtonClicked);
-  d.onClickId("adress-book-button", showAdressBook);
-  d.onClickId("contact-list", contactOptions);
+  d.onClickId("address-book-button", showAddressBook);
+
   d.onClickId("refresh-button", refreshSelectedAcc);
   d.onClickId("back-to-account", backLinkClicked);
   d.onClickId("delete-account", DeleteAccount);
@@ -234,7 +234,7 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
   selectedAccountData.total = mainAccInfo.lastBalance;
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
-  
+
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
     if (asset.type == "stake" || asset.type == "unstake") {
@@ -245,10 +245,10 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
         );
         if (asset.symbol == "UNSTAKED") {
           asset.balance = c.yton(poolAccInfo.unstaked_balance);
-        } else if(asset.symbol == "STAKED") {
+        } else if (asset.symbol == "STAKED") {
           asset.balance = c.yton(poolAccInfo.staked_balance);
         }
-      } else if(asset.symbol == "STNEAR") {
+      } else if (asset.symbol == "STNEAR") {
         let metaPoolResult = await askBackgroundViewMethod(
           asset.contractId,
           "get_account_info",
@@ -523,8 +523,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-          selectedAccountData.accountInfo.ownerId +
-          " to operate this lockup account"
+        selectedAccountData.accountInfo.ownerId +
+        " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() //no hay  espacio
   } else {
@@ -616,11 +616,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-          info.ownerId +
-          " to " +
-          action +
-          " from this " +
-          selectedAccountData.typeFull
+        info.ownerId +
+        " to " +
+        action +
+        " from this " +
+        selectedAccountData.typeFull
       );
     }
   }
@@ -767,11 +767,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -1220,11 +1220,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     let hist: History;
@@ -1289,10 +1289,10 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
     const tokenOptionsList =
       networkInfo.name != "mainnet"
         ? [
-            "token.cheddar.testnet",
-            "token.meta.pool.testnet",
-            "meta-v2.pool.testnet",
-          ]
+          "token.cheddar.testnet",
+          "token.meta.pool.testnet",
+          "meta-v2.pool.testnet",
+        ]
         : [
           "wrap.near",
           "meta-token.near",
@@ -1577,17 +1577,7 @@ function addNoteClicked() {
   showOKCancel(addNoteOKClicked, showInitial);
 }
 
-function contactOptions(ev: Event) {
-  if (ev.target && ev.target instanceof HTMLElement) {
-    const li = ev.target.closest("li");
-    if (li) {
-      const quesoy = Number(li.id); // d.getClosestChildText(".account-item", ev.target, ".name");
-      console.log(quesoy);
-    }
-  }
-}
-
-function showAdressBook() {
+function showAddressBook() {
   isMoreOptionsOpen = false;
   d.hideErr();
   AddressBook_show();
