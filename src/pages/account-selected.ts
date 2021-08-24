@@ -135,7 +135,7 @@ export async function show(
 }
 
 export function onNetworkChanged(info: NetworkInfo) {
-  let lista = document.querySelector("#combo-add-token-datalist");
+  let list = document.querySelector("#combo-add-token-datalist");
 
   let options = "";
 
@@ -162,7 +162,7 @@ export function onNetworkChanged(info: NetworkInfo) {
       data-contract="2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near">nWBTC</option>`;
   }
 
-  if (lista) lista.innerHTML = options;
+  if (list) list.innerHTML = options;
 }
 
 // page init
@@ -328,11 +328,11 @@ async function addOKClicked() {
   d.showWait();
   try {
     let contractValue = d.inputById("combo-add-token").value;
-    let lista =
+    let list =
       document.querySelector("#combo-add-token-datalist")?.children || [];
 
-    for (let i = 0; i < lista?.length || 0; i++) {
-      let element = lista[i] as HTMLOptionElement;
+    for (let i = 0; i < list?.length || 0; i++) {
+      let element = list[i] as HTMLOptionElement;
 
       if (contractValue == (element as HTMLOptionElement).value) {
         contractValue =
@@ -452,9 +452,9 @@ function showSelectedAccount(fromTimer?: boolean) {
     selectedAccountData.accountInfo.lastBalance -
     selectedAccountData.accountInfo.lockedOther;
 
-  // Debajo de esto son todas acciones que se deben realizar cuando el usuario realiza la acción
+  // After this "if" are all the actions that must be performed when this is a user-initiated refresh
   if (fromTimer) {
-    // Solo actualizo en monto
+    // only update amount
     d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(
       selectedAccountData.total
     );
@@ -473,12 +473,11 @@ function showSelectedAccount(fromTimer?: boolean) {
     usdPriceReady();
   }
 
-  //lleno lista de assets
-
+  // fill assets list
   populateAssets();
   d.showSubPage("assets");
 
-  //lleno lista de activity de account
+  // fill account activity list 
   d.clearContainer("account-history-details");
   d.populateUL(
     "account-history-details",
@@ -526,11 +525,11 @@ async function checkAccountAccess() {
         selectedAccountData.accountInfo.ownerId +
         " to operate this lockup account"
       );
-    //new d.El(".footer .title").hide() //no hay  espacio
+    //new d.El(".footer .title").hide() // no room
   } else {
     //normal account
     checkNormalAccountIsFullAccess();
-    //new d.El(".footer .title").show() //hay espacio
+    //new d.El(".footer .title").show() // room available
   }
 }
 
@@ -632,7 +631,7 @@ async function sendClicked() {
     hideOkCancel();
     let maxAmountToSend = selectedAccountData.available;
 
-    //if it's a lock.c and we didn't add a priv key yet, use contract method "trasnfer" (performLockupContractSend)
+    //if it's a lock.c and we didn't add a priv key yet, use contract method "transfer" (performLockupContractSend)
     if (
       selectedAccountData.accountInfo.type == "lock.c" &&
       !selectedAccountData.accountInfo.privateKey
@@ -717,7 +716,7 @@ async function sendOKClicked() {
     //select send procedure
     let performer;
     let maxAvailable;
-    //if it's a lock.c and we didn't add a priv key yet, use contract method "trasnfer" (performLockupContractSend)
+    //if it's a lock.c and we didn't add a priv key yet, use contract method "transfer" (performLockupContractSend)
     if (
       selectedAccountData.accountInfo.type == "lock.c" &&
       !selectedAccountData.accountInfo.privateKey
@@ -792,7 +791,7 @@ async function performLockupContractSend() {
 //----------------------
 async function stakeClicked() {
   try {
-    //Crear asset
+    // create asset
     selectFirstTab();
     const info = selectedAccountData.accountInfo;
     const stakeAmountBox = d.inputById("stake-amount");
@@ -980,7 +979,7 @@ async function performStake() {
         selectedAccountData.accountInfo.assets.push(asset);
       }
 
-      //Agrego history de account
+      // add account history
       if (!selectedAccountData.accountInfo.history) {
         selectedAccountData.accountInfo.history = [];
       }
@@ -1190,7 +1189,7 @@ async function performLockupContractUnstake() {
 }
 
 function displayReflectTransfer(amountNear: number, dest: string) {
-  //sender and receiver .accountInfo.lastBalance are asnyc updated and saved by background.ts function reflectTransfer()
+  //sender and receiver .accountInfo.lastBalance are async updated and saved by background.ts function reflectTransfer()
   //here we only refresh displayed account data
   if (amountNear == 0) return;
   selectedAccountData.accountInfo.lastBalance -= amountNear;
@@ -1752,9 +1751,9 @@ async function makeFullAccessOKClicked() {
       publicKey = getPublicKey(secretKey);
     } else {
       //a seed phrase
-      const seedPrhase = words.trim().split(" ");
-      checkSeedPhrase(seedPrhase);
-      const result = await parseSeedPhraseAsync(seedPrhase);
+      const seedPhrase = words.trim().split(" ");
+      checkSeedPhrase(seedPhrase);
+      const result = await parseSeedPhraseAsync(seedPhrase);
       secretKey = result.secretKey;
       publicKey = result.publicKey;
     }
