@@ -15,6 +15,10 @@ import {
   OkCancelInit,
   showOKCancel,
 } from "../util/okCancel.js";
+import {
+  selectedAccountData,
+  show as AccountSelectedPage_show,
+} from "./account-selected.js";
 import { checkIfAccountExists } from "../util/search-accounts.js";
 
 export let addressContacts: GContact[] = [];
@@ -63,10 +67,14 @@ function showInitial() {
 }
 
 function backToAccountsClicked() {
-  d.clearContainer("address-list");
-  d.showPage("account-list-main");
-  d.showSubPage("assets");
-  d.byId("ok-cancel-row").classList.add("hidden");
+  if(selectedAccountData.name != "") {
+    AccountSelectedPage_show(selectedAccountData.name, undefined);
+  } else {  
+    d.clearContainer("address-list");
+    d.showPage("account-list-main");
+    d.showSubPage("assets");
+    d.byId("ok-cancel-row").classList.add("hidden");
+  }
 }
 
 async function addOKClicked() {

@@ -81,7 +81,7 @@ import { NetworkInfo } from "../lib/near-api-lite/network.js";
 
 const THIS_PAGE = "account-selected";
 
-let selectedAccountData: ExtendedAccountData;
+export let selectedAccountData: ExtendedAccountData;
 
 let accountInfoName: d.El;
 let accountBalance: d.El;
@@ -114,7 +114,7 @@ export async function show(
       }
       case "asset": {
         if (assetIndex !== undefined) {
-          AssetSelected_show(selectedAccountData, assetIndex);
+          AssetSelected_show(assetIndex);
         }
         break;
       }
@@ -212,6 +212,7 @@ function initPage() {
 }
 
 function backLinkClicked() {
+  selectedAccountData.name = "";
   Pages.backToAccountsList();
 }
 
@@ -313,7 +314,7 @@ function showAssetDetailsClicked(ev: Event) {
     if (li) {
       const assetIndex = Number(li.id); // d.getClosestChildText(".account-item", ev.target, ".name");
       if (isNaN(assetIndex)) return;
-      AssetSelected_show(selectedAccountData, assetIndex);
+      AssetSelected_show(assetIndex);
     }
   }
 }
