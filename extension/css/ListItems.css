@@ -109,8 +109,8 @@ border-style: none;
 	font-weight: 200;
 	color:var(--TextGeneric);
 	max-width: 230px;
-	overflow: hidden;
-	/* text-overflow: clip; */
+	/*overflow: hidden;*/
+	text-overflow:ellipsis; 
 	}
 
   
