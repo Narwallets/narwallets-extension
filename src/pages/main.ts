@@ -243,8 +243,6 @@ export async function show() {
     const isConnected = await askBackground({ code: "isConnected" });
     d.onClickId("back-to-account", backToAccountsClicked);
 
-    autoRefresh();
-
     //d.qs("#disconnect-line").showIf(isConnected);
 
     await tryReposition();
@@ -308,12 +306,6 @@ export function accountItemClicked(ev: Event) {
   }
 }
 
-
-async function autoRefresh() {
-  // var intervalId = window.setInterval(function () {
-  //   refreshAllAccounts(); /// call your function here
-  // }, 5000);
-}
 
 export async function refreshAllAccounts() {
   const accountsRecord = await askBackgroundAllNetworkAccounts();

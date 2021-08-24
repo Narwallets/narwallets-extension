@@ -361,7 +361,7 @@ async function addOKClicked() {
   }
 }
 
-export async function addAssetToken(contractId: string) {
+export async function addAssetToken(contractId: string): Promise<Asset> {
   let item = new Asset();
   item.type = "ft";
 
@@ -386,6 +386,7 @@ export async function addAssetToken(contractId: string) {
   item.balance = c.yton(resultBalance);
 
   selectedAccountData.accountInfo.assets.push(item);
+  return item
 }
 
 function getAccountRecord(accName: string): Promise<Account> {
@@ -964,17 +965,14 @@ async function performStake() {
         foundAsset.history.unshift(hist);
         foundAsset.balance = c.yton(newBalance);
       } else {
-        let asset: Asset;
-        asset = {
-          spec: "idk",
-          url: "",
-          contractId: newStakingPool,
-          balance: c.yton(newBalance),
-          type: "stake",
-          symbol: stakeTabSelected == 1 ? "STNEAR" : "STAKED",
-          icon: stakeTabSelected == 1 ? STNEAR_SVG : STAKE_DEFAULT_SVG,
-          history: [],
-        };
+        let asset = new Asset("idk",
+          "",
+          newStakingPool,
+          c.yton(newBalance),
+          "stake",
+          stakeTabSelected == 1 ? "STNEAR" : "STAKED",
+          stakeTabSelected == 1 ? STNEAR_SVG : STAKE_DEFAULT_SVG
+        );
         asset.history.unshift(hist);
         selectedAccountData.accountInfo.assets.push(asset);
       }
@@ -1360,16 +1358,11 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
                 asset.balance = c.yton(poolAccInfo.staked_balance);
               } else {
                 // need to create
-                let newAsset: Asset = {
-                  balance: c.yton(poolAccInfo.staked_balance),
-                  spec: "",
-                  url: "",
-                  contractId: pool.account_id,
-                  type: "stake",
-                  symbol: "STAKED",
-                  icon: STAKE_DEFAULT_SVG,
-                  history: [],
-                };
+                let newAsset = new Asset("","",
+                  pool.account_id,
+                  c.yton(poolAccInfo.staked_balance),
+                  "stake", "STAKED", STAKE_DEFAULT_SVG
+                )
                 exAccData.accountInfo.assets.push(newAsset);
               }
 
@@ -1386,16 +1379,10 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
                   asset.balance = c.yton(poolAccInfo.unstaked_balance);
                 } else {
                   // need to create
-                  let newAsset: Asset = {
-                    balance: c.yton(poolAccInfo.unstaked_balance),
-                    spec: "",
-                    url: "",
-                    contractId: pool.account_id,
-                    type: "unstake",
-                    symbol: "UNSTAKED",
-                    icon: UNSTAKE_DEFAULT_SVG,
-                    history: [],
-                  };
+                  let newAsset = new Asset ("","",pool.account_id,
+                    c.yton(poolAccInfo.unstaked_balance),
+                    "unstake","UNSTAKED", UNSTAKE_DEFAULT_SVG,
+                  );
                   exAccData.accountInfo.assets.push(newAsset);
                 }
               }

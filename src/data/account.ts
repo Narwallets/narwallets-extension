@@ -10,7 +10,7 @@ export class Account {
   // stakingPool?: string;
   // staked: number = 0; // in the pool & staked
   // unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
-  // rewards: number = 0; //Stakingpool rewards (initial staking - (staked+unstaked))
+  // rewards: number = 0; //Staking-pool rewards (initial staking - (staked+unstaked))
   // stakingPoolPct?: number;
   privateKey?: string;
   ownerId?: string; //ownerId if this is a lockup-contract {type:"lock.c"}
@@ -30,32 +30,31 @@ export class Contact {
 }
 
 export class Asset {
-  spec: string = "";
-  url: string = "";
-  contractId: string = "";
-  balance: number = 0;
-  type: string = "ft";
-  symbol: string = "";
-  history: History[] = [];
-  icon: string = "";
-}
-
-export function addHistory(
-  asset: Asset,
-  type: string,
-  amount: number,
-  icon: string
-) {
-  let hist: History;
-  hist = {
-    amount: amount,
-    date: new Date().toISOString(),
-    type: type,
-    destination: "",
-    icon,
+  
+  history: History[];
+  
+  constructor(
+    public spec: string = "",
+    public url: string = "",
+    public contractId: string = "",
+    public balance: number = 0,
+    public type: string = "ft",
+    public symbol: string = "",
+    public icon: string = "",
+  ){
+    this.history= []
   };
 
-  asset.history.unshift(hist);
+  addHistory(
+    type: string,
+    amount: number,
+    destination?: string,
+    icon?: string
+  ) {
+    let hist = new History(type, amount, destination, icon);
+    this.history.unshift(hist);
+  }
+
 }
 
 export class History {
@@ -64,6 +63,20 @@ export class History {
   amount: number = 0;
   destination: string = "";
   icon: string = "";
+
+  constructor(type: string, amount: number, destination?: string, icon?: string) {
+    this.amount = amount;
+    this.date = new Date().toISOString();
+    this.type = type;
+    this.destination = destination||"";
+    this.icon = icon||"";
+
+    // commented. use https://www.w3schools.com/csSref/css3_pr_text-overflow.asp
+    // if (destination.length> 27)
+    //     destination= destination.substring(0, 24) + "..."
+    // }
+
+  }
 }
 
 export class ExtendedAccountData {
@@ -78,7 +91,6 @@ export class ExtendedAccountData {
   available: number;
   // inThePool: number;
   findAsset(contractId: string, symbol?: string): Asset | undefined {
-    //console.log("HOLA");
 
     for (var asset of this.accountInfo.assets) {
       if (

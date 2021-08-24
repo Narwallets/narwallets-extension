@@ -11,7 +11,6 @@ import {
   Asset,
   ExtendedAccountData,
   History,
-  addHistory,
 } from "../data/account.js";
 import {
   isValidAccountID,
@@ -127,7 +126,7 @@ export async function show(
 }
 
 function inputChanged() {
-  // TO DO: Agregar fee y receive
+  // TO DO: Add fee & receive
   let value = c.toNum(d.inputById("liquid-unstake-amount").value);
   let fee_bp;
   let extraMsg = "";
@@ -167,7 +166,7 @@ function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
 
     let range = BigInt(
       metaPoolContractData.nslp_max_discount_basis_points -
-        metaPoolContractData.nslp_min_discount_basis_points
+      metaPoolContractData.nslp_min_discount_basis_points
     );
     //here 0<after<target, so 0<proportion<range
     const proportion: bigint = (range * liq_after) / target;
@@ -250,7 +249,7 @@ async function confirmWithdraw() {
         accData.name
       );
     }
-    addAssetHistory("withdraw", amount, WITHDRAW_SVG);
+    asset_selected.addHistory("withdraw", amount)
     asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
     if (asset_selected.balance == 0) {
@@ -308,32 +307,15 @@ async function LiquidUnstake() {
   }
 }
 
-function addAssetHistory(type: string, amount: number, icon: string) {
-  let hist: History;
-  hist = {
-    amount: amount,
-    date: new Date().toISOString(),
-    type: type,
-    destination: "",
-    icon,
-  };
-
-  if (type == "send") {
-    contactToAdd.length > 27
-      ? (hist.destination = contactToAdd.substring(0, 24) + "...")
-      : (hist.destination = contactToAdd);
-  }
-
-  asset_selected.history.unshift(hist);
-}
 async function LiquidUnstakeOk() {
   d.showWait();
 
   try {
-    if (!accData.isFullAccess)
+    if (!accData.isFullAccess) {
       throw Error("you need full access on " + accData.name);
+    }
 
-    const amount = c.toNum(d.inputById("liquid-unstake-amount").value);
+    const amount = d.getNumber("#liquid-unstake-amount")
     if (!isValidAmount(amount)) throw Error("Amount is not valid");
 
     const actualSP = asset_selected.contractId;
@@ -345,25 +327,27 @@ async function LiquidUnstakeOk() {
 
     let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
 
-    var result = await askBackgroundCallMethod(
+    var liquidUnstakeResult = await askBackgroundCallMethod(
       actualSP,
       "liquid_unstake",
       { st_near_to_burn: yoctosToUnstake, min_expected_near: "0" },
       accData.name
     );
 
-    if (result.meta > 0) {
-      await addMetaAsset(c.yton(result.meta));
-    }
-
     asset_selected.balance -= c.yton(yoctosToUnstake);
+    asset_selected.addHistory("liquid-unstake", c.yton(yoctosToUnstake))
 
-    addAssetHistory("liquid-unstake", c.yton(yoctosToUnstake), STNEAR_SVG);
     await refreshSaveSelectedAccount();
     hideOkCancel();
     reloadDetails();
     showInitial();
-    d.showSuccess("Liquid unstaked " + c.toStringDec(c.yton(result.near)));
+    d.showSuccess("Liquid unstaked " + c.toStringDec(c.yton(liquidUnstakeResult.near)));
+
+    // leave this for last in cae it fails to add the $META asset
+    if (liquidUnstakeResult.meta > 0) {
+      await addMetaAsset(c.yton(liquidUnstakeResult.meta));
+    }
+
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -372,11 +356,12 @@ async function LiquidUnstakeOk() {
 }
 
 async function addMetaAsset(amount: number) {
-  const asset = accData.accountInfo.assets.find((i) => i.symbol == "META");
-  let networkInfo = await askBackgroundGetNetworkInfo();
+  let asset = accData.accountInfo.assets.find((i) => i.symbol == "META" || i.symbol == "$META");
   if (!asset) {
-    await addAssetToken(networkInfo.liquidStakingGovToken);
+    let networkInfo = await askBackgroundGetNetworkInfo();
+    asset = await addAssetToken(networkInfo.liquidStakingGovToken);
   }
+  asset_selected.addHistory("withdraw", amount);
 }
 
 async function restakeOk() {
@@ -409,13 +394,7 @@ async function restakeOk() {
     );
 
     asset_selected.balance -= c.yton(yoctosToRestake);
-
-    addHistory(
-      asset_selected,
-      "restake",
-      c.yton(yoctosToRestake),
-      STAKE_DEFAULT_SVG
-    );
+    asset_selected.addHistory("restake",c.yton(yoctosToRestake));
 
     // Como estoy restakeando, necesito incrementar el saldo del stake (o inicializarlo)
     let foundAsset: Asset = getOrCreateAsset(
@@ -425,7 +404,7 @@ async function restakeOk() {
       STAKE_DEFAULT_SVG
     );
     foundAsset.balance += c.yton(yoctosToRestake);
-    addHistory(foundAsset, "stake", c.yton(yoctosToRestake), STAKE_DEFAULT_SVG);
+    foundAsset.addHistory("stake", c.yton(yoctosToRestake));
 
     await refreshSaveSelectedAccount();
     hideOkCancel();
@@ -455,16 +434,10 @@ function getOrCreateAsset(
   });
 
   if (!existAssetWithThisPool) {
-    foundAsset = {
-      spec: "idk",
-      url: "",
-      contractId: contractId,
-      balance: 0,
-      type: type,
-      symbol: symbol,
-      icon: icon,
-      history: [],
-    };
+    foundAsset = new Asset (
+      "idk", "",contractId,
+      0,type,symbol,icon
+    );
     accData.accountInfo.assets.push(foundAsset);
   }
   return foundAsset;
@@ -543,17 +516,8 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     foundAsset.balance = c.yton(poolAccInfo.unstaked_balance) + amountToUnstake;
   } else {
     if (asset_selected.symbol == "STAKED") {
-      let asset: Asset;
-      asset = {
-        spec: "",
-        url: "",
-        contractId: asset_selected.contractId,
-        balance: amountToUnstake,
-        type: "unstake",
-        symbol: "UNSTAKED",
-        icon: UNSTAKE_DEFAULT_SVG,
-        history: [],
-      };
+      let asset = new Asset( "","",asset_selected.contractId,
+        amountToUnstake,"unstake","UNSTAKED", UNSTAKE_DEFAULT_SVG)
       asset.history.unshift(hist);
       accData.accountInfo.assets.push(asset);
     } else if (asset_selected.symbol == "STNEAR") {
@@ -662,8 +626,7 @@ async function performSend() {
     );
 
     asset_selected.balance -= amountToSend;
-
-    addAssetHistory("send", amountToSend, SEND_SVG);
+    asset_selected.addHistory("send", amountToSend);
     reloadDetails();
     await saveSelectedAccount();
     hideOkCancel();
@@ -671,13 +634,13 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        accData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        " " +
-        asset_selected.symbol +
-        " to " +
-        toAccName
+      accData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      " " +
+      asset_selected.symbol +
+      " to " +
+      toAccName
     );
 
     checkContactList();
