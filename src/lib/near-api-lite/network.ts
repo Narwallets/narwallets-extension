@@ -19,7 +19,7 @@ export const NetworkList:NetworkInfo[] = [
 
   { name: "mainnet", rootAccount: "near", displayName: "NEAR Mainnet", color: "green", 
       rpc: "https://rpc.mainnet.near.org/", explorerUrl: "https://explorer.near.org/", NearWebWalletUrl:"https://wallet.near.org/",
-      liquidStakingContract: "meta.pool.near", liquidStakingGovToken: "token.meta.pool.near",
+      liquidStakingContract: "meta-pool.near", liquidStakingGovToken: "meta-token.near",
   },
 
   { name: "guildnet", rootAccount: "guildnet", displayName: "OSA Guildnet", color: "cyan", 
@@ -53,7 +53,7 @@ export function setCurrent(networkName:string):void {
   }
   current = networkName
   setRpcUrl(info.rpc)
-  //COMMENTED: this is called from processMsgFromPage-- bettter not broadcast changes
+  //COMMENTED: this is called from processMsgFromPage-- better not broadcast changes
   //chrome.runtime.sendMessage({ code: "network-changed", network:current, networkInfo:info });
 };
 
