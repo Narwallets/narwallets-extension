@@ -11,7 +11,7 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { onNetworkChanged as Account_onNetworkChanged, refreshSelectedAccountAndAssets, show as AccountSelectedPage_show } from "./pages/account-selected.js";
+import { onNetworkChanged as Account_onNetworkChanged, refreshSelectedAccountAndAssets, selectedAccountData, show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
@@ -338,6 +338,9 @@ async function initPopup() {
 }
 
 function autoRefresh() {
+  console.log("Calling autorefresh");
+  console.log(selectedAccountData);
+  console.log(d.activePage);
   if (d.activePage == "account-list-main") {
     refreshAllAccounts();
   }

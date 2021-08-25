@@ -127,7 +127,8 @@ async function searchTheAccountName(accName: string) {
 
     //lockup contract?
     let lockupExtData;
-    const accInfo = new Account();
+    const networkInfo = await askBackgroundGetNetworkInfo();
+    const accInfo = new Account(networkInfo.name);
     accInfo.ownerId = accName;
     const lockupContract = await searchAccounts.getLockupContract(accInfo);
     if (lockupContract) {

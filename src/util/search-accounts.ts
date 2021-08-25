@@ -2,7 +2,7 @@ import * as c from "./conversions.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Account } from "../data/account.js";
-import { askBackground } from "../background/askBackground.js";
+import { askBackground, askBackgroundGetNetworkInfo } from "../background/askBackground.js";
 
 async function checkNotLockup(accName: string) {
   const suffix = await LockupContract.getLockupSuffix();
@@ -81,8 +81,8 @@ export async function checkIfAccountExists(accName: string): Promise<boolean> {
 
 export async function searchAccount(accName: string): Promise<Account> {
   await checkNotLockup(accName);
-
-  let result = new Account();
+  const networkInfo = await askBackgroundGetNetworkInfo();
+  let result = new Account(networkInfo.name);
   await asyncRefreshAccountInfo(accName, result);
 
   return result;

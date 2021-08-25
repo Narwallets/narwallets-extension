@@ -149,18 +149,24 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
         autoUnlockSeconds: global.SecureState.autoUnlockSeconds,
       });
     } else if (msg.code == "get-account") {
-      if (!global.SecureState.accounts[Network.current])
+      if (!global.SecureState.accounts[Network.current]) {
         return Promise.resolve(undefined);
+      }
       return Promise.resolve(
         global.SecureState.accounts[Network.current][msg.accountId]
       );
     } else if (msg.code == "set-account") {
       if (!msg.accountId) return Promise.reject(Error("!msg.accountId"));
       if (!msg.accInfo) return Promise.reject(Error("!msg.accInfo"));
-      if (!global.SecureState.accounts[Network.current])
-        global.SecureState.accounts[Network.current] = {};
-      global.SecureState.accounts[Network.current][msg.accountId] = msg.accInfo;
-      global.saveSecureState();
+      if (!global.SecureState.accounts[msg.accInfo.network]) {
+        global.SecureState.accounts[msg.accInfo.network] = {};
+      }
+      if(!msg.accInfo.network) {
+        console.log("Account without network. ", JSON.stringify(msg.accInfo))
+      } else {
+        global.SecureState.accounts[msg.accInfo.network][msg.accountId] = msg.accInfo;
+        global.saveSecureState();
+      }
       return Promise.resolve();
     } else if (msg.code == "add-contact") {
       if (!msg.name) return Promise.reject(Error("!msg.name"));

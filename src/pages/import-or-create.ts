@@ -75,7 +75,8 @@ async function createImplicitAccount_Step3() {
     d.hideErr() 
     const newKeyPair = KeyPairEd25519.fromString(seedResult.secretKey);
     const accountId = encodeHex(newKeyPair.getPublicKey().data)
-    const accInfo = new Account()
+    const networkInfo = await askBackgroundGetNetworkInfo();
+    const accInfo = new Account(networkInfo.name)
     
     accInfo.privateKey= bs58.encode(newKeyPair.getSecretKey())
     await askBackgroundSetAccount(accountId,accInfo)

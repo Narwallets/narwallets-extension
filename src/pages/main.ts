@@ -311,10 +311,7 @@ export async function refreshAllAccounts() {
   const accountsRecord = await askBackgroundAllNetworkAccounts();
 
   for (let key in accountsRecord) {
-    let acc: Account = new Account();
-    await asyncRefreshAccountInfo(key, acc);
-
-    accountsRecord[key].lastBalance = acc.lastBalance;
+    await asyncRefreshAccountInfo(key, accountsRecord[key]);
 
     const extAcc = new ExtendedAccountData(key, accountsRecord[key]);
 

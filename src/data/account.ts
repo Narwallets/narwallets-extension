@@ -3,21 +3,31 @@ import { nearDollarPrice } from "./global.js";
 
 //user NEAR accounts info type
 export class Account {
-  order: number = 0;
-  type: "acc" | "lock.c" = "acc";
-  note: string = "";
-  lastBalance: number = 0; // native balance from rpc:query/account & near state
-  // stakingPool?: string;
-  // staked: number = 0; // in the pool & staked
-  // unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
-  // rewards: number = 0; //Staking-pool rewards (initial staking - (staked+unstaked))
-  // stakingPoolPct?: number;
-  privateKey?: string;
-  ownerId?: string; //ownerId if this is a lockup-contract {type:"lock.c"}
-  lockedOther: number = 0; //locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
-  assets: Asset[] = []; //assets
-  history: History[] = []; //history
-  contacts: Contact[] = [];
+  public order: number;
+  public note: string;
+  public lockedOther: number;//locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
+  public assets: Asset[] = []; //assets
+    public history: History[] = []; //history
+  constructor(
+    public network: string,
+    public type: "acc" | "lock.c" = "acc",
+    public lastBalance: number = 0, // native balance from rpc:query/account & near state
+    // stakingPool?: string;
+    // staked: number = 0; // in the pool & staked
+    // unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
+    // rewards: number = 0; //Staking-pool rewards (initial staking - (staked+unstaked))
+    // stakingPoolPct?: number;
+    public privateKey?: string,
+    public ownerId?: string, //ownerId if this is a lockup-contract {type:"lock.c"}
+    //contacts: Contact[] = [];
+    
+  ){
+    this.order = 0;
+    this.note = "";
+    this.lockedOther = 0;
+    this.assets = [];
+    this.history= []
+  };
 
   // get totalInThePool(): number {
   //   return this.staked + this.unstaked;
@@ -122,7 +132,7 @@ export class ExtendedAccountData {
     this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
 
     if (!this.accountInfo.assets) this.accountInfo.assets = [];
-    if (!this.accountInfo.contacts) this.accountInfo.contacts = [];
+    //if (!this.accountInfo.contacts) this.accountInfo.contacts = [];
     // if (!this.accountInfo.staked) this.accountInfo.staked = 0;
     // if (!this.accountInfo.unstaked) this.accountInfo.unstaked = 0;
     // this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
