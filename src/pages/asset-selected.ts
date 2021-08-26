@@ -7,11 +7,7 @@ import {
   askBackgroundGetNetworkInfo,
   askBackgroundSetAccount,
 } from "../background/askBackground.js";
-import {
-  Asset,
-  ExtendedAccountData,
-  History,
-} from "../data/account.js";
+import { Asset, ExtendedAccountData, History } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -79,7 +75,7 @@ export async function show(
   setLastSelectedAsset(asset_selected);
 
   if (asset_selected.symbol == "STAKED" && asset_selected.icon == "") {
-    asset_selected.icon = STAKE_DEFAULT_SVG;
+    asset_selected.icon = "STAKE";
     await saveSelectedAccount();
   }
   d.showPage(THIS_PAGE);
@@ -167,7 +163,7 @@ function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
 
     let range = BigInt(
       metaPoolContractData.nslp_max_discount_basis_points -
-      metaPoolContractData.nslp_min_discount_basis_points
+        metaPoolContractData.nslp_min_discount_basis_points
     );
     //here 0<after<target, so 0<proportion<range
     const proportion: bigint = (range * liq_after) / target;
@@ -250,7 +246,7 @@ async function confirmWithdraw() {
         selectedAccountData.name
       );
     }
-    asset_selected.addHistory("withdraw", amount)
+    asset_selected.addHistory("withdraw", amount);
     asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
     if (asset_selected.balance == 0) {
@@ -265,7 +261,6 @@ async function confirmWithdraw() {
     d.showSuccess(
       c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
     );
-    console.log(poolAccInfo);
   } catch (ex) {
     d.showErr(ex);
   } finally {
@@ -298,7 +293,10 @@ async function LiquidUnstake() {
       d.maxClicked("liquid-unstake-amount", "#selected-asset #balance");
     });
     d.byId("fee-amount").innerText = "";
-    metaPoolContract = new MetaPool(asset_selected.contractId, selectedAccountData.name);
+    metaPoolContract = new MetaPool(
+      asset_selected.contractId,
+      selectedAccountData.name
+    );
     metaPoolContractData = await metaPoolContract.get_contract_state();
 
     //searchAccounts.contractState;
@@ -316,12 +314,15 @@ async function LiquidUnstakeOk() {
       throw Error("you need full access on " + selectedAccountData.name);
     }
 
-    const amount = d.getNumber("#liquid-unstake-amount")
+    const amount = d.getNumber("#liquid-unstake-amount");
     if (!isValidAmount(amount)) throw Error("Amount is not valid");
 
     const actualSP = asset_selected.contractId;
 
-    const poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
+    const poolAccInfo = await StakingPool.getAccInfo(
+      selectedAccountData.name,
+      actualSP
+    );
 
     if (poolAccInfo.staked_balance == "0")
       throw Error("No funds staked to unstake");
@@ -336,19 +337,20 @@ async function LiquidUnstakeOk() {
     );
 
     asset_selected.balance -= c.yton(yoctosToUnstake);
-    asset_selected.addHistory("liquid-unstake", c.yton(yoctosToUnstake))
+    asset_selected.addHistory("liquid-unstake", c.yton(yoctosToUnstake));
 
     await refreshSaveSelectedAccount();
     hideOkCancel();
     reloadDetails();
     showInitial();
-    d.showSuccess("Liquid unstaked " + c.toStringDec(c.yton(liquidUnstakeResult.near)));
+    d.showSuccess(
+      "Liquid unstaked " + c.toStringDec(c.yton(liquidUnstakeResult.near))
+    );
 
     // leave this for last in cae it fails to add the $META asset
     if (liquidUnstakeResult.meta > 0) {
       await addMetaAsset(c.yton(liquidUnstakeResult.meta));
     }
-
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -357,7 +359,9 @@ async function LiquidUnstakeOk() {
 }
 
 async function addMetaAsset(amount: number) {
-  let asset = selectedAccountData.accountInfo.assets.find((i) => i.symbol == "META" || i.symbol == "$META");
+  let asset = selectedAccountData.accountInfo.assets.find(
+    (i) => i.symbol == "META" || i.symbol == "$META"
+  );
   if (!asset) {
     let networkInfo = await askBackgroundGetNetworkInfo();
     asset = await addAssetToken(networkInfo.liquidStakingGovToken);
@@ -377,7 +381,10 @@ async function restakeOk() {
 
     const actualSP = asset_selected.contractId;
 
-    const poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
+    const poolAccInfo = await StakingPool.getAccInfo(
+      selectedAccountData.name,
+      actualSP
+    );
 
     if (poolAccInfo.unstaked_balance == "0")
       throw Error("No funds unstaked to restake");
@@ -395,14 +402,14 @@ async function restakeOk() {
     );
 
     asset_selected.balance -= c.yton(yoctosToRestake);
-    asset_selected.addHistory("restake",c.yton(yoctosToRestake));
+    asset_selected.addHistory("restake", c.yton(yoctosToRestake));
 
     // Como estoy restakeando, necesito incrementar el saldo del stake (o inicializarlo)
     let foundAsset: Asset = getOrCreateAsset(
       "STAKED",
       actualSP,
       "stake",
-      STAKE_DEFAULT_SVG
+      "STAKE"
     );
     foundAsset.balance += c.yton(yoctosToRestake);
     foundAsset.addHistory("stake", c.yton(yoctosToRestake));
@@ -435,10 +442,7 @@ function getOrCreateAsset(
   });
 
   if (!existAssetWithThisPool) {
-    foundAsset = new Asset (
-      "idk", "",contractId,
-      0,type,symbol,icon
-    );
+    foundAsset = new Asset("idk", "", contractId, 0, type, symbol, icon);
     selectedAccountData.accountInfo.assets.push(foundAsset);
   }
   return foundAsset;
@@ -456,14 +460,22 @@ async function DelayedUnstakeOk() {
 
     const actualSP = asset_selected.contractId;
 
-    const poolAccInfo = await StakingPool.getAccInfo(selectedAccountData.name, actualSP);
+    const poolAccInfo = await StakingPool.getAccInfo(
+      selectedAccountData.name,
+      actualSP
+    );
 
     if (poolAccInfo.staked_balance == "0")
       throw Error("No funds staked to unstake");
 
     let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
     if (yoctosToUnstake == poolAccInfo.staked_balance) {
-      await askBackgroundCallMethod(actualSP, "unstake_all", {}, selectedAccountData.name);
+      await askBackgroundCallMethod(
+        actualSP,
+        "unstake_all",
+        {},
+        selectedAccountData.name
+      );
     } else {
       await askBackgroundCallMethod(
         actualSP,
@@ -499,7 +511,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
       asset_selected.contractId.length > 23
         ? asset_selected.contractId.substring(0, 20) + "..."
         : asset_selected.contractId,
-    icon: UNSTAKE_DEFAULT_SVG,
+    icon: "UNSTAKE",
   };
 
   selectedAccountData.accountInfo.assets.forEach((asset) => {
@@ -517,8 +529,15 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     foundAsset.balance = c.yton(poolAccInfo.unstaked_balance) + amountToUnstake;
   } else {
     if (asset_selected.symbol == "STAKED") {
-      let asset = new Asset( "","",asset_selected.contractId,
-        amountToUnstake,"unstake","UNSTAKED", UNSTAKE_DEFAULT_SVG)
+      let asset = new Asset(
+        "",
+        "",
+        asset_selected.contractId,
+        amountToUnstake,
+        "unstake",
+        "UNSTAKED",
+        UNSTAKE_DEFAULT_SVG
+      );
       asset.history.unshift(hist);
       selectedAccountData.accountInfo.assets.push(asset);
     } else if (asset_selected.symbol == "STNEAR") {
@@ -635,13 +654,13 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      " " +
-      asset_selected.symbol +
-      " to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        " " +
+        asset_selected.symbol +
+        " to " +
+        toAccName
     );
 
     checkContactList();
@@ -691,12 +710,16 @@ async function refreshSaveSelectedAccount() {
   await saveSelectedAccount();
 
   selectedAccountData.available =
-    selectedAccountData.accountInfo.lastBalance - selectedAccountData.accountInfo.lockedOther;
+    selectedAccountData.accountInfo.lastBalance -
+    selectedAccountData.accountInfo.lockedOther;
   selectedAccountData.total = selectedAccountData.available;
 }
 
 async function saveSelectedAccount(): Promise<any> {
-  return askBackgroundSetAccount(selectedAccountData.name, selectedAccountData.accountInfo);
+  return askBackgroundSetAccount(
+    selectedAccountData.name,
+    selectedAccountData.accountInfo
+  );
 }
 
 async function checkContactList() {
