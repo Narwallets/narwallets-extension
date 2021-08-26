@@ -948,9 +948,9 @@ async function performStake() {
       hist = {
         amount: amountToStake,
         date: new Date().toISOString(),
-        type: "stake",
+        type: stakeTabSelected == 1 ? "liquid-stake" : "stake",
         destination: "",
-        icon: "STAKE",
+        icon: stakeTabSelected == 1 ? "LIQUID-STAKE" : "STAKE",
       };
       let foundAsset: Asset = new Asset();
 

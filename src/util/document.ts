@@ -3,6 +3,7 @@
 //---------------------
 import * as c from "./conversions.js";
 import {
+  LIQUID_STAKE_DEFAULT_SVG,
   SEND_SVG,
   STAKE_DEFAULT_SVG,
   UNSTAKE_DEFAULT_SVG,
@@ -409,6 +410,9 @@ export function appendTemplate(
           break;
         case "send":
           data.icon = SEND_SVG;
+          break;
+        case "liquid-stake":
+          data.icon = LIQUID_STAKE_DEFAULT_SVG;
           break;
         default:
           data.icon = "";
