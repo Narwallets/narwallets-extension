@@ -1597,6 +1597,8 @@ async function DeleteAccount() {
 
     await refreshSaveSelectedAccount(); //refresh account to have updated balance
 
+    populateSendCombo("send-balance-to-account-name");
+
     d.showSubPage("account-selected-delete");
     d.inputById("send-balance-to-account-name").value =
       selectedAccountData.accountInfo.ownerId || "";
@@ -1623,6 +1625,11 @@ async function AccountDeleteOKClicked() {
 
     const beneficiary = d.inputById("send-balance-to-account-name").value;
     if (!beneficiary) throw Error("Enter the beneficiary account");
+
+    let accountExists = await searchAccounts.checkIfAccountExists(beneficiary);
+    if (!accountExists) {
+      throw Error("Beneficiary Account does not exists");
+    }
 
     const result = await askBackgroundApplyTxAction(
       toDeleteAccName,
