@@ -2,6 +2,12 @@
 //--- DOM UTILITIES ---
 //---------------------
 import * as c from "./conversions.js";
+import {
+  LIQUID_STAKE_DEFAULT_SVG,
+  SEND_SVG,
+  STAKE_DEFAULT_SVG,
+  UNSTAKE_DEFAULT_SVG,
+} from "./svg_const.js";
 
 export type ClickHandler =
   | (() => void)
@@ -90,7 +96,6 @@ export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
       }
     };
     document.addEventListener("keypress", globalEnterKeyPress);
-
   } catch (ex) {
     console.error("ERR: onGlobalKeyPress() " + ex.message);
   }
@@ -102,7 +107,7 @@ export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
 export function removeGlobalKeyPress() {
   try {
     document.removeEventListener("keypress", globalEnterKeyPress);
-    globalEnterKeyPress = () => { };
+    globalEnterKeyPress = () => {};
   } catch (ex) {
     console.error("ERR: removeGlobalKeyPress() " + ex.message);
   }
@@ -228,15 +233,11 @@ export function showByClass(id: string, className: string) {
  * @param id
  */
 export function showPage(id: string) {
-  console.log(`showPage(${id})`);
   activePage = id;
   showByClass(id, "appface");
 }
 export function showSubPage(id: string) {
-  console.log(`showSubPage(${id})`);
   var stackTrace = Error().stack;
-  console.log(stackTrace);
-
   showByClass(id, "subpage");
   let primerRadio = document.querySelectorAll("#" + id + ".subpage .radio.one");
   if (primerRadio.length > 0) {
@@ -266,7 +267,7 @@ function addShowErr() {
 export function hideErr() {
   try {
     byId(ERR_DIV).innerHTML = "";
-  } catch { }
+  } catch {}
 }
 
 var errorId = 0;
@@ -398,6 +399,27 @@ export function appendTemplate(
 ) {
   const newLI = document.createElement(elType) as HTMLLIElement;
   const templateElem = byId(templateId);
+  if (templateId.includes("history")) {
+    if (!data.icon.startsWith("<svg")) {
+      switch (data.type) {
+        case "unstake":
+          data.icon = UNSTAKE_DEFAULT_SVG;
+          break;
+        case "stake":
+          data.icon = STAKE_DEFAULT_SVG;
+          break;
+        case "send":
+          data.icon = SEND_SVG;
+          break;
+        case "liquid-stake":
+          data.icon = LIQUID_STAKE_DEFAULT_SVG;
+          break;
+        default:
+          data.icon = "";
+          break;
+      }
+    }
+  }
   if (!templateElem)
     console.error("appendTemplate, template id='" + templateId + "' NOT FOUND");
   //-- if data-id has value, set it

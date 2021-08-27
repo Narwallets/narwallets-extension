@@ -235,8 +235,6 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
   selectedAccountData.total = mainAccInfo.lastBalance;
   selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
 
-
-
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
     if (asset.type == "stake" || asset.type == "unstake") {
       if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
@@ -329,6 +327,9 @@ async function addOKClicked() {
   d.showWait();
   try {
     let contractValue = d.inputById("combo-add-token").value;
+    if (!contractValue) {
+      throw new Error("Contract ID empty");
+    }
     let list =
       document.querySelector("#combo-add-token-datalist")?.children || [];
 
@@ -387,7 +388,7 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
   item.balance = c.yton(resultBalance);
 
   selectedAccountData.accountInfo.assets.push(item);
-  return item
+  return item;
 }
 
 function getAccountRecord(accName: string): Promise<Account> {
@@ -415,8 +416,6 @@ async function selectAndShowAccount(accName: string) {
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Pages.setLastSelectedAccount(selectedAccountData);
   populateSendCombo("send-contact-combo");
-
-  console.log(selectedAccountData);
 
   if (accInfo.ownerId && accInfo.type == "lock.c" && !accInfo.privateKey) {
     //lock.c is read-only, but do we have full access on the owner?
@@ -479,7 +478,7 @@ function showSelectedAccount(fromTimer?: boolean) {
   populateAssets();
   d.showSubPage("assets");
 
-  // fill account activity list 
+  // fill account activity list
   d.clearContainer("account-history-details");
   d.populateUL(
     "account-history-details",
@@ -524,8 +523,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-        selectedAccountData.accountInfo.ownerId +
-        " to operate this lockup account"
+          selectedAccountData.accountInfo.ownerId +
+          " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() // no room
   } else {
@@ -617,11 +616,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-        info.ownerId +
-        " to " +
-        action +
-        " from this " +
-        selectedAccountData.typeFull
+          info.ownerId +
+          " to " +
+          action +
+          " from this " +
+          selectedAccountData.typeFull
       );
     }
   }
@@ -768,11 +767,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -949,9 +948,9 @@ async function performStake() {
       hist = {
         amount: amountToStake,
         date: new Date().toISOString(),
-        type: "stake",
+        type: stakeTabSelected == 1 ? "liquid-stake" : "stake",
         destination: "",
-        icon: STAKE_DEFAULT_SVG,
+        icon: stakeTabSelected == 1 ? "LIQUID-STAKE" : "STAKE",
       };
       let foundAsset: Asset = new Asset();
 
@@ -966,7 +965,8 @@ async function performStake() {
         foundAsset.history.unshift(hist);
         foundAsset.balance = c.yton(newBalance);
       } else {
-        let asset = new Asset("idk",
+        let asset = new Asset(
+          "idk",
           "",
           newStakingPool,
           c.yton(newBalance),
@@ -1218,11 +1218,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     let hist: History;
@@ -1232,7 +1232,7 @@ async function performSend() {
       type: "send",
       destination:
         toAccName.length > 27 ? toAccName.substring(0, 24) + "..." : toAccName,
-      icon: SEND_SVG,
+      icon: "SEND",
     };
     selectedAccountData.accountInfo.history.unshift(hist);
 
@@ -1287,22 +1287,22 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
     const tokenOptionsList =
       networkInfo.name != "mainnet"
         ? [
-          "token.cheddar.testnet",
-          "token.meta.pool.testnet",
-          "meta-v2.pool.testnet",
-        ]
+            "token.cheddar.testnet",
+            "token.meta.pool.testnet",
+            "meta-v2.pool.testnet",
+          ]
         : [
-          "wrap.near",
-          "meta-token.near",
-          "meta-pool.near",
-          "berryclub.ek.near",
-          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-        ];
+            "wrap.near",
+            "meta-token.near",
+            "meta-pool.near",
+            "berryclub.ek.near",
+            "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+            "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+            "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+            "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+            "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+            "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+          ];
 
     let checked: Record<string, boolean> = {};
 
@@ -1359,11 +1359,15 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
                 asset.balance = c.yton(poolAccInfo.staked_balance);
               } else {
                 // need to create
-                let newAsset = new Asset("","",
+                let newAsset = new Asset(
+                  "",
+                  "",
                   pool.account_id,
                   c.yton(poolAccInfo.staked_balance),
-                  "stake", "STAKED", STAKE_DEFAULT_SVG
-                )
+                  "stake",
+                  "STAKED",
+                  STAKE_DEFAULT_SVG
+                );
                 exAccData.accountInfo.assets.push(newAsset);
               }
 
@@ -1380,9 +1384,14 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
                   asset.balance = c.yton(poolAccInfo.unstaked_balance);
                 } else {
                   // need to create
-                  let newAsset = new Asset ("","",pool.account_id,
+                  let newAsset = new Asset(
+                    "",
+                    "",
+                    pool.account_id,
                     c.yton(poolAccInfo.unstaked_balance),
-                    "unstake","UNSTAKED", UNSTAKE_DEFAULT_SVG,
+                    "unstake",
+                    "UNSTAKED",
+                    UNSTAKE_DEFAULT_SVG
                   );
                   exAccData.accountInfo.assets.push(newAsset);
                 }
@@ -1588,6 +1597,8 @@ async function DeleteAccount() {
 
     await refreshSaveSelectedAccount(); //refresh account to have updated balance
 
+    populateSendCombo("send-balance-to-account-name");
+
     d.showSubPage("account-selected-delete");
     d.inputById("send-balance-to-account-name").value =
       selectedAccountData.accountInfo.ownerId || "";
@@ -1614,6 +1625,11 @@ async function AccountDeleteOKClicked() {
 
     const beneficiary = d.inputById("send-balance-to-account-name").value;
     if (!beneficiary) throw Error("Enter the beneficiary account");
+
+    let accountExists = await searchAccounts.checkIfAccountExists(beneficiary);
+    if (!accountExists) {
+      throw Error("Beneficiary Account does not exists");
+    }
 
     const result = await askBackgroundApplyTxAction(
       toDeleteAccName,
