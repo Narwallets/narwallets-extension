@@ -191,14 +191,17 @@
   margin: auto;
   margin-top: 10px;
   margin-bottom: 0px;
-
   max-height: 24px;
   height: 15px;
-  width: 260px;
   text-align: center;
   color: var(--BlockText);
   font-size: 12px;
   font-weight: 200;
+}
+
+span#icon img {
+  width: 24px;
+  height: 24px;
 }
 
 .accountdetsbalance {

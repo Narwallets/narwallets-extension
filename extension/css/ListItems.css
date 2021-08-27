@@ -3,7 +3,7 @@
 .accountlistitem
 {
 	position: relative;
-	height: 48px;
+	height: 56px;
 	width: 460px;
 	display: inline-block;
 	font-weight: lighter;
@@ -24,21 +24,20 @@
 .accountlistname 
 {
 	position:relative;
-
 	color:var(--BlockText);
 	font-size: 14px;
-    font-weight: 100;
+	font-weight: 100;
 	overflow-x:hidden;
 	display: inline-block;
 	text-align: left;
 	left: 0px;
-    padding-left: 6px;
-	padding-top: 5px;
+	padding-left: 6px;
+	padding-top: 12px;
 	padding-bottom: 1px;
 	width: 470px;
 	height:17px;
 	top:0px;
-	background-color: var(--Block);;
+	background-color: var(--Block);
 }
 
 .accountlistbalance 
@@ -52,8 +51,7 @@
 	width: 260px;
 	right: 5px;
 	height: 20px;
-	top:20px;
-
+	top: 30px;
 }
 
 .accountlistcomment 
