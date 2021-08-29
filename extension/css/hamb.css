@@ -110,6 +110,7 @@ aside>nav>li {
   font-size  : 1.7em;
   font-weight: 250;
   z-index    : 93;
+  margin-right: 10px;
 }
 
 aside>nav>li:hover {
