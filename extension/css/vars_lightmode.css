@@ -5,14 +5,12 @@
 @import url('https://rsms.me/inter/inter.css');
 
 body {
-	font-family: 'Inter', sans-serif;
-	 !important
+	font-family: 'Inter', sans-serif !important;
 }
 
 @supports (font-variation-settings: normal) {
 	body {
-		font-family: 'Inter var', sans-serif;
-		 !important
+		font-family: 'Inter var', sans-serif !important;
 	}
 }
 
@@ -23,7 +21,7 @@ body {
 
 
 
-/*Colores */
+/*Colors */
 
 :root {
 
@@ -41,14 +39,14 @@ body {
 
 	--TextGeneric: rgb(6, 31, 68);
 
-	/*--HoverColor:rgb(255, 238, 4); /* color de hover en las listas */
+	/*--HoverColor:rgb(255, 238, 4); /* color de hover en las lists */
 
 	--HoverColor: rgb(212 186 102);
 
 	--HighLight: rgb(255, 196, 0);
-	/* color para textos importantes */
+	/* color para important texts */
 
-	--ControlBackgroud: rgb(147, 215, 255);
+	--ControlBackground: rgb(147, 215, 255);
 
 	--ControlText: rgb(255, 255, 255);
 

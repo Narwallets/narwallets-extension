@@ -232,26 +232,19 @@
 
 .generic {
   width: 130px;
-  height: 60px;
-
+  height: 65px;
   margin: 8px;
   margin-top: 15px;
   padding: 10px;
-
   font-size: 16px;
   font-weight: 200;
-
-  padding: 0px;
-  padding-top: 0px;
-
+  padding: 5px;
   display: block;
   border-style: solid;
   border-width: 1px;
   color: var(--ControlText);
   border-radius: 8px;
-
   background: var(--Block);
-
   align-content: center;
 }
 

@@ -37,6 +37,7 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
     if (!lockup) return;
   } else {
     //normal account
+    let network = await askBackgroundGetNetworkInfo()
     let stateResultYoctos;
     try {
       stateResultYoctos = await askBackground({
@@ -44,7 +45,7 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
         accountId: accName,
       });
     } catch (ex) {
-      const reason = ex.message.replace("while viewing", "");
+      let reason = ex.message.includes("name:UNKNOWN_ACCOUNT") ? `account ${accName} not found in ${network.name}` : ex.message;
       throw Error(reason);
     }
 

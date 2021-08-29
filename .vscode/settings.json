@@ -21,6 +21,7 @@
         "subpages",
         "topbar",
         "topbarcaption",
-        "topbarleft"
+        "topbarleft",
+        "unselectable"
     ]
 }

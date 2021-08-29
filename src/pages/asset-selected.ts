@@ -163,7 +163,7 @@ function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
 
     let range = BigInt(
       metaPoolContractData.nslp_max_discount_basis_points -
-        metaPoolContractData.nslp_min_discount_basis_points
+      metaPoolContractData.nslp_min_discount_basis_points
     );
     //here 0<after<target, so 0<proportion<range
     const proportion: bigint = (range * liq_after) / target;
@@ -654,13 +654,13 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        " " +
-        asset_selected.symbol +
-        " to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      " " +
+      asset_selected.symbol +
+      " to " +
+      toAccName
     );
 
     checkContactList();
@@ -756,7 +756,6 @@ async function addContactToList() {
 
     addressContacts.push(contactToSave);
 
-    d.showSuccess("Success");
     hideOkCancel();
     populateSendCombo("combo-send-asset");
     await saveContactOnBook(contactToSave.accountId, contactToSave);

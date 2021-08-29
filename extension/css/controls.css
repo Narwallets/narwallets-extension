@@ -1,57 +1,56 @@
 /*#region text with button */
 
 .inputboxwithbutton {
-width: 360px;
-height: 30px;
-display: block;
-position: relative;
-margin: auto;
-padding: 10px;
+  width   : 360px;
+  height  : 30px;
+  display : block;
+  position: relative;
+  margin  : auto;
+  padding : 10px;
 }
 
 .inputboxwithbutton input[type="text"] {
-position: absolute;
-border-style: solid;
-border-width: 1px;
-border-radius: 16px;
-border-top-right-radius: 0px;
-border-bottom-right-radius: 0px;
-padding: 5px;
-text-align: center;
-width: 220px;
-height: 32px;
-left: 32px;
-top: 1px;
-border-color: var(--Block);
-background-color: var(--ControlBackgroud);
-color:var(--ControlAltText);
+  position                  : absolute;
+  border-style              : solid;
+  border-width              : 1px;
+  border-radius             : 16px;
+  border-top-right-radius   : 0px;
+  border-bottom-right-radius: 0px;
+  padding                   : 5px;
+  text-align                : center;
+  width                     : 220px;
+  height                    : 32px;
+  left                      : 32px;
+  top                       : 1px;
+  border-color: var(--InputBorder);
+  background-color          : var(--ControlBackground);
+  color                     : var(--ControlAltText);
 }
 
 .inputboxwithbutton input[type="text"]:focus {
-  outline: none;
+  outline     : none;
   border-color: var(--HighLight);
 }
 
 .inputboxwithbutton button {
-position: absolute;
-border-style: solid;
-border-width: 1px;
-
-text-align: center;
-width: 80px;
-height: 32px;
-left: 260px;
-top: 11px;
-border-top-right-radius: 16px;
-border-bottom-right-radius: 16px;
-background:var(--Block);
-color:var(--ControlText);
-border-color: var(--Block);
+  position    : absolute;
+  border-style: solid;
+  border-width: 1px;
+  text-align                : center;
+  width                     : 80px;
+  height                    : 32px;
+  left                      : 260px;
+  top                       : 11px;
+  border-top-right-radius   : 16px;
+  border-bottom-right-radius: 16px;
+  background                : var(--Block);
+  color                     : var(--ControlText);
+  border-color: var(--ButtonBorder);
 }
 
 .inputboxwithbutton button:hover {
 
-  cursor:hand;
+  cursor: hand;
 
 }
 
@@ -62,47 +61,47 @@ border-color: var(--Block);
 
 
 .combobox {
-position:relative;
+  position: relative;
 }
 
 .combobox select {
-background-color:var(--ControlBackgroud);
-color:var(--ControlText);
-padding: 5px;
-padding-right: 10px;
-width: 90%;
-border: none;
-border-radius: 5px;
-font-size: 14px;  
--webkit-appearance: button;
+  background-color  : var(--ControlBackground);
+  color             : var(--ControlText);
+  padding           : 5px;
+  padding-right     : 10px;
+  width             : 90%;
+  border            : none;
+  border-radius     : 5px;
+  font-size         : 14px;
+  -webkit-appearance: button;
 
-appearance: button;
-outline: none;
+  appearance: button;
+  outline   : none;
 }
 
 .combobox::before {
-content: "\f13a";
-font-family: FontAwesome;
-position: absolute;
-top: 0;
-right: 0;
-width: 20%;
-height: 100%;
-text-align: center;
-font-size: 28px;
-line-height: 45px;
-color: rgba(255, 255, 255, 0.5);
-background-color: rgba(255, 255, 255, 0.1);
-pointer-events: none;
+  content         : "\f13a";
+  font-family     : FontAwesome;
+  position        : absolute;
+  top             : 0;
+  right           : 0;
+  width           : 20%;
+  height          : 100%;
+  text-align      : center;
+  font-size       : 28px;
+  line-height     : 45px;
+  color           : rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  pointer-events  : none;
 }
 
 .combobox:hover::before {
-color: rgba(255, 255, 255, 0.6);
-background-color: rgba(255, 255, 255, 0.2);
+  color           : rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .combobox select option {
-padding: 30px;
+  padding: 30px;
 }
 
 /*#endregion */
@@ -111,62 +110,78 @@ padding: 30px;
 
 
 .combotextbox {
-width: 470px;
-height: 30px;
-display: block;
-position: relative;
-padding: 5px;
+  width   : 470px;
+  height  : 30px;
+  display : block;
+  position: relative;
+  padding : 5px;
 }
 
-.combotextbox  input[type="text"]  {/*position: relative;*/border-style: solid;border-width: 1px;border-radius: 16px;padding: 5px;text-align: center;width: 390px;height: 32px;margin: auto;margin-bottom: 10px;top: 1px;border-color: var(--Block);background-color: var(--ControlBackgroud);color:var(--ControlAltText);}
+.combotextbox input[type="text"] {
+  /*position: relative;*/
+  border-style    : solid;
+  border-width    : 1px;
+  border-radius   : 16px;
+  padding         : 5px;
+  text-align      : center;
+  width           : 390px;
+  height          : 32px;
+  margin          : auto;
+  margin-bottom   : 10px;
+  top             : 1px;
+  border-color: var(--HighLight);
+  background-color: var(--ControlBackground);
+  color           : var(--ControlAltText);
+}
 
-.combotextbox  input[type="text"]:focus  {
-  outline: none;
+.combotextbox input[type="text"]:focus {
+  outline     : none;
   border-color: var(--HighLight);
 }
+
 .combotextboxtoken {
-width: 480px;
-height: 40px;
-display: block;
-position: relative;
-padding: 5px;
+  width   : 480px;
+  height  : 40px;
+  display : block;
+  position: relative;
+  padding : 5px;
 
 }
 
-.combotextboxtoken  input[type="text"]  {
-  
-position: absolute;
-  
-border-style: solid;
-  
-border-width: 1px;
-  
-border-radius: 16px;
-  
-padding: 5px;
-  
-/* padding-right: 10px; */
-  
-width: 210px;
-  
-height: 32px;
-  
-/* margin: auto; */
-  
-left: 120px;
-  
-top: 1px;
-  
-border-color: var(--Block);
-  
-background-color: var(--ControlBackgroud);
-  
-color:var(--ControlAltText);
+.combotextboxtoken input[type="text"] {
+
+  position: absolute;
+
+  border-style: solid;
+
+  border-width: 1px;
+
+  border-radius: 16px;
+
+  padding: 5px;
+
+  /* padding-right: 10px; */
+
+  width: 210px;
+
+  height: 32px;
+
+  /* margin: auto; */
+
+  left: 120px;
+
+  top: 1px;
+
+  border-color: var(--Block);
+
+  background-color: var(--ControlBackground);
+
+  color: var(--ControlAltText);
 }
 
-.combotextboxtoken  input[type="text"]:focus  {
-  
-  outline: none;
+.combotextboxtoken input[type="text"]:focus {
+
+  outline     : none;
   border-color: var(--HighLight);
 
 }
@@ -176,16 +191,15 @@ color:var(--ControlAltText);
 
 /*#region checkboxcontainer*/
 
-.checkbox-container
-{
+.checkbox-container {
 
-display: block;
-align-content: center;
+  display      : block;
+  align-content: center;
 }
 
-.checkbox-container label
-{ position:relative;
-top:-12px;
+.checkbox-container label {
+  position: relative;
+  top     : -12px;
 
 }
 
@@ -196,105 +210,103 @@ top:-12px;
 /*#region misc */
 
 label {
-color:var(--TextGeneric);
-font-weight: 300;
-font-size: 14px;
-padding: 4px;
-width: 300px;
-height: auto;
-overflow-wrap: break-word;
-margin: auto;
+  color        : var(--TextGeneric);
+  font-weight  : 300;
+  font-size    : 14px;
+  padding      : 4px;
+  width        : 300px;
+  height       : auto;
+  overflow-wrap: break-word;
+  margin       : auto;
 }
 
-input[type="text"]  {
-border-style: solid;
-border-width: 1px;
-border-radius: 16px;
-border-color: var(--Block);
-background-color: var(--ControlBackgroud);
-height: 32px;
-padding: 5px;
-width: 300px;
-text-align: center;
-margin:10px;
-color:var(--ControlAltText);
+input[type="text"] {
+  border-style    : solid;
+  border-width    : 1px;
+  border-radius   : 16px;
+  border-color: var(--HighLight);
+  background-color: var(--ControlBackground);
+  height          : 32px;
+  padding         : 5px;
+  width           : 300px;
+  text-align      : center;
+  margin          : 10px;
+  color           : var(--ControlAltText);
 }
 
-input[type="text"]:focus 
-{
-  outline: none;
+input[type="text"]:focus {
+  outline     : none;
   border-color: var(--HighLight);
 }
 
-.formgeneric
-{
-  display:block;
-  text-align: left;
+.formgeneric {
+  display    : block;
+  text-align : left;
   margin-left: 140px;
 }
 
-input[type='radio'], label{
+input[type='radio'],
+label {
   vertical-align: baseline;
-  left:50px;
-  padding: 5px;
-  margin: 2px;
+  left          : 50px;
+  padding       : 5px;
+  margin        : 2px;
 }
 
-input[type="password"]  {
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 16px;
-  border-color: var(--Block);
-  height: 32px;
-  padding: 5px;
-  width: 300px;
-  text-align: center;
-  margin:10px;
-  background-color: var(--ControlBackgroud);
-  color:var(--ControlAltText);
-  }
+input[type="password"] {
+  border-style    : solid;
+  border-width    : 1px;
+  border-radius   : 16px;
+  border-color    : var(--Block);
+  height          : 32px;
+  padding         : 5px;
+  width           : 300px;
+  text-align      : center;
+  margin          : 10px;
+  background-color: var(--ControlBackground);
+  color           : var(--ControlAltText);
+}
 
-  input[type="password"]:focus 
-  {
-    outline: none;
-    border-color: var(--HighLight);
-  }
+input[type="password"]:focus {
+  outline     : none;
+  border-color: var(--HighLight);
+}
 
 
 .button-group {
-position: fixed;
-display: block;
-text-align: right;
-top: 552px;
-left: 5px;
-width: 470px;
-height: 45px;
+  position  : fixed;
+  display   : block;
+  text-align: right;
+  top       : 552px;
+  left      : 5px;
+  width     : 470px;
+  height    : 45px;
 
-margin: 0px;
-z-index: 98;
+  margin : 0px;
+  z-index: 98;
 }
 
 
 
 
 .boximportante {
-position: relative;
-width: 400px;
-margin: 20px;
-margin-left: auto;
-margin-right: auto;
+  position    : relative;
+  width       : 400px;
+  margin      : 20px;
+  margin-left : auto;
+  margin-right: auto;
 
-padding: 10px;
+  padding: 10px;
 
-height: auto;
-font-size: 17px;
-font-weight: 300;
+  height     : auto;
+  font-size  : 17px;
+  font-weight: 300;
 
-background-color:var(--HighLight);
-color: var(--Block);
-border-style: solid;
-border-width: 1px;
-overflow-wrap: break-word;
+  background-color: var(--HighLight);
+  color           : var(--Block);
+  border-style    : solid;
+  border-width    : 1px;
+  overflow-wrap   : break-word;
 
 }
 

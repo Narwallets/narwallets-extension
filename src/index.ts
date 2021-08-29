@@ -331,7 +331,7 @@ async function initPopup() {
   // set auto-refresh based on page shown
   window.setInterval(async function () {
     autoRefresh();
-  }, 5000);
+  }, 15000);
 
   //show main page
   return Pages.show();
@@ -350,64 +350,64 @@ function autoRefresh() {
 }
 
 function openTermsOfUseOnNewWindow() {
-    localStorageSet({
-      reposition: "create-user",
-      email: d.inputById("email").value,
-    });
-    chrome.windows.create({
-      url: "https://narwallets.com/terms.html",
-    });
-    return false;
+  localStorageSet({
+    reposition: "create-user",
+    email: d.inputById("email").value,
+  });
+  chrome.windows.create({
+    url: "https://narwallets.com/terms.html",
+  });
+  return false;
+}
+
+//event to inform background.js we're unloading (starts auto-lock timer)
+addEventListener(
+  "unload",
+  function (event) {
+    //@ts-ignore
+    background.postMessage({ code: "popupUnloading" }, "*");
+  },
+  true
+);
+
+//listen to background messages
+chrome.runtime.onMessage.addListener(function (msg) {
+  if (msg.code == "can-init-popup") {
+    initPopup();
   }
+});
 
-  //event to inform background.js we're unloading (starts auto-lock timer)
-  addEventListener(
-    "unload",
-    function (event) {
-      //@ts-ignore
-      background.postMessage({ code: "popupUnloading" }, "*");
-    },
-    true
-  );
-
-  //listen to background messages
-  chrome.runtime.onMessage.addListener(function (msg) {
-    if (msg.code == "can-init-popup") {
-      initPopup();
-    }
-  });
-
-  window.onload = function () {
-    // dark light mode
-    // default is dark
-    chrome.storage.local.get("popupConfig", (obj) => {
-      if (chrome.runtime.lastError) {
-        console.log(JSON.stringify(chrome.runtime.lastError));
-      }
-      else {
-        console.log(obj);
-        if (obj?.popupConfig.lightMode) {
-          switchDarkLight(10);
-        }
-      }
-    });
-
-  };
-
-  var background: Window | undefined;
-  //wake-up background page
-  //WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
-  chrome.runtime.getBackgroundPage((bgpage) => {
+window.onload = function () {
+  // dark light mode
+  // default is dark
+  chrome.storage.local.get("popupConfig", (obj) => {
     if (chrome.runtime.lastError) {
-      console.error(JSON.stringify(chrome.runtime.lastError));
-      alert(chrome.runtime.lastError);
-    } else {
-      background = bgpage;
-
-      //@ts-ignore
-      background.postMessage({ code: "popupLoading" }, "*");
-      //will reply with "can-init-popup" after retrieving data from localStorage
+      console.log(JSON.stringify(chrome.runtime.lastError));
+    }
+    else {
+      console.log(obj);
+      if (obj?.popupConfig.lightMode) {
+        switchDarkLight(10);
+      }
     }
   });
+
+};
+
+var background: Window | undefined;
+//wake-up background page
+//WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
+chrome.runtime.getBackgroundPage((bgpage) => {
+  if (chrome.runtime.lastError) {
+    console.error(JSON.stringify(chrome.runtime.lastError));
+    alert(chrome.runtime.lastError);
+  } else {
+    background = bgpage;
+
+    //@ts-ignore
+    background.postMessage({ code: "popupLoading" }, "*");
+    //will reply with "can-init-popup" after retrieving data from localStorage
+  }
+});
 
 
