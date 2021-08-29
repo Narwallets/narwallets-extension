@@ -212,9 +212,6 @@
 }
 
 .remove {
-  position: absolute;
-  top: 5px;
-  left: 420px;
   background-image: url("../icons/SVG/minus_dark.svg");
 }
 
