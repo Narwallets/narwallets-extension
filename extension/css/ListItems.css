@@ -3,7 +3,7 @@
 .accountlistitem
 {
 	position: relative;
-	height: 56px;
+	height: 62px;
 	width: 460px;
 	display: inline-block;
 	font-weight: lighter;
@@ -26,17 +26,17 @@
 	position:relative;
 	color:var(--BlockText);
 	font-size: 14px;
-	font-weight: 100;
+	font-weight: 250;
 	overflow-x:hidden;
 	display: inline-block;
 	text-align: left;
 	left: 0px;
 	padding-left: 6px;
-	padding-top: 12px;
-	padding-bottom: 1px;
+	padding-top: 11px;
+	padding-bottom: 2px;
 	width: 470px;
 	height:17px;
-	top:0px;
+	top: 0px;
 	background-color: var(--Block);
 }
 
@@ -50,7 +50,7 @@
 	display: block;
 	width: 260px;
 	right: 5px;
-	height: 20px;
+	height: 22px;
 	top: 30px;
 }
 
@@ -112,26 +112,22 @@ border-style: none;
 
   
   .accountassettoken {
-	
-	position: absolute;
-	display: block;
-	font-size: 12px;
-	
-	top: 0px;
-	left: 0px;
-	width: 464px;
-	height: 16px;
-	padding-top: 5px;
-	padding-right:5px;
-	border-style: none;
-	border-radius: 0px;
-	
-	background-color: var(--Block);
-	text-align: right;
-	font-weight: 100;
-	color:var(--BlockText);
-	
-  }
+	position: absolute;
+	display: block;
+	font-size: 12px;
+	top: 0px;
+	left: 0px;
+	width: 464px;
+	height: 16px;
+	padding-top: 5px;
+	padding-right:5px;
+	border-style: none;
+	border-radius: 0px;
+	background-color: var(--Block);
+	text-align: right;
+	font-weight: 250;
+	color:var(--BlockText);
+	}
   
   .accountasseticon svg {
 	position: absolute;

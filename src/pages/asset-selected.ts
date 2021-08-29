@@ -71,7 +71,8 @@ export async function show(
   //accData = acc;
   asset_array = selectedAccountData.accountInfo.assets;
   asset_index = assetIndex;
-  asset_selected = selectedAccountData.accountInfo.assets[asset_index];
+  // use Object.assign(new Asset()... to convert into an instance of the class
+  asset_selected = Object.assign(new Asset(), selectedAccountData.accountInfo.assets[asset_index]);
   setLastSelectedAsset(asset_selected);
 
   if (asset_selected.symbol == "STAKED" && asset_selected.icon == "") {
@@ -325,7 +326,7 @@ async function LiquidUnstakeOk() {
     );
 
     if (poolAccInfo.staked_balance == "0")
-      throw Error("No funds staked to unstake");
+      throw Error(`No ${asset_selected.symbol} to liquid-unstake`);
 
     let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
 
@@ -344,13 +345,21 @@ async function LiquidUnstakeOk() {
     reloadDetails();
     showInitial();
     d.showSuccess(
-      "Liquid unstaked " + c.toStringDec(c.yton(liquidUnstakeResult.near))
+      "Liquid unstaked " + c.toStringDec(c.yton(yoctosToUnstake)) + " received " + c.toStringDec(c.yton(liquidUnstakeResult.near)) + " NEAR"
     );
 
-    // leave this for last in cae it fails to add the $META asset
-    if (liquidUnstakeResult.meta > 0) {
-      await addMetaAsset(c.yton(liquidUnstakeResult.meta));
+    // leave this for last in case it fails to add the $META asset
+    if (liquidUnstakeResult.near != "0") {
+      // add also liquid-unstake to main account, with the NEAR amount received
+      let hist = new History("liquid-unstake", c.yton(liquidUnstakeResult.near), "", undefined);
+      selectedAccountData.accountInfo.history.unshift(hist)
     }
+
+    // leave this for last in case it fails to add the $META asset
+    // commented. $META is left in the contract, users must "harvest" to send it to their wallets
+    // if (liquidUnstakeResult.meta > 0) {
+    //   await addMetaAsset(c.yton(liquidUnstakeResult.meta));
+    // }
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -359,14 +368,13 @@ async function LiquidUnstakeOk() {
 }
 
 async function addMetaAsset(amount: number) {
-  let asset = selectedAccountData.accountInfo.assets.find(
+  let metaAsset = selectedAccountData.accountInfo.assets.find(
     (i) => i.symbol == "META" || i.symbol == "$META"
   );
-  if (!asset) {
+  if (!metaAsset) {
     let networkInfo = await askBackgroundGetNetworkInfo();
-    asset = await addAssetToken(networkInfo.liquidStakingGovToken);
+    metaAsset = await addAssetToken(networkInfo.liquidStakingGovToken);
   }
-  asset_selected.addHistory("withdraw", amount);
 }
 
 async function restakeOk() {
@@ -645,12 +653,13 @@ async function performSend() {
       "1"
     );
 
+    hideOkCancel();
+    showInitial();
+
     asset_selected.balance -= amountToSend;
     asset_selected.addHistory("send", amountToSend);
     reloadDetails();
     await saveSelectedAccount();
-    hideOkCancel();
-    showInitial();
 
     d.showSuccess(
       "Success: " +

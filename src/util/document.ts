@@ -107,7 +107,7 @@ export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
 export function removeGlobalKeyPress() {
   try {
     document.removeEventListener("keypress", globalEnterKeyPress);
-    globalEnterKeyPress = () => {};
+    globalEnterKeyPress = () => { };
   } catch (ex) {
     console.error("ERR: removeGlobalKeyPress() " + ex.message);
   }
@@ -267,7 +267,7 @@ function addShowErr() {
 export function hideErr() {
   try {
     byId(ERR_DIV).innerHTML = "";
-  } catch {}
+  } catch { }
 }
 
 var errorId = 0;
@@ -411,7 +411,7 @@ export function appendTemplate(
         case "send":
           data.icon = SEND_SVG;
           break;
-        case "liquid-stake":
+        case "liquid-stake": case "liquid-unstake":
           data.icon = LIQUID_STAKE_DEFAULT_SVG;
           break;
         default:

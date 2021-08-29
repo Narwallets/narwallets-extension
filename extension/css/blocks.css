@@ -211,13 +211,11 @@ span#icon img {
   margin-bottom: 0px;
   max-height: 28px;
   height: 28px;
-  width: 280px;
+  width: 370px;
   text-align: center;
   margin-bottom: 15px;
-
   font-size: 28px;
   font-weight: 200;
-
   color: var(--TextRemark);
 }
 

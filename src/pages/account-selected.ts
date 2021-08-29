@@ -350,10 +350,10 @@ async function addOKClicked() {
       }
     });
 
-    await addAssetToken(contractValue);
+    const asset = await addAssetToken(contractValue);
     refreshSaveSelectedAccount();
     enableOKCancel();
-    d.showSuccess("Success");
+    d.showSuccess("Added Token: " + asset.symbol);
     hideOkCancel();
   } catch (ex) {
     d.showErr(ex);
