@@ -149,20 +149,34 @@
 }
 
 .combotextboxtoken input[type="text"] {
-position: absolute;
-border-style: solid;
-border-width: 1px;
-border-radius: 16px;
-padding: 5px;
-/* padding-right: 10px; */
-width: 380px;
-height: 32px;
-/* margin: auto; */
-left: 35px;
-top: 1px;
-border-color: var(--InputBorder);
-background-color: var(--ControlBackground);
-color: var(--ControlAltText);
+
+position: absolute;
+
+border-style: solid;
+
+border-width: 1px;
+
+border-radius: 16px;
+
+padding: 5px;
+
+/* padding-right: 10px; */
+
+width: 380px;
+
+height: 32px;
+
+/* margin: auto; */
+
+left: 35px;
+
+top: 1px;
+
+border-color: var(--InputBorder);
+
+background-color: var(--ControlBackground);
+
+color: var(--ControlAltText);
 }
 
 .combotextboxtoken input[type="text"]:focus {
@@ -243,7 +257,7 @@ input[type="password"] {
   border-style    : solid;
   border-width    : 1px;
   border-radius   : 16px;
-  border-color    : var(--Block);
+  border-color    : var(--ControlAccent);
   height          : 32px;
   padding         : 5px;
   width           : 300px;
