@@ -207,3 +207,5 @@ export const LIQUID_STAKE_DEFAULT_SVG = `<?xml version="1.0" encoding="UTF-8" st
      style="fill:#ffffff" />
 </svg>
 `;
+
+export const BANANA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="256" height="256"><defs><text id="A" x="0" y="17" font-size="14">🍌</text></defs><use xlink:href="#A"></use></svg>`;
