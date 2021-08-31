@@ -136,6 +136,7 @@ function hambClicked() {
 async function asideLock() {
   await askBackground({ code: "lock" });
   hambClicked();
+  hideOkCancel();
   await UnlockPage_show();
 }
 
