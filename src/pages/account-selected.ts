@@ -379,7 +379,7 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
   item.symbol = result.symbol;
   if (contractId == "berryclub.ek.near") {
     item.icon = BANANA_SVG;
-  } else if (result.icon?.startsWith("http")) {
+  } else if (result.icon?.endsWith("jpg") || result.icon?.endsWith("png")) {
     item.icon = '<img src="' + result.icon + '">';
   } else {
     item.icon = result.icon;
