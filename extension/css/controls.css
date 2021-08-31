@@ -155,10 +155,10 @@
 border-radius: 16px;
 padding: 5px;
 /* padding-right: 10px; */
-width: 210px;
+width: 380px;
 height: 32px;
 /* margin: auto; */
-left: 120px;
+left: 35px;
 top: 1px;
 border-color: var(--InputBorder);
 background-color: var(--ControlBackground);
