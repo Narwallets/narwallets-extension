@@ -49,7 +49,7 @@ export function showOKCancel(
   //isMoreOptionsOpen = false;
   confirmFunction = OKHandler;
   cancelFunction = CancelHandler;
-  console.log("showOkCancel")
+  console.log("showOkCancel");
   okCancelRow.show();
   enableOKCancel();
   if (OKHandler === CancelHandler) {
@@ -75,11 +75,14 @@ export function singleButton() {
 }
 
 export function unHideOKCancel() {
-  console.log("unHideOkCancel")
-  okCancelRow.hidden = false;
+  if (okCancelRow) {
+    okCancelRow.hidden = false;
+  }
 }
 
 export function hideOkCancel() {
-  okCancelRow.hidden = true;
+  if (okCancelRow) {
+    okCancelRow.hidden = true;
+  }
   d.removeGlobalKeyPress();
 }
