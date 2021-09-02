@@ -76,6 +76,7 @@ import {
   SEND_SVG,
   STAKE_DEFAULT_SVG,
   STNEAR_SVG,
+  TOKEN_DEFAULT_SVG,
   UNSTAKE_DEFAULT_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
@@ -381,6 +382,8 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
     item.icon = BANANA_SVG;
   } else if (result.icon?.endsWith("jpg") || result.icon?.endsWith("png")) {
     item.icon = '<img src="' + result.icon + '">';
+  } else if (!result.icon) {
+    item.icon = TOKEN_DEFAULT_SVG;
   } else {
     item.icon = result.icon;
   }
