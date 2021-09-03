@@ -285,3 +285,47 @@ span#icon img {
   padding-right: 30px;
 
 }
+
+.AdverBlock
+{
+  position: absolute;
+  width: 401px;
+  height: 48px;
+  left:2px;
+  right:2px;
+  border-width: 1px;
+  /* border-style: solid; */
+  background-image: url("../icons/SVG/bulb.svg");
+  background-repeat: no-repeat;
+  background-size: 30px 50px;
+  background-position: 10px;
+  text-align: left;
+}
+
+.AdverBlock p
+{
+  position: absolute;
+  left: 56px;
+  top: -7px;
+  font-weight: 200;
+  font-size: 13px;
+  color: var(--BlockText);
+}
+
+.AdverBlock a
+{
+  position: absolute;
+  left: 56px;
+  top: 25px;
+  font-weight: 200;
+  font-size: 14px;
+  color: var(--HighLight);
+  text-decoration: none;
+}
+
+.AdverBlock a:hover
+{
+  color: var(--BlockText);
+  
+}
+
