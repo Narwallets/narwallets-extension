@@ -72,7 +72,6 @@ import { addressContacts } from "./address-book.js";
 import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/Contact.js";
 import {
-  BANANA_SVG,
   SEND_SVG,
   STAKE_DEFAULT_SVG,
   STNEAR_SVG,
@@ -371,31 +370,31 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
 
   item.contractId = contractId;
 
-  let result = await askBackgroundViewMethod(
-    item.contractId,
-    "ft_metadata",
-    {}
-  );
-
-  item.symbol = result.symbol;
-  if (contractId == "berryclub.ek.near") {
-    item.icon = BANANA_SVG;
-  } else if (result.icon?.endsWith("jpg") || result.icon?.endsWith("png")) {
-    item.icon = '<img src="' + result.icon + '">';
-  } else if (!result.icon) {
-    item.icon = TOKEN_DEFAULT_SVG;
-  } else {
-    item.icon = result.icon;
-  }
-  item.url = result.reference;
-  item.spec = result.spec;
-
   let resultBalance = await askBackgroundViewMethod(
     item.contractId,
     "ft_balance_of",
     { account_id: selectedAccountData.name }
   );
   item.balance = c.yton(resultBalance);
+
+  let result = await askBackgroundViewMethod(
+    item.contractId,
+    "ft_metadata",
+    {}
+  );
+  item.symbol = result.symbol;
+  if (!result.icon) {
+    item.icon = TOKEN_DEFAULT_SVG;
+  }
+  else if (result.icon.startsWith("<svg")) {
+    item.icon = result.icon;
+  }
+  else {
+    // assume url reference, either http.. or data:image
+    item.icon = `<img src="${result.icon}">`
+  }
+  item.url = result.reference;
+  item.spec = result.spec;
 
   selectedAccountData.accountInfo.assets.push(item);
   return item;
@@ -533,8 +532,8 @@ async function checkAccountAccess() {
     if (!ownerInfo.privateKey)
       throw Error(
         "You need full access on the owner account: " +
-          selectedAccountData.accountInfo.ownerId +
-          " to operate this lockup account"
+        selectedAccountData.accountInfo.ownerId +
+        " to operate this lockup account"
       );
     //new d.El(".footer .title").hide() // no room
   } else {
@@ -626,11 +625,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-          info.ownerId +
-          " to " +
-          action +
-          " from this " +
-          selectedAccountData.typeFull
+        info.ownerId +
+        " to " +
+        action +
+        " from this " +
+        selectedAccountData.typeFull
       );
     }
   }
@@ -776,11 +775,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -1227,11 +1226,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     let hist: History;
@@ -1296,22 +1295,22 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
     const tokenOptionsList =
       networkInfo.name != "mainnet"
         ? [
-            "token.cheddar.testnet",
-            "token.meta.pool.testnet",
-            "meta-v2.pool.testnet",
-          ]
+          "token.cheddar.testnet",
+          "token.meta.pool.testnet",
+          "meta-v2.pool.testnet",
+        ]
         : [
-            "wrap.near",
-            "meta-token.near",
-            "meta-pool.near",
-            "berryclub.ek.near",
-            "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-            "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-            "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-            "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-            "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-            "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-          ];
+          "wrap.near",
+          "meta-token.near",
+          "meta-pool.near",
+          "berryclub.ek.near",
+          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+        ];
 
     let checked: Record<string, boolean> = {};
 
