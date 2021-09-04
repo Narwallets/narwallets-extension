@@ -23,7 +23,7 @@ import {
 
 const DATA_VERSION = "0.1";
 
-const INVALID_USER_OR_PASS = "Invalid User or Password";
+const INVALID_USER_OR_PASS = "Invalid Password";
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import type { StateStruct } from "./state-type.js";

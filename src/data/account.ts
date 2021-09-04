@@ -7,7 +7,7 @@ export class Account {
   public note: string;
   public lockedOther: number;//locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
   public assets: Asset[] = []; //assets
-    public history: History[] = []; //history
+  public history: History[] = []; //history
   constructor(
     public network: string,
     public type: "acc" | "lock.c" = "acc",
@@ -20,13 +20,13 @@ export class Account {
     public privateKey?: string,
     public ownerId?: string, //ownerId if this is a lockup-contract {type:"lock.c"}
     //contacts: Contact[] = [];
-    
-  ){
+
+  ) {
     this.order = 0;
     this.note = "";
     this.lockedOther = 0;
     this.assets = [];
-    this.history= []
+    this.history = []
   };
 
   // get totalInThePool(): number {
@@ -40,9 +40,9 @@ export class Contact {
 }
 
 export class Asset {
-  
+
   history: History[];
-  
+
   constructor(
     public spec: string = "",
     public url: string = "",
@@ -51,8 +51,8 @@ export class Asset {
     public type: string = "ft",
     public symbol: string = "",
     public icon: string = "",
-  ){
-    this.history= []
+  ) {
+    this.history = []
   };
 
   addHistory(
@@ -78,8 +78,8 @@ export class History {
     this.amount = amount;
     this.date = new Date().toISOString();
     this.type = type;
-    this.destination = destination||"";
-    this.icon = icon||"";
+    this.destination = destination || "";
+    this.icon = icon || "";
 
     // commented. use https://www.w3schools.com/csSref/css3_pr_text-overflow.asp
     // if (destination.length> 27)

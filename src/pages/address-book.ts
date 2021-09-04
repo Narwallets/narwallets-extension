@@ -24,6 +24,16 @@ import { checkIfAccountExists } from "../util/search-accounts.js";
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
+export function contactExists(address: string): boolean {
+  let name = address.trim()
+  for (let contact of addressContacts) {
+    if (contact.accountId == name) {
+      return true;
+    }
+  };
+  return false
+}
+
 export async function show() {
   addressContacts = [];
   d.onClickId("add-contact", showAddContactPage);
@@ -40,7 +50,6 @@ export async function show() {
 }
 export async function initAddressArr() {
   const addressRecord = await askBackgroundAllAddressContact();
-
   for (let key in addressRecord) {
     addressContacts.push(new GContact(key, addressRecord[key].note));
   }
@@ -67,9 +76,9 @@ function showInitial() {
 }
 
 function backToAccountsClicked() {
-  if(selectedAccountData.name != "") {
+  if (selectedAccountData.name != "") {
     AccountSelectedPage_show(selectedAccountData.name, undefined);
-  } else {  
+  } else {
     d.clearContainer("address-list");
     d.showPage("account-list-main");
     d.showSubPage("assets");
@@ -79,10 +88,12 @@ function backToAccountsClicked() {
 
 async function addOKClicked() {
   try {
-    const addressToSave = new d.El("#add-addresbook-id").value;
+    const addressToSave = new d.El("#add-addresbook-id").value.trim();
+
+    // check if the account exists on the current network
     let existAccount = await checkIfAccountExists(addressToSave);
     if (!existAccount) {
-      throw Error("Account ID does not exists");
+      throw Error("Account ID does not exists on the network");
     }
     const noteToSave = new d.El("#add-addresbook-note").value;
 
@@ -91,12 +102,6 @@ async function addOKClicked() {
       note: noteToSave,
     };
 
-    addressContacts.forEach((address) => {
-      if (address.accountId == addressToSave) {
-        throw Error("Address already saved");
-      }
-    });
-    addressContacts.push(contactToSave);
     await saveContactOnBook(addressToSave, contactToSave);
 
     hideOkCancel();
@@ -110,6 +115,10 @@ export async function saveContactOnBook(
   name: string,
   contact: GContact
 ): Promise<any> {
+  if (contactExists(name)) {
+    throw Error("Address already saved");
+  }
+  addressContacts.push(contact);
   return askBackgroundAddContact(name, contact);
 }
 

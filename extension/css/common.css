@@ -449,9 +449,10 @@ h5 {
 }
 
 #err-div>div.info {
-  background-color: #a3a3a3;
+  background-color: #e4e4e4;
   border-width    : 1px;
-  color           : #352f2f;
+  color: #191919;
+  font-weight: 300;
 }
 
 #err-div>div.warning {

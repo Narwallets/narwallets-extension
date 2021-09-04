@@ -89,7 +89,6 @@
   position: absolute;
   border-style: none;
   display: inline-block;
-
   text-align: left;
   top: 30px;
   left: 47px;
@@ -98,7 +97,7 @@
   font-weight: 200;
   color: var(--TextGeneric);
   max-width: 230px;
-  /*overflow: hidden;*/
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 

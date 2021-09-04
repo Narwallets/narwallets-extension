@@ -1,5 +1,3 @@
-const THIS_PAGE = "AccountAssetDetail";
-
 import * as c from "../util/conversions.js";
 import {
   askBackground,
@@ -27,12 +25,16 @@ import {
   populateSendCombo,
   selectedAccountData,
   show as AccountSelectedPage_show,
+  accountHasPrivateKey,
+  showGrantAccessSubPage,
+  historyWithIcons
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { addressContacts, saveContactOnBook } from "./address-book.js";
 import { GContact } from "../data/Contact.js";
 import { localStorageSet } from "../data/util.js";
+import { contactExists } from '../pages/address-book.js'
 import {
   META_SVG,
   SEND_SVG,
@@ -46,6 +48,8 @@ import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { nearDollarPrice } from "../data/global.js";
 import { setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
+
+const THIS_PAGE = "AccountAssetDetail";
 
 let asset_array: Asset[];
 let asset_selected: Asset;
@@ -195,10 +199,11 @@ function reloadDetails() {
   d.appendTemplateLI("selected-asset", "selected-asset-template", templateData);
 
   d.clearContainer("asset-history-details");
+
   d.populateUL(
     "asset-history-details",
     "asset-history-template",
-    asset_selected.history
+    historyWithIcons(asset_selected.history)
   );
 }
 
@@ -271,24 +276,51 @@ async function confirmWithdraw() {
   }
 }
 
-function Withdraw() {
-  d.showSubPage("withdraw");
-  d.onClickId("withdraw-max", function () {
-    d.maxClicked("withdraw-amount", "#selected-asset #balance");
-  });
-  showOKCancel(confirmWithdraw, showInitial);
+async function Withdraw() {
+  try {
+    if (!await accountHasPrivateKey()) {
+      await backToSelectClicked();
+      showGrantAccessSubPage();
+      return;
+    }
+
+    d.showSubPage("withdraw");
+    d.onClickId("withdraw-max", function () {
+      d.maxClicked("withdraw-amount", "#selected-asset #balance");
+    });
+    showOKCancel(confirmWithdraw, showInitial);
+  } catch (ex) {
+    d.showErr(ex);
+  }
+
 }
 
 async function DelayedUnstake() {
-  d.showSubPage("delayed-unstake");
-  d.onClickId("delayed-unstake-max", function () {
-    d.maxClicked("delayed-unstake-amount", "#selected-asset #balance");
-  });
-  await showOKCancel(DelayedUnstakeOk, showInitial);
+  try {
+    if (!await accountHasPrivateKey()) {
+      await backToSelectClicked();
+      showGrantAccessSubPage();
+      return;
+    }
+    d.showSubPage("delayed-unstake");
+    d.onClickId("delayed-unstake-max", function () {
+      d.maxClicked("delayed-unstake-amount", "#selected-asset #balance");
+    });
+    await showOKCancel(DelayedUnstakeOk, showInitial);
+  } catch (ex) {
+    d.showErr(ex);
+  }
 }
 
 async function LiquidUnstake() {
   try {
+
+    if (!await accountHasPrivateKey()) {
+      await backToSelectClicked();
+      showGrantAccessSubPage();
+      return;
+    }
+
     d.showSubPage("liquid-unstake");
     d.onClickId("liquid-unstake-max", function () {
       d.maxClicked("liquid-unstake-amount", "#selected-asset #balance");
@@ -345,7 +377,8 @@ async function LiquidUnstakeOk() {
     reloadDetails();
     showInitial();
     d.showSuccess(
-      "Liquid unstaked " + c.toStringDec(c.yton(yoctosToUnstake)) + " received " + c.toStringDec(c.yton(liquidUnstakeResult.near)) + " NEAR"
+      "Liquid unstaked " + c.toStringDec(c.yton(yoctosToUnstake)) + " stNEAR, received " +
+      c.toStringDec(c.yton(liquidUnstakeResult.near)) + " NEAR"
     );
 
     // leave this for last in case it fails to add the $META asset
@@ -412,7 +445,7 @@ async function restakeOk() {
     asset_selected.balance -= c.yton(yoctosToRestake);
     asset_selected.addHistory("restake", c.yton(yoctosToRestake));
 
-    // Como estoy restakeando, necesito incrementar el saldo del stake (o inicializarlo)
+    // since we're re-staking we need to increase staked amount (or initialize it)
     let foundAsset: Asset = getOrCreateAsset(
       "STAKED",
       actualSP,
@@ -506,38 +539,23 @@ async function DelayedUnstakeOk() {
 
 async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   let existAssetWithThisPool = false;
-  let foundAsset: Asset = new Asset();
   let amountToUnstake: number = amount;
 
-  let hist: History;
+  let hist = new History("unstake", amountToUnstake, asset_selected.contractId);
 
-  hist = {
-    amount: amountToUnstake,
-    date: new Date().toISOString(), //so it's the same as when the data is JSON.parsed() from localStorage
-    type: "unstake",
-    destination:
-      asset_selected.contractId.length > 23
-        ? asset_selected.contractId.substring(0, 20) + "..."
-        : asset_selected.contractId,
-    icon: "UNSTAKE",
+  let unstakedAsset: Asset | undefined = undefined;
+  for (let asset of selectedAccountData.accountInfo.assets) {
+    if (asset.contractId == asset_selected.contractId && asset.symbol == "UNSTAKED") {
+      unstakedAsset = asset;
+    }
   };
 
-  selectedAccountData.accountInfo.assets.forEach((asset) => {
-    if (
-      asset.contractId == asset_selected.contractId &&
-      asset.symbol == "UNSTAKED"
-    ) {
-      existAssetWithThisPool = true;
-      foundAsset = asset;
-    }
-  });
-
-  if (existAssetWithThisPool) {
-    foundAsset.history.unshift(hist);
-    foundAsset.balance = c.yton(poolAccInfo.unstaked_balance) + amountToUnstake;
+  if (unstakedAsset) {
+    unstakedAsset.balance = c.yton(poolAccInfo.unstaked_balance) + amountToUnstake;
   } else {
+    // not existent in wallet
     if (asset_selected.symbol == "STAKED") {
-      let asset = new Asset(
+      unstakedAsset = new Asset(
         "",
         "",
         asset_selected.contractId,
@@ -546,31 +564,32 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
         "UNSTAKED",
         UNSTAKE_DEFAULT_SVG
       );
-      asset.history.unshift(hist);
-      selectedAccountData.accountInfo.assets.push(asset);
+      selectedAccountData.accountInfo.assets.push(unstakedAsset);
     } else if (asset_selected.symbol == "STNEAR") {
-      //TODO
-      //Tengo que agregar la actualizacion al inicio
+      // Can't unstake STNEAR if there's no STNEAR asset
+      // this is unreachable code
     }
   }
-  // update balance of currently selected
-  let balance = await StakingPool.getAccInfo(
-    selectedAccountData.name,
-    asset_selected.contractId
-  );
-  asset_selected.balance = c.yton(balance.staked_balance);
-  asset_selected.history.unshift(hist);
-  //Agrego history de account
+  // add asset history 
+  if (unstakedAsset) { unstakedAsset.history.unshift(hist) };
+  // add account history
   if (!selectedAccountData.accountInfo.history) {
     selectedAccountData.accountInfo.history = [];
   }
   selectedAccountData.accountInfo.history.unshift(hist);
 
+  // update balance of currently selected pool
+  let balance = await StakingPool.getAccInfo(
+    selectedAccountData.name,
+    asset_selected.contractId
+  );
+  asset_selected.balance = c.yton(balance.staked_balance);
+
   refreshSaveSelectedAccount();
 }
 
-function backToSelectClicked() {
-  AccountSelectedPage_show(selectedAccountData.name, undefined);
+async function backToSelectClicked() {
+  await AccountSelectedPage_show(selectedAccountData.name, undefined);
   hideOkCancel();
 }
 
@@ -581,9 +600,14 @@ function showAssetReceiveClicked() {
   showOKCancel(showInitial, showInitial);
 }
 
-function showAssetSendClicked() {
+async function showAssetSendClicked() {
   try {
-    if (selectedAccountData.isReadOnly) throw Error("Account is read-only");
+
+    if (!await accountHasPrivateKey()) {
+      await backToSelectClicked();
+      showGrantAccessSubPage();
+      return;
+    }
 
     d.showSubPage("asset-send-subpage");
     d.byId("asset-symbol").innerText = asset_selected.symbol;
@@ -605,25 +629,20 @@ async function sendOKClicked() {
     //validate
     const toAccName = new d.El("#send-to-asset-account").value;
     const amountToSend = d.getNumber("#send-to-asset-amount");
-    if (!isValidAccountID(toAccName))
-      throw Error("Receiver Account Id is invalid");
-    if (!isValidAmount(amountToSend))
-      throw Error("Amount should be a positive integer");
+    if (!isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
+    if (!isValidAmount(amountToSend)) throw Error("Amount should be a positive integer");
+    if (amountToSend > asset_selected.balance) throw Error("Amount exceeds available balance");
 
-    if (amountToSend > asset_selected.balance)
-      throw Error("Amount exceeds available balance");
     let accountExists = await searchAccounts.checkIfAccountExists(toAccName);
-    if (!accountExists) {
-      throw Error("Receiver Account does not exists");
-    }
+    if (!accountExists) throw Error("Receiver Account does not exists");
     //show confirmation subpage
     d.showSubPage("asset-selected-send-confirmation");
-    d.byId("asset-send-confirmation-amount").innerText =
-      c.toStringDec(amountToSend);
+    d.byId("asset-send-confirmation-amount").innerText = c.toStringDec(amountToSend);
     d.byId("asset-symbol-confirmation").innerText = asset_selected.symbol;
     d.byId("asset-send-confirmation-receiver").innerText = toAccName;
     showOKCancel(performSend, showInitial); //on OK clicked, send
-  } catch (ex) {
+  }
+  catch (ex) {
     d.showErr(ex.message);
   }
 }
@@ -632,9 +651,7 @@ async function performSend() {
   try {
     const toAccName = d.byId("asset-send-confirmation-receiver").innerText;
     contactToAdd = toAccName;
-    const amountToSend = c.toNum(
-      d.byId("asset-send-confirmation-amount").innerText
-    );
+    const amountToSend = c.toNum(d.byId("asset-send-confirmation-amount").innerText);
     d.byId("asset-symbol-confirmation").innerText = asset_selected.symbol;
 
     disableOKCancel();
@@ -657,7 +674,7 @@ async function performSend() {
     showInitial();
 
     asset_selected.balance -= amountToSend;
-    asset_selected.addHistory("send", amountToSend);
+    asset_selected.addHistory("send", amountToSend, toAccName);
     reloadDetails();
     await saveSelectedAccount();
 
@@ -672,7 +689,8 @@ async function performSend() {
       toAccName
     );
 
-    checkContactList();
+    checkContactList(toAccName);
+
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -731,27 +749,15 @@ async function saveSelectedAccount(): Promise<any> {
   );
 }
 
-async function checkContactList() {
-  const toAccName = contactToAdd;
-  let found = false;
-
-  if (addressContacts.length < 1) {
-    d.showSubPage("sure-add-contact-asset");
-    showOKCancel(addContactToList, showInitial);
-  }
-
-  addressContacts.forEach((contact) => {
-    if (contact.accountId == toAccName) {
-      found = true;
-    }
-  });
-
-  if (found) {
+function checkContactList(address: string) {
+  const toAccName = address.trim()
+  if (contactExists(toAccName)) {
     showInitial();
     hideOkCancel();
-  } else {
+  }
+  else {
     d.showSubPage("sure-add-contact-asset");
-    d.byId("asset-add-confirmation-name").innerText = contactToAdd;
+    d.byId("asset-add-confirmation-name").innerText = toAccName;
     showOKCancel(addContactToList, showInitial);
   }
 }
@@ -762,14 +768,13 @@ async function addContactToList() {
       accountId: contactToAdd,
       note: "",
     };
-
-    addressContacts.push(contactToSave);
-
-    hideOkCancel();
-    populateSendCombo("combo-send-asset");
     await saveContactOnBook(contactToSave.accountId, contactToSave);
+    populateSendCombo("combo-send-asset");
     showInitial();
   } catch {
     d.showErr("Error in save contact");
+  }
+  finally {
+    hideOkCancel();
   }
 }

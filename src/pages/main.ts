@@ -267,7 +267,7 @@ async function tryReposition() {
     case "create-user": {
       //was creating user but maybe jumped to terms-of-use
       d.showPage(CREATE_USER);
-      d.inputById("email").value = await localStorageGetAndRemove("email");
+      //d.inputById("email").value = await localStorageGetAndRemove("email");
       break;
     }
     case "account":

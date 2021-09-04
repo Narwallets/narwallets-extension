@@ -21,7 +21,6 @@ export const INPUT = "input";
 //actions
 export const OPEN = "open";
 export const CREATE = "create";
-export const IMPORT = "import";
 //classes
 export const HIDDEN = "hidden";
 //elem-id
@@ -377,6 +376,8 @@ export function templateReplace(
     } else if (/\d+-\d+-\d+T\d+:\d+:\.*/.test(value)) {
       text = new Date(value).toLocaleString();
       // assume string
+    } else if (value.toString().startsWith("data:image")) {
+      text = `<img src="${value}">`
     } else {
       text = value.toString();
     }
@@ -399,27 +400,6 @@ export function appendTemplate(
 ) {
   const newLI = document.createElement(elType) as HTMLLIElement;
   const templateElem = byId(templateId);
-  if (templateId.includes("history")) {
-    if (!data.icon.startsWith("<svg")) {
-      switch (data.type) {
-        case "unstake":
-          data.icon = UNSTAKE_DEFAULT_SVG;
-          break;
-        case "stake":
-          data.icon = STAKE_DEFAULT_SVG;
-          break;
-        case "send":
-          data.icon = SEND_SVG;
-          break;
-        case "liquid-stake": case "liquid-unstake":
-          data.icon = LIQUID_STAKE_DEFAULT_SVG;
-          break;
-        default:
-          data.icon = "";
-          break;
-      }
-    }
-  }
   if (!templateElem)
     console.error("appendTemplate, template id='" + templateId + "' NOT FOUND");
   //-- if data-id has value, set it

@@ -51,6 +51,7 @@ import {
 import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
 import {
+  contactExists,
   initAddressArr,
   saveContactOnBook,
   show as AddressBook_show,
@@ -72,6 +73,7 @@ import { addressContacts } from "./address-book.js";
 import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/Contact.js";
 import {
+  LIQUID_STAKE_DEFAULT_SVG,
   SEND_SVG,
   STAKE_DEFAULT_SVG,
   STNEAR_SVG,
@@ -129,10 +131,6 @@ export async function show(
   localStorageSet({ reposition: "account", account: accName });
   checkConnectOrDisconnect();
 
-  //await refreshFunction();
-  // intervalIdShow = window.setInterval(async function () {
-  //   refreshFunction(true);
-  // }, 5000);
 }
 
 export function onNetworkChanged(info: NetworkInfo) {
@@ -182,7 +180,6 @@ function initPage() {
   d.onClickId("access", changeAccessClicked);
   d.onClickId("list-pools", listPoolsClicked);
   d.onClickId("add", addClicked);
-  //d.onClickId("more", moreClicked);
   d.onClickId("show-public-key", showPublicKeyClicked);
   d.onClickId("show-private-key", showPrivateKeyClicked);
   d.onClickId("add-note", addNoteClicked);
@@ -194,7 +191,6 @@ function initPage() {
   d.onClickId("refresh-button", refreshSelectedAcc);
   d.onClickId("back-to-account", backLinkClicked);
   d.onClickId("delete-account", DeleteAccount);
-  // d.onClickId("acc-disconnect-from-page", disconnectFromPageClicked);
 
   // liquid/delayed stake
   d.onClickId("one-tab-stake", selectFirstTab);
@@ -203,7 +199,6 @@ function initPage() {
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo-add-token");
   removeButton = new d.El("button#remove");
-  //lala_redesign
 
   OkCancelInit();
   removeButton.onClick(removeAccountClicked);
@@ -311,7 +306,7 @@ function showAssetDetailsClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
-      const assetIndex = Number(li.id); // d.getClosestChildText(".account-item", ev.target, ".name");
+      const assetIndex = Number(li.id);
       if (isNaN(assetIndex)) return;
       AssetSelected_show(assetIndex);
     }
@@ -383,15 +378,14 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
     {}
   );
   item.symbol = result.symbol;
-  if (!result.icon) {
-    item.icon = TOKEN_DEFAULT_SVG;
-  }
-  else if (result.icon.startsWith("<svg")) {
+  if (result.icon?.startsWith("<svg")) {
     item.icon = result.icon;
   }
-  else {
-    // assume url reference, either http.. or data:image
+  else if (result.icon?.startsWith("data:image")) {
     item.icon = `<img src="${result.icon}">`
+  }
+  else {
+    item.icon = TOKEN_DEFAULT_SVG;
   }
   item.url = result.reference;
   item.spec = result.spec;
@@ -404,7 +398,7 @@ function getAccountRecord(accName: string): Promise<Account> {
   return askBackground({
     code: "get-account",
     accountId: accName,
-  }); /*as Promise<Account>*/
+  });
 }
 
 export async function populateSendCombo(combo: string) {
@@ -492,18 +486,18 @@ function showSelectedAccount(fromTimer?: boolean) {
   d.populateUL(
     "account-history-details",
     "asset-history-template",
-    selectedAccountData.accountInfo.history
+    historyWithIcons(selectedAccountData.accountInfo.history)
   );
 }
 
 type StateResult = {
-  amount: string; // "27101097909936818225912322116"
-  block_hash: string; //"DoTW1Tpp3TpC9egBe1xFJbbEb6vYxbT33g9GHepiYL5a"
-  block_height: number; //20046823
-  code_hash: string; //"11111111111111111111111111111111"
-  locked: string; //"0"
-  storage_paid_at: number; // 0
-  storage_usage: number; //2080
+  amount: string;
+  block_hash: string;
+  block_height: number;
+  code_hash: string;
+  locked: string;
+  storage_paid_at: number;
+  storage_usage: number;
 };
 
 function listPoolsClicked() {
@@ -515,42 +509,26 @@ function listPoolsClicked() {
   });
 }
 
-function checkNormalAccountIsFullAccess() {
-  if (selectedAccountData.isFullAccess) return true;
-  showOKToGrantAccess();
-  throw Error("Account access is Read-Only");
-}
-
-async function checkAccountAccess() {
+export async function accountHasPrivateKey(): Promise<boolean> {
   if (selectedAccountData.accountInfo.type == "lock.c") {
-    if (!selectedAccountData.accountInfo.ownerId)
-      throw Error("Owner is unknown. Try importing owner account");
+    if (!selectedAccountData.accountInfo.ownerId) {
+      throw Error("Owner is unknown. Try importing the owner account");
+    }
     const ownerInfo = await getAccountRecord(
       selectedAccountData.accountInfo.ownerId
     );
     if (!ownerInfo) throw Error("The owner account is not in this wallet");
-    if (!ownerInfo.privateKey)
+    if (!ownerInfo.privateKey) {
       throw Error(
         "You need full access on the owner account: " +
         selectedAccountData.accountInfo.ownerId +
         " to operate this lockup account"
       );
-    //new d.El(".footer .title").hide() // no room
+    }
+    return true;
   } else {
     //normal account
-    checkNormalAccountIsFullAccess();
-    //new d.El(".footer .title").show() // room available
-  }
-}
-
-async function fullAccessSubPage(subPageId: string, OKHandler: ClickHandler) {
-  try {
-    d.hideErr();
-    await checkAccountAccess();
-    d.showSubPage(subPageId);
-    showOKCancel(OKHandler, showInitial);
-  } catch (ex) {
-    d.showErr(ex.message);
+    return selectedAccountData.isFullAccess;
   }
 }
 
@@ -570,7 +548,8 @@ function showGotoOwner() {
     showOKCancel(GotoOwnerOkHandler, showInitial);
   }
 }
-function showOKToGrantAccess() {
+
+export function showGrantAccessSubPage() {
   d.showSubPage("account-selected-ok-to-grant-access");
   showOKCancel(changeAccessClicked, showInitial);
 }
@@ -584,7 +563,6 @@ function receiveClicked() {
 
 //--------------------------------
 async function connectToWebAppClicked(): Promise<any> {
-  //TODO.
   d.showWait();
   try {
     await askBackground({
@@ -638,6 +616,12 @@ async function checkOwnerAccessThrows(action: string) {
 //----------------------
 async function sendClicked() {
   try {
+
+    if (!await accountHasPrivateKey()) {
+      showGrantAccessSubPage();
+      return;
+    }
+
     hideOkCancel();
     let maxAmountToSend = selectedAccountData.available;
 
@@ -661,32 +645,21 @@ async function sendClicked() {
           0.1
         );
       });
-      fullAccessSubPage("account-selected-send", sendOKClicked);
+      d.showSubPage("account-selected-send")
+      showOKCancel(sendOKClicked, showInitial);
     }
   } catch (ex) {
     d.showErr(ex.message);
   }
 }
 
-async function checkContactList() {
-  const toAccName = new d.El("#send-to-account-name").value;
-  let found = false;
-
-  if (addressContacts.length < 1) {
-    d.showSubPage("sure-add-contact");
-    showOKCancel(addContactToList, showInitial);
-  }
-
-  addressContacts.forEach((contact) => {
-    if (contact.accountId == toAccName) {
-      found = true;
-    }
-  });
-
-  if (found) {
+function checkContactList(address: string) {
+  const toAccName = address.trim()
+  if (contactExists(toAccName)) {
     showInitial();
     hideOkCancel();
-  } else {
+  }
+  else {
     d.showSubPage("sure-add-contact");
     d.byId("add-confirmation-name").innerText = toAccName;
     showOKCancel(addContactToList, showInitial);
@@ -699,15 +672,14 @@ async function addContactToList() {
       accountId: new d.El("#send-to-account-name").value,
       note: "",
     };
-
-    addressContacts.push(contactToSave);
-
-    hideOkCancel();
-    populateSendCombo("send-contact-combo");
     await saveContactOnBook(contactToSave.accountId, contactToSave);
+    populateSendCombo("send-contact-combo");
     showInitial();
   } catch {
     d.showErr("Error in save contact");
+  }
+  finally {
+    hideOkCancel();
   }
 }
 
@@ -784,11 +756,10 @@ async function performLockupContractSend() {
 
     displayReflectTransfer(amountToSend, toAccName);
 
-    await checkContactList();
-
     await refreshSelectedAccountAndAssets();
 
-    showInitial();
+    await checkContactList(toAccName);
+
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -800,6 +771,12 @@ async function performLockupContractSend() {
 //----------------------
 async function stakeClicked() {
   try {
+
+    if (!await accountHasPrivateKey()) {
+      showGrantAccessSubPage();
+      return;
+    }
+
     // create asset
     selectFirstTab();
     const info = selectedAccountData.accountInfo;
@@ -825,7 +802,9 @@ async function stakeClicked() {
 
     if (amountToStake < 0) amountToStake = 0;
 
-    await fullAccessSubPage("account-selected-stake", performer);
+    d.showSubPage("account-selected-stake")
+    showOKCancel(performer, showInitial);
+
     d.qs("#liquid-stake-radio").el.checked = true;
     d.inputById("stake-with-staking-pool").value = "";
     d.qs("#max-stake-amount-1").innerText = c.toStringDec(
@@ -849,8 +828,9 @@ async function stakeClicked() {
       );
     });
     //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
-    if (info.type == "lock.c")
+    if (info.type == "lock.c") {
       stakeAmountBox.value = c.toStringDec(amountToStake);
+    }
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -891,7 +871,7 @@ async function performStake() {
     //const amountToStake = info.lastBalance - info.staked - 36
     if (!isValidAmount(amountToStake))
       throw Error("Amount should be a positive integer");
-    if (amountToStake < 5) throw Error("Stake at least 5 Near");
+    if (amountToStake < 10) throw Error("Stake at least 10 Near");
 
     let poolAccInfo = {
       //empty info
@@ -1008,7 +988,7 @@ async function performStake() {
     selectedAccountData.total -= amountToStake;
     await refreshSaveSelectedAccount();
 
-    d.showSuccess("Success");
+    d.showSuccess(`Staked ${amountToStake} NEAR`);
     hideOkCancel();
     showInitial();
   } catch (ex) {
@@ -1040,7 +1020,7 @@ async function performLockupContractStake() {
     const amountToStake = c.toNum(d.inputById("stake-amount").value);
     if (!isValidAmount(amountToStake))
       throw Error("Amount should be a positive integer");
-    if (amountToStake < 5) throw Error("Stake at least 5 NEAR");
+    if (amountToStake < 10) throw Error("Stake at least 10 NEAR");
 
     const lc = new LockupContract(info);
     await lc.computeContractAccount();
@@ -1051,7 +1031,7 @@ async function performLockupContractStake() {
     //refresh status
     await refreshSaveSelectedAccount();
 
-    d.showSuccess("Success");
+    d.showSuccess(`Staked ${amountToStake} NEAR`);
     showInitial();
   } catch (ex) {
     d.showErr(ex.message);
@@ -1064,6 +1044,12 @@ async function performLockupContractStake() {
 //-------------------------------------
 async function unstakeClicked() {
   try {
+
+    if (!await accountHasPrivateKey()) {
+      showGrantAccessSubPage();
+      return;
+    }
+
     d.showWait();
     const info = selectedAccountData.accountInfo;
     let performer = performUnstake; //default
@@ -1084,8 +1070,6 @@ async function unstakeClicked() {
       amountBox.disabled = false;
       amountBox.classList.remove("bg-lightblue");
     }
-    fullAccessSubPage("account-selected-unstake", performer);
-    disableOKCancel();
 
     //---refresh first
     await refreshSaveSelectedAccount();
@@ -1109,7 +1093,9 @@ async function unstakeClicked() {
 
     //d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
     //d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
-    enableOKCancel();
+    d.showSubPage("account-selected-unstake")
+    showOKCancel(performer, showInitial);
+
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1233,23 +1219,21 @@ async function performSend() {
       toAccName
     );
 
-    let hist: History;
-    hist = {
-      amount: amountToSend,
-      date: new Date().toISOString(),
-      type: "send",
-      destination:
-        toAccName.length > 27 ? toAccName.substring(0, 24) + "..." : toAccName,
-      icon: "SEND",
-    };
-    selectedAccountData.accountInfo.history.unshift(hist);
+    selectedAccountData.accountInfo.history.unshift(
+      new History("send", amountToSend, toAccName)
+    );
 
     displayReflectTransfer(amountToSend, toAccName);
+
     await refreshSelectedAccountAndAssets();
-    await checkContactList();
+
+    await checkContactList(toAccName);
+
   } catch (ex) {
     d.showErr(ex.message);
+
   } finally {
+
     d.hideWait();
     enableOKCancel();
   }
@@ -1806,11 +1790,6 @@ function showInitial() {
   d.showSubPage("assets");
 }
 
-/*function maxClicked(id: string, selector: string) {
-  const amountElem = new d.El(selector);
-  d.inputById(id).value = amountElem.innerText;
-}*/
-
 async function removeAccountClicked(ev: Event) {
   try {
     if (selectedAccountData.isFullAccess) {
@@ -1851,4 +1830,33 @@ async function refreshClicked(ev: Event) {
   } finally {
     d.hideWait();
   }
+}
+
+export function historyWithIcons(base: History[]) {
+  let newHistory: History[] = []
+  // set icons
+  for (let item of base) {
+    let data = Object.assign({}, item)
+    if (!data.icon.startsWith("<svg")) {
+      switch (data.type) {
+        case "unstake":
+          data.icon = UNSTAKE_DEFAULT_SVG;
+          break;
+        case "stake":
+          data.icon = STAKE_DEFAULT_SVG;
+          break;
+        case "send":
+          data.icon = SEND_SVG;
+          break;
+        case "liquid-stake": case "liquid-unstake":
+          data.icon = LIQUID_STAKE_DEFAULT_SVG;
+          break;
+        default:
+          data.icon = "";
+          break;
+      }
+      newHistory.push(data)
+    }
+  }
+  return newHistory;
 }

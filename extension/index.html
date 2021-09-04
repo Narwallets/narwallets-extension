@@ -86,18 +86,12 @@
 			<hr>
 			<li id="lock">Lock</li>
 			<hr>
-			<!--<li id="expand">Expand</li>
-<hr>
--->
-
 			<li id="accounts">Accounts</li>
 			<hr>
 			<li id="add-account-side">Add Account</li>
 			<hr>
 			<li id="address-book-side">Address Book</li>
 			<hr>
-			<!--<li id="change-password">Change your password</li>
-<hr>-->
 			<li id="change-password">Change Password</li>
 			<hr>
 			<li id="create-user">Create a new User</li>
@@ -118,14 +112,19 @@
 	<!--#region WELCOME New user, onboarding-->
 	<div id="welcome-new-user-page" class="appface slide-hide">
 
+		<br><br>
 		<h2>Welcome to Narwallets!</h2>
+		<br><br>
 		<h3>The future is NEAR</h3>
 		<h3>Let's start our journey</h3>
-		<p>
-			<b>Step one:</b><br> Create user and password to protect this wallet
-		</p>
+		<br><br>
+		<div boxed>
+			<h2>Step one:</h2><br>
+			<h3>Create a password to protect this wallet:</h3>
+		</div>
+		<br><br>
 		<div class="flex-row">
-			<button id="welcome-create-pass" class="button generic">Create User &amp; Password</button>
+			<button id="welcome-create-pass" class="button big">Create a Password</button>
 		</div>
 
 	</div>
@@ -133,8 +132,10 @@
 
 	<!--#region New User create pass-->
 	<div id="create-user" class="appface slide-hide">
-		<h2>Create User</h2>
+		<p></p>
+		<h2>Protect this wallet</h2>
 		<div class="form">
+			<!--
 			<div class="form-field-label">
 				<label data-shrink="true" for="email">
 					<h3>Your e-mail</h3>
@@ -143,34 +144,33 @@
 					<input type="text" tabindex="0" autocomplete="email" id="email" />
 				</div>
 			</div>
+			-->
 			<div class="form-field-label">
-				<label class="" data-shrink="true" for="pass" id="create-password-label">
-					<h3>New password (min 8
-						chars)</h3>
-				</label>
-				<div class="form-control">
-					<input type="password" autocomplete="new-password" type="password" id="pass">
-				</div>
+				<label class="big-label" data-shrink="true" for="pass">Password (min 8 chars)</label><br>
+				<input type="password" autocomplete="new-password" type="password" id="pass">
 			</div>
 			<div class="form-field-label">
-				<label class="form-field-label" data-shrink="true" for="pass-confirm" id="confirm-password-label">
-					<h3>Confirm password</h3>
-				</label>
-				<div class="form-control">
-					<input type="password" autocomplete="new-password" id="pass-confirm">
-				</div>
+				<label class="big-label" data-shrink="true" for="pass-confirm">Confirm password</label><br>
+				<input type="password" autocomplete="new-password" id="pass-confirm">
 			</div>
 
-			<p></p>
-			<p></p>
+			<br>
+			<br>
+
+			<h3 class="warning boxed">
+				You need to write down this password.
+				We don't store your password so it is not possible to help you recover it.
+				If you lose the password you will not be able access the wallet anymore.
+				Remember to store passwords and seed phrases, securely and in more than one place.
+			</h3>
 
 			<div class="checkbox-container">
 				<input id="agree-check" type="checkbox" bind:checked aria-checked="false"
 					aria-labelledby="checkbox-label" />
 				<label for="agree-check" class="checkbox-label">
 					I have read and agree to the
-					<a href=# id="open-terms-of-use">Terms of
-						Use
+					<a href=# id="open-terms-of-use">
+						Terms of Use
 					</a>
 				</label>
 			</div>
@@ -517,6 +517,7 @@
 		<!--#region subpage is OK to grant access? -->
 		<div id="account-selected-ok-to-grant-access" class="subpage hidden">
 			<div class="contentarea">
+				<h2>This account is read-only.</h2>
 				<h2>Grant full access to this account ?</h2>
 
 				<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
@@ -606,9 +607,7 @@
 
 				<div class="seed-phrase-form">
 					<div class="form-field-label">
-						<label for="seed-phrase">
-							Seed Phrase
-						</label>
+						<label for="seed-phrase">Seed Phrase or Private key</label>
 						<div class="form-control">
 							<input class="biginput" autocomplete="off" placeholder="correct horse battery staple..."
 								id="seed-phrase" type="text">
@@ -754,34 +753,8 @@
 
 
 		</div>
-
-
 		<!--#endregion -->
 
-
-		<!--#region Ask For Password-->
-
-		<div id="" class="subpage hidden">
-
-			<h3>Please enter user and password to unlock this wallet</h3>
-
-			<div class="form-field-label">
-				<label for="email">Your e-mail</label>
-				<div class="form-control">
-					<input type="text" tabindex="0" autocomplete="email" id="unlock-email-subpage">
-				</div>
-			</div>
-
-			<div class="form-field-label">
-				<label for="unlock-pass">Password</label>
-				<div class="form-control">
-					<input autocomplete="new-password" id="unlock-pass-subpage" type="password">
-				</div>
-			</div>
-
-		</div>
-
-		<!--#endregion -->
 
 		<!--#region Ask For Password-->
 		<div id="account-selected-delete" class="subpage hidden">
@@ -896,10 +869,12 @@
 
 		<div class="bottombar">
 			<button class="button addaccount" id="add-account">Account</button>
+			<!--
 			<div class="AdverBlock">
 				<p>Did you know?</p>
 				<a href="#">Click this lovely link</a>
 			</div>
+		-->
 		</div>
 	</div>
 
@@ -911,7 +886,7 @@
 	<div id="display-seed-phrase" class="appface slide-hide">
 		<button class="button back" id="create-implicit-account-back-to-account"></button>
 		<h2>This is your Seed Phrase</h2>
-		<h3>Write it down, by hand, in two pieces of papers. Store them in safe places. <b>Anyone having this seed
+		<h3>Write it down, by hand, in two pieces of paper. Store them in safe places. <b>Anyone having this seed
 				phrase owns the account.</b></h3>
 
 
@@ -1025,19 +1000,18 @@
 
 	<div id="unlock" class="appface slide-hide">
 
-
-
 		<div class="logo-128"></div>
 
 		<h2>Welcome Back!</h2>
-		<h3>Please enter user and password to unlock this wallet</h3>
+		<h3>Please enter the password to unlock this wallet</h3>
 
-		<div class="form-field-label">
+		<!--<div class="form-field-label">
 			<label for="email">Your e-mail</label>
 			<div class="form-control">
 				<input type="text" tabindex="0" autocomplete="email" id="unlock-email">
 			</div>
 		</div>
+		-->
 
 		<div class="form-field-label">
 			<label for="unlock-pass">Password</label>
@@ -1048,12 +1022,14 @@
 
 		<button id="unlock" class="buttonextra unlocked">Unlock</button>
 
+		<!--
 		<div class="bottombar">
 			<div class="AdverBlock">
 				<p>Did you know?</p>
 				<a href="#">Click this lovely link</a>
 			</div>
 		</div>
+		-->
 
 	</div>
 
@@ -1070,7 +1046,7 @@
 
 		</div>
 
-		
+
 
 		<div id="selected-asset-template" class="hidden">
 			<div class="accountdetscuenta">
@@ -1163,7 +1139,7 @@
 
 				<div class="add-form-confirmation">
 
-					<h3 class="warning">Add </h3> <span id="asset-add-confirmation-name"></span>
+					<h3 class="warning">Add <span id="asset-add-confirmation-name"></span></h3>
 
 				</div>
 
@@ -1253,11 +1229,9 @@
 
 				<h2>Receive</h2>
 
-				<h3>Tell the other party to send </h3>
-				<h3 id="asset-receive-symbol"></h3>
-				<h3>to:</h3>
-
-				<h3 id="asset-receive-account">user.near</h3>
+				<h3>Tell the other party</h3>
+				<h3>to send <span id="asset-receive-symbol"></span></h3>
+				<h3> to: <span id="asset-receive-account">user.near</span></h3>
 			</div>
 		</div>
 

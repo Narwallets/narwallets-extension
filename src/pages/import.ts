@@ -222,19 +222,20 @@ async function importClicked(ev: Event) {
       lastSearchResult.lockupContract.accountInfo,
       accountOrder + 1
     );
-    if (!importedLc) couldNotImport = true;
+    if (!importedLc) {
+      // commented, importIfNew already shows err msg
+      //d.showWarn("Lockup account already in wallet")
+    }
   }
 
   if (couldNotImport) {
     //some time to see the error
     setTimeout(Pages.show, 5000);
   } else {
-    //d.showPage("account-selected");
     AccountSelectedPage_show(
       lastSearchResult.mainAccountName,
       "ask_private_key"
     );
-    //Pages.show();
   }
 }
 
@@ -332,10 +333,6 @@ export async function addListeners() {
   importButton.onClick(importClicked);
 
   onNetworkChanged(await askBackgroundGetNetworkInfo());
-}
-
-function func() {
-  console.log("HOLA HOLA HOLA");
 }
 
 //listen to extension messages

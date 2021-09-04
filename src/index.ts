@@ -33,6 +33,8 @@ import { calculateDollarValue } from "./data/global.js";
 import { D } from "./lib/tweetnacl/core/core.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 
+export const SINGLE_USER_EMAIL = "unique-user@narwallets.com"
+
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
 
 //--- content sections at MAIN popup.html
@@ -165,28 +167,18 @@ async function asideIsUnlocked() {
 
 async function securityOptions() {
   Options_show();
-  /*d.showSubPage("security-options");
-  const data = await askBackground({ code: "get-options" });
-  d.inputById("autolock-seconds-input").value = data.autoUnlockSeconds.toString();
-  //d.inputById("advanced-mode").checked = data.advancedMode ? true : false;
-  d.onClickId("save-settings", saveSecurityOptions);
-  d.onClickId("cancel-security-settings", Pages.show);*/
 }
 
 async function saveSecurityOptions(ev: Event) {
   try {
     ev.preventDefault();
 
-    //const checkElem = document.getElementById(
-    //     "advanced-mode"
-    //) as HTMLInputElement;
     const aulSecs = Number(d.inputById("autolock-seconds-input").value);
     if (isNaN(aulSecs)) throw Error("Invalid auto unlock seconds");
 
     await askBackground({
       code: "set-options",
       autoUnlockSeconds: aulSecs,
-      //advancedMode: checkElem.checked,
     });
 
     Pages.show();
@@ -220,7 +212,6 @@ async function changePassword() {
   if (await asideIsUnlocked()) {
     d.showPage(Pages.CHANGE_PASSWORD);
     ChangePass_addListeners();
-    //d.onClickId("confirm-change-password", ChangePass_addListeners);
   }
 }
 
@@ -246,17 +237,17 @@ async function asideAddressBook() {
   }
 }
 
-export async function asideSwitchMode(delay: number = 300) {
+export async function asideSwitchMode() {
   //close aside
   hambClicked();
 
-  let colorMode = switchDarkLight(10);
+  let colorMode = switchDarkLight();
 
   localStorageSet({ popupConfig: { lightMode: colorMode == "light" } })
 
 }
 
-export function switchDarkLight(delay: number = 300): string {
+export function switchDarkLight(): string {
 
   const cssLinkIndex = 0;
   var oldlink = document.getElementsByTagName("link").item(cssLinkIndex);
@@ -273,11 +264,9 @@ export function switchDarkLight(delay: number = 300): string {
   isDark = !isDark;
 
   console.log(oldlink?.href, cssFile);
-  //setTimeout(() => {
   if (oldlink && !oldlink.href.includes(cssFile)) {
     oldlink.href = cssFile;
   }
-  //}, delay);
 
   return colorMode;
 }
@@ -298,11 +287,9 @@ async function initPopup() {
 
   //aside
   d.qs("aside #lock").onClick(asideLock);
-  //d.qs("aside #expand").onClick(asideExpand);
   d.qs("aside #accounts").onClick(asideAccounts);
   d.qs("aside #create-user").onClick(asideCreateUserClicked);
   d.qs("aside #add-account-side").onClick(asideAddAccount);
-  //d.qs("aside #change-password").onClick(asideChangePassword);
   d.qs("aside #options").onClick(asideOptions);
   d.qs("aside #contact").onClick(asideContact);
   d.qs("aside #change-password").onClick(changePassword);
@@ -313,7 +300,6 @@ async function initPopup() {
   d.populateUL("network-items", "network-item-template", NetworkList);
 
   //--init other pages
-  //lala_design temp commented
   d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
   d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
   CreateUser_addListeners();
@@ -332,16 +318,14 @@ async function initPopup() {
   // set auto-refresh based on page shown
   window.setInterval(async function () {
     autoRefresh();
-  }, 15000);
+  }, 5000);
 
   //show main page
   return Pages.show();
 }
 
 function autoRefresh() {
-  console.log("Calling autorefresh");
-  console.log(selectedAccountData);
-  console.log(d.activePage);
+  //console.log(`Calling auto-refresh, selectedAccountData ${selectedAccountData} d.activePage ${d.activePage}`);
   if (d.activePage == "account-list-main") {
     refreshAllAccounts();
   }
@@ -351,10 +335,10 @@ function autoRefresh() {
 }
 
 function openTermsOfUseOnNewWindow() {
-  localStorageSet({
-    reposition: "create-user",
-    email: d.inputById("email").value,
-  });
+  // localStorageSet({
+  //   reposition: "create-user",
+  //   email: SINGLE_USER_EMAIL, // d.inputById("email").value,
+  // });
   chrome.windows.create({
     url: "https://narwallets.com/terms.html",
   });
@@ -386,9 +370,9 @@ window.onload = function () {
       console.log(JSON.stringify(chrome.runtime.lastError));
     }
     else {
-      console.log(obj);
-      if (obj?.popupConfig.lightMode) {
-        switchDarkLight(10);
+      //console.log(obj);
+      if (obj?.popupConfig?.lightMode) {
+        switchDarkLight();
       }
     }
   });

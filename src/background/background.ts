@@ -53,8 +53,8 @@ function runtimeMessageHandler(
   //console.log("runtimeMessage received ",sender, url)
   log(
     "runtimeMessage received " +
-      (fromPage ? "FROM PAGE " : "from popup ") +
-      JSON.stringify(msg)
+    (fromPage ? "FROM PAGE " : "from popup ") +
+    JSON.stringify(msg)
   );
   if (msg.dest != "ext") {
     sendResponse({ err: "msg.dest must be 'ext'" });
@@ -136,7 +136,7 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
       return global.unlockSecureStateAsync(msg.email, msg.password);
     } else if (msg.code == "create-user") {
       return global.createUserAsync(msg.email, msg.password);
-    } else if(msg.code == "change-password") {
+    } else if (msg.code == "change-password") {
       return global.changePasswordAsync(msg.email, msg.password)
     } else if (msg.code == "set-options") {
       global.SecureState.advancedMode = msg.advancedMode;
@@ -161,7 +161,7 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
       if (!global.SecureState.accounts[msg.accInfo.network]) {
         global.SecureState.accounts[msg.accInfo.network] = {};
       }
-      if(!msg.accInfo.network) {
+      if (!msg.accInfo.network) {
         console.log("Account without network. ", JSON.stringify(msg.accInfo))
       } else {
         global.SecureState.accounts[msg.accInfo.network][msg.accountId] = msg.accInfo;
@@ -171,8 +171,9 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
     } else if (msg.code == "add-contact") {
       if (!msg.name) return Promise.reject(Error("!msg.name"));
       if (!global.SecureState.contacts) global.SecureState.contacts = {};
-      if (!global.SecureState.contacts[Network.current])
+      if (!global.SecureState.contacts[Network.current]) {
         global.SecureState.contacts[Network.current] = {};
+      }
       global.SecureState.contacts[Network.current][msg.name] = msg.contact;
       global.saveSecureState();
       return Promise.resolve();
