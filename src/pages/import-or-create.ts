@@ -7,7 +7,7 @@ import { Account } from "../data/account.js";
 
 import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import type { SeedPhraseResult } from "../lib/near-api-lite/utils/seed-phrase.js";
-import { backToAccountsList } from "./main.js";
+import { backToAccountsList, backToAccountsClicked } from "./main.js";
 import { encodeHex } from "../lib/crypto-lite/encode.js";
 
 
@@ -22,7 +22,8 @@ async function createAccountClicked(ev :Event) {
 }
 
 function importAccountClicked(ev :Event) {
-  d.showPage(IMPORT_ACCOUNT)
+  d.showPage(IMPORT_ACCOUNT);
+  d.onClickId("import-existing-account-back-to-account", backToAccountsClicked);
 }
 
 let seedResult:SeedPhraseResult;
@@ -41,6 +42,7 @@ async function createImplicitAccountClicked(ev :Event) {
 async function createImplicitAccount_Step1() {
   try {
     d.showPage("display-seed-phrase");
+    d.onClickId("create-implicit-account-back-to-account", backToAccountsClicked);
     d.byId("seed-phrase-show-box").innerText = seedResult.seedPhrase.join(" ");
     d.onClickId("seed-phrase-continue",createImplicitAccount_Step2);
     d.onClickId("seed-phrase-cancel",backToAccountsList);
@@ -73,7 +75,8 @@ async function createImplicitAccount_Step3() {
     d.hideErr() 
     const newKeyPair = KeyPairEd25519.fromString(seedResult.secretKey);
     const accountId = encodeHex(newKeyPair.getPublicKey().data)
-    const accInfo = new Account()
+    const networkInfo = await askBackgroundGetNetworkInfo();
+    const accInfo = new Account(networkInfo.name)
     
     accInfo.privateKey= bs58.encode(newKeyPair.getSecretKey())
     await askBackgroundSetAccount(accountId,accInfo)

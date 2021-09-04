@@ -1,0 +1,47 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+.loginface
+{
+	display: inline-block;
+	width:359px;
+	align-content: center;
+	text-align: center;
+	margin:0px;
+	padding: 0px;
+}
+
+.loginface input
+{
+	display:inline-block;
+	width:200px;
+	height:25px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--ControlAccent);
+	margin:5px;
+	border-radius: 5px;
+}
+
+.loginface label
+{
+	color:var(--ControlText) ;
+	
+}
+
+.loginface h1
+{ 
+	color: var(--TextRemark);
+	font-weight: lighter;
+	margin-bottom: -10px;
+}
+
+.loginface h3
+{
+	color: var(--TextColor);
+	font-weight:normal;
+	display:inline-block;
+	width:280px;
+}
+

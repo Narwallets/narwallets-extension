@@ -3,113 +3,119 @@
 -------------------*/
 
 svg {
-    min-height: 20px;
-    transition: transform 0.3s ease-in-out;
+  min-height: 20px;
+  transition: transform 0.3s ease-in-out;
 }
 
 svg line {
-    stroke: currentColor;
-    stroke-width: 3;
-    transition: transform 0.3s ease-in-out
+  stroke      : currentColor;
+  stroke-width: 3;
+  transition  : transform 0.3s ease-in-out;
 }
 
 .hamb {
-    position: absolute;
-    top: 10px;
-    right :10px;
-    border-radius:6px;
-    max-width: 40px;
-    padding: 5px;
-    cursor: pointer;
-    --text-opacity: 1;
-    color: #a0aec0;
-    color: rgba(160,174,192,var(--text-opacity));
-    border-style: none;
-    z-index:99;
+  position      : absolute;
+  top           : 4px;
+  right         : 0px;
+  border-radius : 6px;
+  max-width     : 40px;
+  padding       : 5px;
+  cursor        : pointer;
+  --text-opacity: 1;
+  color         : #a0aec0;
+  color         : rgba(160, 174, 192, var(--text-opacity));
+  border-style  : none;
+  z-index       : 99;
 }
 
 .hamb.open {
-    z-index: 100;
+  z-index: 100;
 }
 
 .open svg {
-    transform: scale(0.7)
+  transform: scale(0.7);
 }
 
 .open #top {
-    transform: translate(2px, 0px) rotate(45deg) scale(1.5,1);
+  transform: translate(2px, 0px) rotate(45deg) scale(1.5, 1);
 }
+
 .open #bottom {
-    transform: translate(-17px, 11px) rotate(-45deg) scale(1.5,1);
+  transform: translate(-17px, 11px) rotate(-45deg) scale(1.5, 1);
 }
 
 .open #middle {
-    opacity: 0;
+  opacity: 0;
 }
 
 /*-------------------
 --  ASIDE
 -------------------*/
 aside {
-    position: absolute;
-    line-height: 2;
-    top: 0;
-    left: 100%;
-    transition: transform 0.3s ease-in-out;
-    background-color: lightgray;
-    z-index: 98;
-    opacity: 1;
-    width: 100%;
-    height: 100%;
-    padding-top: 59px;
+  position        : absolute;
+  line-height     : 2;
+  top             : 0;
+  left            : 481px;
+  transition      : transform 0.3s ease-in-out;
+  background-color: var(--Background);
+  z-index         : 99;
+  opacity         : 1;
+  width           : 100%;
+  height          : 100%;
+  padding-top     : 59px;
 }
 
 aside.open {
-    transform: translate(-450px,0);
+  transform: translate(-480px, 0);
 }
 
-.backblur{
-    opacity: 0;
+.backblur {
+  opacity: 0;
 }
 
-.backblur.open{
-    position: absolute;
-    width:100%;
-    height: 100%;
-    opacity: 0.75;
-    transition:opacity 1s ease-in-out;
-    background-color: black;
+.backblur.open {
+  position        : absolute;
+  width           : 100%;
+  height          : 100%;
+  opacity         : 1;
+  transition      : opacity 1s ease-in-out;
+  background-color: black;
 }
 
 aside>nav>hr {
-    border: 0;
-    width: 82%;
-    height: 1px;
-    background-image: linear-gradient(to left, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-    opacity: 0.2;
-    margin: -1px 0px;
+  border: 0;
+  width : 82%;
+  height: 1px;
+  background-image: linear-gradient(to left,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0));
+  opacity: 0.2;
+  margin : -1px 0px;
 }
 
-aside>nav{
-    flex-flow:column nowrap;
-    align-items: flex-end;
-    display: flex;
+aside>nav {
+  flex-flow  : column nowrap;
+  align-items: flex-end;
+  display    : flex;
 }
 
 aside>nav>li {
-    flex: 1 1;
-    width: 100%;
-    text-align: right;
-    padding:5px 2em;
-    line-height: 2.2em;
-    font-size: 1.7em;
-    font-weight: 250;
-    z-index: 93;
+  flex       : 1 1;
+  width      : 361px;
+  text-align : right;
+  padding    : 5px 10px;
+  margin-left: 10px;
+  line-height: 2.2em;
+  font-size  : 1.7em;
+  font-weight: 250;
+  z-index    : 93;
+  margin-right: 10px;
 }
 
 aside>nav>li:hover {
-    background-color: #939aa03b;
-    cursor: pointer;
+  background-color: var(--HoverColor);
+  cursor          : pointer;
 }
 
 /* more-than 640px 
@@ -126,10 +132,158 @@ aside>nav>li:hover {
 }
 */
 
-aside .logo-128{
-    opacity: 0.07;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 94;
+aside .logo-128 {
+  opacity: 0.88;
+  position: absolute;
+  top     : 5px;
+  left    : 20px;
+  z-index : 94;
+}
+
+/* 
+----------------------
+NETWORK selection drop-down
+----------------------
+*/
+
+.network-component.pointer {
+  border: 1px solid var(--ControlAccent);
+  border-radius: 24px;
+  margin-left  : 108px;
+  padding      : 3px;
+  width        : 149px;
+  flex         : 0 0 auto;
+  display      : flex;
+  z-index      : 99;
+  margin-top   : 2px;
+}
+
+.network-indicator {
+  display    : flex;
+  width      : 211px;
+  align-items: center;
+  font-size  : 13px;
+  color      : var(--Block);
+  font-weight: 400;
+  flex-flow  : row nowrap;
+}
+
+li {
+  list-style-type: none;
+  overflow-x     : hidden;
+  color          : var(--TextGeneric);
+  white-space    : nowrap;
+}
+
+li#current-network-display-name {
+  max-height: 20px;
+  width     : 118px;
+  color     : var(--TextGeneric);
+}
+
+.circle:before {
+  display      : inline-block;
+  content      : "";
+  border       : 2px solid #7f8186bd;
+  margin       : 0 6px;
+  width        : 10px;
+  height       : 10px;
+  border-radius: 7px;
+}
+
+.circle.green:before {
+  background-color: #368440;
+}
+
+.circle.cyan:before {
+  background-color: #388585;
+}
+
+.circle.yellow:before {
+  background-color: #968a31;
+}
+
+.circle.violet:before {
+  background-color: #643f85;
+}
+
+.circle.red:before {
+  background-color: #913e3eb5;
+}
+
+.networks-list-box {
+  position  : absolute;
+  top       : 42px;
+  left      : 277px;
+  z-index   : 55;
+  right     : 12px;
+  max-height: 0px;
+  overflow  : hidden;
+  opacity   : 0.25;
+  transition: top 0.25s ease-in-out, max-height 0.25s ease-in-out,
+    opacity 0.45s ease-in-out;
+  z-index: 99;
+}
+
+.networks-list-box.open {
+  max-height: 700px;
+  opacity   : 0.9;
+  top       : 40px;
+}
+
+.networks-list-content {
+  border-radius: 4px;
+  padding      : 18px 8px;
+  background   : rgb(16 16 16);
+  box-shadow   : rgba(0, 0, 0, 0.15) 0px 2px 2px 2px;
+}
+
+.network-box-header .title {
+  color         : var(--ControlAccent) smoke;
+  color         : white;
+  font-size     : 14pt;
+  padding-bottom: 5px;
+}
+
+.down-arrow {
+  background-image   : url(../icons/down-chevron.svg);
+  background-repeat  : no-repeat;
+  background-size    : contain;
+  background-position: right;
+  font-size          : 0.6em;
+  min-width          : 10px;
+  min-height         : 10px;
+  margin             : 0 8px;
+  min-width          : 10px;
+  min-height         : 10px;
+  color              : white;
+}
+
+.network-box-header hr {
+  border-color: #7090ab;
+  width       : 90%;
+}
+
+.networks-list-content li:hover {
+  background-color: rgb(64 64 64);
+  border-radius   : 4px;
+  opacity         : 1;
+}
+
+.networks-list-content li {
+  color          : rgb(185, 185, 185);
+  list-style     : none;
+  padding        : 5px 22px 5px 1px;
+  font-size      : 16px;
+  font-style     : normal;
+  cursor         : pointer;
+  display        : flex;
+  justify-content: flex-start;
+  align-items    : center;
+  line-height    : 20px;
+  border-color   : rgb(3, 135, 137);
+}
+
+.networks-list-content li span {
+  padding-left: 7px;
 }

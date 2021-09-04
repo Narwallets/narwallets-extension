@@ -1,0 +1,331 @@
+.appface {
+  position: absolute;
+  z-index: 95;
+  left: 0px;
+  top: 44px;
+  width: 480px;
+  height: 550px;
+  background: var(--Background);
+  /* background:var(--midcolor); */
+  overflow: hidden;
+  text-align: center;
+  align-items: center;
+}
+
+.appface.approve {
+  top: 0px;
+}
+
+.TopBlock {
+  position: absolute;
+  display: inline-block;
+  z-index: -1;
+  top: 0px;
+  left: 0px;
+  width: 470px;
+  height: 140px;
+  max-height: 140px;
+  margin: 5px;
+
+  border-radius: 5px;
+
+  background: var(--Block);
+
+  overflow-y: hidden;
+}
+
+.MidBlock {
+  position: absolute;
+  top: 155px;
+  left: 0px;
+  width: 480px;
+  padding: 0px;
+  height: 63px;
+  margin: 0px;
+  padding-top: 5px;
+
+  display: inline-flex;
+  justify-content: center;
+
+  background: var(--Block);
+
+  overflow-y: hidden;
+}
+
+.subpage {
+  position: absolute;
+  top: 226px;
+  left: 0px;
+  width: 470;
+  height: 320px;
+  margin: 5px;
+  background: var(--Background);
+  text-align: center;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.contentarea {
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding: 0px;
+  padding-top: 10px;
+  text-align: center;
+  display: flexbox;
+  background-color: transparent;
+}
+
+.fullblock {
+  position: absolute;
+  display: inline-block;
+  z-index: -1;
+  top: 0px;
+  left: 0px;
+  width: 470px;
+  height: 547px;
+  margin: 5px;
+
+  background: var(--Background);
+
+  overflow-y: hidden;
+}
+
+.bottombar {
+  position: absolute;
+  width: 471px;
+  height: 55px;
+  top: 495px;
+  left: 5px;
+
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+
+  display: inline-block;
+
+  padding-top: 4px;
+  display: inline-flex;
+  justify-content: flex-end;
+
+  background: var(--Block);
+}
+
+.addresslistscrollarea {
+  overflow-y: scroll;
+  height: 444px;
+}
+
+.accountlistscrollarea {
+  overflow-y: scroll;
+  height: 490px;
+}
+
+/*#region account details -------------------------------------------------------*/
+
+.accountdetscuenta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+
+  color: var(--BlockText);
+  background-color: var(--Block);
+
+  height: 48px;
+  width: 430px;
+
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: initial;
+  overflow: hidden;
+
+  font-size: 22px;
+  font-weight: 200;
+
+  border-radius: 5px 5px 0 0;
+
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.accountdetscomment {
+  display: block;
+  margin: auto;
+  margin-top: 2px;
+  margin-bottom: 0px;
+
+  max-height: 24px;
+  height: 15px;
+  width: 260px;
+  text-align: center;
+  color: var(--TextGeneric);
+  font-size: 12px;
+  font-weight: 200;
+}
+
+.accountdetssymbol {
+  display: block;
+  margin: auto;
+  margin-top: 8px;
+  margin-bottom: 0px;
+  color: var(--TextGeneric);
+  max-height: 24px;
+  height: 15px;
+  width: 260px;
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.assetdeticon svg {
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.assetdetcontract {
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  max-height: 24px;
+  height: 15px;
+  text-align: center;
+  color: var(--BlockText);
+  font-size: 12px;
+  font-weight: 200;
+}
+
+span#icon img {
+  width: 24px;
+  height: 24px;
+}
+
+.accountdetsbalance {
+  display: block;
+  margin: auto;
+  margin-top: 1px;
+  margin-bottom: 0px;
+  max-height: 28px;
+  height: 28px;
+  width: 370px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 28px;
+  font-weight: 200;
+  color: var(--TextRemark);
+}
+
+.accountdetsbalance svg {
+  background-color: transparent;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  background-position: center;
+  padding: 2px;
+  top: 6px;
+  left: -3px;
+  position: relative;
+}
+
+.accountdetsfiat {
+  display: inline-block;
+  margin-bottom: 0px;
+  max-height: 24px;
+  height: 28px;
+  padding: 0px;
+  font-weight: 400;
+  text-align: center;
+  align-items: center;
+  width: 260px;
+  background: transparent;
+  color: var(--TextGeneric);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.accountdetsfiat::after {
+  content: " usd";
+}
+
+/*#endregion*/
+
+.addressbook
+{
+  width: auto;
+}
+
+.addressbook h1
+{
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+
+  color: var(--BlockText);
+  
+  height: 48px;
+  width: 430px;
+
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: initial;
+  overflow: hidden;
+
+  font-size: 22px;
+  font-weight: 200;
+
+  border-radius: 5px 5px 0 0;
+
+  padding-left: 30px;
+  padding-right: 30px;
+
+}
+
+.AdverBlock
+{
+  position: absolute;
+  width: 401px;
+  height: 48px;
+  left:2px;
+  right:2px;
+  border-width: 1px;
+  /* border-style: solid; */
+  background-image: url("../icons/SVG/bulb.svg");
+  background-repeat: no-repeat;
+  background-size: 30px 50px;
+  background-position: 10px;
+  text-align: left;
+}
+
+.AdverBlock p
+{
+  position: absolute;
+  left: 56px;
+  top: -7px;
+  font-weight: 200;
+  font-size: 13px;
+  color: var(--BlockText);
+}
+
+.AdverBlock a
+{
+  position: absolute;
+  left: 56px;
+  top: 25px;
+  font-weight: 200;
+  font-size: 14px;
+  color: var(--HighLight);
+  text-decoration: none;
+}
+
+.AdverBlock a:hover
+{
+  color: var(--BlockText);
+  
+}
+

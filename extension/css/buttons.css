@@ -1,0 +1,250 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* ALL BUTTONS */
+
+.button {
+  width: 60px;
+  height: 48px;
+  display: block;
+  margin: 2px;
+  background-repeat: no-repeat;
+  color: var(--ControlText);
+  font-size: 10px;
+  text-align: center;
+  border-style: none;
+  border-radius: 5px;
+  background-color: transparent;
+  padding: 0px;
+  padding-top: 33px;
+  background-size: 30px;
+  background-position-x: center;
+}
+
+.button:hover {
+  cursor: hand;
+}
+
+.buttonextra {
+  width: 60px;
+  height: 48px;
+  display: block;
+  margin: auto;
+  background-repeat: no-repeat;
+  color: var(--TextGeneric);
+  font-size: 10px;
+  text-align: center;
+  border-style: none;
+  border-radius: 5px;
+  padding: 0px;
+  padding-top: 33px;
+  background-size: 30px;
+  background-position-x: center;
+  background-color: transparent;
+}
+
+.morepage {
+  position: relative;
+  width: 480px;
+  height: 60px;
+  color: white;
+  padding: 0px;
+  margin: 0px;
+  border-radius: 0px;
+  background: var(--Background);
+  border-style: none;
+}
+
+.morepage:hover {
+  background: var(--HoverColor);
+}
+
+.morepage h1 {
+  position: absolute;
+  display: block;
+  padding: 2px;
+  margin: 0px;
+  left: 0px;
+  top: 0px;
+  width: 480px;
+  height: 15px;
+  font-weight: 200;
+  font-size: 14px;
+  background: var(--Block);
+  color: var(--BlockText);
+  text-align: left;
+}
+
+.morepage h2 {
+  position: absolute;
+  padding: 0px;
+  margin: 0px;
+  left: 5px;
+  top: 21px;
+  width: 470px;
+  text-align: left;
+  font-weight: 100;
+  font-size: 12px;
+  color: var(--TextGeneric);
+  overflow-wrap: normal;
+}
+
+.cancel {
+  position: absolute;
+  top: 0px;
+  left: 370px;
+  width: 86px;
+  color: white;
+  height: 34px;
+  margin: 0px;
+  display: block;
+  border-radius: 16px;
+  border-style: none;
+  background-color: #c13e3e;
+}
+
+.cancel:hover {
+  cursor: hand;
+}
+
+.ok {
+  position: absolute;
+  top: 0px;
+  left: 274px;
+  width: 86px;
+  color: white;
+  height: 34px;
+  margin: 0px;
+  display: block;
+  border-radius: 16px;
+  border-style: none;
+  background-color: rgb(14 138 80);
+}
+
+.ok:hover {
+  cursor: hand;
+}
+
+.big {
+  width: 300px;
+  height: 40px;
+  margin: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 30px;
+  font-size: 16px;
+  font-weight: 200;
+  padding: 0px;
+  padding-top: 0px;
+  display: block;
+  color: white;
+  border-radius: 20px;
+  border-style: none;
+  background-color: var(--Block);
+  align-content: center;
+  border: 1px solid var(--HighLight);
+}
+
+.big:hover {
+  cursor: hand;
+}
+
+/*buttons that appear in light background*/
+
+.edit {
+  background-image: url("../icons/SVG/edit_light.svg");
+}
+
+.lock {
+  background-image: url("../icons/SVG/lock_light.svg");
+}
+
+.back {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 18px;
+  padding: 0px;
+  background-image: url("../icons/SVG/back_dark.svg");
+  background-size: 16px;
+}
+
+/*buttons that appear in dark background*/
+
+.receive {
+  background-image: url("../icons/SVG/receive_dark.svg");
+}
+
+.unlock {
+  background-image: url("../icons/SVG/key_dark.svg");
+}
+
+.send {
+  background-image: url("../icons/SVG/send_dark.svg");
+}
+
+.removeAddress {
+  background-image: url("../icons/SVG/minus_dark.svg");
+}
+
+.stake {
+  background-image: url("../icons/SVG/stake_dark.svg");
+}
+
+.add {
+  background-image: url("../icons/SVG/plus_dark.svg");
+}
+
+.addaccount {
+  background-image: url("../icons/SVG/plus_dark.svg");
+}
+
+.unlocked {
+  background-image: url("../icons/SVG/lock_dark.svg");
+}
+
+.connect {
+  background-image: url("../icons/SVG/link_dark.svg");
+}
+
+.disconnect {
+  background-image: url("../icons/SVG/unlink_dark.svg");
+}
+
+.remove {
+  background-image: url("../icons/SVG/minus_dark.svg");
+}
+
+.unstake {
+  background-image: url("../icons/SVG/unstake_light.svg");
+}
+
+.liqunstake {
+  background-image: url("../icons/SVG/liqunstk_light.svg");
+}
+
+.withdraw {
+  background-image: url("../icons/SVG/withdraw_light.svg");
+}
+
+.generic {
+  width: 130px;
+  height: 65px;
+  margin: 8px;
+  margin-top: 15px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 200;
+  padding: 5px;
+  display: block;
+  border-style: solid;
+  border-width: 1px;
+  color: var(--ControlText);
+  border-radius: 8px;
+  background: var(--Block);
+  align-content: center;
+}
+
+.generic:hover {
+  cursor: hand;
+}

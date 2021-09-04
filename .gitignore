@@ -3,3 +3,6 @@ out
 extension/dist/
 z-attic-gitignore
 
+extension/dist
+
+.vscode/launch.json

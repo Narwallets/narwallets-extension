@@ -1,0 +1,75 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+@import url('https://rsms.me/inter/inter.css');
+
+body {
+	font-family: 'Inter', sans-serif;
+	 !important
+}
+
+@supports (font-variation-settings: normal) {
+	body {
+		font-family: 'Inter var', sans-serif;
+		 !important
+	}
+}
+
+
+::-webkit-scrollbar {
+	display: none;
+}
+
+
+
+/*Colores */
+
+:root {
+
+	/*#region Color dark */
+
+	--Background: rgb(8, 21, 44);
+
+	--Block: rgb(2, 6, 17);
+
+	--BlockText: rgb(255, 255, 255);
+
+	--TextColor                   : rgb(93, 142, 216);
+	--TextRemark: rgb(197 187 99);
+
+	--TextGeneric: rgb(203 223 255);
+
+	--HoverColor: rgb(36, 51, 100);
+	/* color de hover en las listas */
+
+	--HighLight: rgb(189, 139, 1);
+	/* color para textos importantes */
+
+	--ButtonBorder: rgb(189, 139, 1);
+	--InputBorder: rgb(189, 139, 1);
+
+	--ControlBackgroud: rgb(36, 51, 100);
+
+	--ControlText: rgb(255, 255, 255);
+
+	--ControlAltText: rgb(255, 255, 255);
+
+	--ControlAccent: rgb(32, 106, 216);
+
+	/*#endregion */
+}
+
+
+body {
+	/*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
+	width           : 480px;
+	height          : 600px;
+	margin          : 0px;
+	overflow        : hidden;
+	padding         : 0px;
+	border-style    : none;
+	border-width    : 1px;
+	background-color: var(--Background);
+	color           : var(--TextColor);
+}
