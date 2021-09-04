@@ -13,11 +13,11 @@ export function TGas(tgas:number):string {
     return (BigInt(tgas)*b1e12).toString(); // tgas*1e12 // Note: gas is u64
   }
 export function ntoy(near:number):string {
-    return (BigInt(near)*b1e24).toString(); // near*1e24 // Note: YoctoNear is u128
+    return (BigInt(Math.round(near*1e6))*b1e24/b1e(6)).toString(); // near*1e24 // Note: YoctoNear is u128
 }
 
 /**
- * returns string representing NEAR with thsnds separators, and 5 decimal places
+ * returns string representing NEAR with thousands separators, and 5 decimal places
  * @param {string} yoctos 
  */
 export function ytonString(yoctos:string):string {

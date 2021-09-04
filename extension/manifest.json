@@ -1,29 +1,23 @@
 {
   "manifest_version": 2,
-
   "name": "Narwallets",
   "description": "NEAR protocol multi-account wallets",
-  "version": "2.0.0", 
-
+  "version": "2.0.1",
   "browser_action": {
     "default_popup": "index.html"
   },
-
   "background": {
     "page": "background/background.html",
     "persistent": false
   },
-
   "permissions": [
     "activeTab",
     "tabs",
     "storage",
     "alarms"
   ],
-
   "icons": {
     "48": "icons/logo_48.png",
     "128": "icons/logo_128.png"
   }
- 
 }
