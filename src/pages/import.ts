@@ -21,6 +21,7 @@ import {
 } from "../background/askBackground.js";
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
+import { activeNetworkInfo } from "../index.js";
 
 const NET_NAME = "net-name";
 const NET_ROOT = "net-root";
@@ -127,8 +128,7 @@ async function searchTheAccountName(accName: string) {
 
     //lockup contract?
     let lockupExtData;
-    const networkInfo = await askBackgroundGetNetworkInfo();
-    const accInfo = new Account(networkInfo.name);
+    const accInfo = new Account(activeNetworkInfo.name);
     accInfo.ownerId = accName;
     const lockupContract = await searchAccounts.getLockupContract(accInfo);
     if (lockupContract) {
@@ -256,13 +256,12 @@ async function searchClicked(ev: Event) {
     // let accName = accountInfoName.innerText; //d.byId(ACCOUNT_INFO_NAME).innerText;
     const input = d.inputById("search-account-name");
     let accName = input.value.trim().toLowerCase();
-    const netInfo = await askBackgroundGetNetworkInfo();
-    const root = netInfo.rootAccount;
+    const root = activeNetworkInfo.rootAccount;
     if (
       accName &&
       accName.length < 60 &&
       !accName.endsWith(root) &&
-      !(netInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
+      !(activeNetworkInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
     ) {
       accName = accName + "." + root;
     }

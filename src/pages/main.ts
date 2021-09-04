@@ -24,7 +24,7 @@ import { D } from "../lib/tweetnacl/core/core.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { asideSwitchMode, setIsDark } from "../index.js";
+import { activeNetworkInfo, asideSwitchMode, setIsDark } from "../index.js";
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
@@ -278,7 +278,7 @@ async function tryReposition() {
       const isLocked = await askBackgroundIsLocked();
       if (!isLocked) {
         if (account) {
-          console.log("reposition ",account,reposition,assetIndex)
+          console.log("reposition ", account, reposition, assetIndex)
           AccountSelectedPage_show(account, reposition, assetIndex);
         }
       }
@@ -311,8 +311,13 @@ export async function refreshAllAccounts() {
   const accountsRecord = await askBackgroundAllNetworkAccounts();
 
   for (let key in accountsRecord) {
-    await asyncRefreshAccountInfo(key, accountsRecord[key]);
 
+    if (activeNetworkInfo.name != accountsRecord[key].network) {
+      // network changed
+      return;
+    }
+
+    await asyncRefreshAccountInfo(key, accountsRecord[key]);
     const extAcc = new ExtendedAccountData(key, accountsRecord[key]);
 
     if (key == lastSelectedAccount?.name) {

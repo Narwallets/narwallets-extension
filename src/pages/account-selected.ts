@@ -81,6 +81,7 @@ import {
   UNSTAKE_DEFAULT_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
+import { activeNetworkInfo } from "../index.js";
 
 const THIS_PAGE = "account-selected";
 
@@ -168,6 +169,7 @@ export function onNetworkChanged(info: NetworkInfo) {
 
 function initPage() {
   d.onClickId("assets-list", showAssetDetailsClicked);
+  d.onClickId("account-history-details", historyLineClicked);
 
   // icon bar
   d.onClickId("receive", receiveClicked);
@@ -212,16 +214,30 @@ function backLinkClicked() {
   Pages.backToAccountsList();
 }
 
-export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
-  let accName = selectedAccountData.name;
-  const netInfo = await askBackgroundGetNetworkInfo();
+export function historyLineClicked(ev: Event) {
+  if (ev.target && ev.target instanceof HTMLElement) {
+    const li = ev.target.closest("li");
+    if (li) {
+      navigator.clipboard.writeText(li.innerText)
+      d.showMsg("copied", "info",1000)
+    }
+  }
+}
 
-  const root = netInfo.rootAccount;
+export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
+
+  if (selectedAccountData.accountInfo.network!==activeNetworkInfo.name) {
+    //network changed
+    return;
+  }
+
+  let accName = selectedAccountData.name;
+  const root = activeNetworkInfo.rootAccount;
   if (
     accName &&
     accName.length < 60 &&
     !accName.endsWith(root) &&
-    !(netInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
+    !(activeNetworkInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
   ) {
     accName = accName + "." + root;
   }
@@ -856,8 +872,7 @@ async function performStake() {
 
     const liquidStake = stakeTabSelected == 1;
     if (liquidStake) {
-      let networkInfo = await askBackgroundGetNetworkInfo();
-      newStakingPool = networkInfo.liquidStakingContract;
+      newStakingPool = activeNetworkInfo.liquidStakingContract;
       amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     } else {
       newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
@@ -1243,17 +1258,15 @@ async function performSend() {
 
 async function exploreButtonClicked() {
   localStorageSet({ reposition: "account", account: selectedAccountData.name });
-  const netInfo = await askBackgroundGetNetworkInfo();
   chrome.windows.create({
-    url: netInfo.explorerUrl + "accounts/" + selectedAccountData.name,
+    url: activeNetworkInfo.explorerUrl + "accounts/" + selectedAccountData.name,
     state: "maximized",
   });
 }
 
 async function detailedRewardsClicked() {
   localStorageSet({ reposition: "account", account: selectedAccountData.name });
-  const netInfo = await askBackgroundGetNetworkInfo();
-  if (netInfo.name != "mainnet") {
+  if (activeNetworkInfo.name != "mainnet") {
     d.showErr("This function is only available in mainnet");
   } else {
     chrome.windows.create({
@@ -1277,9 +1290,8 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
   let doingDiv;
   try {
     doingDiv = d.showMsg("Searching Pools...", "info", -1);
-    let networkInfo = await askBackgroundGetNetworkInfo();
     const tokenOptionsList =
-      networkInfo.name != "mainnet"
+      activeNetworkInfo.name != "mainnet"
         ? [
           "token.cheddar.testnet",
           "token.meta.pool.testnet",
@@ -1813,6 +1825,12 @@ async function removeAccountClicked(ev: Event) {
 }
 
 async function refreshSaveSelectedAccount(fromTimer?: boolean) {
+
+  if (selectedAccountData.accountInfo.network!==activeNetworkInfo.name) {
+    //network changed
+    return;
+  }
+
   await searchAccounts.asyncRefreshAccountInfo(
     selectedAccountData.name,
     selectedAccountData.accountInfo

@@ -27,7 +27,8 @@ import {
   show as AccountSelectedPage_show,
   accountHasPrivateKey,
   showGrantAccessSubPage,
-  historyWithIcons
+  historyWithIcons,
+  historyLineClicked
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
@@ -48,6 +49,7 @@ import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { nearDollarPrice } from "../data/global.js";
 import { setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
+import { activeNetworkInfo } from "../index.js";
 
 const THIS_PAGE = "AccountAssetDetail";
 
@@ -85,7 +87,10 @@ export async function show(
   }
   d.showPage(THIS_PAGE);
   d.onClickId("back-to-selected", backToSelectClicked);
+
   d.showSubPage("asset-history");
+  d.onClickId("asset-history-details", historyLineClicked);
+
   d.byId("topbar").innerText = "Assets";
 
   reloadDetails();
@@ -405,8 +410,7 @@ async function addMetaAsset(amount: number) {
     (i) => i.symbol == "META" || i.symbol == "$META"
   );
   if (!metaAsset) {
-    let networkInfo = await askBackgroundGetNetworkInfo();
-    metaAsset = await addAssetToken(networkInfo.liquidStakingGovToken);
+    metaAsset = await addAssetToken(activeNetworkInfo.liquidStakingGovToken);
   }
 }
 
@@ -723,7 +727,7 @@ export function removeSelectedFromAssets() {
 }
 
 function showInitial() {
-  console.log(selectedAccountData);
+  //console.log(selectedAccountData);
   hideOkCancel();
   d.showSubPage("asset-history");
 }

@@ -17,7 +17,7 @@ import { show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
 
 import { recoverState, State } from "./data/global.js";
-import { localStorageSet } from "./data/util.js";
+import { localStorageRemove, localStorageSet } from "./data/util.js";
 import {
   askBackground,
   askBackgroundGetNetworkInfo,
@@ -56,11 +56,12 @@ let isDark = true;
 const hamb = new d.El(".hamb");
 const aside = new d.El("aside");
 
-const currentNetworkDisplayName = new d.El("#current-network-display-name");
-
 let isOpen = false;
 
+export var activeNetworkInfo: NetworkInfo;
+
 function updateNetworkIndicatorVisualState(info: NetworkInfo) {
+  const currentNetworkDisplayName = new d.El("#current-network-display-name");
   currentNetworkDisplayName.innerText = info.displayName; //set name
   currentNetworkDisplayName.el.className = "circle " + info.color; //set indicator color
 }
@@ -84,13 +85,14 @@ async function networkItemClicked(e: Event) {
     closeDropDown(NETWORKS_LIST); //close
 
     //update global state (background)
-    const info = await askBackgroundSetNetwork(networkName);
+    const activeNetworkInfo = await askBackgroundSetNetwork(networkName);
     //update indicator visual state
-    updateNetworkIndicatorVisualState(info);
-    Import_onNetworkChanged(info);
+    updateNetworkIndicatorVisualState(activeNetworkInfo );
+    Import_onNetworkChanged(activeNetworkInfo );
 
-    Account_onNetworkChanged(info);
+    Account_onNetworkChanged(activeNetworkInfo);
     //on network-change restart the page-flow
+    localStorageRemove("reposition");
     Pages.show(); //refresh account list
   } catch (ex) {
     d.showErr(ex.message);
@@ -113,10 +115,6 @@ function selectNetworkClicked(ev: Event) {
   selectionBox.querySelectorAll("div.circle").forEach((div: Element) => {
     div.addEventListener(d.CLICK, networkItemClicked);
   });
-}
-
-function populateAddTokenCombo() {
-
 }
 
 function welcomeCreatePassClicked() {
@@ -308,10 +306,10 @@ async function initPopup() {
   Import_addListeners();
 
   //update network indicator visual state
-  const info = await askBackgroundGetNetworkInfo();
-  updateNetworkIndicatorVisualState(info);
-  Import_onNetworkChanged(info);
-  Account_onNetworkChanged(info);
+  activeNetworkInfo = await askBackgroundGetNetworkInfo();
+  updateNetworkIndicatorVisualState(activeNetworkInfo);
+  Import_onNetworkChanged(activeNetworkInfo);
+  Account_onNetworkChanged(activeNetworkInfo);
 
   calculateDollarValue();
 

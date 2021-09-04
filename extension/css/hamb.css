@@ -235,7 +235,8 @@ li#current-network-display-name {
   border-radius: 4px;
   padding      : 18px 8px;
   background   : rgb(16 16 16);
-  box-shadow   : rgba(0, 0, 0, 0.15) 0px 2px 2px 2px;
+  /* box-shadow: rgb(255 255 255) 11px 7px 2px 8px; */
+  border: 1px solid;
 }
 
 .network-box-header .title {
@@ -271,7 +272,7 @@ li#current-network-display-name {
 }
 
 .networks-list-content li {
-  color          : rgb(185, 185, 185);
+  color: rgb(243 243 243);
   list-style     : none;
   padding        : 5px 22px 5px 1px;
   font-size      : 16px;

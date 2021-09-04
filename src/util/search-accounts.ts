@@ -3,6 +3,7 @@ import * as c from "./conversions.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Account } from "../data/account.js";
 import { askBackground, askBackgroundGetNetworkInfo } from "../background/askBackground.js";
+import { activeNetworkInfo } from "../index.js";
 
 async function checkNotLockup(accName: string) {
   const suffix = await LockupContract.getLockupSuffix();
@@ -37,7 +38,6 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
     if (!lockup) return;
   } else {
     //normal account
-    let network = await askBackgroundGetNetworkInfo()
     let stateResultYoctos;
     try {
       stateResultYoctos = await askBackground({
@@ -45,7 +45,7 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
         accountId: accName,
       });
     } catch (ex) {
-      let reason = ex.message.includes("name:UNKNOWN_ACCOUNT") ? `account ${accName} not found in ${network.name}` : ex.message;
+      let reason = ex.message.includes("name:UNKNOWN_ACCOUNT") ? `account ${accName} not found in ${activeNetworkInfo.name}` : ex.message;
       throw Error(reason);
     }
 
@@ -82,8 +82,7 @@ export async function checkIfAccountExists(accName: string): Promise<boolean> {
 
 export async function searchAccount(accName: string): Promise<Account> {
   await checkNotLockup(accName);
-  const networkInfo = await askBackgroundGetNetworkInfo();
-  let result = new Account(networkInfo.name);
+  let result = new Account(activeNetworkInfo.name);
   await asyncRefreshAccountInfo(accName, result);
 
   return result;
