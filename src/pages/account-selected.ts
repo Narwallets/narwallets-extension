@@ -854,7 +854,8 @@ async function performStake() {
     let amountToStake: number;
     let existAssetWithThisPool = false;
 
-    if (stakeTabSelected == 1) {
+    const liquidStake = stakeTabSelected == 1;
+    if (liquidStake) {
       let networkInfo = await askBackgroundGetNetworkInfo();
       newStakingPool = networkInfo.liquidStakingContract;
       amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
@@ -862,16 +863,18 @@ async function performStake() {
       newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
       amountToStake = c.toNum(d.inputById("stake-amount").value);
     }
-    if (!isValidAccountID(newStakingPool))
+    if (!isValidAccountID(newStakingPool)) {
       throw Error("Staking pool Account Id is invalid");
-
-    if (!selectedAccountData.isFullAccess)
+    }
+    if (!selectedAccountData.isFullAccess) {
       throw Error("you need full access on " + selectedAccountData.name);
+    }
 
     //const amountToStake = info.lastBalance - info.staked - 36
-    if (!isValidAmount(amountToStake))
+    if (!isValidAmount(amountToStake)) {
       throw Error("Amount should be a positive integer");
-    if (amountToStake < 10) throw Error("Stake at least 10 Near");
+    }
+    if (liquidStake && amountToStake < 10) throw Error("Stake at least 10 NEAR");
 
     let poolAccInfo = {
       //empty info
@@ -932,16 +935,13 @@ async function performStake() {
         newBalance = poolAccInfo.staked_balance;
       }
 
-      let hist: History;
-      hist = {
-        amount: amountToStake,
-        date: new Date().toISOString(),
-        type: stakeTabSelected == 1 ? "liquid-stake" : "stake",
-        destination: "",
-        icon: stakeTabSelected == 1 ? "LIQUID-STAKE" : "STAKE",
-      };
-      let foundAsset: Asset = new Asset();
+      let hist = new History(
+        liquidStake ? "liquid-stake" : "stake",
+        amountToStake,
+        newStakingPool
+      )
 
+      let foundAsset: Asset = new Asset();
       selectedAccountData.accountInfo.assets.forEach((asset) => {
         if (asset.symbol != "UNSTAKED" && asset.contractId == newStakingPool) {
           existAssetWithThisPool = true;
@@ -1018,9 +1018,11 @@ async function performLockupContractStake() {
 
     //const amountToStake = info.lastBalance - info.staked - 36
     const amountToStake = c.toNum(d.inputById("stake-amount").value);
-    if (!isValidAmount(amountToStake))
+    if (!isValidAmount(amountToStake)) {
       throw Error("Amount should be a positive integer");
-    if (amountToStake < 10) throw Error("Stake at least 10 NEAR");
+    }
+    const liquidStake = stakeTabSelected == 1;
+    if (liquidStake && amountToStake < 10) throw Error("Stake at least 10 NEAR");
 
     const lc = new LockupContract(info);
     await lc.computeContractAccount();

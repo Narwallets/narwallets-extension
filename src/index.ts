@@ -288,7 +288,7 @@ async function initPopup() {
   //aside
   d.qs("aside #lock").onClick(asideLock);
   d.qs("aside #accounts").onClick(asideAccounts);
-  d.qs("aside #create-user").onClick(asideCreateUserClicked);
+  //d.qs("aside #create-user").onClick(asideCreateUserClicked);
   d.qs("aside #add-account-side").onClick(asideAddAccount);
   d.qs("aside #options").onClick(asideOptions);
   d.qs("aside #contact").onClick(asideContact);
