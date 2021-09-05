@@ -85,7 +85,7 @@ async function networkItemClicked(e: Event) {
     closeDropDown(NETWORKS_LIST); //close
 
     //update global state (background)
-    const activeNetworkInfo = await askBackgroundSetNetwork(networkName);
+    activeNetworkInfo = await askBackgroundSetNetwork(networkName);
     //update indicator visual state
     updateNetworkIndicatorVisualState(activeNetworkInfo );
     Import_onNetworkChanged(activeNetworkInfo );
