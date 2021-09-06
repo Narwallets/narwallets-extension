@@ -131,7 +131,6 @@ export async function show(
   }
   localStorageSet({ reposition: "account", account: accName });
   checkConnectOrDisconnect();
-
 }
 
 export function onNetworkChanged(info: NetworkInfo) {
@@ -218,15 +217,14 @@ export function historyLineClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
-      navigator.clipboard.writeText(li.innerText)
-      d.showMsg("copied", "info",1000)
+      navigator.clipboard.writeText(li.innerText);
+      d.showMsg("copied", "info", 1000);
     }
   }
 }
 
 export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
-
-  if (selectedAccountData.accountInfo.network!==activeNetworkInfo.name) {
+  if (selectedAccountData.accountInfo.network !== activeNetworkInfo.name) {
     //network changed
     return;
   }
@@ -237,7 +235,10 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
     accName &&
     accName.length < 60 &&
     !accName.endsWith(root) &&
-    !(activeNetworkInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
+    !(
+      activeNetworkInfo.name == "testnet" &&
+      /dev-[0-9]{13}-[0-9]{7}/.test(accName)
+    )
   ) {
     accName = accName + "." + root;
   }
@@ -396,11 +397,9 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
   item.symbol = result.symbol;
   if (result.icon?.startsWith("<svg")) {
     item.icon = result.icon;
-  }
-  else if (result.icon?.startsWith("data:image")) {
-    item.icon = `<img src="${result.icon}">`
-  }
-  else {
+  } else if (result.icon?.startsWith("data:image")) {
+    item.icon = `<img src="${result.icon}">`;
+  } else {
     item.icon = TOKEN_DEFAULT_SVG;
   }
   item.url = result.reference;
@@ -537,8 +536,8 @@ export async function accountHasPrivateKey(): Promise<boolean> {
     if (!ownerInfo.privateKey) {
       throw Error(
         "You need full access on the owner account: " +
-        selectedAccountData.accountInfo.ownerId +
-        " to operate this lockup account"
+          selectedAccountData.accountInfo.ownerId +
+          " to operate this lockup account"
       );
     }
     return true;
@@ -619,11 +618,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-        info.ownerId +
-        " to " +
-        action +
-        " from this " +
-        selectedAccountData.typeFull
+          info.ownerId +
+          " to " +
+          action +
+          " from this " +
+          selectedAccountData.typeFull
       );
     }
   }
@@ -632,8 +631,7 @@ async function checkOwnerAccessThrows(action: string) {
 //----------------------
 async function sendClicked() {
   try {
-
-    if (!await accountHasPrivateKey()) {
+    if (!(await accountHasPrivateKey())) {
       showGrantAccessSubPage();
       return;
     }
@@ -661,7 +659,7 @@ async function sendClicked() {
           0.1
         );
       });
-      d.showSubPage("account-selected-send")
+      d.showSubPage("account-selected-send");
       showOKCancel(sendOKClicked, showInitial);
     }
   } catch (ex) {
@@ -670,12 +668,11 @@ async function sendClicked() {
 }
 
 function checkContactList(address: string) {
-  const toAccName = address.trim()
+  const toAccName = address.trim();
   if (contactExists(toAccName)) {
     showInitial();
     hideOkCancel();
-  }
-  else {
+  } else {
     d.showSubPage("sure-add-contact");
     d.byId("add-confirmation-name").innerText = toAccName;
     showOKCancel(addContactToList, showInitial);
@@ -693,8 +690,7 @@ async function addContactToList() {
     showInitial();
   } catch {
     d.showErr("Error in save contact");
-  }
-  finally {
+  } finally {
     hideOkCancel();
   }
 }
@@ -763,11 +759,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -775,7 +771,6 @@ async function performLockupContractSend() {
     await refreshSelectedAccountAndAssets();
 
     await checkContactList(toAccName);
-
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -787,8 +782,7 @@ async function performLockupContractSend() {
 //----------------------
 async function stakeClicked() {
   try {
-
-    if (!await accountHasPrivateKey()) {
+    if (!(await accountHasPrivateKey())) {
       showGrantAccessSubPage();
       return;
     }
@@ -818,7 +812,7 @@ async function stakeClicked() {
 
     if (amountToStake < 0) amountToStake = 0;
 
-    d.showSubPage("account-selected-stake")
+    d.showSubPage("account-selected-stake");
     showOKCancel(performer, showInitial);
 
     d.qs("#liquid-stake-radio").el.checked = true;
@@ -889,7 +883,8 @@ async function performStake() {
     if (!isValidAmount(amountToStake)) {
       throw Error("Amount should be a positive integer");
     }
-    if (liquidStake && amountToStake < 10) throw Error("Stake at least 10 NEAR");
+    if (liquidStake && amountToStake < 10)
+      throw Error("Stake at least 10 NEAR");
 
     let poolAccInfo = {
       //empty info
@@ -954,7 +949,7 @@ async function performStake() {
         liquidStake ? "liquid-stake" : "stake",
         amountToStake,
         newStakingPool
-      )
+      );
 
       let foundAsset: Asset = new Asset();
       selectedAccountData.accountInfo.assets.forEach((asset) => {
@@ -1037,7 +1032,8 @@ async function performLockupContractStake() {
       throw Error("Amount should be a positive integer");
     }
     const liquidStake = stakeTabSelected == 1;
-    if (liquidStake && amountToStake < 10) throw Error("Stake at least 10 NEAR");
+    if (liquidStake && amountToStake < 10)
+      throw Error("Stake at least 10 NEAR");
 
     const lc = new LockupContract(info);
     await lc.computeContractAccount();
@@ -1061,8 +1057,7 @@ async function performLockupContractStake() {
 //-------------------------------------
 async function unstakeClicked() {
   try {
-
-    if (!await accountHasPrivateKey()) {
+    if (!(await accountHasPrivateKey())) {
       showGrantAccessSubPage();
       return;
     }
@@ -1110,9 +1105,8 @@ async function unstakeClicked() {
 
     //d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
     //d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
-    d.showSubPage("account-selected-unstake")
+    d.showSubPage("account-selected-unstake");
     showOKCancel(performer, showInitial);
-
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1229,11 +1223,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
+        selectedAccountData.name +
+        " transferred " +
+        c.toStringDec(amountToSend) +
+        "\u{24c3} to " +
+        toAccName
     );
 
     selectedAccountData.accountInfo.history.unshift(
@@ -1245,12 +1239,9 @@ async function performSend() {
     await refreshSelectedAccountAndAssets();
 
     await checkContactList(toAccName);
-
   } catch (ex) {
     d.showErr(ex.message);
-
   } finally {
-
     d.hideWait();
     enableOKCancel();
   }
@@ -1293,22 +1284,22 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
     const tokenOptionsList =
       activeNetworkInfo.name != "mainnet"
         ? [
-          "token.cheddar.testnet",
-          "token.meta.pool.testnet",
-          "meta-v2.pool.testnet",
-        ]
+            "token.cheddar.testnet",
+            "token.meta.pool.testnet",
+            "meta-v2.pool.testnet",
+          ]
         : [
-          "wrap.near",
-          "meta-token.near",
-          "meta-pool.near",
-          "berryclub.ek.near",
-          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-        ];
+            "wrap.near",
+            "meta-token.near",
+            "meta-pool.near",
+            "berryclub.ek.near",
+            "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+            "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+            "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+            "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+            "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+            "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+          ];
 
     let checked: Record<string, boolean> = {};
 
@@ -1376,31 +1367,30 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
                 );
                 exAccData.accountInfo.assets.push(newAsset);
               }
+            }
+            // has unstaked balance?
+            if (c.yton(poolAccInfo.unstaked_balance) > 0) {
+              let asset =
+                // exAccData.accountInfo.assets.find(
+                //   (i) =>
+                //     i.contractId == pool.account_id && i.symbol == "UNSTAKED"
+                // );
 
-              // has unstaked balance?
-              if (c.yton(poolAccInfo.unstaked_balance) > 0) {
-                let asset =
-                  // exAccData.accountInfo.assets.find(
-                  //   (i) =>
-                  //     i.contractId == pool.account_id && i.symbol == "UNSTAKED"
-                  // );
-
-                  exAccData.findAsset(pool.account_id, "UNSTAKED");
-                if (asset) {
-                  asset.balance = c.yton(poolAccInfo.unstaked_balance);
-                } else {
-                  // need to create
-                  let newAsset = new Asset(
-                    "",
-                    "",
-                    pool.account_id,
-                    c.yton(poolAccInfo.unstaked_balance),
-                    "unstake",
-                    "UNSTAKED",
-                    UNSTAKE_DEFAULT_SVG
-                  );
-                  exAccData.accountInfo.assets.push(newAsset);
-                }
+                exAccData.findAsset(pool.account_id, "UNSTAKED");
+              if (asset) {
+                asset.balance = c.yton(poolAccInfo.unstaked_balance);
+              } else {
+                // need to create
+                let newAsset = new Asset(
+                  "",
+                  "",
+                  pool.account_id,
+                  c.yton(poolAccInfo.unstaked_balance),
+                  "unstake",
+                  "UNSTAKED",
+                  UNSTAKE_DEFAULT_SVG
+                );
+                exAccData.accountInfo.assets.push(newAsset);
               }
             }
           }
@@ -1825,8 +1815,7 @@ async function removeAccountClicked(ev: Event) {
 }
 
 async function refreshSaveSelectedAccount(fromTimer?: boolean) {
-
-  if (selectedAccountData.accountInfo.network!==activeNetworkInfo.name) {
+  if (selectedAccountData.accountInfo.network !== activeNetworkInfo.name) {
     //network changed
     return;
   }
@@ -1853,10 +1842,10 @@ async function refreshClicked(ev: Event) {
 }
 
 export function historyWithIcons(base: History[]) {
-  let newHistory: History[] = []
+  let newHistory: History[] = [];
   // set icons
   for (let item of base) {
-    let data = Object.assign({}, item)
+    let data = Object.assign({}, item);
     if (!data.icon.startsWith("<svg")) {
       switch (data.type) {
         case "unstake":
@@ -1868,14 +1857,15 @@ export function historyWithIcons(base: History[]) {
         case "send":
           data.icon = SEND_SVG;
           break;
-        case "liquid-stake": case "liquid-unstake":
+        case "liquid-stake":
+        case "liquid-unstake":
           data.icon = LIQUID_STAKE_DEFAULT_SVG;
           break;
         default:
           data.icon = "";
           break;
       }
-      newHistory.push(data)
+      newHistory.push(data);
     }
   }
   return newHistory;
