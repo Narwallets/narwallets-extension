@@ -82,6 +82,7 @@ function hideSearchResultExtraData() {
 function importExistingAccount() {
   //accountInfoName.innerText=""
   hideSearchResultExtraData();
+  d.inputById("search-account-name").focus();
   d.showPage(IMPORT_ACCOUNT);
 }
 
