@@ -3,50 +3,63 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Narwallet Approve Transaction</title>
+    <title>Narwallets Approve Transaction</title>
     <link rel="stylesheet" href="approve.css">
-   
+
 </head>
 
 <body>
-   
-        <div class="appface">
 
-            <div class="sep30"> </div>
+    <div class="appface">
 
-            <h3 id="web-page">www.asdasd.asdasd</h3>
-            <h3>is asking to execute on</h3>
-            <h2 id="receiver">dsfsdfsdfsdfsdf</h2>
+        <div class="sep30"> </div>
 
-            <ul id="list" class="list">
-            </ul>
+        <h3 id="web-page">www.narwallets.com</h3>
+        <h3>is asking to execute on</h3>
+        <h2 id="receiver">meta-pool.near</h2>
 
-            <li id="item-template" class="hidden" data-id="{name}">
-                <div class="action">{action}</div>
-                <div class="attached-near">{attached}</div>
-            </li>
+        <ul id="list" class="list">
+        </ul>
 
-            <div class="sep10"></div>
-            <h3>click OK to approve the transaction in <span id="net-name"></span> with account</h3>
-            <h2 id="signer-id">asdasdasdasd</h2>
-            <div class="sep30"> </div>
-            <!-- OK CANCEL buttons common to all subpages -->
-            <div class="button-group">
-                <button id="approve-ok" class="ok">OK</button>
-                <button id="approve-cancel" class="cancel">Cancel</button>
-            </div>
+        <li id="item-template" class="hidden" data-id="{name}">
+            <div class="action">{action}</div>
+            <div class="attached-near">{attached}</div>
+        </li>
 
-
-            <!-- -->
-            <div id="err-div"></div>
-            <!-- -->
-
-            <div id="wait">
-                <div class="lds-ring"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-            </div>
-
+        <div class="sep10"></div>
+        <h3>click OK to approve the transaction in <span id="net-name"></span> with account</h3>
+        <h2 id="signer-id">lorem.ipsum.near</h2>
+        <div class="sep30"> </div>
+        <!-- OK CANCEL buttons common to all subpages -->
+        <div class="button-group">
+            <button id="approve-ok" class="ok">OK</button>
+            <button id="approve-cancel" class="cancel">Cancel</button>
         </div>
-  
+
+
+        <!-- -->
+        <div id="err-div"></div>
+        <!-- -->
+
+        <div id="wait">
+            <div class="lds-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+
+    </div>
+
     <script type="module" src="../../dist/popups/approve/approve.js"></script>
 
 </body>

@@ -109,7 +109,7 @@ function displayTx(msg:TxMsg) {
   try {
     d.byId("net-name").innerText = msg.network || ""
     d.byId("signer-id").innerText = msg.signerId || ""
-    d.byId("web-page").innerText = msg.url
+    d.byId("web-page").innerText = msg.url.split(/[?#]/)[0]; // remove querystring and/or hash
     d.byId("receiver").innerText = msg.tx.receiver
 
     d.clearContainer("list")
