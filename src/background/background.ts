@@ -226,8 +226,7 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
       return near.view(msg.contract, msg.method, msg.args);
     } else if (msg.code == "set-address-book") {
       if (!msg.accountId) return Promise.reject(Error("!msg.accountId"));
-      if (!global.SecureState.contacts[Network.current])
-        global.SecureState.contacts[Network.current] = {};
+      if (!global.SecureState.contacts[Network.current]) global.SecureState.contacts[Network.current] = {};
       global.SecureState.contacts[Network.current][msg.accountId] = msg.contact;
       global.saveSecureState();
       return Promise.resolve();
@@ -242,8 +241,7 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
       //when resolved, send msg to content-script->page
       const signerId = msg.signerId || "...";
       const accInfo = global.getAccount(signerId);
-      if (!accInfo.privateKey)
-        throw Error(`Narwallets: account ${signerId} is read-only`);
+      if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);
       //convert wallet-api actions to near.TX.Action
       const actions: TX.Action[] = [];
       for (let item of msg.tx.items) {
@@ -391,8 +389,9 @@ async function processMessageFromWebPage(msg: any) {
         //verify account exists and is full-access
         const signerId = ctinfo.connectedAccountId;
         const accInfo = global.getAccount(signerId);
-        if (!accInfo.privateKey)
+        if (!accInfo.privateKey) {
           throw Error(`Narwallets: account ${signerId} is read-only`);
+        }
 
         msg.dest = "approve"; //send msg to the approval popup
         msg.signerId = ctinfo.connectedAccountId;
