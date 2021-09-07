@@ -82,7 +82,7 @@ function backToAccountsClicked() {
     d.clearContainer("address-list");
     d.showPage("account-list-main");
     d.showSubPage("assets");
-    d.byId("ok-cancel-row").classList.add("hidden");
+    hideOkCancel();
   }
 }
 

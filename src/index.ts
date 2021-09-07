@@ -149,7 +149,8 @@ function asideExpand() {
 
 function asideAccounts() {
   hambClicked();
-  Pages.show();
+  hideOkCancel();
+  d.showPage("account-list-main");
 }
 
 async function asideIsUnlocked() {
@@ -208,6 +209,7 @@ async function asideOptions() {
 
 async function changePassword() {
   if (await asideIsUnlocked()) {
+    hideOkCancel();
     d.showPage(Pages.CHANGE_PASSWORD);
     ChangePass_addListeners();
   }
@@ -219,6 +221,7 @@ function asideCreateUserClicked() {
 }
 async function asideAddAccount() {
   if (await asideIsUnlocked()) {
+    hideOkCancel();
     Pages.addAccountClicked();
   }
 }
@@ -230,6 +233,7 @@ async function asideChangePassword() {
 }
 
 async function asideAddressBook() {
+  hideOkCancel();
   if (await asideIsUnlocked()) {
     AddressBook_show();
   }
