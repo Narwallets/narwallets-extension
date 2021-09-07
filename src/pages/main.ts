@@ -25,6 +25,7 @@ import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { activeNetworkInfo, asideSwitchMode, setIsDark } from "../index.js";
+import { hideOkCancel } from "../util/okCancel.js";
 
 //--- content sections at MAIN popup.html
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
@@ -258,7 +259,7 @@ export function backToAccountsClicked() {
   d.clearContainer("assets-list");
   d.showPage("account-list-main");
   d.showSubPage("assets");
-  d.byId("ok-cancel-row").classList.add("hidden");
+  hideOkCancel()
 }
 
 async function tryReposition() {

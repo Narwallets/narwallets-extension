@@ -49,7 +49,6 @@ export function showOKCancel(
   //isMoreOptionsOpen = false;
   confirmFunction = OKHandler;
   cancelFunction = CancelHandler;
-  console.log("showOkCancel");
   okCancelRow.show();
   enableOKCancel();
   if (OKHandler === CancelHandler) {

@@ -211,6 +211,7 @@ function initPage() {
 function backLinkClicked() {
   selectedAccountData.name = "";
   Pages.backToAccountsList();
+  hideOkCancel();
 }
 
 export function historyLineClicked(ev: Event) {
