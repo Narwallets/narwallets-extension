@@ -99,6 +99,7 @@ let intervalIdShow: any;
 
 // Added for add token datalist patch
 const TOKEN_LIST = "token-list";
+const ADDRESS_LIST = "address-list"
 
 export async function show(
   accName: string,
@@ -242,6 +243,7 @@ function initPage() {
 
   // Added for datalist patch
   d.onClickId("select-token", selectTokenClicked);
+  d.onClickId("current-to-send-address", selectAddressClicked)
 
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo-add-token");
@@ -686,6 +688,9 @@ async function sendClicked() {
     }
 
     hideOkCancel();
+
+    setAddressBookList()
+
     let maxAmountToSend = selectedAccountData.available;
 
     //if it's a lock.c and we didn't add a priv key yet, use contract method "transfer" (performLockupContractSend)
@@ -714,6 +719,42 @@ async function sendClicked() {
   } catch (ex) {
     d.showErr(ex.message);
   }
+}
+
+function selectAddressClicked(ev: Event) {
+  const selectionBox = d.byId(ADDRESS_LIST);
+  if (selectionBox == undefined) return;
+  if (selectionBox.classList.contains(d.OPEN)) {
+    closeDropDown(ADDRESS_LIST); //close
+    return;
+  }
+  //open drop down box
+  selectionBox.classList.add(d.OPEN);
+  selectionBox.querySelectorAll("option").forEach((option: Element) => {
+    option.addEventListener(d.CLICK, addressItemClicked);
+  });
+}
+
+function addressItemClicked(ev: Event) {
+  let input = d.inputById("send-to-account-name")
+  let target = ev.target as HTMLElement
+
+  if(input) {
+    input.value = target.innerHTML
+  }
+  closeDropDown(ADDRESS_LIST); //close
+}
+
+function setAddressBookList() {
+  closeDropDown(ADDRESS_LIST); //close
+  let items = d.byId("address-items")
+  let options = "";
+
+  addressContacts.forEach(element => {
+    options += `<option value="` + element.accountId + `">` + element.accountId + `</option>`
+  });
+
+  if (items) items.innerHTML = options;
 }
 
 function checkContactList(address: string) {

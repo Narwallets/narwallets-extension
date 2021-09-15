@@ -310,11 +310,23 @@
 				<h2>Send</h2>
 				<h3>Send to Account Id</h3>
 
-				<div class="combotextbox">
+				<div id="select-send-address-book" class="inputboxwithbutton" title="Send address book">
+					<div class="inputboxwithbutton">
+						<input id="send-to-account-name" type="text" list="combo-send-asset" />
+						<button id="current-to-send-address">Select Address</button>
+						<div class="down-arrow"></div>
+						<!-- Add Token Dropdown -->
+
+						<div id="address-list" class="networks-list-box">	
+							<div id="address-items">Select address</div>
+						</div>
+					</div>
+				</div>
+				<!-- <div class="combotextbox">
 					<input id="send-to-account-name" type="text" list="send-contact-combo" />
 					<datalist id="send-contact-combo">
 					</datalist>
-				</div>
+				</div> -->
 
 				<h3>Amount in NEAR (Max. <span id="max-amount-send"></span>)</h3>
 				<div class="inputboxwithbutton">
