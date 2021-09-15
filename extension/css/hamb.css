@@ -55,7 +55,7 @@ aside {
   position        : absolute;
   line-height     : 2;
   top             : 0;
-  left            : 481px;
+  left            : 493px;
   transition      : transform 0.3s ease-in-out;
   background-color: var(--Background);
   z-index         : 99;
@@ -66,7 +66,7 @@ aside {
 }
 
 aside.open {
-  transform: translate(-480px, 0);
+  transform: translate(-492px, 0);
 }
 
 .backblur {

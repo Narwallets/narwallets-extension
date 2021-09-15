@@ -11,7 +11,7 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { onNetworkChanged as Account_onNetworkChanged, refreshSelectedAccountAndAssets, selectedAccountData, show as AccountSelectedPage_show } from "./pages/account-selected.js";
+import { refreshSelectedAccountAndAssets, selectedAccountData, show as AccountSelectedPage_show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
@@ -90,7 +90,7 @@ async function networkItemClicked(e: Event) {
     updateNetworkIndicatorVisualState(activeNetworkInfo );
     Import_onNetworkChanged(activeNetworkInfo );
 
-    Account_onNetworkChanged(activeNetworkInfo);
+    // Account_onNetworkChanged(activeNetworkInfo);
     //on network-change restart the page-flow
     localStorageRemove("reposition");
     Pages.show(); //refresh account list
@@ -99,7 +99,7 @@ async function networkItemClicked(e: Event) {
   }
 }
 
-function closeDropDown(id: string): void {
+export function closeDropDown(id: string): void {
   d.byId(id).classList.remove(d.OPEN); //hides
 }
 
@@ -313,7 +313,7 @@ async function initPopup() {
   activeNetworkInfo = await askBackgroundGetNetworkInfo();
   updateNetworkIndicatorVisualState(activeNetworkInfo);
   Import_onNetworkChanged(activeNetworkInfo);
-  Account_onNetworkChanged(activeNetworkInfo);
+  // Account_onNetworkChanged(activeNetworkInfo);
 
   calculateDollarValue();
 

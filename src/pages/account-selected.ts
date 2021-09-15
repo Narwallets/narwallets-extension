@@ -81,17 +81,14 @@ import {
   UNSTAKE_DEFAULT_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { activeNetworkInfo } from "../index.js";
+import { activeNetworkInfo, closeDropDown } from "../index.js";
 
 const THIS_PAGE = "account-selected";
 
 export let selectedAccountData: ExtendedAccountData;
 
-let accountInfoName: d.El;
-let accountBalance: d.El;
 
 let removeButton: d.El;
-let refreshButton: d.El;
 
 let seedTextElem: d.El;
 let comboAdd: d.El;
@@ -99,6 +96,9 @@ let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
 let intervalIdShow: any;
+
+// Added for add token datalist patch
+const TOKEN_LIST = "token-list";
 
 export async function show(
   accName: string,
@@ -133,35 +133,78 @@ export async function show(
   checkConnectOrDisconnect();
 }
 
-export function onNetworkChanged(info: NetworkInfo) {
-  let list = document.querySelector("#combo-add-token-datalist");
+function selectTokenClicked(ev: Event) {
+  setCurrentNetworkTokenList();
+  const selectionBox = d.byId(TOKEN_LIST);
+  if (selectionBox == undefined) return;
+  if (selectionBox.classList.contains(d.OPEN)) {
+    closeDropDown(TOKEN_LIST); //close
+    return;
+  }
+  //open drop down box
+  selectionBox.classList.add(d.OPEN);
+  selectionBox.querySelectorAll("option").forEach((div: Element) => {
+    div.addEventListener(d.CLICK, tokenItemClicked);
+  });
+}
 
-  let options = "";
+function tokenItemClicked(ev: Event) {
+  let input = document.querySelector("#token-to-add-name") as HTMLInputElement
+  let select = document.querySelector("#current-to-add-token")
 
-  if (info.name == "testnet") {
-    options = `<option value="token.cheddar.testnet">CHDR</option>
-		<option value="token.meta.pool.testnet">META</option>
-		<option value="meta-v2.pool.testnet">STNEAR</option>`;
-  } else if (info.name == "mainnet") {
-    options = `<option value="wrap.near">wNEAR</option>
-    <option value="meta-token.near">META TOKEN</option>
-    <option value="meta-pool.near">STNEAR</option>
-    <option value="berryclub.ek.near">BANANA</option>
-    <option value="6b17...1d0f.factory.bridge.near"
-      data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
-    <option value="dac17...31ec7.factory.bridge.near"
-      data-contract="dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near">nUSDT</option>
-    <option value="1f98...f984.factory.bridge.near"
-      data-contract="1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near">nUNI</option>
-    <option value="5149...86ca.factory.bridge.near"
-      data-contract="514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near">nLINK</option>
-    <option value="a0b8...eb48.factory.bridge.near"
-      data-contract="a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near">nUSDC</option>
-    <option value="2260...c599.factory.bridge.near"
-      data-contract="2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near">nWBTC</option>`;
+  let clickedElement = ev.target as HTMLElement
+  let value = clickedElement.getAttribute("value") as string
+  let innerHtml = clickedElement.innerHTML
+
+  if(input) {
+    input.value = value
+  }
+  if(select) {
+    select.innerHTML = innerHtml
   }
 
-  if (list) list.innerHTML = options;
+}
+
+function setCurrentNetworkTokenList() {
+  let list = document.querySelector("#token-items");
+
+  let options = "";
+  if (activeNetworkInfo.name == "testnet") {
+    options = `<option value="token.cheddar.testnet">CHDR</option>
+               <option value="token.meta.pool.testnet">META</option>
+               <option value="meta-v2.pool.testnet">STNEAR</option>`;
+  } else if (activeNetworkInfo.name == "mainnet") {
+    options = `<option value="wrap.near">wNEAR</option>
+               <option value="meta-token.near">META TOKEN</option>
+               <option value="meta-pool.near">STNEAR</option>
+               <option value="berryclub.ek.near">BANANA</option>
+               <option value="6b17...1d0f.factory.bridge.near"
+                data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
+               <option value="dac17...31ec7.factory.bridge.near"
+                data-contract="dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near">nUSDT</option>
+               <option value="1f98...f984.factory.bridge.near"
+                data-contract="1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near">nUNI</option>
+               <option value="5149...86ca.factory.bridge.near"
+                data-contract="514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near">nLINK</option>
+               <option value="a0b8...eb48.factory.bridge.near"
+                data-contract="a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near">nUSDC</option>
+               <option value="2260...c599.factory.bridge.near"
+                data-contract="2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near">nWBTC</option>`;
+  }
+    
+    if (list) list.innerHTML = options;
+}
+
+// This works without datalist. It was done due some Chrome update that broke it and should be replaced by the commented below
+export function onNetworkChanged(info: NetworkInfo) {
+  const tokenList = d.byId("combo-add-token-datalist")
+  if (tokenList == undefined) return;
+  if (tokenList.classList.contains(d.OPEN)) {
+    closeDropDown(TOKEN_LIST); //close
+    return;
+  }
+  //open drop down box
+  tokenList.classList.add(d.OPEN);
 }
 
 // page init
@@ -196,6 +239,9 @@ function initPage() {
   // liquid/delayed stake
   d.onClickId("one-tab-stake", selectFirstTab);
   d.onClickId("two-tab-stake", selectSecondTab);
+
+  // Added for datalist patch
+  d.onClickId("select-token", selectTokenClicked);
 
   seedTextElem = new d.El("#seed-phrase");
   comboAdd = new d.El("#combo-add-token");
@@ -333,6 +379,8 @@ function showAssetDetailsClicked(ev: Event) {
 
 function addClicked() {
   d.showSubPage("add-subpage");
+  let select = document.querySelector("#current-to-add-token") as HTMLElement
+  select.innerHTML = "Select token"
   showOKCancel(addOKClicked, showInitial);
 }
 
@@ -340,12 +388,12 @@ async function addOKClicked() {
   disableOKCancel();
   d.showWait();
   try {
-    let contractValue = d.inputById("combo-add-token").value;
+    let contractValue = d.inputById("token-to-add-name").value;
     if (!contractValue) {
       throw new Error("Contract ID empty");
     }
     let list =
-      document.querySelector("#combo-add-token-datalist")?.children || [];
+      document.querySelector("#token-items")?.children || [];
 
     for (let i = 0; i < list?.length || 0; i++) {
       let element = list[i] as HTMLOptionElement;

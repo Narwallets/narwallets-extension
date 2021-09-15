@@ -53,6 +53,8 @@
 		</div>
 	</div>
 
+	
+
 	<!-- Network Item Template -->
 	<div id="network-item-template" class="hidden">
 		<div data-code="{name}" class="circle {color}">{displayName}</div>
@@ -504,9 +506,28 @@
 				<h2>Add Token</h2>
 				<div class="combotextboxtoken">
 
-					<input type="text" list="combo-add-token-datalist" id="combo-add-token" />
-					<datalist id="combo-add-token-datalist">
-					</datalist>
+					<!-- This is a temporary patch to fix the datalist problem from Chrome -->
+					<div id="select-token" class="network-component pointer" title="Add token">
+						<div class="token-indicator">
+							<input id="token-to-add-name" value="" placeholder="Type token name"/>
+							<li id="current-to-add-token"></li>
+							<div class="down-arrow"></div>
+							<!-- Add Token Dropdown -->
+
+							<div id="token-list" class="networks-list-box">
+								<div class="networks-list-content">
+									
+									<div id="token-items">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- The code below is for the case of the datalist -->
+					<!-- <input type="text" list="combo-add-token-datalist" id="combo-add-token" /> -->
+					<!-- <datalist id="combo-add-token-datalist">
+					</datalist> -->
 
 				</div>
 
