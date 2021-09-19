@@ -101,15 +101,15 @@ aside>nav {
 }
 
 aside>nav>li {
-  flex       : 1 1;
-  width      : 361px;
-  text-align : right;
-  padding    : 5px 10px;
-  margin-left: 10px;
-  line-height: 2.2em;
-  font-size  : 1.7em;
-  font-weight: 250;
-  z-index    : 93;
+  flex        : 1 1;
+  width       : 361px;
+  text-align  : right;
+  padding     : 5px 10px;
+  margin-left : 10px;
+  line-height : 2.2em;
+  font-size   : 1.7em;
+  font-weight : 250;
+  z-index     : 93;
   margin-right: 10px;
 }
 
@@ -133,7 +133,7 @@ aside>nav>li:hover {
 */
 
 aside .logo-128 {
-  opacity: 0.88;
+  opacity : 0.88;
   position: absolute;
   top     : 5px;
   left    : 20px;
@@ -147,7 +147,7 @@ NETWORK selection drop-down
 */
 
 .network-component.pointer {
-  border: 1px solid var(--ControlAccent);
+  border       : 1px solid var(--ControlAccent);
   border-radius: 24px;
   margin-left  : 108px;
   padding      : 3px;
@@ -231,12 +231,71 @@ li#current-network-display-name {
   top       : 40px;
 }
 
+.combo-list-appface {
+  position        : absolute;
+  top             : 600px;
+  left            : 0px;
+  right           : 0px;
+  bottom          : 0px;
+  opacity         : 0;
+  transition      : opacity 0.25s ease-in-out;
+  z-index         : 99;
+  padding         : 20px;
+  margin          : 0px;
+}
+
+.combo-list-appface.open {
+  top             : 0px;
+  opacity: 0.7;
+  background-color: var(--Background);
+  border          : 1px solid var(--HighLight);
+  text-align      : center;
+  box-shadow      : 0px 0px 7px var(--HighLight);
+}
+
+.combo-list-box {
+  opacity         : 0;
+}
+
+.combo-list-box.open {
+  position        : absolute;
+  top             : auto;
+  left            : 20px;
+  right           : 20px;
+  bottom          : 20px;
+  max-height : 500px;
+  opacity         : 1;
+  transition      : opacity 0.25s ease-in-out;
+  z-index         : 99;
+  padding         : 20px;
+  background-color: var(--Background);
+  border          : 1px solid var(--HighLight);
+  text-align      : center;
+  box-shadow      : 0px 0px 7px var(--HighLight);
+}
+
+option {
+  font-size       : 16px;
+  padding         : 4px 0px;
+  cursor          : pointer;
+  word-break      : break-all;
+  display         : block;
+  /* max-width    : 400px; */
+  height          : auto;
+  overflow        : hidden;
+  text-overflow   : ellipsis;
+}
+
+option:hover {
+  background-color: var(--HoverColor);
+}
+
 .networks-list-content {
   border-radius: 4px;
   padding      : 18px 8px;
   background   : rgb(16 16 16);
   /* box-shadow: rgb(255 255 255) 11px 7px 2px 8px; */
-  border: 1px solid;
+  border       : 1px solid;
 }
 
 .network-box-header .title {
@@ -272,7 +331,7 @@ li#current-network-display-name {
 }
 
 .networks-list-content li {
-  color: rgb(243 243 243);
+  color          : rgb(243 243 243);
   list-style     : none;
   padding        : 5px 22px 5px 1px;
   font-size      : 16px;

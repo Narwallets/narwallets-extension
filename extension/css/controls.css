@@ -2,11 +2,11 @@
 
 .inputboxwithbutton {
   width   : 360px;
-  height  : 30px;
+  height: 60px;
   display : block;
   position: relative;
   margin  : auto;
-  padding : 10px;
+  /* padding : 10px; */
 }
 
 .inputboxwithbutton input[type="text"] {

@@ -55,6 +55,7 @@ import {
   initAddressArr,
   saveContactOnBook,
   show as AddressBook_show,
+  getAddressesForPopupList
 } from "./address-book.js";
 
 import type { AnyElement, ClickHandler } from "../util/document.js";
@@ -81,7 +82,8 @@ import {
   UNSTAKE_DEFAULT_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { activeNetworkInfo, closeDropDown } from "../index.js";
+import { activeNetworkInfo} from "../index.js";
+import { closePopupList, PopupItem, popupListOpen } from "../util/popup-list.js";
 
 const THIS_PAGE = "account-selected";
 
@@ -91,7 +93,6 @@ export let selectedAccountData: ExtendedAccountData;
 let removeButton: d.El;
 
 let seedTextElem: d.El;
-let comboAdd: d.El;
 let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
 
@@ -99,7 +100,7 @@ let intervalIdShow: any;
 
 // Added for add token datalist patch
 const TOKEN_LIST = "token-list";
-const ADDRESS_LIST = "address-list"
+
 
 export async function show(
   accName: string,
@@ -134,79 +135,6 @@ export async function show(
   checkConnectOrDisconnect();
 }
 
-function selectTokenClicked(ev: Event) {
-  setCurrentNetworkTokenList();
-  const selectionBox = d.byId(TOKEN_LIST);
-  if (selectionBox == undefined) return;
-  if (selectionBox.classList.contains(d.OPEN)) {
-    closeDropDown(TOKEN_LIST); //close
-    return;
-  }
-  //open drop down box
-  selectionBox.classList.add(d.OPEN);
-  selectionBox.querySelectorAll("option").forEach((div: Element) => {
-    div.addEventListener(d.CLICK, tokenItemClicked);
-  });
-}
-
-function tokenItemClicked(ev: Event) {
-  let input = document.querySelector("#token-to-add-name") as HTMLInputElement
-  let select = document.querySelector("#current-to-add-token")
-
-  let clickedElement = ev.target as HTMLElement
-  let value = clickedElement.getAttribute("value") as string
-  let innerHtml = clickedElement.innerHTML
-
-  if(input) {
-    input.value = value
-  }
-  if(select) {
-    select.innerHTML = innerHtml
-  }
-
-}
-
-function setCurrentNetworkTokenList() {
-  let list = document.querySelector("#token-items");
-
-  let options = "";
-  if (activeNetworkInfo.name == "testnet") {
-    options = `<option value="token.cheddar.testnet">CHDR</option>
-               <option value="token.meta.pool.testnet">META</option>
-               <option value="meta-v2.pool.testnet">STNEAR</option>`;
-  } else if (activeNetworkInfo.name == "mainnet") {
-    options = `<option value="wrap.near">wNEAR</option>
-               <option value="meta-token.near">META TOKEN</option>
-               <option value="meta-pool.near">STNEAR</option>
-               <option value="berryclub.ek.near">BANANA</option>
-               <option value="6b17...1d0f.factory.bridge.near"
-                data-contract="6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near">nDAI</option>
-               <option value="dac17...31ec7.factory.bridge.near"
-                data-contract="dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near">nUSDT</option>
-               <option value="1f98...f984.factory.bridge.near"
-                data-contract="1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near">nUNI</option>
-               <option value="5149...86ca.factory.bridge.near"
-                data-contract="514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near">nLINK</option>
-               <option value="a0b8...eb48.factory.bridge.near"
-                data-contract="a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near">nUSDC</option>
-               <option value="2260...c599.factory.bridge.near"
-                data-contract="2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near">nWBTC</option>`;
-  }
-    
-    if (list) list.innerHTML = options;
-}
-
-// This works without datalist. It was done due some Chrome update that broke it and should be replaced by the commented below
-export function onNetworkChanged(info: NetworkInfo) {
-  const tokenList = d.byId("combo-add-token-datalist")
-  if (tokenList == undefined) return;
-  if (tokenList.classList.contains(d.OPEN)) {
-    closeDropDown(TOKEN_LIST); //close
-    return;
-  }
-  //open drop down box
-  tokenList.classList.add(d.OPEN);
-}
 
 // page init
 
@@ -241,12 +169,7 @@ function initPage() {
   d.onClickId("one-tab-stake", selectFirstTab);
   d.onClickId("two-tab-stake", selectSecondTab);
 
-  // Added for datalist patch
-  d.onClickId("select-token", selectTokenClicked);
-  d.onClickId("current-to-send-address", selectAddressClicked)
-
   seedTextElem = new d.El("#seed-phrase");
-  comboAdd = new d.El("#combo-add-token");
   removeButton = new d.El("button#remove");
 
   OkCancelInit();
@@ -381,10 +304,40 @@ function showAssetDetailsClicked(ev: Event) {
 
 function addClicked() {
   d.showSubPage("add-subpage");
-  let select = document.querySelector("#current-to-add-token") as HTMLElement
-  select.innerHTML = "Select token"
+  d.onClickId("token-combo-select", selectTokenClicked);
   showOKCancel(addOKClicked, showInitial);
 }
+
+// shows drop-down with tokens
+async function selectTokenClicked() {
+  let items: PopupItem[];
+  if (activeNetworkInfo.name == "testnet") {
+    items = [
+      {text:"CHDR - token.cheddar.testnet", value:"token.cheddar.testnet"},
+      {text:"$META - token.meta.pool.testnet", value:"token.meta.pool.testnet"},
+      {text:"stNEAR - meta-v2.pool.testnet", value:"meta-v2.pool.testnet"},
+    ]
+  } else {
+    items = [
+      {text:"wNEAR - wrap.near", value:"wrap.near"},
+      {text:"$META - meta-token.near", value:"meta-token.near"},
+      {text:"stNEAR - meta-pool.near", value:"meta-pool.near"},
+      {text:"BANANA - berryclub.ek.near", value:"berryclub.ek.near"},
+      {text:"nWBTC- (bridged)", value:"2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near"},
+      {text:"nUSDT- (bridged)", value:"dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near"},
+      {text:"nUSDC- (bridged)", value:"a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near"},
+      {text:"nDAI - (bridged)", value:"6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near"},
+      {text:"nUNI - (bridged)", value:"1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near"},
+      {text:"nLINK- (bridged)", value:"514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near"},
+    ]
+  }
+  //show and what to do when clicked
+  popupListOpen(items, tokenPopupListItemClicked) 
+}
+function tokenPopupListItemClicked(text: string, value: string) {
+  d.inputById("token-to-add-name").value = value
+}
+
 
 async function addOKClicked() {
   disableOKCancel();
@@ -467,24 +420,12 @@ function getAccountRecord(accName: string): Promise<Account> {
   });
 }
 
-export async function populateSendCombo(combo: string) {
-  var options = "";
-  if (addressContacts.length == 0) await initAddressArr();
-
-  for (var i = 0; i < addressContacts.length; i++) {
-    options += '<option value="' + addressContacts[i].accountId + '" />';
-  }
-
-  d.byId(combo).innerHTML = options;
-}
-
 async function selectAndShowAccount(accName: string) {
   const accInfo = await getAccountRecord(accName);
   if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
 
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Pages.setLastSelectedAccount(selectedAccountData);
-  populateSendCombo("send-contact-combo");
 
   if (accInfo.ownerId && accInfo.type == "lock.c" && !accInfo.privateKey) {
     //lock.c is read-only, but do we have full access on the owner?
@@ -587,8 +528,8 @@ export async function accountHasPrivateKey(): Promise<boolean> {
     if (!ownerInfo.privateKey) {
       throw Error(
         "You need full access on the owner account: " +
-          selectedAccountData.accountInfo.ownerId +
-          " to operate this lockup account"
+        selectedAccountData.accountInfo.ownerId +
+        " to operate this lockup account"
       );
     }
     return true;
@@ -669,11 +610,11 @@ async function checkOwnerAccessThrows(action: string) {
       showGotoOwner();
       throw Error(
         "You need full access on " +
-          info.ownerId +
-          " to " +
-          action +
-          " from this " +
-          selectedAccountData.typeFull
+        info.ownerId +
+        " to " +
+        action +
+        " from this " +
+        selectedAccountData.typeFull
       );
     }
   }
@@ -688,8 +629,6 @@ async function sendClicked() {
     }
 
     hideOkCancel();
-
-    setAddressBookList()
 
     let maxAmountToSend = selectedAccountData.available;
 
@@ -714,6 +653,7 @@ async function sendClicked() {
         );
       });
       d.showSubPage("account-selected-send");
+      d.onClickId("current-to-send-address", selectAddressClicked)
       showOKCancel(sendOKClicked, showInitial);
     }
   } catch (ex) {
@@ -721,68 +661,14 @@ async function sendClicked() {
   }
 }
 
-function selectAddressClicked(ev: Event) {
-  const selectionBox = d.byId(ADDRESS_LIST);
-  if (selectionBox == undefined) return;
-  if (selectionBox.classList.contains(d.OPEN)) {
-    closeDropDown(ADDRESS_LIST); //close
-    return;
-  }
-  //open drop down box
-  selectionBox.classList.add(d.OPEN);
-  selectionBox.querySelectorAll("option").forEach((option: Element) => {
-    option.addEventListener(d.CLICK, addressItemClicked);
-  });
+// shows drop-down with addresses
+async function selectAddressClicked() {
+  const items = await getAddressesForPopupList()
+  //show and what to do when clicked
+  popupListOpen(items, popupListItemClicked) 
 }
-
-function addressItemClicked(ev: Event) {
-  let input = d.inputById("send-to-account-name")
-  let target = ev.target as HTMLElement
-
-  if(input) {
-    input.value = target.innerHTML
-  }
-  closeDropDown(ADDRESS_LIST); //close
-}
-
-function setAddressBookList() {
-  closeDropDown(ADDRESS_LIST); //close
-  let items = d.byId("address-items")
-  let options = "";
-
-  addressContacts.forEach(element => {
-    options += `<option value="` + element.accountId + `">` + element.accountId + `</option>`
-  });
-
-  if (items) items.innerHTML = options;
-}
-
-function checkContactList(address: string) {
-  const toAccName = address.trim();
-  if (contactExists(toAccName)) {
-    showInitial();
-    hideOkCancel();
-  } else {
-    d.showSubPage("sure-add-contact");
-    d.byId("add-confirmation-name").innerText = toAccName;
-    showOKCancel(addContactToList, showInitial);
-  }
-}
-
-async function addContactToList() {
-  try {
-    const contactToSave: GContact = {
-      accountId: new d.El("#send-to-account-name").value,
-      note: "",
-    };
-    await saveContactOnBook(contactToSave.accountId, contactToSave);
-    populateSendCombo("send-contact-combo");
-    showInitial();
-  } catch {
-    d.showErr("Error in save contact");
-  } finally {
-    hideOkCancel();
-  }
+function popupListItemClicked(text: string, value: string) {
+  d.inputById("send-to-asset-account").value = value
 }
 
 //----------------------
@@ -849,11 +735,11 @@ async function performLockupContractSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     displayReflectTransfer(amountToSend, toAccName);
@@ -866,6 +752,34 @@ async function performLockupContractSend() {
   } finally {
     d.hideWait();
     enableOKCancel();
+  }
+}
+
+//----------------------
+function checkContactList(address: string) {
+  const toAccName = address.trim();
+  if (contactExists(toAccName)) {
+    showInitial();
+    hideOkCancel();
+  } else {
+    d.showSubPage("sure-add-contact");
+    d.byId("add-confirmation-name").innerText = toAccName;
+    showOKCancel(addContactToList, showInitial);
+  }
+}
+
+async function addContactToList() {
+  try {
+    const contactToSave: GContact = {
+      accountId: new d.El("#send-to-account-name").value,
+      note: "",
+    };
+    await saveContactOnBook(contactToSave.accountId, contactToSave);
+    showInitial();
+  } catch {
+    d.showErr("Error in save contact");
+  } finally {
+    hideOkCancel();
   }
 }
 
@@ -1313,11 +1227,11 @@ async function performSend() {
 
     d.showSuccess(
       "Success: " +
-        selectedAccountData.name +
-        " transferred " +
-        c.toStringDec(amountToSend) +
-        "\u{24c3} to " +
-        toAccName
+      selectedAccountData.name +
+      " transferred " +
+      c.toStringDec(amountToSend) +
+      "\u{24c3} to " +
+      toAccName
     );
 
     selectedAccountData.accountInfo.history.unshift(
@@ -1374,22 +1288,22 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
     const tokenOptionsList =
       activeNetworkInfo.name != "mainnet"
         ? [
-            "token.cheddar.testnet",
-            "token.meta.pool.testnet",
-            "meta-v2.pool.testnet",
-          ]
+          "token.cheddar.testnet",
+          "token.meta.pool.testnet",
+          "meta-v2.pool.testnet",
+        ]
         : [
-            "wrap.near",
-            "meta-token.near",
-            "meta-pool.near",
-            "berryclub.ek.near",
-            "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-            "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-            "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-            "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-            "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-            "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-          ];
+          "wrap.near",
+          "meta-token.near",
+          "meta-pool.near",
+          "berryclub.ek.near",
+          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
+          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
+          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
+          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+        ];
 
     let checked: Record<string, boolean> = {};
 
@@ -1682,8 +1596,6 @@ async function DeleteAccount() {
     if (selectedAccountData.isReadOnly) throw Error("Account is Read-Only");
 
     await refreshSaveSelectedAccount(); //refresh account to have updated balance
-
-    populateSendCombo("send-balance-to-account-name");
 
     d.showSubPage("account-selected-delete");
     d.inputById("send-balance-to-account-name").value =

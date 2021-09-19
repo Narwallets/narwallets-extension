@@ -15,6 +15,10 @@
   border-style    : none;
 }
 
+.address-item:hover {
+  background-color: var(--HoverColor);
+}
+
 .accountlistitem:hover {
   background-color: var(--HoverColor);
 }
@@ -182,7 +186,7 @@
   /* font-size : 1; */
   position  : relative;
   width     : 468px;
-  height: 53px;
+  height    : 53px;
   display   : block;
   background: var(--Background);
 }
@@ -196,17 +200,17 @@
   border-style : none;
   display      : inline-block;
   text-align   : left;
-  top: 26px;
-  left: 43px;
-  /* width: 500px; */
-  min-width: 250px;
-  font-size: 13px;
-  font-weight: 300;
+  top          : 26px;
+  left         : 43px;
+  /* width     : 500px; */
+  min-width    : 250px;
+  font-size    : 13px;
+  font-weight  : 300;
   color        : var(--TextGeneric);
   max-width    : 230px;
   overflow     : hidden;
   text-overflow: ellipsis;
-  /* right: 100; */
+  /* right     : 100; */
 }
 
 .history-date {
@@ -252,10 +256,10 @@
   display     : block;
   border-style: none;
   font-weight : 200;
-  font-size: 19px;
-  top: 23px;
+  font-size   : 19px;
+  top         : 23px;
   right       : 15px;
-  width: 385px;
+  width       : 385px;
   text-align  : right;
   color       : var(--TextRemark);
 }

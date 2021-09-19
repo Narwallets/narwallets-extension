@@ -82,7 +82,7 @@ async function networkItemClicked(e: Event) {
     if (!networkName) return;
 
     //close dropdown
-    closeDropDown(NETWORKS_LIST); //close
+    d.byId(NETWORKS_LIST).classList.remove(d.OPEN); //hides
 
     //update global state (background)
     activeNetworkInfo = await askBackgroundSetNetwork(networkName);
@@ -99,15 +99,11 @@ async function networkItemClicked(e: Event) {
   }
 }
 
-export function closeDropDown(id: string): void {
-  d.byId(id).classList.remove(d.OPEN); //hides
-}
-
 function selectNetworkClicked(ev: Event) {
   const selectionBox = d.byId(NETWORKS_LIST);
   if (selectionBox == undefined) return;
   if (selectionBox.classList.contains(d.OPEN)) {
-    closeDropDown(NETWORKS_LIST); //close
+    d.byId(NETWORKS_LIST).classList.remove(d.OPEN); //hides
     return;
   }
   //open drop down box

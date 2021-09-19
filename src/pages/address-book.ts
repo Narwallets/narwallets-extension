@@ -1,4 +1,4 @@
-const ADDRESS_BOOK = "addressbook";
+const ADDRESS_BOOK = "addressBook";
 import {
   askBackground,
   askBackgroundAddContact,
@@ -20,9 +20,19 @@ import {
   show as AccountSelectedPage_show,
 } from "./account-selected.js";
 import { checkIfAccountExists } from "../util/search-accounts.js";
+import type { PopupItem } from "../util/popup-list.js";
 
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
+
+export async function getAddressesForPopupList() : Promise<PopupItem[]> {
+  if (addressContacts.length == 0) await initAddressArr();
+  let items = []
+  for (let item of addressContacts) {
+    items.push({ text: item.accountId, value: item.accountId })
+  }
+  return items
+}
 
 export function contactExists(address: string): boolean {
   let name = address.trim()
@@ -39,7 +49,7 @@ export async function show() {
   d.onClickId("add-contact", showAddContactPage);
   d.onClickId("remove-contact", deleteContact);
   d.onClickId("edit-contact", editContact);
-  d.onClickId("back-to-addressbook", backToAddressBook);
+  d.onClickId("back-to-addressBook", backToAddressBook);
   OkCancelInit();
   hideOkCancel();
   d.clearContainer("address-list");
@@ -60,7 +70,7 @@ function backToAddressBook() {
 }
 
 function showAddContactPage() {
-  d.showPage("add-addressbook");
+  d.showPage("add-addressBook");
   showOKCancel(addOKClicked, showInitial);
 }
 
@@ -88,14 +98,14 @@ function backToAccountsClicked() {
 
 async function addOKClicked() {
   try {
-    const addressToSave = new d.El("#add-addresbook-id").value.trim();
+    const addressToSave = new d.El("#add-addressBook-id").value.trim();
 
     // check if the account exists on the current network
     let existAccount = await checkIfAccountExists(addressToSave);
     if (!existAccount) {
       throw Error("Account ID does not exists on the network");
     }
-    const noteToSave = new d.El("#add-addresbook-note").value;
+    const noteToSave = new d.El("#add-addressBook-note").value;
 
     const contactToSave: GContact = {
       accountId: addressToSave,
@@ -138,13 +148,13 @@ function showAddressDetails(ev: Event) {
       selectedContactIndex = index;
     }
   }
-  d.byId("bottombar-addressbook").classList.remove("hidden");
-  d.showPage("addressbook-details");
+  d.byId("bottomBar-addressBook").classList.remove("hidden");
+  d.showPage("addressBook-details");
 }
 
 function deleteContact() {
   if (isNaN(selectedContactIndex)) return;
-  d.byId("bottombar-addressbook").classList.add("hidden");
+  d.byId("bottomBar-addressBook").classList.add("hidden");
   d.showSubPage("contact-remove-selected");
   showOKCancel(okDeleteContact, showInitial);
 }
@@ -160,7 +170,7 @@ async function okDeleteContact() {
 }
 
 function editContact() {
-  d.byId("bottombar-addressbook").classList.add("hidden");
+  d.byId("bottomBar-addressBook").classList.add("hidden");
   d.showSubPage("contact-edit-selected");
   d.inputById("edit-note-contact").value =
     addressContacts[selectedContactIndex].note || "";
@@ -172,7 +182,7 @@ async function addNoteOKClicked() {
     .inputById("edit-note-contact")
     .value.trim();
 
-  //Guardo
+  // Save
   await askBackground({
     code: "set-address-book",
     accountId: addressContacts[selectedContactIndex].accountId,

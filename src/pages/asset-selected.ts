@@ -22,7 +22,6 @@ import {
   addAssetToken,
   fixUserAmountInY,
   populateAssets,
-  populateSendCombo,
   selectedAccountData,
   show as AccountSelectedPage_show,
   accountHasPrivateKey,
@@ -32,7 +31,7 @@ import {
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
-import { addressContacts, saveContactOnBook } from "./address-book.js";
+import { addressContacts, getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
 import { GContact } from "../data/Contact.js";
 import { localStorageSet } from "../data/util.js";
 import { contactExists } from '../pages/address-book.js'
@@ -50,6 +49,7 @@ import { nearDollarPrice } from "../data/global.js";
 import { setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
 import { activeNetworkInfo } from "../index.js";
+import { popupListOpen } from "../util/popup-list.js";
 
 const THIS_PAGE = "AccountAssetDetail";
 
@@ -94,8 +94,6 @@ export async function show(
   d.byId("topbar").innerText = "Assets";
 
   reloadDetails();
-
-  await populateSendCombo("combo-send-asset");
 
   switch (asset_selected.symbol) {
     case "STNEAR": {
@@ -622,11 +620,25 @@ async function showAssetSendClicked() {
       d.maxClicked("send-to-asset-amount", "#selected-asset #balance");
     });
 
+    d.onClickId("send-to-asset-account-select", selectAddressClicked);
+
     showOKCancel(sendOKClicked, showInitial);
   } catch (ex) {
     d.showErr(ex.message);
   }
 }
+
+// shows drop-down with addresses
+async function selectAddressClicked() {
+  const items = await getAddressesForPopupList()
+  //show and what to do when clicked
+  popupListOpen(items, popupListItemClicked) 
+}
+function popupListItemClicked(text: string, value: string) {
+  d.inputById("send-to-asset-account").value = value
+}
+
+
 
 async function sendOKClicked() {
   try {
@@ -713,17 +725,15 @@ async function deleteAsset() {
 
   populateAssets();
 
-  //Guardo
+  // Save
 
-  //Salgo del asset detail eliminado
+  // back to asset list
   backToSelectClicked();
 }
 
 export function removeSelectedFromAssets() {
   d.showSubPage("asset-remove-selected");
   showOKCancel(deleteAsset, showInitial);
-
-  // //elimino, limpio y relleno lista de assets
 }
 
 function showInitial() {
@@ -773,7 +783,6 @@ async function addContactToList() {
       note: "",
     };
     await saveContactOnBook(contactToSave.accountId, contactToSave);
-    populateSendCombo("combo-send-asset");
     showInitial();
   } catch {
     d.showErr("Error in save contact");

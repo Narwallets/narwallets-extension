@@ -53,7 +53,7 @@
 		</div>
 	</div>
 
-	
+
 
 	<!-- Network Item Template -->
 	<div id="network-item-template" class="hidden">
@@ -313,20 +313,9 @@
 				<div id="select-send-address-book" class="inputboxwithbutton" title="Send address book">
 					<div class="inputboxwithbutton">
 						<input id="send-to-account-name" type="text" list="combo-send-asset" />
-						<button id="current-to-send-address">Select Address</button>
-						<div class="down-arrow"></div>
-						<!-- Add Token Dropdown -->
-
-						<div id="address-list" class="networks-list-box">	
-							<div id="address-items">Select address</div>
-						</div>
+						<button id="current-to-send-address">▽</button>
 					</div>
 				</div>
-				<!-- <div class="combotextbox">
-					<input id="send-to-account-name" type="text" list="send-contact-combo" />
-					<datalist id="send-contact-combo">
-					</datalist>
-				</div> -->
 
 				<h3>Amount in NEAR (Max. <span id="max-amount-send"></span>)</h3>
 				<div class="inputboxwithbutton">
@@ -516,32 +505,12 @@
 			<div class="contentarea">
 
 				<h2>Add Token</h2>
-				<div class="combotextboxtoken">
 
-					<!-- This is a temporary patch to fix the datalist problem from Chrome -->
-					<div id="select-token" class="network-component pointer" title="Add token">
-						<div class="token-indicator">
-							<input id="token-to-add-name" value="" placeholder="Type token name"/>
-							<li id="current-to-add-token"></li>
-							<div class="down-arrow"></div>
-							<!-- Add Token Dropdown -->
-
-							<div id="token-list" class="networks-list-box">
-								<div class="networks-list-content">
-									
-									<div id="token-items">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- The code below is for the case of the datalist -->
-					<!-- <input type="text" list="combo-add-token-datalist" id="combo-add-token" /> -->
-					<!-- <datalist id="combo-add-token-datalist">
-					</datalist> -->
-
+				<div class="inputboxwithbutton">
+					<input id="token-to-add-name" type="text" value="" placeholder="Token contract" />
+					<button id="token-combo-select">▽</button>
 				</div>
+
 
 			</div>
 		</div>
@@ -824,7 +793,7 @@
 
 		<!--#region AddressBook-->
 
-		<div class="subpage hidden" id="addressbook-subpage">
+		<div class="subpage hidden" id="addressBook-subpage">
 
 			<div class="wrapper">
 
@@ -900,7 +869,7 @@
 
 		</div>
 
-		<div class="bottombar">
+		<div class="bottomBar">
 			<button class="button addaccount" id="add-account">Account</button>
 			<!--
 			<div class="AdverBlock">
@@ -1059,7 +1028,7 @@
 		<button id="unlock" class="buttonextra unlocked">Unlock</button>
 
 		<!--
-		<div class="bottombar">
+		<div class="bottomBar">
 			<div class="AdverBlock">
 				<p>Did you know?</p>
 				<a href="#">Click this lovely link</a>
@@ -1153,10 +1122,9 @@
 				<h2>Send</h2>
 
 				<h3>Send to Account Id</h3>
-				<div class="combotextbox">
-					<input id="send-to-asset-account" type="text" list="combo-send-asset" />
-					<datalist id="combo-send-asset">
-					</datalist>
+				<div class="inputboxwithbutton">
+					<input id="send-to-asset-account" type="text" />
+					<button id="send-to-asset-account-select">▽</button>
 				</div>
 
 				<h3>Amount in <span id="asset-symbol"></span> (Max. <span id="max-amount-send-asset"></span>)</h3>
@@ -1307,7 +1275,7 @@
 
 	<!--#region address book-->
 
-	<div id="addressbook" class="appface slide-hide">
+	<div id="addressBook" class="appface slide-hide">
 		<h2>Address Book</h2>
 		<button class="button back" id="address-back-to-account"></button>
 
@@ -1321,7 +1289,7 @@
 			</div>
 		</div>
 
-		<div class="bottombar">
+		<div class="bottomBar">
 			<button class="button addaccount" id="add-contact">Address</button>
 
 		</div>
@@ -1329,25 +1297,25 @@
 	<!--#endregion -->
 
 	<!--#region Add address book-->
-	<div id="add-addressbook" class="appface slide-hide">
+	<div id="add-addressBook" class="appface slide-hide">
 		<h2>Add Address </h2>
-		<input placeholder="Account ID" id="add-addresbook-id" type="text">
-		<input placeholder="Note" id="add-addresbook-note" type="text">
+		<input placeholder="Account ID" id="add-addressBook-id" type="text">
+		<input placeholder="Note" id="add-addressBook-note" type="text">
 
 	</div>
 	<!--#endregion -->
 
 	<!--#region detail address book-->
-	<div id="addressbook-details" class="appface slide-hide">
+	<div id="addressBook-details" class="appface slide-hide">
 
-		<button class="button back" id="back-to-addressbook"></button>
+		<button class="button back" id="back-to-addressBook"></button>
 
 		<h2>Address Details</h2>
 
 		<div id="selected-contact">
 		</div>
 
-		<div id="selected-contact-template" class="hidden addressbook">
+		<div id="selected-contact-template" class="hidden addressBook">
 			<h1>{accountId}<h1>
 					<h3>{note}<h3>
 		</div>
@@ -1368,7 +1336,7 @@
 
 		<div id="main-contact" class="subpage hidden"></div>
 
-		<div id="bottombar-addressbook" class="bottombar">
+		<div id="bottomBar-addressBook" class="bottomBar">
 			<button class="button removeAddress" id="remove-contact">Remove</button>
 			<button class="button edit" id="edit-contact">Edit</button>
 		</div>
@@ -1421,6 +1389,13 @@
 		</div>
 	</div>
 
+	<!--#endregion-->
+
+	<!--#region Overlay combo popup-->
+	<div id="popup-list-appface" class="combo-list-appface">
+	</div>
+	<div id="popup-list" class="combo-list-box">
+	</div>
 
 	<!--#endregion-->
 
