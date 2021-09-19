@@ -44,7 +44,7 @@ export class LockupContract {
   static async getLockupSuffix() {
     const networkInfo = await askBackgroundGetNetworkInfo();
     const rootAccount = networkInfo.rootAccount;
-    //HACK to test lockup contracts in testnet - until core devs provide a way to
+    //HACK to test lockup contracts in testnet - until core developers provide a way to
     //create xxx.lockup.testnet accounts- we use .lockupy.testnet, that we created
     const lockupSuffix = rootAccount == "testnet" ? "lockupy" : "lockup";
     return "." + lockupSuffix + "." + rootAccount;
@@ -105,16 +105,11 @@ export class LockupContract {
 
       return true;
     } catch (ex) {
-      //console.log("INFO", "retrieving lockupcontract ", ex.message);
-      if (firstOneOK) d.showErr("lockup.c search error: " + ex.message); //another error
+      //console.log("INFO", "retrieving lockup contract ", ex.message);
+      if (firstOneOK) console.log("lockup.c search error: " + ex.message); //another error
       return false;
     }
   }
-
-  //total balance - mal calculado
-  // get totalBalance():number {
-  //   return this.liquidBalance + this.locked + this.accountInfo.staked + this.accountInfo.rewards;
-  // }
 
   //wraps call to this lockup contract (method, params, gas)
   call_method(method: string, args: any, gas: string): Promise<any> {
@@ -134,8 +129,9 @@ export class LockupContract {
     if (isNaN(amountNear) || amountNear <= 0) throw Error("invalid amount");
 
     //refresh lockup acc info - get staking pool and balances
-    if (!(await this.tryRetrieveInfo()))
+    if (!(await this.tryRetrieveInfo())){
       throw Error("Error refreshing lockup contract info");
+    }
 
     //let actualSP = this.accountInfo.stakingPool
     let poolAccInfo = {
@@ -216,8 +212,9 @@ export class LockupContract {
     privateKey: string
   ): Promise<string> {
     //refresh lockup acc info - get staking pool and balances
-    if (!(await this.tryRetrieveInfo()))
+    if (!(await this.tryRetrieveInfo())) {
       throw Error("Error refreshing account info");
+    }
 
     const actualSP = await this.get_staking_pool_account_id();
     if (!actualSP)

@@ -25,7 +25,7 @@ import type { PopupItem } from "../util/popup-list.js";
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
-export async function getAddressesForPopupList() : Promise<PopupItem[]> {
+export async function getAddressesForPopupList(): Promise<PopupItem[]> {
   if (addressContacts.length == 0) await initAddressArr();
   let items = []
   for (let item of addressContacts) {
@@ -86,7 +86,7 @@ function showInitial() {
 }
 
 function backToAccountsClicked() {
-  if (selectedAccountData.name != "") {
+  if (selectedAccountData && selectedAccountData.name != "") {
     AccountSelectedPage_show(selectedAccountData.name, undefined);
   } else {
     d.clearContainer("address-list");

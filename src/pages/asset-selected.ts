@@ -46,7 +46,7 @@ import {
 import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { nearDollarPrice } from "../data/global.js";
-import { setLastSelectedAsset } from "./main.js";
+import { backToAccountsList, setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
 import { activeNetworkInfo } from "../index.js";
 import { popupListOpen } from "../util/popup-list.js";
@@ -99,6 +99,7 @@ export async function show(
     case "STNEAR": {
       d.byId("asset-send").classList.remove("hidden");
       d.byId("asset-receive").classList.remove("hidden");
+      d.byId("asset-stake").classList.remove("hidden");
       d.byId("asset-liquid-unstake").classList.remove("hidden");
       break;
     }
@@ -119,7 +120,8 @@ export async function show(
   }
 
   d.onClickId("asset-unstake", DelayedUnstake);
-  d.onClickId("asset-withdraw", Withdraw);
+  d.onClickId("asset-withdraw", assetWithdrawClicked);
+  d.onClickId("asset-stake", assetStakeClicked);
   d.onClickId("asset-liquid-unstake", LiquidUnstake);
   d.onClickId("asset-restake", ReStake);
 
@@ -185,12 +187,13 @@ function get_discount_basis_points(liquidity: bigint, sell: bigint): number {
 }
 
 function hideInMiddle() {
-  d.byId("asset-send").classList.add("hidden");
-  d.byId("asset-receive").classList.add("hidden");
-  d.byId("asset-liquid-unstake").classList.add("hidden");
-  d.byId("asset-withdraw").classList.add("hidden");
-  d.byId("asset-unstake").classList.add("hidden");
-  d.byId("asset-restake").classList.add("hidden");
+  d.all("#AccountAssetDetail .midblock button").hide()
+  // d.byId("asset-send").classList.add("hidden");
+  // d.byId("asset-receive").classList.add("hidden");
+  // d.byId("asset-liquid-unstake").classList.add("hidden");
+  // d.byId("asset-withdraw").classList.add("hidden");
+  // d.byId("asset-unstake").classList.add("hidden");
+  // d.byId("asset-restake").classList.add("hidden");
 }
 
 function reloadDetails() {
@@ -279,7 +282,7 @@ async function confirmWithdraw() {
   }
 }
 
-async function Withdraw() {
+async function assetWithdrawClicked() {
   try {
     if (!await accountHasPrivateKey()) {
       await backToSelectClicked();
@@ -314,6 +317,11 @@ async function DelayedUnstake() {
     d.showErr(ex);
   }
 }
+
+async function assetStakeClicked() {
+  backToMainAccount("stake");
+}
+
 
 async function LiquidUnstake() {
   try {
@@ -590,9 +598,13 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   refreshSaveSelectedAccount();
 }
 
-async function backToSelectClicked() {
-  await AccountSelectedPage_show(selectedAccountData.name, undefined);
+async function backToMainAccount(reposition?: string) {
   hideOkCancel();
+  return AccountSelectedPage_show(selectedAccountData.name, reposition);
+}
+
+async function backToSelectClicked() {
+  return backToMainAccount()
 }
 
 function showAssetReceiveClicked() {
@@ -632,7 +644,7 @@ async function showAssetSendClicked() {
 async function selectAddressClicked() {
   const items = await getAddressesForPopupList()
   //show and what to do when clicked
-  popupListOpen(items, popupListItemClicked) 
+  popupListOpen(items, popupListItemClicked)
 }
 function popupListItemClicked(text: string, value: string) {
   d.inputById("send-to-asset-account").value = value

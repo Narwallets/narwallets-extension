@@ -312,7 +312,7 @@
 
 				<div id="select-send-address-book" class="inputboxwithbutton" title="Send address book">
 					<div class="inputboxwithbutton">
-						<input id="send-to-account-name" type="text" list="combo-send-asset" />
+						<input id="send-to-account-name" type="text" />
 						<button id="current-to-send-address">▽</button>
 					</div>
 				</div>
@@ -765,13 +765,14 @@
 			</div>
 			<div class="delete-account">
 				<div class="form-field-label">
-					<label for="send-balance-to-account-name">
-						Balance beneficiary Account Id
-					</label>
-					<div class="form-control">
-						<input id="send-balance-to-account-name" type="text" dir="auto" value=""
-							list="send-contact-combo">
+
+					<h3>Balance beneficiary Account Id</h3>
+
+					<div class="inputboxwithbutton">
+						<input id="send-balance-to-account-name" type="text" value="" placeholder="Beneficiary" />
+						<button id="beneficiary-address-combo-select">▽</button>
 					</div>
+
 				</div>
 				<div class="subtitle">
 					<h4 class="warning">WARNING: Deleting an account is irreversible.
@@ -893,13 +894,13 @@
 
 
 
-		<h3>Your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
+		<h3>This is your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
 		<div class="boximportante" id="seed-phrase-show-box"></div>
 
 
 		<div class="flex-row">
-			<button id="seed-phrase-continue" class="button generic">OK, I've written down the Seed Phrase</button>
-			<button id="seed-phrase-cancel" class="button generic">Cancel</button>
+			<button id="seed-phrase-continue" class="button huge generic">OK, I've written down the Seed Phrase</button>
+			<button id="seed-phrase-cancel" class="button huge generic">Cancel</button>
 		</div>
 	</div>
 
@@ -1074,6 +1075,7 @@
 		<div class="midblock">
 			<button class="button send hidden" id="asset-send">Send</button>
 			<button class="button receive hidden" id="asset-receive">Receive</button>
+			<button class="button stake hidden" id="asset-stake">Stake</button>
 			<button class="button liqunstake hidden" id="asset-liquid-unstake">Liquid unstake</button>
 			<button class="button unstake hidden" id="asset-unstake">Unstake</button>
 			<button class="button withdraw hidden" id="asset-withdraw">Withdraw</button>

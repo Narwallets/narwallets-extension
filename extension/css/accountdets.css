@@ -7,99 +7,96 @@
 /* for asset history */
 
 .histreceive {
-  background-image: url("../icons/SVG/receive_dark_fix.svg");
-  height: 50px;
-  width: 32px;
-  background-repeat: no-repeat;
+  background-image   : url("../icons/SVG/receive_dark_fix.svg");
+  height             : 50px;
+  width              : 32px;
+  background-repeat  : no-repeat;
   background-position: center;
 }
 
 .histsend {
-  background-image: url("../icons/SVG/send_dark_fix.svg");
-  height: 50px;
-  width: 32px;
-  background-repeat: no-repeat;
+  background-image   : url("../icons/SVG/send_dark_fix.svg");
+  height             : 50px;
+  width              : 32px;
+  background-repeat  : no-repeat;
   background-position: center;
 }
 
 .assethistoryline {
-  position: relative;
-  width: 359px;
-  height: 58px;
-  display: block;
-  background-color: var(--LightColor);
-  margin: 0px;
-  padding: 0px;
-  top: 0px;
-  bottom: 0px;
+  position           : relative;
+  width              : 359px;
+  height             : 58px;
+  display            : block;
+  background-color   : var(--LightColor);
+  margin             : 0px;
+  padding            : 0px;
+  top                : 0px;
+  bottom             : 0px;
   border-bottom-style: solid;
   border-bottom-width: 1px;
-  overflow: hidden;
+  overflow           : hidden;
 }
 
 .assethisttype {
   position: absolute;
-  display: inline-block;
-  top: 0px;
-  left: 5px;
-  width: 60px;
-  height: 20px;
+  display : inline-block;
+  top     : 0px;
+  left    : 5px;
+  width   : 60px;
+  height  : 20px;
 }
 
 .assethistaccount {
-  position: absolute;
-  display: inline-block;
-  left: 48px;
-  top: 0px;
-  width: 300px;
-  height: 10px;
-  color: blue;
+  position   : absolute;
+  display    : inline-block;
+  left       : 48px;
+  top        : 0px;
+  width      : 300px;
+  height     : 10px;
+  color      : blue;
   font-weight: 200;
 }
 
 .assethistdate {
   position: absolute;
-  display: inline-block;
-  left: 48px;
-  top: 18px;
-  width: 100px;
-  height: 20px;
+  display : inline-block;
+  left    : 48px;
+  top     : 18px;
+  width   : 100px;
+  height  : 20px;
 }
 
 .assethistamount {
-  position: absolute;
-  top: 21px;
-  right: 5px;
+  position  : absolute;
+  top       : 21px;
+  right     : 5px;
   text-align: right;
-  font-size: 24px;
+  font-size : 24px;
 
   font-weight: 200;
-  width: 400px;
-  height: 20px;
+  width      : 400px;
+  height     : 20px;
 }
 
 
-.addresslistname
-{
- text-align: unset;
- font-size: 15;
- position: absolute;
- color: var(--BlockText);
- left: 0px;
- top:0px;
- background-color: var(--Block);
- padding: 2px;
- font-weight: 200;
- width: 480px;
- text-align: left;
- padding-top: 5px;
+.addresslistname {
+  text-align : unset;
+  font-size  : 15;
+  position   : absolute;
+  color      : var(--BlockText);
+  left       : 0px;
+  top        : 0px;
+  padding    : 2px;
+  font-weight: 200;
+  width      : 480px;
+  text-align : left;
+  padding-top: 5px;
 }
 
-.addresslistcomment
-{
-  position: absolute;
-  left:5px;
-  top:26px;
-  color: var(--TextGeneric);
+.addresslistcomment {
+  position   : absolute;
+  left       : 5px;
+  top        : 26px;
+  color      : var(--TextGeneric);
   font-weight: 250;
 }

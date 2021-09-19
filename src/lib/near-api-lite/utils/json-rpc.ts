@@ -52,10 +52,10 @@ export function formatJSONErr(obj: any): any {
     let n = text.indexOf(KEY)
     if (n > 0 && n < text.length - kl - 5) {
         const i = text.indexOf("'", n + kl + 4)
-        const cutted = text.slice(n + kl, i+1)
-        if (cutted.trim().length > 5) {
+        const cut = text.slice(n + kl, i+1)
+        if (cut.trim().length > 5) {
             log(text.slice(n, i + 80)) //show info in the console before removing extra info
-            text = "panicked at: " + cutted;
+            text = "panicked at: " + cut;
         }
     }
 
@@ -73,7 +73,7 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
         }
 
         let timeoutRetries = 0;
-        let accountDontExistsRetries = 0;
+        let accountDoesNotExistsRetries = 0;
         while (true) {
             let fetchResult = await fetch(rpcUrl, rpcOptions);
             let response = await fetchResult.json()
@@ -101,10 +101,10 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
                     err.name = 'TimeoutError'
                     throw err;
                 }
-                else if (rpcUrl.indexOf("mainnet")==-1 && errorMessage.indexOf("doesn't exist") != -1) {
+                else if (rpcUrl.indexOf("mainnet")==-1 && errorMessage.indexOf("does not exist") != -1) {
                     //often in testnet there's failure searching existing accounts. Retry
-                    if (accountDontExistsRetries<2){
-                        accountDontExistsRetries++;
+                    if (accountDoesNotExistsRetries<2){
+                        accountDoesNotExistsRetries++;
                         continue;
                     }
                 }

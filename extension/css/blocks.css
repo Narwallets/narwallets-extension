@@ -36,25 +36,22 @@
 
 .MidBlock {
   position   : absolute;
-  top        : 155px;
+  top: 147px;
   left       : 0px;
   width      : 480px;
   padding    : 0px;
   height     : 63px;
   margin     : 0px;
   padding-top: 5px;
-
   display        : inline-flex;
   justify-content: center;
-
   background: var(--Block);
-
   overflow-y: hidden;
 }
 
 .subpage {
   position     : absolute;
-  top          : 226px;
+  top: 210px;
   left         : 0px;
   width        : 470;
   height       : 320px;

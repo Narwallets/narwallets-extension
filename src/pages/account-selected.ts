@@ -27,7 +27,7 @@ import {
   History,
   Contact,
 } from "../data/account.js";
-import { localStorageSet } from "../data/util.js";
+import { localStorageGetAndRemove, localStorageSet } from "../data/util.js";
 import {
   askBackground,
   askBackgroundApplyTxAction,
@@ -82,7 +82,7 @@ import {
   UNSTAKE_DEFAULT_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { activeNetworkInfo} from "../index.js";
+import { activeNetworkInfo } from "../index.js";
 import { closePopupList, PopupItem, popupListOpen } from "../util/popup-list.js";
 
 const THIS_PAGE = "account-selected";
@@ -308,31 +308,34 @@ function addClicked() {
   showOKCancel(addOKClicked, showInitial);
 }
 
-// shows drop-down with tokens
-async function selectTokenClicked() {
-  let items: PopupItem[];
+function getKnownNEP141Contracts(): PopupItem[] {
   if (activeNetworkInfo.name == "testnet") {
-    items = [
-      {text:"CHDR - token.cheddar.testnet", value:"token.cheddar.testnet"},
-      {text:"$META - token.meta.pool.testnet", value:"token.meta.pool.testnet"},
-      {text:"stNEAR - meta-v2.pool.testnet", value:"meta-v2.pool.testnet"},
+    return [
+      { text: "CHDR - token.cheddar.testnet", value: "token.cheddar.testnet" },
+      { text: "$META - token.meta.pool.testnet", value: "token.meta.pool.testnet" },
+      { text: "stNEAR - meta-v2.pool.testnet", value: "meta-v2.pool.testnet" },
     ]
   } else {
-    items = [
-      {text:"wNEAR - wrap.near", value:"wrap.near"},
-      {text:"$META - meta-token.near", value:"meta-token.near"},
-      {text:"stNEAR - meta-pool.near", value:"meta-pool.near"},
-      {text:"BANANA - berryclub.ek.near", value:"berryclub.ek.near"},
-      {text:"nWBTC- (bridged)", value:"2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near"},
-      {text:"nUSDT- (bridged)", value:"dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near"},
-      {text:"nUSDC- (bridged)", value:"a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near"},
-      {text:"nDAI - (bridged)", value:"6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near"},
-      {text:"nUNI - (bridged)", value:"1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near"},
-      {text:"nLINK- (bridged)", value:"514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near"},
+    return [
+      { text: "wNEAR - wrap.near", value: "wrap.near" },
+      { text: "$META - meta-token.near", value: "meta-token.near" },
+      { text: "stNEAR - meta-pool.near", value: "meta-pool.near" },
+      { text: "BANANA - berryclub.ek.near", value: "berryclub.ek.near" },
+      { text: "nWBTC- (bridged)", value: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near" },
+      { text: "nUSDT- (bridged)", value: "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near" },
+      { text: "nUSDC- (bridged)", value: "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near" },
+      { text: "nDAI - (bridged)", value: "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near" },
+      { text: "nUNI - (bridged)", value: "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near" },
+      { text: "nLINK- (bridged)", value: "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near" },
     ]
   }
-  //show and what to do when clicked
-  popupListOpen(items, tokenPopupListItemClicked) 
+}
+
+// shows drop-down with tokens
+async function selectTokenClicked() {
+  const items = getKnownNEP141Contracts()
+  // open popup, with what to show and what to do when clicked
+  popupListOpen(items, tokenPopupListItemClicked)
 }
 function tokenPopupListItemClicked(text: string, value: string) {
   d.inputById("token-to-add-name").value = value
@@ -665,10 +668,10 @@ async function sendClicked() {
 async function selectAddressClicked() {
   const items = await getAddressesForPopupList()
   //show and what to do when clicked
-  popupListOpen(items, popupListItemClicked) 
+  popupListOpen(items, popupListItemClicked)
 }
 function popupListItemClicked(text: string, value: string) {
-  d.inputById("send-to-asset-account").value = value
+  d.inputById("send-to-account-name").value = value
 }
 
 //----------------------
@@ -1285,25 +1288,6 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
   let doingDiv;
   try {
     doingDiv = d.showMsg("Searching Pools...", "info", -1);
-    const tokenOptionsList =
-      activeNetworkInfo.name != "mainnet"
-        ? [
-          "token.cheddar.testnet",
-          "token.meta.pool.testnet",
-          "meta-v2.pool.testnet",
-        ]
-        : [
-          "wrap.near",
-          "meta-token.near",
-          "meta-pool.near",
-          "berryclub.ek.near",
-          "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-          "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-          "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near",
-          "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near",
-          "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-          "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-        ];
 
     let checked: Record<string, boolean> = {};
 
@@ -1403,11 +1387,11 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
     }
 
     // search tokens
-    for (let tokenOption of tokenOptionsList) {
+    for (let tokenOption of getKnownNEP141Contracts()) {
       let resultBalance;
       try {
         resultBalance = await askBackgroundViewMethod(
-          tokenOption,
+          tokenOption.value,
           "ft_balance_of",
           { account_id: exAccData.name }
         );
@@ -1417,16 +1401,16 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
 
       if (resultBalance > 0) {
         d.showSuccess(
-          `Found! ${c.toStringDec(c.yton(resultBalance))} in ${tokenOption}`
+          `Found! ${c.toStringDec(c.yton(resultBalance))} ${tokenOption.text}`
         );
-        let asset = exAccData.findAsset(tokenOption);
+        let asset = exAccData.findAsset(tokenOption.value);
         if (asset) {
           asset.balance = c.yton(resultBalance);
         } else {
           // must create
           let item = new Asset();
           item.type = "ft";
-          item.contractId = tokenOption;
+          item.contractId = tokenOption.value;
           item.balance = c.yton(resultBalance);
           let metadata = await askBackgroundViewMethod(
             item.contractId,
@@ -1599,7 +1583,9 @@ async function DeleteAccount() {
 
     d.showSubPage("account-selected-delete");
     d.inputById("send-balance-to-account-name").value =
-      selectedAccountData.accountInfo.ownerId || "";
+      selectedAccountData.accountInfo.ownerId || ""; // if a lockup account
+
+    d.onClickId("beneficiary-address-combo-select", selectBeneficiaryAddressClicked);
 
     showOKCancel(AccountDeleteOKClicked, showInitial);
   } catch (ex) {
@@ -1607,6 +1593,15 @@ async function DeleteAccount() {
   } finally {
     d.hideWait();
   }
+}
+
+// shows drop-down with addresses
+async function selectBeneficiaryAddressClicked() {
+  const items = await getAddressesForPopupList()
+  //show and what to do when clicked
+  popupListOpen(items, (text: string, value: string) => {
+    d.inputById("send-balance-to-account-name").value = value
+  });
 }
 
 //-----------------------------------
@@ -1641,6 +1636,8 @@ async function AccountDeleteOKClicked() {
       accountId: selectedAccountData.name,
     });
     //console.log("remove-account sent ",selectedAccountData.name)
+    // avoid reposition on removed account
+    await localStorageGetAndRemove("account");
     //return to accounts page
     await AccountPages_show();
 
@@ -1809,6 +1806,8 @@ async function removeAccountClicked(ev: Event) {
       code: "remove-account",
       accountId: selectedAccountData.name,
     });
+    // avoid reposition on removed account
+    await localStorageGetAndRemove("account");
     //return to main page
     await AccountPages_show();
   } catch (ex) {

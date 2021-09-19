@@ -9,7 +9,10 @@ export type PopupItem = { text: string, value: string }
 
 export async function populatePopupList(items: PopupItem[]) {
     var options = "";
-    for (let item of items) {
+    if (items.length == 0) {
+        options = `<option value="">-- no data --</option>`
+    }
+    else for (let item of items) {
         const value = item.value
         const text = item.text.length < 42 ? item.text : item.text.slice(0, 19) + "..." + item.text.slice(-19)
         options += `<option value="${value}">${text}</option>`;
