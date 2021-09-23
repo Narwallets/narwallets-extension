@@ -107,7 +107,8 @@ export async function show(
     }
     case "UNSTAKED": {
       d.byId("asset-withdraw").classList.remove("hidden");
-      d.byId("asset-restake").classList.remove("hidden");
+      // for now, remove the possibility for lockup-accounts
+      if (!selectedAccountData.isLockup) d.byId("asset-restake").classList.remove("hidden");
       break;
     }
     case "STAKED": {
@@ -125,7 +126,7 @@ export async function show(
   d.onClickId("asset-withdraw", assetWithdrawClicked);
   d.onClickId("asset-stake", assetStakeClicked);
   d.onClickId("asset-liquid-unstake", LiquidUnstake);
-  d.onClickId("asset-restake", ReStake);
+  d.onClickId("asset-restake", reStakeClicked);
 
   localStorageSet({
     reposition: "asset",
@@ -215,12 +216,12 @@ function reloadDetails() {
   );
 }
 
-async function ReStake() {
+async function reStakeClicked() {
   d.showSubPage("restake");
   d.onClickId("restake-max", function () {
     d.maxClicked("restake-amount", "#selected-asset #balance");
   });
-  await showOKCancel(restakeOk, showInitial);
+  await showOKCancel(restakeOkClicked, showInitial);
 }
 
 async function confirmWithdraw() {
@@ -360,9 +361,9 @@ async function delayedUnstakeClicked() {
     d.showSubPage("delayed-unstake");
 
     const unstakeAmountBox = d.inputById("delayed-unstake-amount")
-    const maxButton= d.byId("delayed-unstake-max") as HTMLButtonElement
+    const maxButton = d.byId("delayed-unstake-max") as HTMLButtonElement
     if (selectedAccountData.isLockup) {
-      unstakeAmountBox.value="ALL"
+      unstakeAmountBox.value = "ALL"
       unstakeAmountBox.disabled = true;
       maxButton.disabled = true;
       unstakeAmountBox.classList.add("semi-transparent");
@@ -378,7 +379,7 @@ async function delayedUnstakeClicked() {
 
     await showOKCancel(delayedUnstakeOkClicked, showInitial);
 
-  } 
+  }
   catch (ex) {
     d.showErr(ex);
   }
@@ -486,7 +487,7 @@ async function addMetaAsset(amount: number) {
   }
 }
 
-async function restakeOk() {
+async function restakeOkClicked() {
   d.showWait();
 
   try {
@@ -569,7 +570,7 @@ async function delayedUnstakeOkClicked() {
   d.showWait();
 
   try {
-    
+
     if (!selectedAccountData.isLockup) {
 
       if (!selectedAccountData.isFullAccess) {
@@ -589,7 +590,7 @@ async function delayedUnstakeOkClicked() {
       throw Error("No funds staked to unstake");
     }
 
-    let yoctosToUnstake = poolAccInfo.staked_balance 
+    let yoctosToUnstake = poolAccInfo.staked_balance
     if (selectedAccountData.isLockup) {
       await performLockupContractUnstakeAndWithdrawAll()
     }
