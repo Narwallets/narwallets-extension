@@ -217,6 +217,7 @@ async function importClicked(ev: Event) {
   if (!importedMain) couldNotImport = true;
 
   if (lastSearchResult.lockupContract) {
+    lastSearchResult.lockupContract.accountInfo.note ="owner: " + lastSearchResult.lockupContract.accountInfo.ownerId
     const importedLc = await importIfNew(
       "Lockup Contract",
       lastSearchResult.lockupContract.contractAccount,

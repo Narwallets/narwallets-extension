@@ -106,11 +106,11 @@ export async function changePasswordAsync(
   if (!password || password.length < 8) {
     throw Error("password must be at least 8 characters long");
   }
-  
+
   State.currentUser = email;
   SecureState.hashedPass = await sha256PwdBase64Async(password);
   saveSecureState();
-  
+
   lock("changePasswordAsync"); //log out current user
 }
 
@@ -170,7 +170,7 @@ export function setCurrentUser(user: string) {
     try {
       State.currentUser = user;
       saveState();
-    } catch {}
+    } catch { }
   }
 }
 
@@ -253,16 +253,16 @@ export function getAccount(accName: string): Account {
 }
 //------------------
 export function saveAccount(accName: string, accountInfo: Account) {
-  if (!accName || !accountInfo) {
-    log("saveFoundAccount called but no data");
+  if (!accName || !accountInfo || !accountInfo.network) {
+    log("saveAccount called but no data");
     return;
   }
 
-  let accountsForCurrentNetwork = SecureState.accounts[Network.current];
+  let accountsForCurrentNetwork = SecureState.accounts[accountInfo.network];
   if (accountsForCurrentNetwork == undefined) {
     //no accounts yet
     accountsForCurrentNetwork = {}; //create empty object
-    SecureState.accounts[Network.current] = accountsForCurrentNetwork;
+    SecureState.accounts[accountInfo.network] = accountsForCurrentNetwork;
   }
 
   accountsForCurrentNetwork[accName] = accountInfo;

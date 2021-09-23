@@ -41,17 +41,19 @@ export class Contact {
 
 export class Asset {
 
+  public spec:string; // ft metadata spec
+  public url:string; // ft metadata url
   history: History[];
 
   constructor(
-    public spec: string = "",
-    public url: string = "",
     public contractId: string = "",
     public balance: number = 0,
     public type: string = "ft",
     public symbol: string = "",
     public icon: string = "",
   ) {
+    this.spec="" 
+    this.url="" 
     this.history = []
   };
 
@@ -90,18 +92,17 @@ export class History {
 }
 
 export class ExtendedAccountData {
-  type: string; //small-type + note
+  //type: string; //small-type + note
   name: string;
-  accessStatus: string;
+  //accessStatus: string;
   typeFull: string; //full-type + note
   accountInfo: Account;
   total: number; //lastBalance+inThePool
   totalUSD: number; //lastBalance+inThePool * NEAR price
   unlockedOther: number;
   available: number;
-  // inThePool: number;
-  findAsset(contractId: string, symbol?: string): Asset | undefined {
 
+  findAsset(contractId: string, symbol?: string): Asset | undefined {
     for (var asset of this.accountInfo.assets) {
       if (
         asset.contractId == contractId &&
@@ -110,6 +111,26 @@ export class ExtendedAccountData {
         return asset;
     }
     return undefined;
+  }
+
+  findAssetByType(type: string): Asset | undefined {
+    for (var asset of this.accountInfo.assets) {
+      if (asset.type == type) {
+        return asset;
+      }
+    }
+    return undefined;
+  }
+
+  removeAsset(contractId: string, type?: string) {
+    let inx = 0;
+    for (var asset of this.accountInfo.assets) {
+      if (asset.contractId == contractId && (type==undefined || asset.type == type) ) {
+        this.accountInfo.assets.splice(inx, 1)
+        break;
+      }
+      inx++
+    }
   }
 
   constructor(name: string, accountInfo: Account) {
@@ -121,15 +142,15 @@ export class ExtendedAccountData {
     };
     this.accountInfo.assets = accountInfo.assets;
 
-    this.type = this.accountInfo.type;
+    //this.type = this.accountInfo.type;
     this.typeFull = typeFullTranslation[this.accountInfo.type];
     if (this.accountInfo.note) {
       const formattedNote = " (" + this.accountInfo.note + ")";
-      this.type += formattedNote;
+      //this.type += formattedNote;
       this.typeFull += formattedNote;
     }
 
-    this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
+    //this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
 
     if (!this.accountInfo.assets) this.accountInfo.assets = [];
     //if (!this.accountInfo.contacts) this.accountInfo.contacts = [];
@@ -146,7 +167,7 @@ export class ExtendedAccountData {
     this.available =
       this.accountInfo.lastBalance - this.accountInfo.lockedOther;
 
-    if (this.accountInfo.type == "lock.c") {
+    if (this.isLockup) {
       this.available = Math.max(0, this.available - 4);
     }
     this.total = accountInfo.lastBalance;
@@ -174,4 +195,8 @@ export class ExtendedAccountData {
   get isFullAccess() {
     return !this.isReadOnly;
   }
+  get isLockup() {
+    return this.accountInfo.type == "lock.c"
+  }
+
 }

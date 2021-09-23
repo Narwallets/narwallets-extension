@@ -47,7 +47,7 @@ export function byId(id: string): HTMLElement {
 }
 
 /**
- * gets checked radiobutton by name
+ * gets checked radio button by name
  * @param name
  */
 export function checkedRadioButton(name: string): HTMLElement {

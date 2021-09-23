@@ -124,24 +124,18 @@
   justify-content: center;
   align-items    : center;
   margin         : auto;
-
   color           : var(--BlockText);
   background-color: var(--Block);
-
   height: 48px;
-  width : 430px;
-
+  width: 393px;
   overflow-wrap: break-word;
   word-break   : break-word;
   white-space  : initial;
   overflow     : hidden;
-
   font-size  : 22px;
   font-weight: 200;
-
   border-radius: 5px 5px 0 0;
-
-  padding-left : 30px;
+  padding-left: 44px;
   padding-right: 30px;
 }
 

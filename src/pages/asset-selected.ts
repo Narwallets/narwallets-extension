@@ -25,9 +25,10 @@ import {
   selectedAccountData,
   show as AccountSelectedPage_show,
   accountHasPrivateKey,
-  showGrantAccessSubPage,
+  ifNormalAccShowGrantAccessSubPage,
   historyWithIcons,
-  historyLineClicked
+  historyLineClicked,
+  getAccountRecord
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
@@ -50,6 +51,7 @@ import { backToAccountsList, setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
 import { activeNetworkInfo } from "../index.js";
 import { popupListOpen } from "../util/popup-list.js";
+import { LockupContract } from "../contracts/LockupContract.js";
 
 const THIS_PAGE = "AccountAssetDetail";
 
@@ -243,21 +245,31 @@ async function confirmWithdraw() {
       amount,
       poolAccInfo.unstaked_balance
     ); // round user amount
-    if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
-      await askBackgroundCallMethod(
-        asset_selected.contractId,
-        "withdraw_all",
-        {},
-        selectedAccountData.name
-      );
-    } else {
-      await askBackgroundCallMethod(
-        asset_selected.contractId,
-        "withdraw",
-        { amount: yoctosToWithdraw },
-        selectedAccountData.name
+
+    if (selectedAccountData.accountInfo.type == "lock.c") {
+      await performLockupContractUnstakeAndWithdrawAll()
+    }
+    else {
+      if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
+        await askBackgroundCallMethod(
+          asset_selected.contractId,
+          "withdraw_all",
+          {},
+          selectedAccountData.name
+        );
+      } else {
+        await askBackgroundCallMethod(
+          asset_selected.contractId,
+          "withdraw",
+          { amount: yoctosToWithdraw },
+          selectedAccountData.name
+        );
+      }
+      d.showSuccess(
+        c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
       );
     }
+
     asset_selected.addHistory("withdraw", amount);
     asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
@@ -270,30 +282,65 @@ async function confirmWithdraw() {
       showInitial();
     }
 
-    d.showSuccess(
-      c.toStringDec(c.yton(yoctosToWithdraw)) + " withdrew from the pool"
-    );
-  } catch (ex) {
+  }
+  catch (ex) {
     d.showErr(ex);
-  } finally {
+  }
+  finally {
     hideOkCancel();
     d.hideWait();
     showInitial();
   }
 }
 
+async function performLockupContractUnstakeAndWithdrawAll() {
+
+    const info = selectedAccountData.accountInfo;
+    if (!info.ownerId) {
+      throw Error("unknown ownerId");
+    }
+
+    const owner = await getAccountRecord(info.ownerId);
+    if (!owner.privateKey) {
+      throw Error("you need full access on " + info.ownerId);
+    }
+
+    const lc = new LockupContract(info);
+    await lc.computeContractAccount();
+
+    const message = await lc.unstakeAndWithdrawAll(
+      info.ownerId,
+      owner.privateKey
+    );
+    d.showSuccess(message);
+
+}
+
 async function assetWithdrawClicked() {
   try {
-    if (!await accountHasPrivateKey()) {
-      await backToSelectClicked();
-      showGrantAccessSubPage();
-      return;
-    }
 
     d.showSubPage("withdraw");
     d.onClickId("withdraw-max", function () {
       d.maxClicked("withdraw-amount", "#selected-asset #balance");
     });
+
+    if (selectedAccountData.isLockup) {
+      //lockup - always full amount
+      d.maxClicked("withdraw-amount", "#selected-asset #balance");
+      d.byId("withdraw-max").setAttribute("disabled", "");
+      d.byId("withdraw-amount").setAttribute("disabled", "");
+      //await checkOwnerAccessThrows("unstake")
+    }
+    else {
+      if (!await accountHasPrivateKey()) {
+        await backToSelectClicked();
+        ifNormalAccShowGrantAccessSubPage();
+        return;
+      }
+      d.byId("withdraw-max").removeAttribute("disabled");
+      d.byId("withdraw-amount").removeAttribute("disabled");
+    }
+
     showOKCancel(confirmWithdraw, showInitial);
   } catch (ex) {
     d.showErr(ex);
@@ -305,7 +352,7 @@ async function DelayedUnstake() {
   try {
     if (!await accountHasPrivateKey()) {
       await backToSelectClicked();
-      showGrantAccessSubPage();
+      ifNormalAccShowGrantAccessSubPage();
       return;
     }
     d.showSubPage("delayed-unstake");
@@ -328,7 +375,7 @@ async function LiquidUnstake() {
 
     if (!await accountHasPrivateKey()) {
       await backToSelectClicked();
-      showGrantAccessSubPage();
+      ifNormalAccShowGrantAccessSubPage();
       return;
     }
 
@@ -493,7 +540,7 @@ function getOrCreateAsset(
   });
 
   if (!existAssetWithThisPool) {
-    foundAsset = new Asset("idk", "", contractId, 0, type, symbol, icon);
+    foundAsset = new Asset(contractId, 0, type, symbol, icon);
     selectedAccountData.accountInfo.assets.push(foundAsset);
   }
   return foundAsset;
@@ -566,8 +613,6 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     // not existent in wallet
     if (asset_selected.symbol == "STAKED") {
       unstakedAsset = new Asset(
-        "",
-        "",
         asset_selected.contractId,
         amountToUnstake,
         "unstake",
@@ -619,7 +664,7 @@ async function showAssetSendClicked() {
 
     if (!await accountHasPrivateKey()) {
       await backToSelectClicked();
-      showGrantAccessSubPage();
+      ifNormalAccShowGrantAccessSubPage();
       return;
     }
 

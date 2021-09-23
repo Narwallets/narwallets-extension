@@ -215,10 +215,9 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
     accName = accName + "." + root;
   }
 
-  const mainAccInfo = await searchAccounts.searchAccount(accName);
-
-  selectedAccountData.total = mainAccInfo.lastBalance;
-  selectedAccountData.accountInfo.lastBalance = mainAccInfo.lastBalance;
+  // refresh balance
+  await searchAccounts.asyncRefreshAccountInfo(accName, selectedAccountData.accountInfo)
+  selectedAccountData.total = selectedAccountData.accountInfo.lastBalance;
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
     if (asset.type == "stake" || asset.type == "unstake") {
@@ -416,7 +415,7 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
   return item;
 }
 
-function getAccountRecord(accName: string): Promise<Account> {
+export function getAccountRecord(accName: string): Promise<Account> {
   return askBackground({
     code: "get-account",
     accountId: accName,
@@ -430,12 +429,12 @@ async function selectAndShowAccount(accName: string) {
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Pages.setLastSelectedAccount(selectedAccountData);
 
-  if (accInfo.ownerId && accInfo.type == "lock.c" && !accInfo.privateKey) {
-    //lock.c is read-only, but do we have full access on the owner?
-    const ownerInfo = await getAccountRecord(accInfo.ownerId);
-    if (ownerInfo && ownerInfo.privateKey)
-      selectedAccountData.accessStatus = "Owner";
-  }
+  // if (accInfo.ownerId && accInfo.type == "lock.c" && !accInfo.privateKey) {
+  //   //lock.c is read-only, but do we have full access on the owner?
+  //   const ownerInfo = await getAccountRecord(accInfo.ownerId);
+  //   if (ownerInfo && ownerInfo.privateKey)
+  //     selectedAccountData.accessStatus = "Owner";
+  // }
 
   showSelectedAccount();
 }
@@ -520,7 +519,7 @@ function listPoolsClicked() {
 }
 
 export async function accountHasPrivateKey(): Promise<boolean> {
-  if (selectedAccountData.accountInfo.type == "lock.c") {
+  if (selectedAccountData.isLockup) {
     if (!selectedAccountData.accountInfo.ownerId) {
       throw Error("Owner is unknown. Try importing the owner account");
     }
@@ -559,9 +558,11 @@ function showGotoOwner() {
   }
 }
 
-export function showGrantAccessSubPage() {
-  d.showSubPage("account-selected-ok-to-grant-access");
-  showOKCancel(changeAccessClicked, showInitial);
+export function ifNormalAccShowGrantAccessSubPage() {
+  if (!selectedAccountData.isLockup) {
+    d.showSubPage("account-selected-ok-to-grant-access");
+    showOKCancel(changeAccessClicked, showInitial);
+  }
 }
 
 function receiveClicked() {
@@ -604,30 +605,32 @@ async function disconnectFromPageClicked() {
 }
 
 //--------------------------------
-async function checkOwnerAccessThrows(action: string) {
-  //check if we have owner's key
-  const info = selectedAccountData.accountInfo;
-  if (info.ownerId) {
-    const owner = await getAccountRecord(info.ownerId);
-    if (!owner || !owner.privateKey) {
-      showGotoOwner();
-      throw Error(
-        "You need full access on " +
-        info.ownerId +
-        " to " +
-        action +
-        " from this " +
-        selectedAccountData.typeFull
-      );
-    }
-  }
-}
+// deprecated, use AccountHasPrivateKey
+// async function checkOwnerAccessThrows(action: string) {
+//   //check if we have owner's key
+//   const info = selectedAccountData.accountInfo;
+//   if (info.ownerId) {
+//     const owner = await getAccountRecord(info.ownerId);
+//     if (!owner || !owner.privateKey) {
+//       showGotoOwner();
+//       throw Error(
+//         "You need full access on " +
+//         info.ownerId +
+//         " to " +
+//         action +
+//         " from this " +
+//         selectedAccountData.typeFull
+//       );
+//     }
+//   }
+// }
 
 //----------------------
 async function sendClicked() {
   try {
+
     if (!(await accountHasPrivateKey())) {
-      showGrantAccessSubPage();
+      ifNormalAccShowGrantAccessSubPage();
       return;
     }
 
@@ -637,7 +640,7 @@ async function sendClicked() {
 
     //if it's a lock.c and we didn't add a priv key yet, use contract method "transfer" (performLockupContractSend)
     if (
-      selectedAccountData.accountInfo.type == "lock.c" &&
+      selectedAccountData.isLockup &&
       !selectedAccountData.accountInfo.privateKey
     ) {
       maxAmountToSend = selectedAccountData.unlockedOther;
@@ -651,7 +654,7 @@ async function sendClicked() {
       d.onClickId("send-max", function () {
         d.maxClicked(
           "send-to-account-amount",
-          "#selected-account .accountdetsbalance",
+          "#max-amount-send",
           0.1
         );
       });
@@ -680,20 +683,21 @@ async function sendOKClicked() {
     //validate
     const toAccName = new d.El("#send-to-account-name").value;
     const amountToSend = d.getNumber("#send-to-account-amount");
-    if (!isValidAccountID(toAccName))
+    if (!isValidAccountID(toAccName)) {
       throw Error("Receiver Account Id is invalid");
-    if (!isValidAmount(amountToSend))
+    }
+    if (!isValidAmount(amountToSend)) {
       throw Error("Amount should be a positive integer");
+    }
 
     //select send procedure
     let performer;
     let maxAvailable;
-    //if it's a lock.c and we didn't add a priv key yet, use contract method "transfer" (performLockupContractSend)
+    // if it's a lock.c and we didn't add a priv key yet, use contract method "transfer" (performLockupContractSend)
     if (
-      selectedAccountData.accountInfo.type == "lock.c" &&
+      selectedAccountData.isLockup &&
       !selectedAccountData.accountInfo.privateKey
     ) {
-      await checkOwnerAccessThrows("send");
       performer = performLockupContractSend;
       maxAvailable = selectedAccountData.unlockedOther;
     } else {
@@ -702,8 +706,9 @@ async function sendOKClicked() {
       maxAvailable = selectedAccountData.available;
     }
 
-    if (amountToSend > maxAvailable)
+    if (amountToSend > maxAvailable) {
       throw Error("Amount exceeds available balance");
+    }
 
     //show confirmation subpage
     d.showSubPage("account-selected-send-confirmation");
@@ -726,8 +731,9 @@ async function performLockupContractSend() {
     if (!info.ownerId) throw Error("unknown ownerId");
 
     const owner = await getAccountRecord(info.ownerId);
-    if (!owner.privateKey)
+    if (!owner.privateKey) {
       throw Error("you need full access on " + info.ownerId);
+    }
 
     const toAccName = d.byId("send-confirmation-receiver").innerText;
     const amountToSend = c.toNum(d.byId("send-confirmation-amount").innerText);
@@ -736,23 +742,18 @@ async function performLockupContractSend() {
     await lc.computeContractAccount();
     await lc.transfer(amountToSend, toAccName);
 
-    d.showSuccess(
-      "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
-    );
+    d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
 
     displayReflectTransfer(amountToSend, toAccName);
 
     await refreshSelectedAccountAndAssets();
 
     await checkContactList(toAccName);
-  } catch (ex) {
+  }
+  catch (ex) {
     d.showErr(ex.message);
-  } finally {
+  }
+  finally {
     d.hideWait();
     enableOKCancel();
   }
@@ -790,7 +791,7 @@ async function addContactToList() {
 async function stakeClicked() {
   try {
     if (!(await accountHasPrivateKey())) {
-      showGrantAccessSubPage();
+      ifNormalAccShowGrantAccessSubPage();
       return;
     }
 
@@ -800,55 +801,62 @@ async function stakeClicked() {
     const stakeAmountBox = d.inputById("stake-amount");
     let performer = performStake; //default
     let amountToStake = selectedAccountData.unlockedOther;
-    // if (info.unstaked > 0) {
-    //   amountToStake = info.unstaked;
-    // } else {
-    //   amountToStake = info.unstaked + info.lastBalance - 2;
-    //   if (info.type == "lock.c") amountToStake -= 34;
-    // }
-
-    if (info.type == "lock.c") {
-      await checkOwnerAccessThrows("stake");
+    let removeFromMax = 0.1
+    
+    let lc:LockupContract|undefined=undefined;
+    if (selectedAccountData.isLockup) {
+      lc = new LockupContract(selectedAccountData.accountInfo);
+      await lc.computeContractAccount();
+      if (! await lc.tryRetrieveInfo()) {
+        throw Error("error getting lockup account info")
+      }
+      amountToStake = c.yton(lc.accountBalanceYoctos);
+      removeFromMax = 0
       performer = performLockupContractStake;
-      stakeAmountBox.disabled = true;
-      stakeAmountBox.classList.add("bg-lightblue");
-    } else {
-      stakeAmountBox.disabled = false;
-      stakeAmountBox.classList.remove("bg-lightblue");
-    }
+    } 
 
     if (amountToStake < 0) amountToStake = 0;
 
     d.showSubPage("account-selected-stake");
     showOKCancel(performer, showInitial);
 
-    d.qs("#liquid-stake-radio").el.checked = true;
-    d.inputById("stake-with-staking-pool").value = "";
-    d.qs("#max-stake-amount-1").innerText = c.toStringDec(
-      Math.max(0, amountToStake - 0.1)
-    );
-    d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(
-      Math.max(0, amountToStake - 0.1)
-    );
-    d.onClickId("liquid-stake-max", function () {
-      d.maxClicked(
-        "stake-amount-liquid",
-        "#selected-account .accountdetsbalance",
-        0.1
-      );
-    });
-    d.onClickId("max-stake-amount-2-button", function () {
-      d.maxClicked(
-        "stake-amount",
-        "#selected-account .accountdetsbalance",
-        0.1
-      );
-    });
-    //commented. facilitate errors. let the user type-in to confirm.- stakeAmountBox.value = c.toStringDec(amountToStake)
-    if (info.type == "lock.c") {
-      stakeAmountBox.value = c.toStringDec(amountToStake);
+    if (selectedAccountData.isLockup && lc) {
+      stakeAmountBox.value = c.ytonFull(lc.accountBalanceYoctos)
+      d.qs("#max-stake-amount-2-label").innerText = stakeAmountBox.value;
+      stakeAmountBox.disabled = true;
+      stakeAmountBox.classList.add("semi-transparent");
     }
-  } catch (ex) {
+    else {
+      stakeAmountBox.disabled = false;
+      stakeAmountBox.classList.remove("semi-transparent");
+
+      d.qs("#liquid-stake-radio").el.checked = true;
+      d.inputById("stake-with-staking-pool").value = "";
+      d.qs("#max-stake-amount-1").innerText = c.toStringDec(
+        Math.max(0, amountToStake - removeFromMax)
+      );
+      d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(
+        Math.max(0, amountToStake - removeFromMax)
+      );
+      d.onClickId("liquid-stake-max", function () {
+        d.maxClicked(
+          "stake-amount-liquid",
+          "#max-stake-amount-1",
+          removeFromMax
+        );
+      });
+      d.onClickId("max-stake-amount-2-button", function () {
+        d.maxClicked(
+          "stake-amount",
+          "#max-stake-amount-2-label",
+          removeFromMax
+        );
+      });
+
+    }
+
+  } 
+  catch (ex) {
     d.showErr(ex.message);
   }
 }
@@ -971,8 +979,6 @@ async function performStake() {
         foundAsset.balance = c.yton(newBalance);
       } else {
         let asset = new Asset(
-          "idk",
-          "",
           newStakingPool,
           c.yton(newBalance),
           "stake",
@@ -1023,31 +1029,50 @@ async function performLockupContractStake() {
     d.showWait();
 
     const newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
-    if (!isValidAccountID(newStakingPool))
+    if (!isValidAccountID(newStakingPool)) {
       throw Error("Staking pool Account Id is invalid");
+    }
 
     const info = selectedAccountData.accountInfo;
     if (!info.ownerId) throw Error("unknown ownerId");
 
     const owner = await getAccountRecord(info.ownerId);
-    if (!owner.privateKey)
+    if (!owner.privateKey) {
       throw Error("you need full access on " + info.ownerId);
+    }
 
-    //const amountToStake = info.lastBalance - info.staked - 36
-    const amountToStake = c.toNum(d.inputById("stake-amount").value);
+    const amountText = d.inputById("stake-amount").value
+    const amountToStake = c.toNum(amountText);
     if (!isValidAmount(amountToStake)) {
       throw Error("Amount should be a positive integer");
     }
     const liquidStake = stakeTabSelected == 1;
-    if (liquidStake && amountToStake < 10)
+    if (liquidStake && amountToStake < 10) {
       throw Error("Stake at least 10 NEAR");
+    }
 
     const lc = new LockupContract(info);
     await lc.computeContractAccount();
-    await lc.stakeWith(newStakingPool, amountToStake);
+    await lc.stakeWith(selectedAccountData, newStakingPool, amountText.replace(".","")); //amount in yoctos
 
-    //store updated lc state
-    await askBackgroundSetAccount(lc.contractAccount, lc.accountInfo);
+    selectedAccountData.accountInfo.history.push(
+      new History("STAKE", amountToStake, newStakingPool, STAKE_DEFAULT_SVG)
+    )
+
+    let asset = selectedAccountData.findAsset(newStakingPool,"STAKED")
+    if (!asset) {
+      asset = new Asset(
+        newStakingPool,
+        0,
+        "stake",
+        "STAKED",
+        STAKE_DEFAULT_SVG
+      );
+      selectedAccountData.accountInfo.assets.push(asset);
+    }
+    asset.balance += amountToStake
+
+
     //refresh status
     await refreshSaveSelectedAccount();
 
@@ -1061,66 +1086,67 @@ async function performLockupContractStake() {
   }
 }
 
-//-------------------------------------
-async function unstakeClicked() {
-  try {
-    if (!(await accountHasPrivateKey())) {
-      showGrantAccessSubPage();
-      return;
-    }
+// OBSOLETE now, not being called - Unstake is from the Asset
+// //-------------------------------------
+// async function unstakeClicked() {
+//   try {
+//     if (!(await accountHasPrivateKey())) {
+//       showGrantAccessSubPage();
+//       return;
+//     }
 
-    d.showWait();
-    const info = selectedAccountData.accountInfo;
-    let performer = performUnstake; //default
-    const amountBox = d.inputById("unstake-amount");
-    const optionWU = d.qs("#option-unstake-withdraw");
-    d.byId("unstake-from-staking-pool").innerText = "";
-    optionWU.hide();
-    if (info.type == "lock.c") {
-      //lockup - always full amount
-      d.qs("#unstake-ALL-label").show();
-      await checkOwnerAccessThrows("unstake");
-      performer = performLockupContractUnstake;
-      amountBox.disabled = true;
-      amountBox.classList.add("bg-lightblue");
-    } else {
-      //normal account can choose amounts
-      d.qs("#unstake-ALL-label").hide();
-      amountBox.disabled = false;
-      amountBox.classList.remove("bg-lightblue");
-    }
+//     d.showWait();
+//     const info = selectedAccountData.accountInfo;
+//     let performer = performUnstake; //default
+//     const amountBox = d.inputById("unstake-amount");
+//     const optionWU = d.qs("#option-unstake-withdraw");
+//     d.byId("unstake-from-staking-pool").innerText = "";
+//     optionWU.hide();
+//     if (info.type == "lock.c") {
+//       //lockup - always full amount
+//       d.qs("#unstake-ALL-label").show();
+//       await checkOwnerAccessThrows("unstake");
+//       performer = performLockupContractUnstake;
+//       amountBox.disabled = true;
+//       amountBox.classList.add("semi-transparent");
+//     } else {
+//       //normal account can choose amounts
+//       d.qs("#unstake-ALL-label").hide();
+//       amountBox.disabled = false;
+//       amountBox.classList.remove("semi-transparent");
+//     }
 
-    //---refresh first
-    await refreshSaveSelectedAccount();
+//     //---refresh first
+//     await refreshSaveSelectedAccount();
 
-    // if (!selectedAccountData.accountInfo.stakingPool) {
-    //   showButtons();
-    //   throw Error("No staking pool associated whit this account. Stake first");
-    // }
+//     // if (!selectedAccountData.accountInfo.stakingPool) {
+//     //   showButtons();
+//     //   throw Error("No staking pool associated whit this account. Stake first");
+//     // }
 
-    let amountForTheField;
-    let amountToWithdraw = selectedAccountData.unlockedOther;
-    if (amountToWithdraw > 0) {
-      d.inputById("radio-withdraw").checked = true;
-      amountForTheField = amountToWithdraw;
-    } else {
-      d.inputById("radio-unstake").checked = true;
-      //amountForTheField = selectedAccountData.accountInfo.staked;
-      //if (amountForTheField == 0) throw Error("No funds on the pool");
-    }
-    if (info.type != "lock.c") optionWU.show();
+//     let amountForTheField;
+//     let amountToWithdraw = selectedAccountData.unlockedOther;
+//     if (amountToWithdraw > 0) {
+//       d.inputById("radio-withdraw").checked = true;
+//       amountForTheField = amountToWithdraw;
+//     } else {
+//       d.inputById("radio-unstake").checked = true;
+//       //amountForTheField = selectedAccountData.accountInfo.staked;
+//       //if (amountForTheField == 0) throw Error("No funds on the pool");
+//     }
+//     if (info.type != "lock.c") optionWU.show();
 
-    //d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
-    //d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
-    d.showSubPage("account-selected-unstake");
-    showOKCancel(performer, showInitial);
-  } catch (ex) {
-    d.showErr(ex.message);
-  } finally {
-    d.hideWait();
-    enableOKCancel();
-  }
-}
+//     //d.byId("unstake-from-staking-pool").innerText = info.stakingPool || "";
+//     //d.inputById("unstake-amount").value = c.toStringDec(amountForTheField);
+//     d.showSubPage("account-selected-unstake");
+//     showOKCancel(performer, showInitial);
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     d.hideWait();
+//     enableOKCancel();
+//   }
+// }
 
 //-----------------------
 export function fixUserAmountInY(amount: number, yoctosMax: string): string {
@@ -1166,38 +1192,6 @@ async function performUnstake() {
   }
 }
 
-async function performLockupContractUnstake() {
-  try {
-    disableOKCancel();
-    d.showWait();
-
-    const info = selectedAccountData.accountInfo;
-    if (!info.ownerId) throw Error("unknown ownerId");
-
-    const owner = await getAccountRecord(info.ownerId);
-    if (!owner.privateKey)
-      throw Error("you need full access on " + info.ownerId);
-
-    const lc = new LockupContract(info);
-    await lc.computeContractAccount();
-
-    const message = await lc.unstakeAndWithdrawAll(
-      info.ownerId,
-      owner.privateKey
-    );
-    d.showSuccess(message);
-
-    //refresh status
-    await refreshSaveSelectedAccount();
-
-    showInitial();
-  } catch (ex) {
-    d.showErr(ex.message);
-  } finally {
-    d.hideWait();
-    enableOKCancel();
-  }
-}
 
 function displayReflectTransfer(amountNear: number, dest: string) {
   //sender and receiver .accountInfo.lastBalance are async updated and saved by background.ts function reflectTransfer()
@@ -1228,14 +1222,7 @@ async function performSend() {
     //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
     //global.state.transactions[Network.current].push(transactionInfo)
 
-    d.showSuccess(
-      "Success: " +
-      selectedAccountData.name +
-      " transferred " +
-      c.toStringDec(amountToSend) +
-      "\u{24c3} to " +
-      toAccName
-    );
+    d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
 
     selectedAccountData.accountInfo.history.unshift(
       new History("send", amountToSend, toAccName)
@@ -1246,9 +1233,11 @@ async function performSend() {
     await refreshSelectedAccountAndAssets();
 
     await checkContactList(toAccName);
-  } catch (ex) {
+  }
+  catch (ex) {
     d.showErr(ex.message);
-  } finally {
+  }
+  finally {
     d.hideWait();
     enableOKCancel();
   }
@@ -1345,8 +1334,6 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
               } else {
                 // need to create
                 let newAsset = new Asset(
-                  "",
-                  "",
                   pool.account_id,
                   c.yton(poolAccInfo.staked_balance),
                   "stake",
@@ -1370,8 +1357,6 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
               } else {
                 // need to create
                 let newAsset = new Asset(
-                  "",
-                  "",
                   pool.account_id,
                   c.yton(poolAccInfo.unstaked_balance),
                   "unstake",
@@ -1725,7 +1710,7 @@ async function makeReadOnlyOKClicked() {
     } else {
       selectedAccountData.accountInfo.privateKey = undefined;
       await saveSelectedAccount();
-      selectedAccountData.accessStatus = "Read Only";
+      //selectedAccountData.accessStatus = "Read Only";
       showSelectedAccount();
       d.showMsg("Account access removed", "success");
       showInitial();

@@ -1,7 +1,7 @@
 /*#region text with button */
 
 .inputboxwithbutton {
-  width   : 360px;
+  width: 429px;
   height: 60px;
   display : block;
   position: relative;
@@ -18,7 +18,7 @@
   border-bottom-right-radius: 0px;
   padding                   : 5px;
   text-align                : center;
-  width                     : 220px;
+  width: 273px;
   height                    : 32px;
   left                      : 32px;
   top                       : 1px;
@@ -39,7 +39,7 @@
   text-align                : center;
   width                     : 80px;
   height                    : 32px;
-  left                      : 260px;
+  left: 314px;
   top                       : 11px;
   border-top-right-radius   : 16px;
   border-bottom-right-radius: 16px;
@@ -345,4 +345,7 @@ a:visited {
 }
 .big-label {
   font-size: 18px;
+}
+.semi-transparent {
+  opacity:0.7
 }

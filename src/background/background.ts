@@ -284,7 +284,7 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
         actions,
         signerId,
         msg.tx.receiver,
-        accInfo.privateKey
+        accInfo.privateKey || ""
       );
     }
     //default
