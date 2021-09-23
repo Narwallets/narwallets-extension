@@ -802,8 +802,8 @@ async function stakeClicked() {
     let performer = performStake; //default
     let amountToStake = selectedAccountData.unlockedOther;
     let removeFromMax = 0.1
-    
-    let lc:LockupContract|undefined=undefined;
+
+    let lc: LockupContract | undefined = undefined;
     if (selectedAccountData.isLockup) {
       lc = new LockupContract(selectedAccountData.accountInfo);
       await lc.computeContractAccount();
@@ -813,7 +813,7 @@ async function stakeClicked() {
       amountToStake = c.yton(lc.accountBalanceYoctos);
       removeFromMax = 0
       performer = performLockupContractStake;
-    } 
+    }
 
     if (amountToStake < 0) amountToStake = 0;
 
@@ -855,7 +855,7 @@ async function stakeClicked() {
 
     }
 
-  } 
+  }
   catch (ex) {
     d.showErr(ex.message);
   }
@@ -1053,13 +1053,13 @@ async function performLockupContractStake() {
 
     const lc = new LockupContract(info);
     await lc.computeContractAccount();
-    await lc.stakeWith(selectedAccountData, newStakingPool, amountText.replace(".","")); //amount in yoctos
+    await lc.stakeWith(selectedAccountData, newStakingPool, amountText.replace(".", "")); //amount in yoctos
 
     selectedAccountData.accountInfo.history.push(
       new History("STAKE", amountToStake, newStakingPool, STAKE_DEFAULT_SVG)
     )
 
-    let asset = selectedAccountData.findAsset(newStakingPool,"STAKED")
+    let asset = selectedAccountData.findAsset(newStakingPool, "STAKED")
     if (!asset) {
       asset = new Asset(
         newStakingPool,
@@ -1086,7 +1086,7 @@ async function performLockupContractStake() {
   }
 }
 
-// OBSOLETE now, not being called - Unstake is from the Asset
+// OBSOLETE now, not being called - Unstake is made from the Asset
 // //-------------------------------------
 // async function unstakeClicked() {
 //   try {

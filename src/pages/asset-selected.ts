@@ -121,7 +121,7 @@ export async function show(
     }
   }
 
-  d.onClickId("asset-unstake", DelayedUnstake);
+  d.onClickId("asset-unstake", delayedUnstakeClicked);
   d.onClickId("asset-withdraw", assetWithdrawClicked);
   d.onClickId("asset-stake", assetStakeClicked);
   d.onClickId("asset-liquid-unstake", LiquidUnstake);
@@ -246,7 +246,7 @@ async function confirmWithdraw() {
       poolAccInfo.unstaked_balance
     ); // round user amount
 
-    if (selectedAccountData.accountInfo.type == "lock.c") {
+    if (selectedAccountData.isLockup) {
       await performLockupContractUnstakeAndWithdrawAll()
     }
     else {
@@ -295,24 +295,24 @@ async function confirmWithdraw() {
 
 async function performLockupContractUnstakeAndWithdrawAll() {
 
-    const info = selectedAccountData.accountInfo;
-    if (!info.ownerId) {
-      throw Error("unknown ownerId");
-    }
+  const info = selectedAccountData.accountInfo;
+  if (!info.ownerId) {
+    throw Error("unknown ownerId");
+  }
 
-    const owner = await getAccountRecord(info.ownerId);
-    if (!owner.privateKey) {
-      throw Error("you need full access on " + info.ownerId);
-    }
+  const owner = await getAccountRecord(info.ownerId);
+  if (!owner.privateKey) {
+    throw Error("you need full access on " + info.ownerId);
+  }
 
-    const lc = new LockupContract(info);
-    await lc.computeContractAccount();
+  const lc = new LockupContract(info);
+  await lc.computeContractAccount();
 
-    const message = await lc.unstakeAndWithdrawAll(
-      info.ownerId,
-      owner.privateKey
-    );
-    d.showSuccess(message);
+  const message = await lc.unstakeAndWithdrawAll(
+    info.ownerId,
+    owner.privateKey
+  );
+  d.showSuccess(message);
 
 }
 
@@ -329,6 +329,7 @@ async function assetWithdrawClicked() {
       d.maxClicked("withdraw-amount", "#selected-asset #balance");
       d.byId("withdraw-max").setAttribute("disabled", "");
       d.byId("withdraw-amount").setAttribute("disabled", "");
+      d.byId("withdraw-amount").classList.add("semi-transparent")
       //await checkOwnerAccessThrows("unstake")
     }
     else {
@@ -339,6 +340,7 @@ async function assetWithdrawClicked() {
       }
       d.byId("withdraw-max").removeAttribute("disabled");
       d.byId("withdraw-amount").removeAttribute("disabled");
+      d.byId("withdraw-amount").classList.remove("semi-transparent")
     }
 
     showOKCancel(confirmWithdraw, showInitial);
@@ -348,7 +350,7 @@ async function assetWithdrawClicked() {
 
 }
 
-async function DelayedUnstake() {
+async function delayedUnstakeClicked() {
   try {
     if (!await accountHasPrivateKey()) {
       await backToSelectClicked();
@@ -356,11 +358,28 @@ async function DelayedUnstake() {
       return;
     }
     d.showSubPage("delayed-unstake");
-    d.onClickId("delayed-unstake-max", function () {
-      d.maxClicked("delayed-unstake-amount", "#selected-asset #balance");
-    });
-    await showOKCancel(DelayedUnstakeOk, showInitial);
-  } catch (ex) {
+
+    const unstakeAmountBox = d.inputById("delayed-unstake-amount")
+    const maxButton= d.byId("delayed-unstake-max") as HTMLButtonElement
+    if (selectedAccountData.isLockup) {
+      unstakeAmountBox.value="ALL"
+      unstakeAmountBox.disabled = true;
+      maxButton.disabled = true;
+      unstakeAmountBox.classList.add("semi-transparent");
+    }
+    else {
+      unstakeAmountBox.disabled = false;
+      unstakeAmountBox.classList.remove("semi-transparent");
+      maxButton.disabled = false;
+      d.onClickId("delayed-unstake-max", function () {
+        d.maxClicked("delayed-unstake-amount", "#selected-asset #balance");
+      });
+    }
+
+    await showOKCancel(delayedUnstakeOkClicked, showInitial);
+
+  } 
+  catch (ex) {
     d.showErr(ex);
   }
 }
@@ -546,15 +565,18 @@ function getOrCreateAsset(
   return foundAsset;
 }
 
-async function DelayedUnstakeOk() {
+async function delayedUnstakeOkClicked() {
   d.showWait();
 
   try {
-    if (!selectedAccountData.isFullAccess)
-      throw Error("you need full access on " + selectedAccountData.name);
+    
+    if (!selectedAccountData.isLockup) {
 
-    const amount = c.toNum(d.inputById("delayed-unstake-amount").value);
-    if (!isValidAmount(amount)) throw Error("Amount is not valid");
+      if (!selectedAccountData.isFullAccess) {
+        throw Error("you need full access on " + selectedAccountData.name);
+      }
+
+    }
 
     const actualSP = asset_selected.contractId;
 
@@ -563,33 +585,45 @@ async function DelayedUnstakeOk() {
       actualSP
     );
 
-    if (poolAccInfo.staked_balance == "0")
+    if (poolAccInfo.staked_balance == "0") {
       throw Error("No funds staked to unstake");
-
-    let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
-    if (yoctosToUnstake == poolAccInfo.staked_balance) {
-      await askBackgroundCallMethod(
-        actualSP,
-        "unstake_all",
-        {},
-        selectedAccountData.name
-      );
-    } else {
-      await askBackgroundCallMethod(
-        actualSP,
-        "unstake",
-        { amount: yoctosToUnstake },
-        selectedAccountData.name
-      );
     }
+
+    let yoctosToUnstake = poolAccInfo.staked_balance 
+    if (selectedAccountData.isLockup) {
+      await performLockupContractUnstakeAndWithdrawAll()
+    }
+    else {
+      const amount = c.toNum(d.inputById("delayed-unstake-amount").value);
+      if (!isValidAmount(amount)) throw Error("Amount is not valid");
+      yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
+      if (yoctosToUnstake == poolAccInfo.staked_balance) {
+        await askBackgroundCallMethod(
+          actualSP,
+          "unstake_all",
+          {},
+          selectedAccountData.name
+        );
+      } else {
+        await askBackgroundCallMethod(
+          actualSP,
+          "unstake",
+          { amount: yoctosToUnstake },
+          selectedAccountData.name
+        );
+      }
+    }
+
     await createOrUpdateAssetUnstake(poolAccInfo, c.yton(yoctosToUnstake));
     hideOkCancel();
     reloadDetails();
     showInitial();
     d.showSuccess("Unstaked");
-  } catch (ex) {
+  }
+  catch (ex) {
     d.showErr(ex.message);
-  } finally {
+  }
+  finally {
     d.hideWait();
   }
 }

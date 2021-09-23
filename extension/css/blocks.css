@@ -36,7 +36,7 @@
 
 .MidBlock {
   position   : absolute;
-  top: 147px;
+  top: 149px;
   left       : 0px;
   width      : 480px;
   padding    : 0px;
@@ -135,8 +135,10 @@
   font-size  : 22px;
   font-weight: 200;
   border-radius: 5px 5px 0 0;
-  padding-left: 44px;
+  padding-left: 28px;
   padding-right: 30px;
+  padding-top: 7px;
+  padding-bottom: 7px;
 }
 
 .accountdetscomment {
@@ -180,10 +182,10 @@
 .assetdetcontract {
   display      : block;
   margin       : auto;
-  margin-top   : 10px;
-  margin-bottom: 0px;
-  max-height   : 24px;
-  height       : 15px;
+  margin-top: 0px;
+  margin-bottom: 4px;
+  max-height: 24px;
+  height: 15px;
   text-align   : center;
   color        : var(--BlockText);
   font-size    : 12px;
@@ -199,15 +201,17 @@ span#icon img {
   display      : block;
   margin       : auto;
   margin-top   : 1px;
-  margin-bottom: 0px;
+  margin-bottom: 11px !important;
   max-height   : 28px;
-  height       : 28px;
+  height: 35px;
   width        : 370px;
   text-align   : center;
   margin-bottom: 15px;
   font-size    : 28px;
   font-weight  : 200;
   color        : var(--TextRemark);
+  padding-top: 4px;
+  padding-bottom: 0px;
 }
 
 .accountdetsbalance svg {
