@@ -413,10 +413,24 @@ async function LiquidUnstake() {
     metaPoolContractData = await metaPoolContract.get_contract_state();
 
     //searchAccounts.contractState;
-    await showOKCancel(LiquidUnstakeOk, showInitial);
+    await showOKCancel(confirmLiquidUnstake, showInitial);
   } catch (error) {
     d.showErr(error);
   }
+}
+
+async function confirmLiquidUnstake() {
+  try {
+    const amount = d.inputById("liquid-unstake-amount").value;
+    console.log(amount)
+    d.byId("liquid-unstake-confirmation-amount").innerHTML = amount;
+
+    d.showSubPage("asset-selected-liquid-unstake-confirmation");
+    await showOKCancel(LiquidUnstakeOk, showInitial);
+  } catch(error) {
+    console.log(error)
+  }
+  
 }
 
 async function LiquidUnstakeOk() {
@@ -426,8 +440,8 @@ async function LiquidUnstakeOk() {
     if (!selectedAccountData.isFullAccess) {
       throw Error("you need full access on " + selectedAccountData.name);
     }
-
-    const amount = d.getNumber("#liquid-unstake-amount");
+    const amountString = d.byId("liquid-unstake-confirmation-amount").innerHTML.trim()
+    const amount = c.toNum(amountString);
     if (!isValidAmount(amount)) throw Error("Amount is not valid");
 
     const actualSP = asset_selected.contractId;
