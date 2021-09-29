@@ -97,6 +97,8 @@ export async function show(
 
   reloadDetails();
 
+  d.byId("asset-remove").classList.remove("hidden"); // shown in all cases
+
   switch (asset_selected.symbol) {
     case "STNEAR": {
       d.byId("asset-send").classList.remove("hidden");
@@ -550,17 +552,9 @@ function getOrCreateAsset(
   type: string,
   icon: string
 ): Asset {
-  let existAssetWithThisPool = false;
-  let foundAsset: Asset = new Asset();
-  selectedAccountData.accountInfo.assets.forEach((asset) => {
-    if (asset.symbol == symbol && asset.contractId == contractId) {
-      existAssetWithThisPool = true;
-      foundAsset = asset;
-    }
-  });
-
-  if (!existAssetWithThisPool) {
-    foundAsset = new Asset(contractId, 0, type, symbol, icon);
+  let foundAsset = selectedAccountData.findAsset(contractId,symbol);
+  if (!foundAsset) {
+    foundAsset = new Asset(contractId, type, symbol, icon);
     selectedAccountData.accountInfo.assets.push(foundAsset);
   }
   return foundAsset;
@@ -649,11 +643,11 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     if (asset_selected.symbol == "STAKED") {
       unstakedAsset = new Asset(
         asset_selected.contractId,
-        amountToUnstake,
         "unstake",
         "UNSTAKED",
         UNSTAKE_DEFAULT_SVG
       );
+      unstakedAsset.balance = amountToUnstake
       selectedAccountData.accountInfo.assets.push(unstakedAsset);
     } else if (asset_selected.symbol == "STNEAR") {
       // Can't unstake STNEAR if there's no STNEAR asset

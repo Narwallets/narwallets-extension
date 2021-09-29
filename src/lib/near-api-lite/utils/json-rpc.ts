@@ -1,5 +1,5 @@
 
-import {log} from "../../log.js";
+import { log } from "../../log.js";
 
 let rpcUrl: string = "https://rpc.mainnet.near.org/"
 
@@ -24,7 +24,14 @@ function ytonFull(str: string): string {
 
 export function formatJSONErr(obj: any): any {
 
-    let text = JSON.stringify(obj)
+    let text;
+    if (obj["data"]) {
+        text = obj["data"]
+    }
+    else {
+        text = JSON.stringify(obj)
+    }
+
     text = text.replace(/{/g, " ")
     text = text.replace(/}/g, " ")
     text = text.replace(/"/g, "")
@@ -52,7 +59,7 @@ export function formatJSONErr(obj: any): any {
     let n = text.indexOf(KEY)
     if (n > 0 && n < text.length - kl - 5) {
         const i = text.indexOf("'", n + kl + 4)
-        const cut = text.slice(n + kl, i+1)
+        const cut = text.slice(n + kl, i + 1)
         if (cut.trim().length > 5) {
             log(text.slice(n, i + 80)) //show info in the console before removing extra info
             text = "panicked at: " + cut;
@@ -93,23 +100,21 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
                 const errorMessage = formatJSONErr(error);
                 if (error.data === 'Timeout' || errorMessage.indexOf('Timeout error') != -1) {
                     const err = new Error('jsonRpc has timed out')
-                    if (timeoutRetries<3){
+                    if (timeoutRetries < 3) {
                         timeoutRetries++;
-                        log(err.message,"RETRY #",timeoutRetries);
+                        log(err.message, "RETRY #", timeoutRetries);
                         continue;
                     }
                     err.name = 'TimeoutError'
                     throw err;
                 }
-                else if (rpcUrl.indexOf("mainnet")==-1 && errorMessage.indexOf("does not exist") != -1) {
+                else if (rpcUrl.indexOf("mainnet") == -1 && errorMessage.indexOf("does not exist") != -1 && accountDoesNotExistsRetries < 2) {
                     //often in testnet there's failure searching existing accounts. Retry
-                    if (accountDoesNotExistsRetries<2){
-                        accountDoesNotExistsRetries++;
-                        continue;
-                    }
+                    accountDoesNotExistsRetries++;
+                    continue;
                 }
                 else {
-                    throw new Error("Error: " + errorMessage);
+                    throw new Error(errorMessage);
                 }
             }
             return response.result;

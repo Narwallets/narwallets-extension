@@ -1,4 +1,7 @@
 import { timeStamp } from "node:console";
+import { askBackgroundViewMethod } from "../background/askBackground.js";
+import { yton, ytond } from "../util/conversions.js";
+import { TOKEN_DEFAULT_SVG } from "../util/svg_const.js";
 import { nearDollarPrice } from "./global.js";
 
 //user NEAR accounts info type
@@ -41,21 +44,18 @@ export class Contact {
 
 export class Asset {
 
-  public spec:string; // ft metadata spec
-  public url:string; // ft metadata url
-  history: History[];
+  public balance: number = 0;
+  public spec: string = ""; // ft metadata spec
+  public url: string = ""; // ft metadata url
+  history: History[] = [];
 
   constructor(
     public contractId: string = "",
-    public balance: number = 0,
     public type: string = "ft",
     public symbol: string = "",
     public icon: string = "",
-  ) {
-    this.spec="" 
-    this.url="" 
-    this.history = []
-  };
+    public decimals: number = 24,
+  ) { };
 
   addHistory(
     type: string,
@@ -68,6 +68,43 @@ export class Asset {
   }
 
 }
+
+// note: moved outside so it works with POJOs
+export function assetSetBalanceYoctos(asset:Asset, yoctos: string): number {
+  asset.balance = ytond(yoctos, asset.decimals||24);
+  return asset.balance
+}
+
+export async function assetUpdateBalance(asset:Asset, accountId: string): Promise<number> {
+  if (asset.type = "ft") {
+    let balanceYoctos = await askBackgroundViewMethod(
+      asset.contractId, "ft_balance_of", { account_id: accountId }
+    );
+    return assetSetBalanceYoctos(asset,balanceYoctos);
+  }
+  else {
+    throw Error("assetUpdateBalance only supports ft")
+  }
+}
+
+
+export async function newTokenFromMetadata(contractId: string): Promise<Asset> {
+  let item = new Asset(contractId, "ft");
+  let metaData = await askBackgroundViewMethod(contractId, "ft_metadata", {});
+  item.symbol = metaData.symbol;
+  item.decimals = metaData.decimals;
+  if (metaData.icon?.startsWith("<svg")) {
+    item.icon = metaData.icon;
+  } else if (metaData.icon?.startsWith("data:image")) {
+    item.icon = `<img src="${metaData.icon}">`;
+  } else {
+    item.icon = TOKEN_DEFAULT_SVG;
+  }
+  item.url = metaData.reference;
+  item.spec = metaData.spec;
+  return item
+}
+
 
 export class History {
   date: string = ""; //store as date.toISOString() so JSON.stringify/parse does not change the value
@@ -103,20 +140,19 @@ export class ExtendedAccountData {
   available: number;
 
   findAsset(contractId: string, symbol?: string): Asset | undefined {
-    for (var asset of this.accountInfo.assets) {
+    for (var assetPojo of this.accountInfo.assets) {
       if (
-        asset.contractId == contractId &&
-        (symbol == undefined || asset.symbol == symbol)
+        assetPojo.contractId == contractId && (symbol == undefined || assetPojo.symbol == symbol)
       )
-        return asset;
+        return assetPojo; // returns a pointer
     }
     return undefined;
   }
 
   findAssetByType(type: string): Asset | undefined {
-    for (var asset of this.accountInfo.assets) {
-      if (asset.type == type) {
-        return asset;
+    for (var assetPojo of this.accountInfo.assets) {
+      if (assetPojo.type == type) {
+        return assetPojo; // returns a pointer
       }
     }
     return undefined;
@@ -125,7 +161,7 @@ export class ExtendedAccountData {
   removeAsset(contractId: string, type?: string) {
     let inx = 0;
     for (var asset of this.accountInfo.assets) {
-      if (asset.contractId == contractId && (type==undefined || asset.type == type) ) {
+      if (asset.contractId == contractId && (type == undefined || asset.type == type)) {
         this.accountInfo.assets.splice(inx, 1)
         break;
       }

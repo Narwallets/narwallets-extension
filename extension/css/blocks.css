@@ -35,23 +35,23 @@
 }
 
 .MidBlock {
-  position   : absolute;
-  top: 149px;
-  left       : 0px;
-  width      : 480px;
-  padding    : 0px;
-  height     : 63px;
-  margin     : 0px;
-  padding-top: 5px;
+  position       : absolute;
+  top            : 149px;
+  left           : 0px;
+  width          : 480px;
+  padding        : 0px;
+  height         : 63px;
+  margin         : 0px;
+  padding-top    : 5px;
   display        : inline-flex;
   justify-content: center;
-  background: var(--Block);
-  overflow-y: hidden;
+  background     : var(--Block);
+  overflow-y     : hidden;
 }
 
 .subpage {
   position     : absolute;
-  top: 210px;
+  top          : 210px;
   left         : 0px;
   width        : 470;
   height       : 320px;
@@ -120,25 +120,25 @@
 /*#region account details -------------------------------------------------------*/
 
 .accountdetscuenta {
-  display        : flex;
-  justify-content: center;
-  align-items    : center;
-  margin         : auto;
+  display         : flex;
+  justify-content : center;
+  align-items     : center;
+  margin          : auto;
   color           : var(--BlockText);
   background-color: var(--Block);
-  height: 48px;
-  width: 393px;
-  overflow-wrap: break-word;
-  word-break   : break-word;
-  white-space  : initial;
-  overflow     : hidden;
-  font-size  : 22px;
-  font-weight: 200;
-  border-radius: 5px 5px 0 0;
-  padding-left: 28px;
-  padding-right: 30px;
-  padding-top: 7px;
-  padding-bottom: 7px;
+  height          : 48px;
+  width           : 420px;
+  overflow-wrap   : break-word;
+  word-break      : break-word;
+  white-space     : initial;
+  overflow        : hidden;
+  font-size       : 22px;
+  font-weight     : 200;
+  border-radius   : 5px 5px 0 0;
+  padding-left    : 28px;
+  padding-right   : 30px;
+  padding-top     : 7px;
+  padding-bottom  : 7px;
 }
 
 .accountdetscomment {
@@ -182,10 +182,10 @@
 .assetdetcontract {
   display      : block;
   margin       : auto;
-  margin-top: 0px;
+  margin-top   : 0px;
   margin-bottom: 4px;
-  max-height: 24px;
-  height: 15px;
+  max-height   : 24px;
+  height       : 15px;
   text-align   : center;
   color        : var(--BlockText);
   font-size    : 12px;
@@ -198,19 +198,19 @@ span#icon img {
 }
 
 .accountdetsbalance {
-  display      : block;
-  margin       : auto;
-  margin-top   : 1px;
-  margin-bottom: 11px !important;
-  max-height   : 28px;
-  height: 35px;
-  width        : 370px;
-  text-align   : center;
-  margin-bottom: 15px;
-  font-size    : 28px;
-  font-weight  : 200;
-  color        : var(--TextRemark);
-  padding-top: 4px;
+  display       : block;
+  margin        : auto;
+  margin-top    : 1px;
+  margin-bottom : 11px !important;
+  max-height    : 28px;
+  height        : 35px;
+  width         : 370px;
+  text-align    : center;
+  margin-bottom : 15px;
+  font-size     : 28px;
+  font-weight   : 200;
+  color         : var(--TextRemark);
+  padding-top   : 4px;
   padding-bottom: 0px;
 }
 

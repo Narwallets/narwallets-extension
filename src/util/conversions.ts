@@ -31,18 +31,27 @@ export function ytonStringMin(yoctos: string): string {
 }
 
 /**
- * returns Near number with 4 decimal digits
+ * returns number with 4 decimal digits
  * @param {string} yoctos amount in yoctos
+ * @param {number} decimals token decimals default 24
  */
-export function yton(yoctos: string): number {
+export function ytond(yoctos: string, decimals: number): number {
     try {
-        const just5dec = ytonFull(yoctos).slice(0, -19)
+        const just5dec = ytonFullD(yoctos,decimals).slice(0, -decimals + 5)
         return Number(just5dec) // truncated to 4 decimals 
     }
     catch (ex) {
         console.log("ERR: yton(", yoctos, ")", ex)
         return NaN;
     }
+}
+
+/**
+ * returns Near number with 4 decimal digits
+ * @param {string} yoctos amount in yoctos
+ */
+export function yton(yoctos: string): number {
+    return ytond(yoctos, 24)
 }
 
 
@@ -97,8 +106,17 @@ export function toNum(str: string): number {
  * @param {string} yoctoString amount in yoctos
  */
 export function ytonFull(yoctoString: string): string {
-    let result = (yoctoString + "").padStart(25, "0")
-    result = result.slice(0, -24) + "." + result.slice(-24)
+    return ytonFullD(yoctoString, 24)
+}
+
+/**
+ * returns string with a decimal point and 24 decimal places
+ * @param {string} yoctoString amount in yoctos
+ * @param {number} decimals how many decimals
+ */
+export function ytonFullD(yoctoString: string, decimals: number): string {
+    let result = (yoctoString + "").padStart(decimals + 1, "0")
+    result = result.slice(0, -decimals) + "." + result.slice(-decimals)
     return result
 }
 

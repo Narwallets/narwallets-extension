@@ -26,6 +26,9 @@ import {
   ExtendedAccountData,
   History,
   Contact,
+  newTokenFromMetadata,
+  assetSetBalanceYoctos,
+  assetUpdateBalance,
 } from "../data/account.js";
 import { localStorageGetAndRemove, localStorageSet } from "../data/util.js";
 import {
@@ -241,12 +244,7 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
       }
     }
     if (asset.type == "ft") {
-      let resultBalance = await askBackgroundViewMethod(
-        asset.contractId,
-        "ft_balance_of",
-        { account_id: selectedAccountData.name }
-      );
-      asset.balance = c.yton(resultBalance);
+      await assetUpdateBalance(asset, selectedAccountData.name)
     }
   });
   await refreshSaveSelectedAccount(fromTimer);
@@ -310,22 +308,24 @@ function addClicked() {
 function getKnownNEP141Contracts(): PopupItem[] {
   if (activeNetworkInfo.name == "testnet") {
     return [
-      { text: "CHDR - token.cheddar.testnet", value: "token.cheddar.testnet" },
-      { text: "$META - token.meta.pool.testnet", value: "token.meta.pool.testnet" },
       { text: "stNEAR - meta-v2.pool.testnet", value: "meta-v2.pool.testnet" },
+      { text: "$META - token.meta.pool.testnet", value: "token.meta.pool.testnet" },
+      { text: "CHDR - token.cheddar.testnet", value: "token.cheddar.testnet" },
     ]
   } else {
     return [
-      { text: "wNEAR - wrap.near", value: "wrap.near" },
-      { text: "$META - meta-token.near", value: "meta-token.near" },
       { text: "stNEAR - meta-pool.near", value: "meta-pool.near" },
-      { text: "BANANA - berryclub.ek.near", value: "berryclub.ek.near" },
+      { text: "$META - meta-token.near", value: "meta-token.near" },
+      { text: "REF - ref.finance", value: "token.v2.ref-finance.near" },
+      { text: "Paras - token.paras.near", value: "token.paras.near" },
+      { text: "wNEAR - wrap.near", value: "wrap.near" },
       { text: "nWBTC- (bridged)", value: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near" },
       { text: "nUSDT- (bridged)", value: "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near" },
       { text: "nUSDC- (bridged)", value: "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near" },
       { text: "nDAI - (bridged)", value: "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near" },
       { text: "nUNI - (bridged)", value: "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near" },
       { text: "nLINK- (bridged)", value: "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near" },
+      { text: "BANANA - berryclub.ek.near", value: "berryclub.ek.near" },
     ]
   }
 }
@@ -383,34 +383,8 @@ async function addOKClicked() {
 }
 
 export async function addAssetToken(contractId: string): Promise<Asset> {
-  let item = new Asset();
-  item.type = "ft";
-
-  item.contractId = contractId;
-
-  let resultBalance = await askBackgroundViewMethod(
-    item.contractId,
-    "ft_balance_of",
-    { account_id: selectedAccountData.name }
-  );
-  item.balance = c.yton(resultBalance);
-
-  let result = await askBackgroundViewMethod(
-    item.contractId,
-    "ft_metadata",
-    {}
-  );
-  item.symbol = result.symbol;
-  if (result.icon?.startsWith("<svg")) {
-    item.icon = result.icon;
-  } else if (result.icon?.startsWith("data:image")) {
-    item.icon = `<img src="${result.icon}">`;
-  } else {
-    item.icon = TOKEN_DEFAULT_SVG;
-  }
-  item.url = result.reference;
-  item.spec = result.spec;
-
+  let item = await newTokenFromMetadata(contractId)
+  await assetUpdateBalance(item, selectedAccountData.name)
   selectedAccountData.accountInfo.assets.push(item);
   return item;
 }
@@ -980,11 +954,11 @@ async function performStake() {
       } else {
         let asset = new Asset(
           newStakingPool,
-          c.yton(newBalance),
           "stake",
           stakeTabSelected == 1 ? "STNEAR" : "STAKED",
           stakeTabSelected == 1 ? STNEAR_SVG : STAKE_DEFAULT_SVG
         );
+        assetSetBalanceYoctos(asset, newBalance)
         asset.history.unshift(hist);
         selectedAccountData.accountInfo.assets.push(asset);
       }
@@ -1063,7 +1037,6 @@ async function performLockupContractStake() {
     if (!asset) {
       asset = new Asset(
         newStakingPool,
-        0,
         "stake",
         "STAKED",
         STAKE_DEFAULT_SVG
@@ -1319,7 +1292,7 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
             c.yton(poolAccInfo.staked_balance);
           if (amount > 0) {
             d.showSuccess(
-              `Found! ${c.toStringDec(amount)} on ${pool.account_id}`
+              `Found! ${c.toStringDec(amount)} in ${pool.account_id}`
             );
 
             // has staked?
@@ -1335,11 +1308,11 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
                 // need to create
                 let newAsset = new Asset(
                   pool.account_id,
-                  c.yton(poolAccInfo.staked_balance),
                   "stake",
                   "STAKED",
                   STAKE_DEFAULT_SVG
                 );
+                assetSetBalanceYoctos(newAsset, poolAccInfo.staked_balance)
                 exAccData.accountInfo.assets.push(newAsset);
               }
             }
@@ -1358,11 +1331,11 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
                 // need to create
                 let newAsset = new Asset(
                   pool.account_id,
-                  c.yton(poolAccInfo.unstaked_balance),
                   "unstake",
                   "UNSTAKED",
                   UNSTAKE_DEFAULT_SVG
                 );
+                assetSetBalanceYoctos(newAsset, poolAccInfo.unstaked_balance)
                 exAccData.accountInfo.assets.push(newAsset);
               }
             }
@@ -1373,40 +1346,27 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
 
     // search tokens
     for (let tokenOption of getKnownNEP141Contracts()) {
-      let resultBalance;
+      let resultBalanceYoctos;
       try {
-        resultBalance = await askBackgroundViewMethod(
-          tokenOption.value,
-          "ft_balance_of",
-          { account_id: exAccData.name }
+        resultBalanceYoctos = await askBackgroundViewMethod(
+          tokenOption.value, "ft_balance_of", { account_id: exAccData.name }
         );
       } catch (ex) {
         continue;
       }
 
-      if (resultBalance > 0) {
-        d.showSuccess(
-          `Found! ${c.toStringDec(c.yton(resultBalance))} ${tokenOption.text}`
-        );
+      if (resultBalanceYoctos && resultBalanceYoctos != "0") {
         let asset = exAccData.findAsset(tokenOption.value);
         if (asset) {
-          asset.balance = c.yton(resultBalance);
+          assetSetBalanceYoctos(asset, resultBalanceYoctos)
         } else {
           // must create
-          let item = new Asset();
-          item.type = "ft";
-          item.contractId = tokenOption.value;
-          item.balance = c.yton(resultBalance);
-          let metadata = await askBackgroundViewMethod(
-            item.contractId,
-            "ft_metadata",
-            {}
-          );
-          item.symbol = metadata.symbol;
-          item.icon = metadata.icon;
-          item.url = metadata.reference;
-          item.spec = metadata.spec;
+          let item = await newTokenFromMetadata(tokenOption.value)
+          let amount = assetSetBalanceYoctos(item, resultBalanceYoctos);
           exAccData.accountInfo.assets.push(item);
+          d.showSuccess(
+            `Found! ${c.toStringDec(amount)} ${item.symbol}`
+          );
         }
       }
     }
