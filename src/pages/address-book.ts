@@ -3,8 +3,9 @@ import {
   askBackground,
   askBackgroundAddContact,
   askBackgroundAllAddressContact,
+  askBackgroundAllNetworkAccounts,
 } from "../background/askBackground.js";
-import { GContact } from "../data/Contact.js";
+import { contactPlusNote, GContact } from "../data/Contact.js";
 import { saveSecureState } from "../data/global.js";
 import { D } from "../lib/tweetnacl/core/core.js";
 import * as d from "../util/document.js";
@@ -25,12 +26,26 @@ import type { PopupItem } from "../util/popup-list.js";
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
-export async function getAddressesForPopupList(): Promise<PopupItem[]> {
+export async function getAddressesForPopupList(except?:string): Promise<PopupItem[]> {
   if (addressContacts.length == 0) await initAddressArr();
   let items = []
+  let added:Record<string,boolean>={}
   for (let item of addressContacts) {
-    items.push({ text: item.accountId, value: item.accountId })
+    if (!except || item.accountId!=except){
+      items.push({ text: contactPlusNote(item), value: item.accountId })
+      added[item.accountId]=true
+    }
   }
+  // add also all wallet accounts
+  const walletAccounts = await askBackgroundAllNetworkAccounts();
+  for (let key in walletAccounts) {
+    if (!added[key] && (!except || key!=except)){
+      let title = key
+      if (walletAccounts[key].note) title += " ("+walletAccounts[key].note+")"
+      items.push({ text: title, value: key })
+    }
+  }
+
   return items
 }
 

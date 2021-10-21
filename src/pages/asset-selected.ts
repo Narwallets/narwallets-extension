@@ -552,7 +552,7 @@ function getOrCreateAsset(
   type: string,
   icon: string
 ): Asset {
-  let foundAsset = selectedAccountData.findAsset(contractId,symbol);
+  let foundAsset = selectedAccountData.findAsset(contractId, symbol);
   if (!foundAsset) {
     foundAsset = new Asset(contractId, type, symbol, icon);
     selectedAccountData.accountInfo.assets.push(foundAsset);
@@ -751,6 +751,7 @@ async function sendOKClicked() {
 
 async function performSend() {
   try {
+    if (asset_selected.decimals == undefined) throw Error("no info on decimals");
     const toAccName = d.byId("asset-send-confirmation-receiver").innerText;
     contactToAdd = toAccName;
     const amountToSend = c.toNum(d.byId("asset-send-confirmation-amount").innerText);
@@ -764,7 +765,7 @@ async function performSend() {
       "ft_transfer",
       {
         receiver_id: toAccName,
-        amount: c.ntoy(amountToSend),
+        amount: c.nToYD(amountToSend, asset_selected.decimals),
         memo: null,
       },
       selectedAccountData.name,

@@ -70,27 +70,24 @@ export class Asset {
 }
 
 // note: moved outside so it works with POJOs
-export function assetSetBalanceYoctos(asset:Asset, yoctos: string): number {
-  asset.balance = ytond(yoctos, asset.decimals||24);
+export function assetSetBalanceYoctos(asset: Asset, yoctos: string): number {
+  asset.balance = ytond(yoctos, asset.decimals || 24);
   return asset.balance
 }
 
-export async function assetUpdateBalance(asset:Asset, accountId: string): Promise<number> {
+export async function assetUpdateBalance(asset: Asset, accountId: string): Promise<number> {
   if (asset.type = "ft") {
     let balanceYoctos = await askBackgroundViewMethod(
       asset.contractId, "ft_balance_of", { account_id: accountId }
     );
-    return assetSetBalanceYoctos(asset,balanceYoctos);
+    return assetSetBalanceYoctos(asset, balanceYoctos);
   }
   else {
     throw Error("assetUpdateBalance only supports ft")
   }
 }
 
-
-export async function newTokenFromMetadata(contractId: string): Promise<Asset> {
-  let item = new Asset(contractId, "ft");
-  let metaData = await askBackgroundViewMethod(contractId, "ft_metadata", {});
+export function updateTokenAssetFromMetadata(item: Asset, metaData: any) {
   item.symbol = metaData.symbol;
   item.decimals = metaData.decimals;
   if (metaData.icon?.startsWith("<svg")) {
@@ -102,6 +99,18 @@ export async function newTokenFromMetadata(contractId: string): Promise<Asset> {
   }
   item.url = metaData.reference;
   item.spec = metaData.spec;
+}
+
+export async function assetUpdateMetadata(item: Asset): Promise<Asset> {
+  let metaData = await askBackgroundViewMethod(item.contractId, "ft_metadata", {});
+  updateTokenAssetFromMetadata(item, metaData)
+  return item
+}
+
+export async function newTokenFromMetadata(contractId: string): Promise<Asset> {
+  let item = new Asset(contractId, "ft");
+  let metaData = await askBackgroundViewMethod(contractId, "ft_metadata", {});
+  updateTokenAssetFromMetadata(item, metaData)
   return item
 }
 

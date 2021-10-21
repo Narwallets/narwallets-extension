@@ -29,6 +29,7 @@ import {
   newTokenFromMetadata,
   assetSetBalanceYoctos,
   assetUpdateBalance,
+  assetUpdateMetadata,
 } from "../data/account.js";
 import { localStorageGetAndRemove, localStorageSet } from "../data/util.js";
 import {
@@ -244,6 +245,9 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
       }
     }
     if (asset.type == "ft") {
+      if (asset.decimals==undefined) {
+        await assetUpdateMetadata(asset);
+      }
       await assetUpdateBalance(asset, selectedAccountData.name)
     }
   });

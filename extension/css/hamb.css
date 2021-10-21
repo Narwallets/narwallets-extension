@@ -179,7 +179,7 @@ li#current-network-display-name {
   max-height: 20px;
   width     : 118px;
   color     : var(--TextGeneric);
-  cursor: pointer;
+  cursor    : pointer;
 }
 
 .circle:before {
@@ -233,21 +233,21 @@ li#current-network-display-name {
 }
 
 .combo-list-appface {
-  position        : absolute;
-  top             : 600px;
-  left            : 0px;
-  right           : 0px;
-  bottom          : 0px;
-  opacity         : 0;
-  transition      : opacity 0.25s ease-in-out;
-  z-index         : 99;
-  padding         : 20px;
-  margin          : 0px;
+  position  : absolute;
+  top       : 600px;
+  left      : 0px;
+  right     : 0px;
+  bottom    : 0px;
+  opacity   : 0;
+  transition: opacity 0.25s ease-in-out;
+  z-index   : 99;
+  padding   : 20px;
+  margin    : 0px;
 }
 
 .combo-list-appface.open {
   top             : 0px;
-  opacity: 0.7;
+  opacity         : 0.7;
   background-color: var(--Background);
   border          : 1px solid var(--HighLight);
   text-align      : center;
@@ -255,22 +255,22 @@ li#current-network-display-name {
 }
 
 .combo-list-box {
-  position        : absolute;
-  opacity         : 0;
-  top: 700;
-  left            : 20px;
-  right           : 20px;
+  position: absolute;
+  opacity : 0;
+  top     : 700;
+  left    : 20px;
+  right   : 20px;
 }
 
 .combo-list-box.open {
   top             : auto;
   bottom          : 20px;
-  max-height: 500px;
-  overflow-y: scroll;
+  max-height      : 520px;
+  overflow-y      : scroll;
   opacity         : 1;
   transition      : opacity 0.25s ease-in-out;
   z-index         : 99;
-  padding         : 20px;
+  padding         : 2px;
   background-color: var(--Background);
   border          : 1px solid var(--HighLight);
   text-align      : center;
@@ -287,6 +287,8 @@ option {
   height          : auto;
   overflow        : hidden;
   text-overflow   : ellipsis;
+  min-width       : 409px;
+  margin          : 0px;
 }
 
 option:hover {
@@ -320,7 +322,7 @@ option:hover {
   min-width          : 10px;
   min-height         : 10px;
   color              : white;
-  cursor: pointer;
+  cursor             : pointer;
 }
 
 .network-box-header hr {

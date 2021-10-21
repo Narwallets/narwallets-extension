@@ -16,6 +16,10 @@ export function TGas(tgas: number): string {
 export function ntoy(near: number): string {
     return (BigInt(Math.trunc(near * 1e6)) * b1e18).toString(); // near*1e24 // Note: YoctoNear is u128
 }
+/// use up-to 6 decimals from user's input
+export function nToYD(near: number, decimals: number): string {
+    return (BigInt(Math.trunc(near * 1e6)) * b1e(decimals - 6)).toString(); // use up-to 6 decimals from user input
+}
 
 /**
  * returns string representing NEAR with thousands separators, and 5 decimal places
@@ -37,7 +41,7 @@ export function ytonStringMin(yoctos: string): string {
  */
 export function ytond(yoctos: string, decimals: number): number {
     try {
-        const just5dec = ytonFullD(yoctos,decimals).slice(0, -decimals + 5)
+        const just5dec = ytonFullD(yoctos, decimals).slice(0, -decimals + 5)
         return Number(just5dec) // truncated to 4 decimals 
     }
     catch (ex) {

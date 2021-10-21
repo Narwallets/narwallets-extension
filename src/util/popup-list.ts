@@ -14,7 +14,7 @@ export async function populatePopupList(items: PopupItem[]) {
     }
     else for (let item of items) {
         const value = item.value
-        const text = item.text.length < 42 ? item.text : item.text.slice(0, 19) + "..." + item.text.slice(-19)
+        const text = item.text.length < 48 ? item.text : item.text.slice(0, 22) + "..." + item.text.slice(-22)
         options += `<option value="${value}">${text}</option>`;
     }
     d.byId(POPUP_LIST).innerHTML = options;
@@ -23,7 +23,16 @@ export async function populatePopupList(items: PopupItem[]) {
 export function closePopupList() {
     d.byId(POPUP_LIST).classList.remove(d.OPEN); //hides
     d.byId(POPUP_LIST_APPFACE).classList.remove(d.OPEN); //hides
+    document.removeEventListener("keydown", checkEscKeyPressed);
 }
+
+function checkEscKeyPressed(event: KeyboardEvent) {
+    if (event.key === "Escape") {
+        event.preventDefault()
+        closePopupList()
+    }
+}
+
 
 export function popupListOpen(items: PopupItem[], clickHandler: Function) {
     // populate list
@@ -42,6 +51,7 @@ export function popupListOpen(items: PopupItem[], clickHandler: Function) {
             closePopupList()
         });
     });
+    document.addEventListener("keydown", checkEscKeyPressed);
 }
 
 
