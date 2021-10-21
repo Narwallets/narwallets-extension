@@ -26,6 +26,12 @@ export function closePopupList() {
 }
 
 export function popupListOpen(items: PopupItem[], clickHandler: Function) {
+    document.body.addEventListener("keydown", function (event) {
+        if (event.code === 'Escape') {
+            closePopupList();
+            event.preventDefault();
+        }
+    });
     // populate list
     populatePopupList(items);
     // open full body semi-transparent background
