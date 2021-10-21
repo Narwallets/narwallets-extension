@@ -675,6 +675,8 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
     selectedAccountData.accountInfo.history = [];
   }
   selectedAccountData.accountInfo.history.unshift(hist);
+  // add current asset history
+  asset_selected.history.unshift(hist);
 
   // update balance of currently selected pool
   let balance = await StakingPool.getAccInfo(
