@@ -1,9 +1,11 @@
 import * as c from "../util/conversions.js";
 import {
   askBackground,
+  askBackgroundAllNetworkAccounts,
   askBackgroundCallMethod,
   askBackgroundGetNetworkInfo,
   askBackgroundSetAccount,
+  askBackgroundViewMethod,
 } from "../background/askBackground.js";
 import { Asset, ExtendedAccountData, History } from "../data/account.js";
 import {
@@ -41,6 +43,7 @@ import {
   SEND_SVG,
   STAKE_DEFAULT_SVG,
   STNEAR_SVG,
+  TOKEN_DEFAULT_SVG,
   UNSTAKE_DEFAULT_SVG,
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
@@ -808,12 +811,65 @@ async function performSend() {
     );
 
     checkContactList(toAccName);
+    InternalUpdate(toAccName)
+
 
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
     d.hideWait();
     enableOKCancel();
+  }
+}
+
+async function InternalUpdate(toAccName: string){
+  try{
+
+    const receiverAccInfo = await askBackground({
+      code: "get-account",
+      accountId: toAccName,
+    });
+    let receiverAccountData = new ExtendedAccountData(toAccName, receiverAccInfo);
+    
+    let result = await askBackgroundViewMethod(
+      asset_selected.contractId,
+      "ft_metadata",
+      {}
+      );
+      
+    let resultBalance = await askBackgroundViewMethod(
+      asset_selected.contractId,
+      "ft_balance_of",
+      { account_id: receiverAccountData.name }
+    );
+    let item = new Asset(asset_selected.contractId,"ft",result.symbol);
+    item.balance = c.yton(resultBalance);
+    if (result.icon?.startsWith("<svg")) {
+        item.icon = result.icon;
+    } else if (result.icon?.startsWith("data:image")) {
+        item.icon = `<img src="${result.icon}">`;
+    } else {
+        item.icon = TOKEN_DEFAULT_SVG;
+    }
+    item.url = result.reference;
+    item.spec = result.spec;
+    let existingAsset = receiverAccountData.accountInfo.assets.find(i => i.contractId == item.contractId);
+      
+    if(existingAsset){ 
+      item.history = existingAsset.history;
+      let index = receiverAccountData.accountInfo.assets.indexOf(existingAsset);
+      receiverAccountData.accountInfo.assets[index] = item;
+    }else{
+      receiverAccountData.accountInfo.assets.push(item);
+      
+    }
+    
+    return askBackgroundSetAccount(
+      receiverAccountData.name,
+      receiverAccountData.accountInfo
+      );
+  } catch {
+    
   }
 }
 
