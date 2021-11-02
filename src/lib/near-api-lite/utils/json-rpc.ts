@@ -24,9 +24,9 @@ function ytonFull(str: string): string {
 
 export function formatJSONErr(obj: any): any {
 
-    let text;
+    let text: string;
     if (obj["data"]) {
-        text = obj["data"]
+        text = JSON.stringify(obj["data"])
     }
     else {
         text = JSON.stringify(obj)

@@ -45,8 +45,8 @@ export async function asyncRefreshAccountInfo(accName: string, info: Account) {
         accountId: accName,
       });
     } catch (ex) {
-      let reason = ex.message.includes("name:UNKNOWN_ACCOUNT") ? `account ${accName} not found in ${activeNetworkInfo.name}` : ex.message;
-      throw Error(reason);
+      let reason = ex.message.includes("name:UNKNOWN_ACCOUNT") ? `not found in ${activeNetworkInfo.name}` : ex.message;
+      throw Error(`account:"${accName}", Error:${reason}`);
     }
 
     info.lastBalance = c.yton(stateResultYoctos.amount);

@@ -422,15 +422,14 @@ async function LiquidUnstake() {
 async function confirmLiquidUnstake() {
   try {
     const amount = d.inputById("liquid-unstake-amount").value;
-    console.log(amount)
     d.byId("liquid-unstake-confirmation-amount").innerHTML = amount;
 
     d.showSubPage("asset-selected-liquid-unstake-confirmation");
     await showOKCancel(LiquidUnstakeOk, showInitial);
-  } catch(error) {
+  } catch (error) {
     console.log(error)
   }
-  
+
 }
 
 async function LiquidUnstakeOk() {

@@ -119,8 +119,8 @@ export function getValidators(): Promise<any> {
 
 //-------------------------------
 export function broadcast_tx_commit_signed(signedTransaction: TX.SignedTransaction): Promise<any> {
-    const borshEcoded = signedTransaction.encode();
-    const b64Encoded = Buffer.from(borshEcoded).toString('base64')
+    const borshEncoded = signedTransaction.encode();
+    const b64Encoded = Buffer.from(borshEncoded).toString('base64')
     return jsonRpc('broadcast_tx_commit', [b64Encoded]) as Promise<any>
 };
 
