@@ -278,7 +278,7 @@ export function showMsg(
   extraClass: string,
   showMs?: number
 ): HTMLElement {
-  if (!showMs) showMs = 6000; //default show for 6 seconds
+  if (!showMs) showMs = 3000; //default show for 3 seconds
   const errDiv = byId(ERR_DIV);
   const newDiv = document.createElement("DIV") as HTMLElement;
   newDiv.innerText = msg;
