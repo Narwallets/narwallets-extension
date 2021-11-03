@@ -18,7 +18,7 @@ async function changeClicked(ev :Event) {
     const confirm = d.inputById(PASS_CONFIRM).value;
     
     if (!confirm || confirm != password) {
-      throw Error("passwords don't match")
+      throw Error("Passwords don't match")
     }
 
     const state = await askBackgroundGetState()

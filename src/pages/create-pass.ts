@@ -25,7 +25,7 @@ async function createClicked(ev: Event) {
     const confirm = d.inputById(PASS_CONFIRM).value;
     const agree = d.inputById(AGREE_CHECK);
     if (!confirm || confirm != password) {
-      throw Error("passwords don't match")
+      throw Error("Passwords don't match")
     }
     else if (!agree.checked) {
       throw Error("Please agree to the Terms of Use")
