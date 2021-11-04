@@ -7,7 +7,7 @@ import {
   askBackgroundSetAccount,
   askBackgroundViewMethod,
 } from "../background/askBackground.js";
-import { Asset, ExtendedAccountData, History } from "../data/account.js";
+import { Asset, assetUpdateBalance, assetUpdateMetadata, ExtendedAccountData, History, newTokenFromMetadata, updateTokenAssetFromMetadata } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -832,33 +832,11 @@ async function InternalUpdate(toAccName: string){
       accountId: toAccName,
     });
     let receiverAccountData = new ExtendedAccountData(toAccName, receiverAccInfo);
-    
-    // With the account in our wallet, update or create the asset in the receiver account
-    let result = await askBackgroundViewMethod(
-      asset_selected.contractId,
-      "ft_metadata",
-      {}
-      );
-      
-    let resultBalance = await askBackgroundViewMethod(
-      asset_selected.contractId,
-      "ft_balance_of",
-      { account_id: receiverAccountData.name }
-    );
 
     // Fill the asset for update/create
-    let item = new Asset(asset_selected.contractId,"ft",result.symbol);
-    item.balance = c.yton(resultBalance);
-    if (result.icon?.startsWith("<svg")) {
-        item.icon = result.icon;
-    } else if (result.icon?.startsWith("data:image")) {
-        item.icon = `<img src="${result.icon}">`;
-    } else {
-        item.icon = TOKEN_DEFAULT_SVG;
-    }
-    item.url = result.reference;
-    item.spec = result.spec;
-
+    let item = await newTokenFromMetadata(asset_selected.contractId);
+    await assetUpdateBalance(item, receiverAccountData.name);
+    
     // Check the existence of the asset in the asset list of the account
     let existingAsset = receiverAccountData.accountInfo.assets.find(i => i.contractId == item.contractId);
       
@@ -870,7 +848,6 @@ async function InternalUpdate(toAccName: string){
     }else{
       // Create the asset.
       receiverAccountData.accountInfo.assets.push(item);
-      
     }
     return askBackgroundSetAccount(
       receiverAccountData.name,
