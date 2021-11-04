@@ -811,7 +811,8 @@ async function performSend() {
     );
 
     checkContactList(toAccName);
-    InternalUpdate(toAccName)
+
+    InternalUpdate(toAccName);
 
 
   } catch (ex) {
@@ -825,12 +826,14 @@ async function performSend() {
 async function InternalUpdate(toAccName: string){
   try{
 
+    // Trying to get the receiver account in the wallet. If not exist, throw error.
     const receiverAccInfo = await askBackground({
       code: "get-account",
       accountId: toAccName,
     });
     let receiverAccountData = new ExtendedAccountData(toAccName, receiverAccInfo);
     
+    // With the account in our wallet, update or create the asset in the receiver account
     let result = await askBackgroundViewMethod(
       asset_selected.contractId,
       "ft_metadata",
@@ -842,6 +845,8 @@ async function InternalUpdate(toAccName: string){
       "ft_balance_of",
       { account_id: receiverAccountData.name }
     );
+
+    // Fill the asset for update/create
     let item = new Asset(asset_selected.contractId,"ft",result.symbol);
     item.balance = c.yton(resultBalance);
     if (result.icon?.startsWith("<svg")) {
@@ -853,17 +858,20 @@ async function InternalUpdate(toAccName: string){
     }
     item.url = result.reference;
     item.spec = result.spec;
+
+    // Check the existence of the asset in the asset list of the account
     let existingAsset = receiverAccountData.accountInfo.assets.find(i => i.contractId == item.contractId);
       
     if(existingAsset){ 
+      // Update the asset.
       item.history = existingAsset.history;
       let index = receiverAccountData.accountInfo.assets.indexOf(existingAsset);
       receiverAccountData.accountInfo.assets[index] = item;
     }else{
+      // Create the asset.
       receiverAccountData.accountInfo.assets.push(item);
       
     }
-    
     return askBackgroundSetAccount(
       receiverAccountData.name,
       receiverAccountData.accountInfo
