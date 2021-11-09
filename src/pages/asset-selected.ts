@@ -1,11 +1,13 @@
 import * as c from "../util/conversions.js";
 import {
   askBackground,
+  askBackgroundAllNetworkAccounts,
   askBackgroundCallMethod,
   askBackgroundGetNetworkInfo,
   askBackgroundSetAccount,
+  askBackgroundViewMethod,
 } from "../background/askBackground.js";
-import { Asset, ExtendedAccountData, History } from "../data/account.js";
+import { Asset, assetUpdateBalance, assetUpdateMetadata, ExtendedAccountData, History, newTokenFromMetadata, updateTokenAssetFromMetadata } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -41,6 +43,7 @@ import {
   SEND_SVG,
   STAKE_DEFAULT_SVG,
   STNEAR_SVG,
+  TOKEN_DEFAULT_SVG,
   UNSTAKE_DEFAULT_SVG,
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
@@ -809,11 +812,49 @@ async function performSend() {
 
     checkContactList(toAccName);
 
+    InternalUpdate(toAccName);
+
+
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
     d.hideWait();
     enableOKCancel();
+  }
+}
+
+async function InternalUpdate(toAccName: string){
+  try{
+
+    // Trying to get the receiver account in the wallet. If not exist, throw error.
+    const receiverAccInfo = await askBackground({
+      code: "get-account",
+      accountId: toAccName,
+    });
+    let receiverAccountData = new ExtendedAccountData(toAccName, receiverAccInfo);
+
+    // Fill the asset for update/create
+    let item = await newTokenFromMetadata(asset_selected.contractId);
+    await assetUpdateBalance(item, receiverAccountData.name);
+    
+    // Check the existence of the asset in the asset list of the account
+    let existingAsset = receiverAccountData.accountInfo.assets.find(i => i.contractId == item.contractId);
+      
+    if(existingAsset){ 
+      // Update the asset.
+      item.history = existingAsset.history;
+      let index = receiverAccountData.accountInfo.assets.indexOf(existingAsset);
+      receiverAccountData.accountInfo.assets[index] = item;
+    }else{
+      // Create the asset.
+      receiverAccountData.accountInfo.assets.push(item);
+    }
+    return askBackgroundSetAccount(
+      receiverAccountData.name,
+      receiverAccountData.accountInfo
+      );
+  } catch {
+    
   }
 }
 
