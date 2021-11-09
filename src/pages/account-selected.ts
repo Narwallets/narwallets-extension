@@ -305,7 +305,7 @@ function showAssetDetailsClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
-      const assetIndex = Number(li.id.replace("index-",""));
+      const assetIndex = Number(li.id.replace("index-", ""));
       if (isNaN(assetIndex)) return;
       AssetSelected_show(assetIndex);
     }
@@ -735,7 +735,7 @@ async function performLockupContractSend() {
 
     await refreshSelectedAccountAndAssets();
 
-    await checkContactList(toAccName);
+    await accountCheckContactList(toAccName);
   }
   catch (ex) {
     d.showErr(ex.message);
@@ -747,14 +747,13 @@ async function performLockupContractSend() {
 }
 
 //----------------------
-function checkContactList(address: string) {
-  const toAccName = address.trim();
-  if (contactExists(toAccName)) {
+async function accountCheckContactList(address: string) {
+  if (await contactExists(address)) {
     showInitial();
     hideOkCancel();
   } else {
     d.showSubPage("sure-add-contact");
-    d.byId("add-confirmation-name").innerText = toAccName;
+    d.byId("add-confirmation-name").innerText = address.trim();
     showOKCancel(addContactToList, showInitial);
   }
 }
@@ -1218,7 +1217,7 @@ async function performSend() {
 
     await refreshSelectedAccountAndAssets();
 
-    await checkContactList(toAccName);
+    await accountCheckContactList(toAccName);
   }
   catch (ex) {
     d.showErr(ex.message);

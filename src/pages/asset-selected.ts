@@ -767,6 +767,48 @@ async function sendOKClicked() {
   }
 }
 
+async function nep141_transfer(asset: Asset, amountToSend: number, toAccName: string) {
+
+  // check if the dest account is registered in the contract
+  let regBalance = await askBackgroundViewMethod(
+    asset.contractId,
+    "storage_balance_of", { account_id: toAccName }
+  );
+  if (!regBalance) {
+    // if not, register
+    // double-check if account exists
+    let accountExists = await searchAccounts.checkIfAccountExists(toAccName);
+    if (!accountExists) throw Error("Receiver Account does not exists");
+    // register
+    await askBackgroundCallMethod(
+      asset.contractId,
+      "storage_deposit",
+      {
+        account_id: toAccName,
+        registration_only: true,
+      },
+      selectedAccountData.name,
+      undefined,
+      c.ntoy(0.1) // hardcoded to avoid calling storage_balance_bounds
+    );
+  }
+
+  await askBackgroundCallMethod(
+    asset.contractId,
+    "ft_transfer",
+    {
+      receiver_id: toAccName,
+      amount: c.nToYD(amountToSend, asset.decimals),
+      memo: null,
+    },
+    selectedAccountData.name,
+    undefined,
+    "1"
+  );
+
+}
+
+
 async function performSend() {
   try {
     if (asset_selected.decimals == undefined) throw Error("no info on decimals");
@@ -778,18 +820,7 @@ async function performSend() {
     disableOKCancel();
     d.showWait();
 
-    await askBackgroundCallMethod(
-      asset_selected.contractId,
-      "ft_transfer",
-      {
-        receiver_id: toAccName,
-        amount: c.nToYD(amountToSend, asset_selected.decimals),
-        memo: null,
-      },
-      selectedAccountData.name,
-      undefined,
-      "1"
-    );
+    await nep141_transfer(asset_selected, amountToSend, toAccName)
 
     hideOkCancel();
     showInitial();
@@ -810,10 +841,9 @@ async function performSend() {
       toAccName
     );
 
-    checkContactList(toAccName);
-
     InternalUpdate(toAccName);
 
+    assetCheckContactList(toAccName);
 
   } catch (ex) {
     d.showErr(ex.message);
@@ -823,8 +853,8 @@ async function performSend() {
   }
 }
 
-async function InternalUpdate(toAccName: string){
-  try{
+async function InternalUpdate(toAccName: string) {
+  try {
 
     // Trying to get the receiver account in the wallet. If not exist, throw error.
     const receiverAccInfo = await askBackground({
@@ -836,25 +866,24 @@ async function InternalUpdate(toAccName: string){
     // Fill the asset for update/create
     let item = await newTokenFromMetadata(asset_selected.contractId);
     await assetUpdateBalance(item, receiverAccountData.name);
-    
+
     // Check the existence of the asset in the asset list of the account
-    let existingAsset = receiverAccountData.accountInfo.assets.find(i => i.contractId == item.contractId);
-      
-    if(existingAsset){ 
+    let existingAssetIndex = receiverAccountData.findAssetIndex(item.contractId)
+    if (existingAssetIndex >= 0) {
       // Update the asset.
-      item.history = existingAsset.history;
-      let index = receiverAccountData.accountInfo.assets.indexOf(existingAsset);
-      receiverAccountData.accountInfo.assets[index] = item;
-    }else{
+      item.history = receiverAccountData.accountInfo.assets[existingAssetIndex].history; // take existing history
+      receiverAccountData.accountInfo.assets[existingAssetIndex] = item;
+    } else {
       // Create the asset.
       receiverAccountData.accountInfo.assets.push(item);
     }
+    // save data
     return askBackgroundSetAccount(
       receiverAccountData.name,
       receiverAccountData.accountInfo
-      );
+    );
   } catch {
-    
+
   }
 }
 
@@ -906,15 +935,14 @@ async function saveSelectedAccount(): Promise<any> {
   );
 }
 
-function checkContactList(address: string) {
-  const toAccName = address.trim()
-  if (contactExists(toAccName)) {
+async function assetCheckContactList(address: string) {
+  if (await contactExists(address)) {
     showInitial();
     hideOkCancel();
   }
   else {
     d.showSubPage("sure-add-contact-asset");
-    d.byId("asset-add-confirmation-name").innerText = toAccName;
+    d.byId("asset-add-confirmation-name").innerText = address.trim();
     showOKCancel(addContactToList, showInitial);
   }
 }

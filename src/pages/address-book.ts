@@ -26,37 +26,27 @@ import type { PopupItem } from "../util/popup-list.js";
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
-export async function getAddressesForPopupList(except?:string): Promise<PopupItem[]> {
+export async function getAddressesForPopupList(except?: string): Promise<PopupItem[]> {
   if (addressContacts.length == 0) await initAddressArr();
   let items = []
-  let added:Record<string,boolean>={}
+  let added: Record<string, boolean> = {}
   for (let item of addressContacts) {
-    if (!except || item.accountId!=except){
+    if (!except || item.accountId != except) {
       items.push({ text: contactPlusNote(item), value: item.accountId })
-      added[item.accountId]=true
+      added[item.accountId] = true
     }
   }
   // add also all wallet accounts
   const walletAccounts = await askBackgroundAllNetworkAccounts();
   for (let key in walletAccounts) {
-    if (!added[key] && (!except || key!=except)){
+    if (!added[key] && (!except || key != except)) {
       let title = key
-      if (walletAccounts[key].note) title += " ("+walletAccounts[key].note+")"
+      if (walletAccounts[key].note) title += " (" + walletAccounts[key].note + ")"
       items.push({ text: title, value: key })
     }
   }
 
   return items
-}
-
-export function contactExists(address: string): boolean {
-  let name = address.trim()
-  for (let contact of addressContacts) {
-    if (contact.accountId == name) {
-      return true;
-    }
-  };
-  return false
 }
 
 export async function show() {
@@ -140,7 +130,7 @@ export async function saveContactOnBook(
   name: string,
   contact: GContact
 ): Promise<any> {
-  if (contactExists(name)) {
+  if (contactInAddressBook(name)) {
     throw Error("Address already saved");
   }
   addressContacts.push(contact);
@@ -205,4 +195,23 @@ async function addNoteOKClicked() {
   });
   showInitial();
   hideOkCancel();
+}
+
+export function contactInAddressBook(address: string): boolean {
+  let name = address.trim()
+  for (let contact of addressContacts) {
+    if (contact.accountId == name) {
+      return true;
+    }
+  };
+  return false;
+}
+
+export async function contactExists(address: string): Promise<boolean> {
+  if (contactInAddressBook(address)) return true;
+  // check in the wallet
+  const networkAccounts = await askBackgroundAllNetworkAccounts();
+  if (!networkAccounts) return false;
+  if (!networkAccounts[address.trim()]) return false;
+  return true;
 }
