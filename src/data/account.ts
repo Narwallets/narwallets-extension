@@ -158,13 +158,17 @@ export class ExtendedAccountData {
     return undefined;
   }
 
-  findAssetByType(type: string): Asset | undefined {
+  findAssetIndex(contractId: string, symbol?: string): number {
+    let index = 0
     for (var assetPojo of this.accountInfo.assets) {
-      if (assetPojo.type == type) {
-        return assetPojo; // returns a pointer
+      if (
+        assetPojo.contractId == contractId && (symbol == undefined || assetPojo.symbol == symbol)
+      ) {
+        return index; // returns an index
       }
+      index += 1
     }
-    return undefined;
+    return -1;
   }
 
   removeAsset(contractId: string, type?: string) {

@@ -245,10 +245,19 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
       }
     }
     if (asset.type == "ft") {
-      if (asset.decimals==undefined) {
+      if (asset.decimals == undefined) {
         await assetUpdateMetadata(asset);
       }
-      await assetUpdateBalance(asset, selectedAccountData.name)
+      let assetBalanceNumber = await assetUpdateBalance(asset, selectedAccountData.name)
+      if (fromTimer) {
+        let index = selectedAccountData.findAssetIndex(asset.contractId, asset.symbol);
+        if (index >= 0) {
+          // update balance on-screen
+          d.qs(`#assets-list #index-${index} .accountassetbalance`).innerText = c.toStringDec(
+            assetBalanceNumber
+          );
+        }
+      }
     }
   });
   await refreshSaveSelectedAccount(fromTimer);
@@ -296,7 +305,7 @@ function showAssetDetailsClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
-      const assetIndex = Number(li.id);
+      const assetIndex = Number(li.id.replace("index-",""));
       if (isNaN(assetIndex)) return;
       AssetSelected_show(assetIndex);
     }
