@@ -1,4 +1,5 @@
 import { askBackground, askBackgroundGetState } from "../background/askBackground.js"
+import { showPassword } from "../data/util.js";
 import * as d from "../util/document.js"
 import { show as UnlockPage_show } from "./unlock.js";
 
@@ -7,6 +8,9 @@ const PASS = "new-pass"
 const PASS_CONFIRM = "new-pass-confirm"
 const CHANGE_PASS = "confirm-change-password"
 const UNLOCK = "unlock";
+const SHOW_PASSWORD_CURRENT = "show-password-current";
+const SHOW_PASSWORD_NEW_CURRENT = "show-password-new-current";
+const SHOW_PASSWORD_NEW_CONFIRM = "show-password-confirm";
 
 async function changeClicked(ev :Event) {
   try {
@@ -48,5 +52,7 @@ async function changeClicked(ev :Event) {
 export function addListeners() {
 
   d.onClickId(CHANGE_PASS, changeClicked);
-
+  d.onClickId(SHOW_PASSWORD_CURRENT, showPassword);
+  d.onClickId(SHOW_PASSWORD_NEW_CURRENT, showPassword);
+  d.onClickId(SHOW_PASSWORD_NEW_CONFIRM, showPassword);
 }

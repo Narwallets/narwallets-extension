@@ -31,7 +31,7 @@ import {
   assetUpdateBalance,
   assetUpdateMetadata,
 } from "../data/account.js";
-import { localStorageGetAndRemove, localStorageSet } from "../data/util.js";
+import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/util.js";
 import {
   askBackground,
   askBackgroundApplyTxAction,
@@ -172,6 +172,7 @@ function initPage() {
   // liquid/delayed stake
   d.onClickId("one-tab-stake", selectFirstTab);
   d.onClickId("two-tab-stake", selectSecondTab);
+  d.onClickId("show-password-request",showPassword);
 
   seedTextElem = new d.El("#seed-phrase");
   removeButton = new d.El("button#remove");
