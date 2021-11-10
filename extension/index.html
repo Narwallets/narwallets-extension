@@ -149,11 +149,21 @@
 			-->
 			<div class="form-field-label">
 				<label class="big-label" data-shrink="true" for="pass">Password (min 8 chars)</label><br>
-				<input type="password" autocomplete="new-password" type="password" id="pass">
+				<div class="inputboxwithbutton">
+					<div class="inputboxwithbutton">
+						<input type="password" tabindex="0" autocomplete="password" id="pass" />
+						<button id="show-new-user-password" style="font-size: 21px;">👁</button>
+					</div>
+				</div>
 			</div>
 			<div class="form-field-label">
 				<label class="big-label" data-shrink="true" for="pass-confirm">Confirm password</label><br>
-				<input type="password" autocomplete="new-password" id="pass-confirm">
+				<div class="inputboxwithbutton">
+					<div class="inputboxwithbutton">
+						<input type="password" tabindex="0" autocomplete="password" id="pass-confirm" />
+						<button id="show-new-user-password-confirm" style="font-size: 21px;">👁</button>
+					</div>
+				</div>
 			</div>
 
 			<br>
@@ -183,8 +193,7 @@
 
 
 		</div>
-
-
+		
 
 
 	</div>
@@ -199,8 +208,11 @@
 				<label data-shrink="true" for="current-password">
 					<h3>Type your current password</h3>
 				</label>
-				<div class="form-control">
-					<input type="password" tabindex="0" autocomplete="password" id="current-pass" />
+				<div class="inputboxwithbutton">
+					<div class="inputboxwithbutton">
+						<input type="password" tabindex="0" autocomplete="password" id="current-pass" />
+						<button id="show-password-current" style="font-size: 21px;">👁</button>
+					</div>
 				</div>
 			</div>
 			<div class="form-field-label">
@@ -208,16 +220,19 @@
 					<h3>New password (min 8
 						chars)</h3>
 				</label>
-				<div class="form-control">
-					<input type="password" autocomplete="new-password" type="password" id="new-pass">
+				<div class="inputboxwithbutton">
+					<input type="password" autocomplete="new-password" id="new-pass">
+					<button id="show-password-new-current" style="font-size: 21px;">👁</button>
+					
 				</div>
 			</div>
 			<div class="form-field-label">
 				<label class="form-field-label" data-shrink="true" for="pass-confirm" id="confirm-new-password-label">
 					<h3>Confirm password</h3>
 				</label>
-				<div class="form-control">
+				<div class="inputboxwithbutton">
 					<input type="password" autocomplete="new-password" id="new-pass-confirm">
+					<button id="show-password-confirm" style="font-size: 21px;">👁</button>
 				</div>
 			</div>
 
@@ -411,7 +426,10 @@
 				<div class="request-password-form">
 					<div class="form-field-label">
 						<div class="form-control">
-							<input placeholder="" id="password-request-password" type="password" dir="auto" value="">
+							<div class="inputboxwithbutton">
+								<input type="password" autocomplete="new-password" id="password-request-password">
+								<button id="show-password-request" style="font-size: 21px;">👁</button>
+							</div>
 						</div>
 
 					</div>
@@ -1016,7 +1034,10 @@
 		<div class="form-field-label">
 			<label for="unlock-pass">Password</label>
 			<div class="form-control">
-				<input autocomplete="new-password" id="unlock-pass" type="password">
+				<div class="inputboxwithbutton">
+					<input type="password" autocomplete="new-password" id="unlock-pass">
+					<button id="show-password-login" style="font-size: 21px;">👁</button>
+				</div>
 			</div>
 		</div>
 

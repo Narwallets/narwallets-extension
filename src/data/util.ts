@@ -93,3 +93,17 @@ export function localStorageSave(title: string, code: string, value: any) {
       );
   });
 }
+
+export function showPassword(e :Event){
+  
+  const showHideButton = e.target as HTMLButtonElement;
+  const input = showHideButton.previousSibling?.previousSibling as HTMLInputElement;
+  
+  if (input?.type === "password") {
+    input.type = "text";
+    showHideButton.innerText = '✖';
+  } else {
+    input.type = "password";
+    showHideButton.innerText = '👁';
+  }
+}

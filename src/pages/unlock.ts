@@ -3,6 +3,7 @@ import { askBackground, askBackgroundGetAccessKey, askBackgroundGetState } from 
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js"
 import {show as MainPage_show} from "./main.js"
 import { SINGLE_USER_EMAIL } from "../index.js"
+import { showPassword } from "../data/util.js"
 
 async function unlockClicked(ev :Event) {
 
@@ -43,6 +44,8 @@ export async function show() {
   d.showPage("unlock"); //show & clear fields
 
   const state = await askBackgroundGetState()
+
+  d.onClickId("show-password-login",showPassword);
   //d.inputById("unlock-email").value = state.currentUser;
 
 }
