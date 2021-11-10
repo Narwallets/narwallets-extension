@@ -2,142 +2,142 @@
 <html>
 
 <head>
-	<link rel="stylesheet" href="css/styles_dark.css">
+    <link rel="stylesheet" href="css/styles_dark.css">
 
-	<meta charset="UTF-8">
-	<title>Narwallet</title>
+    <meta charset="UTF-8">
+    <title>Narwallet</title>
 
 </head>
 
 <body>
 
-	<!--#region TopBar  -->
+    <!--#region TopBar  -->
 
-	<div class="topbar">
-		<div class="topbarleft"></div>
-		<div class="topbarcaption" id="topbar"></div>
-		<div class="topbarpulldown">
-			<div class="app-header-network-component-wrapper">
-				<div id="select-network" class="network-component pointer" title="Active Network">
-					<div class="network-indicator">
-						<li id="current-network-display-name" class="circle yellow">NEAR Testnet</li>
-						<div class="down-arrow"></div>
-					</div>
-				</div>
-			</div>
-		</div>
+    <div class="topbar">
+        <div class="topbarleft"></div>
+        <div class="topbarcaption" id="topbar"></div>
+        <div class="topbarpulldown">
+            <div class="app-header-network-component-wrapper">
+                <div id="select-network" class="network-component pointer" title="Active Network">
+                    <div class="network-indicator">
+                        <li id="current-network-display-name" class="circle yellow">NEAR Testnet</li>
+                        <div class="down-arrow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		<!--<div class="topbarhamburguer"></div>-->
+        <!--<div class="topbarhamburguer"></div>-->
 
-		<div class="hamb" id="hamb-button">
-			<svg width=24 height=28>
+        <div class="hamb" id="hamb-button">
+            <svg width=24 height=28>
 				<line id="top" x1=0 y1=2 x2=24 y2=2 />
 				<line id="middle" x1=0 y1=12 x2=24 y2=12 />
 				<line id="bottom" x1=0 y1=22 x2=24 y2=22 />
 			</svg>
-		</div>
+        </div>
 
-	</div>
+    </div>
 
-	<!-- Networks Dropdown -->
+    <!-- Networks Dropdown -->
 
-	<div id="networks-list" class="networks-list-box">
-		<div class="networks-list-content">
-			<div class="network-box-header">
-				<div class="title">Networks</div>
-				<hr>
-				<div class="messsage"></div>
-			</div>
-			<div id="network-items">
-			</div>
-		</div>
-	</div>
+    <div id="networks-list" class="networks-list-box">
+        <div class="networks-list-content">
+            <div class="network-box-header">
+                <div class="title">Networks</div>
+                <hr>
+                <div class="messsage"></div>
+            </div>
+            <div id="network-items">
+            </div>
+        </div>
+    </div>
 
 
 
-	<!-- Network Item Template -->
-	<div id="network-item-template" class="hidden">
-		<div data-code="{name}" class="circle {color}">{displayName}</div>
-	</div>
+    <!-- Network Item Template -->
+    <div id="network-item-template" class="hidden">
+        <div data-code="{name}" class="circle {color}">{displayName}</div>
+    </div>
 
-	<!-- -->
-	<!-- <div id="err-div"></div> -->
-	<!-- -->
-	<div id="wait">
+    <!-- -->
+    <!-- <div id="err-div"></div> -->
+    <!-- -->
+    <div id="wait">
 
-		<div class="lds-ring">
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
 
-	</div>
+    </div>
 
-	<aside>
-		<div class="logo-128"></div>
-		<nav>
-			<hr>
-			<li id="lock">Lock</li>
-			<hr>
-			<li id="accounts">Accounts</li>
-			<hr>
-			<li id="add-account-side">Add Account</li>
-			<hr>
-			<li id="address-book-side">Address Book</li>
-			<hr>
-			<li id="change-password">Change Password</li>
-			<hr>
-			<!--<li id="create-user">Create a new User</li>
+    <aside>
+        <div class="logo-128"></div>
+        <nav>
+            <hr>
+            <li id="lock">Lock</li>
+            <hr>
+            <li id="accounts">Accounts</li>
+            <hr>
+            <li id="add-account-side">Add Account</li>
+            <hr>
+            <li id="address-book-side">Address Book</li>
+            <hr>
+            <li id="change-password">Change Password</li>
+            <hr>
+            <!--<li id="create-user">Create a new User</li>
 			<hr>-->
-			<li id="darkmode">Switch Dark/Light Mode</li>
-			<hr>
-			<li id="options">Options</li>
-			<hr>
-			<li id="contact">Contact</li>
-			<hr>
-			<li id="about">About</li>
-			<hr>
-		</nav>
-	</aside>
+            <li id="darkmode">Switch Dark/Light Mode</li>
+            <hr>
+            <li id="options">Options</li>
+            <hr>
+            <li id="contact">Contact</li>
+            <hr>
+            <li id="about">About</li>
+            <hr>
+        </nav>
+    </aside>
 
-	<!--#endregion  -->
+    <!--#endregion  -->
 
-	<!--#region WELCOME New user, onboarding-->
-	<div id="welcome-new-user-page" class="appface slide-hide">
+    <!--#region WELCOME New user, onboarding-->
+    <div id="welcome-new-user-page" class="appface slide-hide">
 
-		<br><br>
-		<h2>Welcome to Narwallets!</h2>
-		<br><br>
-		<h3>The future is NEAR</h3>
-		<h3>Let's start our journey</h3>
-		<br><br>
-		<div boxed>
-			<h2>Step one:</h2><br>
-			<h3>Create a password to protect this wallet:</h3>
-		</div>
-		<br><br>
-		<div class="flex-row">
-			<button id="welcome-create-pass" class="button big">Create a Password</button>
-		</div>
+        <br><br>
+        <h2>Welcome to Narwallets!</h2>
+        <br><br>
+        <h3>The future is NEAR</h3>
+        <h3>Let's start our journey</h3>
+        <br><br>
+        <div boxed>
+            <h2>Step one:</h2><br>
+            <h3>Create a password to protect this wallet:</h3>
+        </div>
+        <br><br>
+        <div class="flex-row">
+            <button id="welcome-create-pass" class="button big">Create a Password</button>
+        </div>
 
-	</div>
-	<!--#endregion-->
+    </div>
+    <!--#endregion-->
 
-	<!--#region New User create pass-->
-	<div id="create-user" class="appface slide-hide">
-		<p></p>
-		<h2>Protect this wallet</h2>
-		<div class="form">
-			<!--
+    <!--#region New User create pass-->
+    <div id="create-user" class="appface slide-hide">
+        <p></p>
+        <h2>Protect this wallet</h2>
+        <div class="form">
+            <!--
 			<div class="form-field-label">
 				<label data-shrink="true" for="email">
 					<h3>Your e-mail</h3>
@@ -147,864 +147,856 @@
 				</div>
 			</div>
 			-->
-			<div class="form-field-label">
-				<label class="big-label" data-shrink="true" for="pass">Password (min 8 chars)</label><br>
-				<input type="password" autocomplete="new-password" type="password" id="pass">
-			</div>
-			<div class="form-field-label">
-				<label class="big-label" data-shrink="true" for="pass-confirm">Confirm password</label><br>
-				<input type="password" autocomplete="new-password" id="pass-confirm">
-			</div>
+            <div class="form-field-label">
+                <label class="big-label" data-shrink="true" for="pass">Password (min 8 chars)</label><br>
+                <input type="password" autocomplete="new-password" type="password" id="pass">
+            </div>
+            <div class="form-field-label">
+                <label class="big-label" data-shrink="true" for="pass-confirm">Confirm password</label><br>
+                <input type="password" autocomplete="new-password" id="pass-confirm">
+            </div>
 
-			<br>
-			<br>
+            <br>
+            <br>
 
-			<h3 class="warning boxed">
-				You need to write down this password.
-				We don't store your password so it is not possible to help you recover it.
-				If you lose the password you will not be able access the wallet anymore.
-				Remember to store passwords and seed phrases, securely and in more than one place.
-			</h3>
+            <h3 class="warning boxed">
+                You need to write down this password. We don't store your password so it is not possible to help you recover it. If you lose the password you will not be able access the wallet anymore. Remember to store passwords and seed phrases, securely and in more
+                than one place.
+            </h3>
 
-			<div class="checkbox-container">
-				<input id="agree-check" type="checkbox" bind:checked aria-checked="false"
-					aria-labelledby="checkbox-label" />
-				<label for="agree-check" class="checkbox-label">
+            <div class="checkbox-container">
+                <input id="agree-check" type="checkbox" bind:checked aria-checked="false" aria-labelledby="checkbox-label" />
+                <label for="agree-check" class="checkbox-label">
 					I have read and agree to the
 					<a href=# id="open-terms-of-use">
 						Terms of Use
 					</a>
 				</label>
-			</div>
+            </div>
 
-			<p></p>
+            <p></p>
 
-			<button class="big" id="create-user">Create</button>
-
-
-		</div>
+            <button class="big" id="create-user">Create</button>
 
 
+        </div>
 
 
-	</div>
 
-	<!--#endregion-->
 
-	<!--#region change password-->
-	<div id="change-password" class="appface slide-hide">
-		<h2>Change Password</h2>
-		<div class="form">
-			<div class="form-field-label">
-				<label data-shrink="true" for="current-password">
+    </div>
+
+    <!--#endregion-->
+
+    <!--#region change password-->
+    <div id="change-password" class="appface slide-hide">
+        <h2>Change Password</h2>
+        <div class="form">
+            <div class="form-field-label">
+                <label data-shrink="true" for="current-password">
 					<h3>Type your current password</h3>
 				</label>
-				<div class="form-control">
-					<input type="password" tabindex="0" autocomplete="password" id="current-pass" />
-				</div>
-			</div>
-			<div class="form-field-label">
-				<label class="" data-shrink="true" for="pass" id="new-password-label">
+                <div class="form-control">
+                    <input type="password" tabindex="0" autocomplete="password" id="current-pass" />
+                </div>
+            </div>
+            <div class="form-field-label">
+                <label class="" data-shrink="true" for="pass" id="new-password-label">
 					<h3>New password (min 8
 						chars)</h3>
 				</label>
-				<div class="form-control">
-					<input type="password" autocomplete="new-password" type="password" id="new-pass">
-				</div>
-			</div>
-			<div class="form-field-label">
-				<label class="form-field-label" data-shrink="true" for="pass-confirm" id="confirm-new-password-label">
+                <div class="form-control">
+                    <input type="password" autocomplete="new-password" type="password" id="new-pass">
+                </div>
+            </div>
+            <div class="form-field-label">
+                <label class="form-field-label" data-shrink="true" for="pass-confirm" id="confirm-new-password-label">
 					<h3>Confirm password</h3>
 				</label>
-				<div class="form-control">
-					<input type="password" autocomplete="new-password" id="new-pass-confirm">
-				</div>
-			</div>
+                <div class="form-control">
+                    <input type="password" autocomplete="new-password" id="new-pass-confirm">
+                </div>
+            </div>
 
-			<br><br>
-			<button class="big" id="confirm-change-password">Change Password</button>
+            <br><br>
+            <button class="big" id="confirm-change-password">Change Password</button>
 
-		</div>
-
-
+        </div>
 
 
-	</div>
 
-	<!--#endregion-->
 
-	<!--#region AddAccount-->
+    </div>
 
-	<div class="appface slide-hide" id="import-or-create">
-		<button class="button back" id="add-account-back-to-account"></button>
+    <!--#endregion-->
 
-		<h2>Do you have an Account?</h2>
+    <!--#region AddAccount-->
 
-		<h3>No, create a new NAMED account</h3>
-		<h4>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
+    <div class="appface slide-hide" id="import-or-create">
+        <button class="button back" id="add-account-back-to-account"></button>
+
+        <h2>Do you have an Account?</h2>
+
+        <h3>No, create a new NAMED account</h3>
+        <h4>Create a new named account, you can choose the account name, but <b>you will have to send 1 NEAR to a
 				temporary account</b> to complete the account creation</h4>
 
-		<button class="big" id="option-create">Create named account</button>
+        <button class="big" id="option-create">Create named account</button>
 
-		<h3>Yes, I already have an account</h3>
+        <h3>Yes, I already have an account</h3>
 
-		<button class="big" id="option-import">Import existing account</button>
+        <button class="big" id="option-import">Import existing account</button>
 
-		<h3>No, create a free implicit Account</h3>
-		<h4>Create a new implicit account. It's free to create but it's a large string of numbers and letters</h4>
+        <h3>No, create a free implicit Account</h3>
+        <h4>Create a new implicit account. It's free to create but it's a large string of numbers and letters</h4>
 
-		<button class="big" id="option-create-implicit">Create implicit account</button>
+        <button class="big" id="option-create-implicit">Create implicit account</button>
 
 
 
 
-	</div>
+    </div>
 
-	<!--#endregion -->
+    <!--#endregion -->
 
-	<!--#region Account details -->
+    <!--#region Account details -->
 
-	<div class="appface slide-hide" id="account-selected">
+    <div class="appface slide-hide" id="account-selected">
 
-		<button class="button back" id="back-to-account"></button>
+        <button class="button back" id="back-to-account"></button>
 
-		<div class="accountdetstopcenter" id="selected-account">
-		</div>
+        <div class="accountdetstopcenter" id="selected-account">
+        </div>
 
-		<div class="midblock">
-			<button class="button send" id="send">Send</button>
-			<button class="button receive" id="receive">Receive</button>
-			<button class="button stake" id="stake">Stake</button>
-			<button class="button add" id="add">Token</button>
-			<button class="button connect" id="acc-connect-to-page">Connect</button>
-			<button class="button disconnect hidden" id="acc-disconnect-to-page">Disconnect</button>
-		</div>
+        <div class="midblock">
+            <button class="button send" id="send">Send</button>
+            <button class="button receive" id="receive">Receive</button>
+            <button class="button stake" id="stake">Stake</button>
+            <button class="button add" id="add">Token</button>
+            <button class="button connect" id="acc-connect-to-page">Connect</button>
+            <button class="button disconnect hidden" id="acc-disconnect-to-page">Disconnect</button>
+        </div>
 
-		<!-- Template -->
-		<div id="selected-account-template" class="hidden">
+        <!-- Template -->
+        <div id="selected-account-template" class="hidden">
 
-			<div class="accountdetscuenta">
-				{name}
-			</div>
-			<div class="accountdetscomment">
-				{accountInfo.note}
-			</div>
-			<div class="accountdetsbalance balance">{total}</div>
+            <div class="accountdetscuenta">
+                {name}
+            </div>
+            <div class="accountdetscomment">
+                {accountInfo.note}
+            </div>
+            <div class="accountdetsbalance balance">{total}</div>
 
-			<div class="accountdetsfiat hidden">
-				{totalUSD}
-			</div>
+            <div class="accountdetsfiat hidden">
+                {totalUSD}
+            </div>
 
-		</div>
+        </div>
 
 
-		<!--#region subpage SEND -->
-		<div id="account-selected-send" class="subpage hidden">
+        <!--#region subpage SEND -->
+        <div id="account-selected-send" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Send</h2>
-				<h3>Send to Account Id</h3>
+                <h2>Send</h2>
+                <h3>Send to Account Id</h3>
 
-				<div id="select-send-address-book" class="inputboxwithbutton" title="Send address book">
-					<div class="inputboxwithbutton">
-						<input id="send-to-account-name" type="text" />
-						<button id="current-to-send-address">▽</button>
-					</div>
-				</div>
+                <div id="select-send-address-book" class="inputboxwithbutton" title="Send address book">
+                    <div class="inputboxwithbutton">
+                        <input id="send-to-account-name" type="text" />
+                        <button id="current-to-send-address">▽</button>
+                    </div>
+                </div>
 
-				<h3>Amount in NEAR (Max. <span id="max-amount-send"></span>)</h3>
-				<div class="inputboxwithbutton">
-					<input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
-					<button id="send-max">Max</button>
-				</div>
+                <h3>Amount in NEAR (Max. <span id="max-amount-send"></span>)</h3>
+                <div class="inputboxwithbutton">
+                    <input id="send-to-account-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+                    <button id="send-max">Max</button>
+                </div>
 
 
-			</div>
+            </div>
 
-		</div>
-		<!--#endregion -->
+        </div>
+        <!--#endregion -->
 
-		<!-- #region subpage SEND CONFIRMATION -->
-		<div id="account-selected-send-confirmation" class="subpage hidden">
+        <!-- #region subpage SEND CONFIRMATION -->
+        <div id="account-selected-send-confirmation" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Confirm Send</h2>
+                <h2>Confirm Send</h2>
 
-				<div class="send-form-confirmation">
+                <div class="send-form-confirmation">
 
-					<h3 class="warning">Send <span id="send-confirmation-amount"></span> NEAR
-						to <span id="send-confirmation-receiver"></span> ?</h3>
+                    <h3 class="warning">Send <span id="send-confirmation-amount"></span> NEAR to <span id="send-confirmation-receiver"></span> ?</h3>
 
-				</div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!-- #region subpage ADD CONTACT -->
-		<div id="sure-add-contact" class="subpage hidden">
+        <!-- #region subpage ADD CONTACT -->
+        <div id="sure-add-contact" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Add this contact to address book?</h2>
+                <h2>Add this contact to address book?</h2>
 
-				<div class="add-form-confirmation">
+                <div class="add-form-confirmation">
 
-					<h3 class="warning">Add <span id="add-confirmation-name"></span></h3>
+                    <h3 class="warning">Add <span id="add-confirmation-name"></span></h3>
 
-				</div>
+                </div>
 
-			</div>
+                <div>
+                    <input placeholder="Note" id="add-contact-note" type="text">
+                </div>
+            </div>
 
-		</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!-- #region subpage MAKE READ ONLY -->
-		<div id="account-selected-make-read-only" class="subpage hidden">
+        <!-- #region subpage MAKE READ ONLY -->
+        <div id="account-selected-make-read-only" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
 
-				<h2>Remove private key</h2>
+                <h2>Remove private key</h2>
 
 
 
-				<h3 class="warning">WARNING: Removing access means
-					you won't be able to access this account again
-					without the seed phrase. Please make sure you
-					have the seed phrase securely stored and available</h3>
+                <h3 class="warning">WARNING: Removing access means you won't be able to access this account again without the seed phrase. Please make sure you have the seed phrase securely stored and available</h3>
 
-				<br />
-				<h3>Type the account name to confirm</h3>
+                <br />
+                <h3>Type the account name to confirm</h3>
 
-				<div class="make-read-only-form">
+                <div class="make-read-only-form">
 
-					<div class="form-field-label">
+                    <div class="form-field-label">
 
-						<div class="form-control">
-							<input placeholder="" id="account-name-confirm" type="text" dir="auto" value="">
-						</div>
+                        <div class="form-control">
+                            <input placeholder="" id="account-name-confirm" type="text" dir="auto" value="">
+                        </div>
 
-					</div>
-				</div>
+                    </div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
-		<!--#endregion-->
+        </div>
+        <!--#endregion-->
 
-		<!-- #region subpage SHOW PRIVATE KEY -->
-		<div id="request-password" class="subpage hidden">
+        <!-- #region subpage SHOW PRIVATE KEY -->
+        <div id="request-password" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
 
-				<h2>Show private key</h2>
-				<h3>Type your password</h3>
+                <h2>Show private key</h2>
+                <h3>Type your password</h3>
 
 
-				<div class="request-password-form">
-					<div class="form-field-label">
-						<div class="form-control">
-							<input placeholder="" id="password-request-password" type="password" dir="auto" value="">
-						</div>
+                <div class="request-password-form">
+                    <div class="form-field-label">
+                        <div class="form-control">
+                            <input placeholder="" id="password-request-password" type="password" dir="auto" value="">
+                        </div>
 
-					</div>
-				</div>
+                    </div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
-		<!--#endregion-->
+        </div>
+        <!--#endregion-->
 
-		<!--#region subpage RECEIVE -->
-		<div id="account-selected-receive" class="subpage hidden">
-			<div class="contentarea">
-				<h3>Tell the other party to send to:</h3>
-				<h2 id="account-selected-receive-name" class="important-label"></h2>
-			</div>
-		</div>
+        <!--#region subpage RECEIVE -->
+        <div id="account-selected-receive" class="subpage hidden">
+            <div class="contentarea">
+                <h3>Tell the other party to send to:</h3>
+                <h2 id="account-selected-receive-name" class="important-label"></h2>
+            </div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!--#region STAKE-->
+        <!--#region STAKE-->
 
-		<div id="account-selected-stake" class="subpage hidden">
+        <div id="account-selected-stake" class="subpage hidden">
 
-			<div class="wrapper">
+            <div class="wrapper">
 
-				<input class="radio one" id="liquid-stake-radio" name="account-selected-stake" type="radio" checked>
-				<input class="radio two" id="delayed-stake-radio" name="account-selected-stake" type="radio">
+                <input class="radio one" id="liquid-stake-radio" name="account-selected-stake" type="radio" checked>
+                <input class="radio two" id="delayed-stake-radio" name="account-selected-stake" type="radio">
 
 
-				<div class="tabs" id="tabtab">
-					<label class="tab one" id="one-tab-stake" for="liquid-stake-radio">Liquid Stake</label>
-					<label class="tab two" id="two-tab-stake" for="delayed-stake-radio">Delayed Stake</label>
-				</div>
+                <div class="tabs" id="tabtab">
+                    <label class="tab one" id="one-tab-stake" for="liquid-stake-radio">Liquid Stake</label>
+                    <label class="tab two" id="two-tab-stake" for="delayed-stake-radio">Delayed Stake</label>
+                </div>
 
-				<div class="panels">
+                <div class="panels">
 
-					<div class="panel one">
+                    <div class="panel one">
 
-						<div class="contentarea">
+                        <div class="contentarea">
 
-							<h2>Liquid Stake</h2>
+                            <h2>Liquid Stake</h2>
 
-							<h3>Amount in NEAR to Stake (Max. <span id="max-stake-amount-1"></span>)</h3>
+                            <h3>Amount in NEAR to Stake (Max. <span id="max-stake-amount-1"></span>)</h3>
 
-							<div class="inputboxwithbutton">
-								<input id="stake-amount-liquid" type="text">
-								<button id="liquid-stake-max">Max</button>
-							</div>
+                            <div class="inputboxwithbutton">
+                                <input id="stake-amount-liquid" type="text">
+                                <button id="liquid-stake-max">Max</button>
+                            </div>
 
-						</div>
+                        </div>
 
-					</div>
+                    </div>
 
-					<div class="panel two">
+                    <div class="panel two">
 
-						<div class="contentarea">
-							<h2>Stake</h2>
+                        <div class="contentarea">
+                            <h2>Stake</h2>
 
-							<h3>Deposit & Stake with this Staking Pool</h3>
+                            <h3>Deposit & Stake with this Staking Pool</h3>
 
-							<div class="inputboxwithbutton">
-								<input id="stake-with-staking-pool" type="text"></input>
-								<button id="list-pools">List Pools</button>
-							</div>
+                            <div class="inputboxwithbutton">
+                                <input id="stake-with-staking-pool" type="text"></input>
+                                <button id="list-pools">List Pools</button>
+                            </div>
 
-							<h3>Amount in NEAR to Stake (Max. <span id="max-stake-amount-2-label"></span>)</h3>
-							<div class="inputboxwithbutton">
+                            <h3>Amount in NEAR to Stake (Max. <span id="max-stake-amount-2-label"></span>)</h3>
+                            <div class="inputboxwithbutton">
 
-								<input id="stake-amount" type="text">
-								<button id="max-stake-amount-2-button">Max</button>
-							</div>
+                                <input id="stake-amount" type="text">
+                                <button id="max-stake-amount-2-button">Max</button>
+                            </div>
 
-						</div>
+                        </div>
 
-					</div>
+                    </div>
 
-				</div>
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!--#region add asset-->
-		<div id="add-subpage" class="subpage hidden">
+        <!--#region add asset-->
+        <div id="add-subpage" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Add Token</h2>
+                <h2>Add Token</h2>
 
-				<div class="inputboxwithbutton">
-					<input id="token-to-add-name" type="text" value="" placeholder="Token contract" />
-					<button id="token-combo-select">▽</button>
-				</div>
+                <div class="inputboxwithbutton">
+                    <input id="token-to-add-name" type="text" value="" placeholder="Token contract" />
+                    <button id="token-combo-select">▽</button>
+                </div>
 
 
-			</div>
-		</div>
-		<!--#endregion -->
+            </div>
+        </div>
+        <!--#endregion -->
 
-		<!--#region subpage is OK to grant access? -->
-		<div id="account-selected-ok-to-grant-access" class="subpage hidden">
-			<div class="contentarea">
-				<h2>This account is read-only.</h2>
-				<h2>Grant full access to this account ?</h2>
+        <!--#region subpage is OK to grant access? -->
+        <div id="account-selected-ok-to-grant-access" class="subpage hidden">
+            <div class="contentarea">
+                <h2>This account is read-only.</h2>
+                <h2>Grant full access to this account ?</h2>
 
-				<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
-			</div>
-		</div>
+                <!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+            </div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!--#region subpage ADD NOTE -->
+        <!--#region subpage ADD NOTE -->
 
-		<div id="account-selected-add-note" class="subpage hidden">
+        <div id="account-selected-add-note" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Add Note to this account</h2>
+                <h2>Add Note to this account</h2>
 
-				<h3>Text will be displayed with the account type. Enter a small note</h3>
+                <h3>Text will be displayed with the account type. Enter a small note</h3>
 
-				<div class="public-key">
-					<div class="form-field-label">
-						<label for="add-note">
+                <div class="public-key">
+                    <div class="form-field-label">
+                        <label for="add-note">
 							Note:
 						</label>
-						<div class="form-control">
-							<input id="add-note" type="text">
-						</div>
-					</div>
-				</div>
+                        <div class="form-control">
+                            <input id="add-note" type="text">
+                        </div>
+                    </div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!--#region subpage SHOW PRIVATE KEY -->
-		<div id="account-selected-show-private-key" class="subpage hidden">
+        <!--#region subpage SHOW PRIVATE KEY -->
+        <div id="account-selected-show-private-key" class="subpage hidden">
 
-			<div class="contentarea">
-				<h2>Private Key</h2>
+            <div class="contentarea">
+                <h2>Private Key</h2>
 
-				<h3>Please store the private key in a safe place. You WILL eventually need a seed phrase
-					or this private key to regain access to your funds.
-					<b>It's extremely important that you preserve your seed phrase or your private key</b>
-				</h3>
+                <h3>Please store the private key in a safe place. You WILL eventually need a seed phrase or this private key to regain access to your funds.
+                    <b>It's extremely important that you preserve your seed phrase or your private key</b>
+                </h3>
 
-				<h3>Your PRIVATE key <b>DO NOT SHARE!</b></h3>
-				<h5 id="account-selected-private-key"></h5>
-			</div>
+                <h3>Your PRIVATE key <b>DO NOT SHARE!</b></h3>
+                <h5 id="account-selected-private-key"></h5>
+            </div>
 
-		</div>
-		<!--#endregion -->
+        </div>
+        <!--#endregion -->
 
-		<!--#region subpage SHOW PUBLIC KEY  -->
-		<div id="account-selected-show-public-key" class="subpage hidden">
+        <!--#region subpage SHOW PUBLIC KEY  -->
+        <div id="account-selected-show-public-key" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Your public key:</h2>
+                <h2>Your public key:</h2>
 
-				<h5 id="account-selected-public-key"></h5>
+                <h5 id="account-selected-public-key"></h5>
 
-			</div>
+            </div>
 
-		</div>
-		<!--#endregion -->
+        </div>
+        <!--#endregion -->
 
-		<!--#region subpage staking-pool  -->
+        <!--#region subpage staking-pool  -->
 
-		<div id="staking-pool-info-line" class="hidden single-account-item-group small-labels">
-			<label>Staking Pool</label>
-			<div>{accountInfo.stakingPool} ({accountInfo.stakingPoolPct}%)</div>
-			<label>Rewards</label>
-			<div class="balance">{accountInfo.rewards}</div>
-		</div>
+        <div id="staking-pool-info-line" class="hidden single-account-item-group small-labels">
+            <label>Staking Pool</label>
+            <div>{accountInfo.stakingPool} ({accountInfo.stakingPoolPct}%)</div>
+            <label>Rewards</label>
+            <div class="balance">{accountInfo.rewards}</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!--#region set Full Access-->
+        <!--#region set Full Access-->
 
-		<div id="account-selected-make-full-access" class="subpage hidden">
+        <div id="account-selected-make-full-access" class="subpage hidden">
 
-			<div class="contentarea">
-				<h2>Enter private key</h2>
+            <div class="contentarea">
+                <h2>Enter private key</h2>
 
-				<h3>Enter the seed phrase (or private key)<br> for this account</h3>
+                <h3>Enter the seed phrase (or private key)<br> for this account</h3>
 
-				<div class="seed-phrase-form">
-					<div class="form-field-label">
-						<label for="seed-phrase">Seed Phrase or Private key</label>
-						<div class="form-control">
-							<input class="biginput" autocomplete="off" placeholder="correct horse battery staple..."
-								id="seed-phrase" type="text">
-						</div>
-					</div>
-				</div>
+                <div class="seed-phrase-form">
+                    <div class="form-field-label">
+                        <label for="seed-phrase">Seed Phrase or Private key</label>
+                        <div class="form-control">
+                            <input class="biginput" autocomplete="off" placeholder="correct horse battery staple..." id="seed-phrase" type="text">
+                        </div>
+                    </div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!--#region subpage asset list-->
-		<div class="subpage hidden" id="assets">
+        <!--#region subpage asset list-->
+        <div class="subpage hidden" id="assets">
 
 
-			<div class="wrapper">
+            <div class="wrapper">
 
-				<input class="radio one" id="selected-account-asset-list" name="selected-account" type="radio" checked>
-				<input class="radio two" id="selected-account-activity" name="selected-account" type="radio">
-				<input class="radio three" id="selected-account-more" name="selected-account" type="radio">
+                <input class="radio one" id="selected-account-asset-list" name="selected-account" type="radio" checked>
+                <input class="radio two" id="selected-account-activity" name="selected-account" type="radio">
+                <input class="radio three" id="selected-account-more" name="selected-account" type="radio">
 
-				<div class="tabs" id="tabtab">
-					<label class="tab one" for="selected-account-asset-list">Assets</label>
-					<label class="tab two" for="selected-account-activity">Activity</label>
-					<label class="tab three" for="selected-account-more">More</label>
-				</div>
+                <div class="tabs" id="tabtab">
+                    <label class="tab one" for="selected-account-asset-list">Assets</label>
+                    <label class="tab two" for="selected-account-activity">Activity</label>
+                    <label class="tab three" for="selected-account-more">More</label>
+                </div>
 
-				<div class="panels">
+                <div class="panels">
 
-					<div class="panel one">
+                    <div class="panel one">
 
-						<div id="assets-list"> </div>
+                        <div id="assets-list"> </div>
 
-						<div id="asset-item-template" class="hidden asset-item" data-id="index-{key}">
-							<div class="accountdetsassets">
-								<div class="accountasseticon">{icon}</div>
-								<span class="accountassetcoin">{symbol}</span>
-								<div class="accountassettoken">{contractId}</div>
-								<div class="accountassetbalance">{balance}</div>
-								<div class="accountassetfiat"></div>
-							</div>
-						</div>
+                        <div id="asset-item-template" class="hidden asset-item" data-id="index-{key}">
+                            <div class="accountdetsassets">
+                                <div class="accountasseticon">{icon}</div>
+                                <span class="accountassetcoin">{symbol}</span>
+                                <div class="accountassettoken">{contractId}</div>
+                                <div class="accountassetbalance">{balance}</div>
+                                <div class="accountassetfiat"></div>
+                            </div>
+                        </div>
 
 
 
-					</div>
+                    </div>
 
-					<div class="panel two">
+                    <div class="panel two">
 
-						<div id="account-history-details">
-						</div>
+                        <div id="account-history-details">
+                        </div>
 
 
 
-					</div>
+                    </div>
 
-					<div class="panel three">
-						<button class="button morepage" id="refresh-button">
+                    <div class="panel three">
+                        <button class="button morepage" id="refresh-button">
 							<h1>Refresh</h1>
 							<h2>
 								Updates account balance and assets balances from the blockchain.
 							</h2>
 						</button>
 
-						<button class="button morepage" id="address-book-button">
+                        <button class="button morepage" id="address-book-button">
 							<h1>Account Address Book</h1>
 							<h2>
 								Manage addresses to operate in a simpler way.
 							</h2>
 						</button>
 
-						<button class="button morepage" id="search-pools">
+                        <button class="button morepage" id="search-pools">
 							<h1>Search More Assets</h1>
 							<h2>
 								Searches for any asset you may have and adds it to your asset list
 							</h2>
 						</button>
-						<button class="button morepage" id="explore">
+                        <button class="button morepage" id="explore">
 							<h1>Explore Account</h1>
 							<h2>
 								Opens near explorer in a separate browser window.
 							</h2>
 						</button>
-						<button class="button morepage" id="detailed-rewards">
+                        <button class="button morepage" id="detailed-rewards">
 							<h1>Detailed Rewards</h1>
 							<h2>
 								Opens near-staking.com in a separate browser window providing information about your
 								staking rewards.
 							</h2>
 						</button>
-						<button class="button morepage" id="add-note">
+                        <button class="button morepage" id="add-note">
 							<h1>Add Note</h1>
 							<h2>
 								Set a short note for the current account.
 							</h2>
 						</button>
-						<button class="button morepage" id="access">
+                        <button class="button morepage" id="access">
 							<h1>Make Read Only / Make Full Access</h1>
 							<h2>
 								Add or remove the private key for this account in this wallet. You need the private key
 								to send near or other assets.
 							</h2>
 						</button>
-						<button class="button morepage" id="show-public-key">
+                        <button class="button morepage" id="show-public-key">
 							<h1>Show Public Key</h1>
 							<h2>
 								Displays your public key.
 							</h2>
 						</button>
-						<button class="button morepage" id="show-private-key">
+                        <button class="button morepage" id="show-private-key">
 							<h1>Show Private Key</h1>
 							<h2>
 								Displays your private key (password required). WARNING: never share your private key.
 							</h2>
 						</button>
-						<button class="button morepage" id="remove">
+                        <button class="button morepage" id="remove">
 							<h1>Remove Private Key or Account from this Wallet</h1>
 							<h2>
 								Removes the private key from this wallet, or the account itself if it is read-only.
 							</h2>
 						</button>
-						<!-- <button class="button morepage">
+                        <!-- <button class="button morepage">
 							<h1>Lock Up Contract - Take Control</h1>
 							<h2>
 								TODO
 							</h2>
 						</button> -->
-						<button class="button morepage" id="delete-account">
+                        <button class="button morepage" id="delete-account">
 							<h1>Delete Account</h1>|
 							<h2>
 								Delete the account from the blockchain. Requests a beneficiary account to transfer all
 								your near tokens.
 							</h2>
 						</button>
-					</div>
+                    </div>
 
 
-				</div>
+                </div>
 
-			</div>
-
-
-		</div>
-		<!--#endregion -->
+            </div>
 
 
-		<!--#region Ask For Password-->
-		<div id="account-selected-delete" class="subpage hidden">
-			<div class="title">
-				<h2>Delete Account</h2>
-			</div>
-			<div class="delete-account">
-				<div class="form-field-label">
+        </div>
+        <!--#endregion -->
 
-					<h3>Balance beneficiary Account Id</h3>
 
-					<div class="inputboxwithbutton">
-						<input id="send-balance-to-account-name" type="text" value="" placeholder="Beneficiary" />
-						<button id="beneficiary-address-combo-select">▽</button>
-					</div>
+        <!--#region Ask For Password-->
+        <div id="account-selected-delete" class="subpage hidden">
+            <div class="title">
+                <h2>Delete Account</h2>
+            </div>
+            <div class="delete-account">
+                <div class="form-field-label">
 
-				</div>
-				<div class="subtitle">
-					<h4 class="warning">WARNING: Deleting an account is irreversible.
-						The account balance will be transferred to the beneficiary above.
-						Please make sure the beneficiary account is correct</h4>
-				</div>
-				<div class="form-field-label">
-					<label for="delete-account-name-confirm">
+                    <h3>Balance beneficiary Account Id</h3>
+
+                    <div class="inputboxwithbutton">
+                        <input id="send-balance-to-account-name" type="text" value="" placeholder="Beneficiary" />
+                        <button id="beneficiary-address-combo-select">▽</button>
+                    </div>
+
+                </div>
+                <div class="subtitle">
+                    <h4 class="warning">WARNING: Deleting an account is irreversible. The account balance will be transferred to the beneficiary above. Please make sure the beneficiary account is correct</h4>
+                </div>
+                <div class="form-field-label">
+                    <label for="delete-account-name-confirm">
 						Type the account name you want to Delete to confirm
 					</label>
-					<div class="form-control">
-						<input placeholder="" id="delete-account-name-confirm" type="text" dir="auto" value="">
-					</div>
-				</div>
-			</div>
-		</div>
-		<!--#endregion -->
+                    <div class="form-control">
+                        <input placeholder="" id="delete-account-name-confirm" type="text" dir="auto" value="">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--#endregion -->
 
 
-		<!--#region AddressBook-->
+        <!--#region AddressBook-->
 
-		<div class="subpage hidden" id="addressBook-subpage">
+        <div class="subpage hidden" id="addressBook-subpage">
 
-			<div class="wrapper">
+            <div class="wrapper">
 
-				<input class="radio one" id="address-book" name="address-book-contacts" type="radio" checked>
+                <input class="radio one" id="address-book" name="address-book-contacts" type="radio" checked>
 
 
-				<div class="tabs">
-					<label class="tab one" id="one-tab-address" for="address-book">Account Address Book</label>
-				</div>
+                <div class="tabs">
+                    <label class="tab one" id="one-tab-address" for="address-book">Account Address Book</label>
+                </div>
 
-				<div class="panels">
+                <div class="panels">
 
-					<div class="panel one">
+                    <div class="panel one">
 
-						<div id="contact-list"> </div>
+                        <div id="contact-list"> </div>
 
-						<div id="contact-item-template" class="hidden contact-item" data-id="{key}">
-							<div class="accountdetsassets">
-								<div class="accountasseticon">{accountId}</div>
-								<span class="accountassetcoin">{alias}</span>
-								<button class="button send" id="send-to-this-contact"></button>
-								<button class="button more" id="remove-this-contact"></button>
+                        <div id="contact-item-template" class="hidden contact-item" data-id="{key}">
+                            <div class="accountdetsassets">
+                                <div class="accountasseticon">{accountId}</div>
+                                <span class="accountassetcoin">{alias}</span>
+                                <button class="button send" id="send-to-this-contact"></button>
+                                <button class="button more" id="remove-this-contact"></button>
 
-							</div>
-						</div>
+                            </div>
+                        </div>
 
-						<!-- <div class="accountlistitem">
+                        <!-- <div class="accountlistitem">
 							<div class="accountlistname">{name}</div>
 							<div class="accountlistcomment">{accountInfo.note}</div>
 						</div> -->
 
 
-					</div>
+                    </div>
 
-				</div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!--extra div -->
-		<div class="subpage hidden"></div>
+        <!--extra div -->
+        <div class="subpage hidden"></div>
 
-	</div>
+    </div>
 
-	<!--#endregion -->
+    <!--#endregion -->
 
-	<!--#region All Accounts page, Account Item Template -->
-	<div class="appface hidden slide-hide" id="account-list-main">
+    <!--#region All Accounts page, Account Item Template -->
+    <div class="appface hidden slide-hide" id="account-list-main">
 
-		<div class="accountlistscrollarea">
+        <div class="accountlistscrollarea">
 
-			<div id="accounts-list">
-			</div>
+            <div id="accounts-list">
+            </div>
 
-			<div id="account-item-template" class="hidden account-item" data-id="{name}">
-				<div class="accountlistitem">
-					<div class="accountlistname">{name}</div>
-					<div class="accountlistbalance balance">{total}</div>
-					<div class="accountlistcomment">{accountInfo.note}</div>
-				</div>
-			</div>
+            <div id="account-item-template" class="hidden account-item" data-id="{name}">
+                <div class="accountlistitem">
+                    <div class="accountlistname">{name}</div>
+                    <div class="accountlistbalance balance">{total}</div>
+                    <div class="accountlistcomment">{accountInfo.note}</div>
+                </div>
+            </div>
 
-			<div class="total-row accountlistitem">
-				<div class="account-item-group">
-					<div class="accountlistname">Total</div>
-					<div class="accountlistbalance balance total"></div>
-					<div class="accountlistcomment"></div>
-				</div>
-			</div>
+            <div class="total-row accountlistitem">
+                <div class="account-item-group">
+                    <div class="accountlistname">Total</div>
+                    <div class="accountlistbalance balance total"></div>
+                    <div class="accountlistcomment"></div>
+                </div>
+            </div>
 
-		</div>
+        </div>
 
-		<div class="bottomBar">
-			<button class="button addaccount" id="add-account">Account</button>
-			<!--
+        <div class="bottomBar">
+            <button class="button addaccount" id="add-account">Account</button>
+            <!--
 			<div class="AdverBlock">
 				<p>Did you know?</p>
 				<a href="#">Click this lovely link</a>
 			</div>
 		-->
-		</div>
-	</div>
+        </div>
+    </div>
 
-	</div>
+    </div>
 
-	<!--#endregion -->
+    <!--#endregion -->
 
-	<!--#region Existing user, unlock-->
-	<div id="display-seed-phrase" class="appface slide-hide">
-		<button class="button back" id="create-implicit-account-back-to-account"></button>
-		<h2>This is your Seed Phrase</h2>
-		<h3>Write it down, by hand, in two pieces of paper. Store them in safe places. <b>Anyone having this seed
+    <!--#region Existing user, unlock-->
+    <div id="display-seed-phrase" class="appface slide-hide">
+        <button class="button back" id="create-implicit-account-back-to-account"></button>
+        <h2>This is your Seed Phrase</h2>
+        <h3>Write it down, by hand, in two pieces of paper. Store them in safe places. <b>Anyone having this seed
 				phrase owns the account.</b></h3>
 
 
 
-		<h3>This is your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
-		<div class="boximportante" id="seed-phrase-show-box"></div>
+        <h3>This is your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
+        <div class="boximportante" id="seed-phrase-show-box"></div>
 
 
-		<div class="flex-row">
-			<button id="seed-phrase-continue" class="button huge generic">OK, I've written down the Seed Phrase</button>
-			<button id="seed-phrase-cancel" class="button huge generic">Cancel</button>
-		</div>
-	</div>
+        <div class="flex-row">
+            <button id="seed-phrase-continue" class="button huge generic">OK, I've written down the Seed Phrase</button>
+            <button id="seed-phrase-cancel" class="button huge generic">Cancel</button>
+        </div>
+    </div>
 
-	<div id="seed-phrase-step-2" class="appface slide-hide">
+    <div id="seed-phrase-step-2" class="appface slide-hide">
 
-		<div class="contents-header">
-			<h2>Verifying your Seed Phrase</h2>
-			<h3>What was word #<span id="seed-phrase-word-number"></span>?</h3>
-		</div>
+        <div class="contents-header">
+            <h2>Verifying your Seed Phrase</h2>
+            <h3>What was word #<span id="seed-phrase-word-number"></span>?</h3>
+        </div>
 
-		<div class="form">
+        <div class="form">
 
-			<div class="form-field-label">
-				<div class="form-control">
-					<input id="seed-word" type="text" dir="auto" value="">
-				</div>
-			</div>
+            <div class="form-field-label">
+                <div class="form-control">
+                    <input id="seed-word" type="text" dir="auto" value="">
+                </div>
+            </div>
 
-			<div class="flex-row">
-				<button id="seed-word-continue" class="button generic">Continue</button>
-				<button id="seed-word-cancel" class="button generic">Back</button>
-			</div>
-		</div>
-	</div>
+            <div class="flex-row">
+                <button id="seed-word-continue" class="button generic">Continue</button>
+                <button id="seed-word-cancel" class="button generic">Back</button>
+            </div>
+        </div>
+    </div>
 
-	<!--#endregion -->
+    <!--#endregion -->
 
-	<!--#region import account-->
+    <!--#region import account-->
 
-	<div id="import-account" class="appface slide-hide">
-		<div class="button back" id="import-existing-account-back-to-account"></div>
-		<h2>Import existing account</h2>
-		<div class="form">
-			<div class="sep30"></div>
-			<h3>Search Account Name</h3>
+    <div id="import-account" class="appface slide-hide">
+        <div class="button back" id="import-existing-account-back-to-account"></div>
+        <h2>Import existing account</h2>
+        <div class="form">
+            <div class="sep30"></div>
+            <h3>Search Account Name</h3>
 
-			<div class="inputboxwithbutton">
-				<input id="search-account-name" type="text">
-				<button id="net-root" disabled="">.guildnet</button>
-			</div>
+            <div class="inputboxwithbutton">
+                <input id="search-account-name" type="text">
+                <button id="net-root" disabled="">.guildnet</button>
+            </div>
 
-			<div class="form-field-label">
-				<h3>Do you wish to search for more assets like tokens or pools?</h3>
-				<div class="sep10"></div>
-				<div class="formgeneric" id="yes-search-pools">
-					<input id="yes-search-the-pools" type="radio" name="search-the-pools" checked>
-					<label for="yes-search-the-pools">Yes, search for more assets</label>
-				</div>
+            <div class="form-field-label">
+                <h3>Do you wish to search for more assets like tokens or pools?</h3>
+                <div class="sep10"></div>
+                <div class="formgeneric" id="yes-search-pools">
+                    <input id="yes-search-the-pools" type="radio" name="search-the-pools" checked>
+                    <label for="yes-search-the-pools">Yes, search for more assets</label>
+                </div>
 
-				<div class="formgeneric">
-					<input id="no-search-the-pools" type="radio" name="search-the-pools">
-					<label for="no-search-the-pools">No, do not search</label>
-				</div>
+                <div class="formgeneric">
+                    <input id="no-search-the-pools" type="radio" name="search-the-pools">
+                    <label for="no-search-the-pools">No, do not search</label>
+                </div>
 
-			</div>
+            </div>
 
-			<button id="search" class="button big">
+            <button id="search" class="button big">
 				Search Account in&nbsp;<span id="net-name"></span>
 			</button>
 
 
 
-			<!-- IMPORT: SHOW DATA BEFORE IMPORT-->
-			<div id="account-search-results" class="hidden">
-				<div id="searched-account-info" class="hidden">
-				</div>
-				<div id="searched-lockup-account-info" class="hidden">
-				</div>
-				<div id="account-get-message-line" class="hidden flex-labeled-row">
-					<label>Msg</label>
-					<div id="account-get-message" class=""></div>
-				</div>
-			</div>
+            <!-- IMPORT: SHOW DATA BEFORE IMPORT-->
+            <div id="account-search-results" class="hidden">
+                <div id="searched-account-info" class="hidden">
+                </div>
+                <div id="searched-lockup-account-info" class="hidden">
+                </div>
+                <div id="account-get-message-line" class="hidden flex-labeled-row">
+                    <label>Msg</label>
+                    <div id="account-get-message" class=""></div>
+                </div>
+            </div>
 
 
-			<!-- Template -->
-			<div id="search-info-account-template" class="hidden account-info flex-labeled-container">
-				<div id="account-line" class="flex-labeled-row small-labels">
-					<div class="nameresult">{name}</div>
-					<div class="balanceresult balance">{accountInfo.lastBalance}</div>
-				</div>
-				<div id="staking-pool-info-line" class="flex-labeled-row small-labels hidden">
-					<div class="nameresult">At Pool {accountInfo.stakingPool}</div>
-					<div class="balanceresult balance">{inThePool}</div>
-				</div>
-			</div>
+            <!-- Template -->
+            <div id="search-info-account-template" class="hidden account-info flex-labeled-container">
+                <div id="account-line" class="flex-labeled-row small-labels">
+                    <div class="nameresult">{name}</div>
+                    <div class="balanceresult balance">{accountInfo.lastBalance}</div>
+                </div>
+                <div id="staking-pool-info-line" class="flex-labeled-row small-labels hidden">
+                    <div class="nameresult">At Pool {accountInfo.stakingPool}</div>
+                    <div class="balanceresult balance">{inThePool}</div>
+                </div>
+            </div>
 
-			<button id="import" class="big hidden">
+            <button id="import" class="big hidden">
 				Import Account into this Wallet
 			</button>
 
-		</div>
-	</div>
+        </div>
+    </div>
 
-	<!--#endregion -->
+    <!--#endregion -->
 
-	<!--#region Existing user, LOGIN-->
+    <!--#region Existing user, LOGIN-->
 
-	<div id="unlock" class="appface slide-hide">
+    <div id="unlock" class="appface slide-hide">
 
-		<div class="logo-128"></div>
+        <div class="logo-128"></div>
 
-		<br><br>
-		<h2>Welcome Back!</h2>
-		<br><br>
-		<h3>Please enter the password to unlock this wallet</h3>
+        <br><br>
+        <h2>Welcome Back!</h2>
+        <br><br>
+        <h3>Please enter the password to unlock this wallet</h3>
 
-		<!--<div class="form-field-label">
+        <!--<div class="form-field-label">
 			<label for="email">Your e-mail</label>
 			<div class="form-control">
 				<input type="text" tabindex="0" autocomplete="email" id="unlock-email">
@@ -1012,17 +1004,17 @@
 		</div>
 		-->
 
-		<br><br>
-		<div class="form-field-label">
-			<label for="unlock-pass">Password</label>
-			<div class="form-control">
-				<input autocomplete="new-password" id="unlock-pass" type="password">
-			</div>
-		</div>
+        <br><br>
+        <div class="form-field-label">
+            <label for="unlock-pass">Password</label>
+            <div class="form-control">
+                <input autocomplete="new-password" id="unlock-pass" type="password">
+            </div>
+        </div>
 
-		<button id="unlock" class="buttonextra unlocked">Unlock</button>
+        <button id="unlock" class="buttonextra unlocked">Unlock</button>
 
-		<!--
+        <!--
 		<div class="bottomBar">
 			<div class="AdverBlock">
 				<p>Did you know?</p>
@@ -1031,391 +1023,392 @@
 		</div>
 		-->
 
-	</div>
+    </div>
 
-	<!--#endregion -->
+    <!--#endregion -->
 
-	<!--#region Asset Detail -->
+    <!--#region Asset Detail -->
 
-	<div class="appface slide-hide" id="AccountAssetDetail">
+    <div class="appface slide-hide" id="AccountAssetDetail">
 
 
-		<button class="button back" id="back-to-selected"></button>
+        <button class="button back" id="back-to-selected"></button>
 
-		<div class="accountdetstopcenter" id="selected-asset">
+        <div class="accountdetstopcenter" id="selected-asset">
 
-		</div>
+        </div>
 
 
 
-		<div id="selected-asset-template" class="hidden">
-			<div class="accountdetscuenta">
-				{acc.name}
-			</div>
-			<div class="accountdetscomment">
-				{accountInfo.note}
-			</div>
-			<div class="accountdetsbalance ">
-				<span id="icon">{asset.icon}</span>
-				<span id="balance">{asset.balance}</span>
-				<span id="symbol">{asset.symbol}</span>
+        <div id="selected-asset-template" class="hidden">
+            <div class="accountdetscuenta">
+                {acc.name}
+            </div>
+            <div class="accountdetscomment">
+                {accountInfo.note}
+            </div>
+            <div class="accountdetsbalance ">
+                <span id="icon">{asset.icon}</span>
+                <span id="balance">{asset.balance}</span>
+                <span id="symbol">{asset.symbol}</span>
 
-			</div>
-			<div class="assetdetcontract">
-				{asset.contractId}
-			</div>
-		</div>
+            </div>
+            <div class="assetdetcontract">
+                {asset.contractId}
+            </div>
+        </div>
 
-		<div class="midblock">
-			<button class="button send hidden" id="asset-send">Send</button>
-			<button class="button receive hidden" id="asset-receive">Receive</button>
-			<button class="button stake hidden" id="asset-stake">Stake</button>
-			<button class="button liqunstake hidden" id="asset-liquid-unstake">Liquid unstake</button>
-			<button class="button unstake hidden" id="asset-unstake">Unstake</button>
-			<button class="button withdraw hidden" id="asset-withdraw">Withdraw</button>
-			<button class="button stake hidden" id="asset-restake">Re-stake</button>
-			<button class="button remove hidden" id="asset-remove">Remove</button>
-		</div>
+        <div class="midblock">
+            <button class="button send hidden" id="asset-send">Send</button>
+            <button class="button receive hidden" id="asset-receive">Receive</button>
+            <button class="button stake hidden" id="asset-stake">Stake</button>
+            <button class="button liqunstake hidden" id="asset-liquid-unstake">Liquid unstake</button>
+            <button class="button unstake hidden" id="asset-unstake">Unstake</button>
+            <button class="button withdraw hidden" id="asset-withdraw">Withdraw</button>
+            <button class="button stake hidden" id="asset-restake">Re-stake</button>
+            <button class="button remove hidden" id="asset-remove">Remove</button>
+        </div>
 
-		<div class="subpage hidden" id="asset-history">
+        <div class="subpage hidden" id="asset-history">
 
-			<div class="wrapper">
+            <div class="wrapper">
 
-				<input class="radio one" id="asset-activity" name="asset-details" type="radio" checked>
+                <input class="radio one" id="asset-activity" name="asset-details" type="radio" checked>
 
 
-				<div class="tabs">
-					<label class="tab one" id="one-tab-history" for="asset-activty">Asset Activity</label>
-				</div>
+                <div class="tabs">
+                    <label class="tab one" id="one-tab-history" for="asset-activty">Asset Activity</label>
+                </div>
 
-				<div class="panels">
+                <div class="panels">
 
-					<div class="panel one">
+                    <div class="panel one">
 
-						<div id="asset-history-details">
-						</div>
-					</div>
+                        <div id="asset-history-details">
+                        </div>
+                    </div>
 
-					<div id="asset-history-template" class="hidden" data-id="{key}">
-						<div class="history-line">
-							<div class="history-icon">{icon}</div>
-							<div class="history-type">{type}&nbsp;
-								<span class="history-contract-id">{destination}</span>
-							</div>
-							<div class="history-date">{date}</div>
-							<div class="history-amount">{amount}</div>
-							<div class="history-fiat"></div>
-						</div>
-					</div>
+                    <div id="asset-history-template" class="hidden" data-id="{key}">
+                        <div class="history-line">
+                            <div class="history-icon">{icon}</div>
+                            <div class="history-type">{type}&nbsp;
+                                <span class="history-contract-id">{destination}</span>
+                            </div>
+                            <div class="history-date">{date}</div>
+                            <div class="history-amount">{amount}</div>
+                            <div class="history-fiat"></div>
+                        </div>
+                    </div>
 
-				</div>
+                </div>
 
-			</div>
-		</div>
+            </div>
+        </div>
 
-		<div class="subpage hidden" id="asset-send-subpage">
-			<div class="contentarea">
-				<h2>Send</h2>
+        <div class="subpage hidden" id="asset-send-subpage">
+            <div class="contentarea">
+                <h2>Send</h2>
 
-				<h3>Send to Account Id</h3>
-				<div class="inputboxwithbutton">
-					<input id="send-to-asset-account" type="text" />
-					<button id="send-to-asset-account-select">▽</button>
-				</div>
+                <h3>Send to Account Id</h3>
+                <div class="inputboxwithbutton">
+                    <input id="send-to-asset-account" type="text" />
+                    <button id="send-to-asset-account-select">▽</button>
+                </div>
 
-				<h3>Amount in <span id="asset-symbol"></span> (Max. <span id="max-amount-send-asset"></span>)</h3>
-				<div class="inputboxwithbutton">
-					<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
-					<button id="asset-send-max">Max</button>
-				</div>
-			</div>
-		</div>
+                <h3>Amount in <span id="asset-symbol"></span> (Max. <span id="max-amount-send-asset"></span>)</h3>
+                <div class="inputboxwithbutton">
+                    <input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+                    <button id="asset-send-max">Max</button>
+                </div>
+            </div>
+        </div>
 
-		<div id="sure-add-contact-asset" class="subpage hidden">
+        <div id="sure-add-contact-asset" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Add this contact to address book?</h2>
+                <h2>Add this contact to address book?</h2>
 
-				<div class="add-form-confirmation">
+                <div class="add-form-confirmation">
 
-					<h3 class="warning">Add <span id="asset-add-confirmation-name"></span></h3>
+                    <h3 class="warning">Add <span id="asset-add-confirmation-name"></span></h3>
 
-				</div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<!-- #region subpage SEND CONFIRMATION -->
+        <!-- #region subpage SEND CONFIRMATION -->
 
-		<div id="asset-selected-send-confirmation" class="subpage hidden">
+        <div id="asset-selected-send-confirmation" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Confirm Send</h2>
+                <h2>Confirm Send</h2>
 
-				<div class="send-form-confirmation">
+                <div class="send-form-confirmation">
 
-					<h3 class="warning">Send <span id="asset-send-confirmation-amount"></span>
-						<span id="asset-symbol-confirmation"></span>
-						to <span id="asset-send-confirmation-receiver"></span> ?
-					</h3>
+                    <h3 class="warning">Send <span id="asset-send-confirmation-amount"></span>
+                        <span id="asset-symbol-confirmation"></span> to <span id="asset-send-confirmation-receiver"></span> ?
+                    </h3>
 
-				</div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!-- #region subpage LIQUID UNSTAKE CONFIRMATION -->
-		<div id="asset-selected-liquid-unstake-confirmation" class="subpage hidden">
+        <!-- #region subpage LIQUID UNSTAKE CONFIRMATION -->
+        <div id="asset-selected-liquid-unstake-confirmation" class="subpage hidden">
 
-			<div class="contentarea">
+            <div class="contentarea">
 
-				<h2>Confirm Liquid Unstake</h2>
+                <h2>Confirm Liquid Unstake</h2>
 
-				<div class="liquid-unstake-form-confirmation">
+                <div class="liquid-unstake-form-confirmation">
 
-					<h3 class="warning">Liquid unstake <span id="liquid-unstake-confirmation-amount"></span> STNEAR?</h3>
+                    <h3 class="warning">Liquid unstake <span id="liquid-unstake-confirmation-amount"></span> STNEAR?</h3>
 
-				</div>
+                </div>
 
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
 
-		<!-- #region subpage RESTAKE -->
+        <!-- #region subpage RESTAKE -->
 
-		<div id="restake" class="subpage hidden">
-			<h2>Restake</h2>
-			<h3>Amount in NEAR to Restake (Max. <span id="max-restake-amount-1"></span>)</h3>
-			<div class="inputboxwithbutton">
-				<input id="restake-amount" type="text" />
-				<button id="restake-max">Max</button>
-			</div>
-		</div>
+        <div id="restake" class="subpage hidden">
+            <h2>Restake</h2>
+            <h3>Amount in NEAR to Restake (Max. <span id="max-restake-amount-1"></span>)</h3>
+            <div class="inputboxwithbutton">
+                <input id="restake-amount" type="text" />
+                <button id="restake-max">Max</button>
+            </div>
+        </div>
 
-		<!--#endregion -->
+        <!--#endregion -->
 
-		<!-- #region subpage LIQUID UNSTAKE -->
-		<div class="subpage hidden" id="liquid-unstake">
-			<h2>Liquid Unstake</h2>
-			<h3>Amount to unstake?</h3>
+        <!-- #region subpage LIQUID UNSTAKE -->
+        <div class="subpage hidden" id="liquid-unstake">
+            <h2>Liquid Unstake</h2>
+            <h3>Amount to unstake?</h3>
 
-			<div class="inputboxwithbutton">
-				<input placeholder="" id="liquid-unstake-amount" type="text">
-				<button id="liquid-unstake-max">Max</button>
-			</div>
+            <div class="inputboxwithbutton">
+                <input placeholder="" id="liquid-unstake-amount" type="text">
+                <button id="liquid-unstake-max">Max</button>
+            </div>
 
-			<div class="fee-dynamic">
-				<h5><span id="fee-amount"></span> </h5>
-			</div>
-		</div>
+            <div class="fee-dynamic">
+                <h5><span id="fee-amount"></span> </h5>
+            </div>
+        </div>
 
-		<!--#endregion -->
-		<!-- #region subpage DELAYED UNSTAKE -->
-		<div class="subpage hidden" id="delayed-unstake">
-			<h2>Delayed Unstake</h2>
-			<h3>Amount to unstake?</h3>
-			<div class="inputboxwithbutton">
-				<input placeholder="" id="delayed-unstake-amount" type="text">
-				<button id="delayed-unstake-max">Max</button>
-			</div>
+        <!--#endregion -->
+        <!-- #region subpage DELAYED UNSTAKE -->
+        <div class="subpage hidden" id="delayed-unstake">
+            <h2>Delayed Unstake</h2>
+            <h3>Amount to unstake?</h3>
+            <div class="inputboxwithbutton">
+                <input placeholder="" id="delayed-unstake-amount" type="text">
+                <button id="delayed-unstake-max">Max</button>
+            </div>
 
-		</div>
-		<!--#endregion -->
+        </div>
+        <!--#endregion -->
 
-		<!-- #region subpage WITHDRAW -->
-		<div class="subpage hidden" id="withdraw">
-			<h2>Withdraw</h2>
-			<h3>Amount to withdraw?</h3>
-			<div class="inputboxwithbutton">
-				<input placeholder="" id="withdraw-amount" type="text">
-				<button id="withdraw-max">Max</button>
-			</div>
-		</div>
-		<!--#endregion -->
+        <!-- #region subpage WITHDRAW -->
+        <div class="subpage hidden" id="withdraw">
+            <h2>Withdraw</h2>
+            <h3>Amount to withdraw?</h3>
+            <div class="inputboxwithbutton">
+                <input placeholder="" id="withdraw-amount" type="text">
+                <button id="withdraw-max">Max</button>
+            </div>
+        </div>
+        <!--#endregion -->
 
 
 
-		<div class="subpage hidden" id="asset-receive-subpage">
-			<div class="contentarea">
+        <div class="subpage hidden" id="asset-receive-subpage">
+            <div class="contentarea">
 
-				<h2>Receive</h2>
+                <h2>Receive</h2>
 
-				<h3>Tell the other party</h3>
-				<h3>to send <span id="asset-receive-symbol"></span></h3>
-				<h3> to: <span id="asset-receive-account">user.near</span></h3>
-			</div>
-		</div>
+                <h3>Tell the other party</h3>
+                <h3>to send <span id="asset-receive-symbol"></span></h3>
+                <h3> to: <span id="asset-receive-account">user.near</span></h3>
+            </div>
+        </div>
 
-		<div id="asset-remove-selected" class="subpage hidden">
-			<div class="contentarea">
-				<h2>Remove this asset?</h2>
-				<!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
-			</div>
-		</div>
+        <div id="asset-remove-selected" class="subpage hidden">
+            <div class="contentarea">
+                <h2>Remove this asset?</h2>
+                <!--<div id="account-selected-open-owner-name" class="important-label"></div>-->
+            </div>
+        </div>
 
-		<div id="selected-asset-template" class="hidden">
+        <div id="selected-asset-template" class="hidden">
 
-			<div class="accountdetscuenta">
-				<h1>{name}</h1>
-			</div>
-			<div class="accountdetscomment">
-				<h2>{accountInfo.note}</h2>
-			</div>
-			<div class="accountdetsbalance ">
-				<h3 class="balance">{total}</h3>
-			</div>
-			<!-- <div class="accountdetsfiat">
+            <div class="accountdetscuenta">
+                <h1>{name}</h1>
+            </div>
+            <div class="accountdetscomment">
+                <h2>{accountInfo.note}</h2>
+            </div>
+            <div class="accountdetsbalance ">
+                <h3 class="balance">{total}</h3>
+            </div>
+            <!-- <div class="accountdetsfiat">
 				<h4>{totalUSD} usd</h4>
 			</div> -->
 
-		</div>
+        </div>
 
-		<div class="subpage hidden"></div>
-
-
-
-	</div>
+        <div class="subpage hidden"></div>
 
 
 
-	<!--#endregion -->
-
-	<!--#region address book-->
-
-	<div id="addressBook" class="appface slide-hide">
-		<h2>Address Book</h2>
-		<button class="button back" id="address-back-to-account"></button>
-
-		<div id="address-list" class="addresslistscrollarea">
-		</div>
-
-		<div id="address-item-template" class="hidden address-item" data-id="{key}">
-			<div class="accountlistitem">
-				<div class="addresslistname">{accountId}</div>
-				<div class="addresslistcomment">{note}</div>
-			</div>
-		</div>
-
-		<div class="bottomBar">
-			<button class="button addaccount" id="add-contact">Address</button>
-
-		</div>
-	</div>
-	<!--#endregion -->
-
-	<!--#region Add address book-->
-	<div id="add-addressBook" class="appface slide-hide">
-		<h2>Add Address </h2>
-		<input placeholder="Account ID" id="add-addressBook-id" type="text">
-		<input placeholder="Note" id="add-addressBook-note" type="text">
-
-	</div>
-	<!--#endregion -->
-
-	<!--#region detail address book-->
-	<div id="addressBook-details" class="appface slide-hide">
-
-		<button class="button back" id="back-to-addressBook"></button>
-
-		<h2>Address Details</h2>
-
-		<div id="selected-contact">
-		</div>
-
-		<div id="selected-contact-template" class="hidden addressBook">
-			<h1>{accountId}<h1>
-					<h3>{note}<h3>
-		</div>
+    </div>
 
 
-		<div id="contact-remove-selected" class="subpage hidden">
-			<div class="contentarea">
-				<h3>Remove this contact?</h3>
-			</div>
-		</div>
 
-		<div id="contact-edit-selected" class="subpage hidden">
-			<div class="contentarea">
-				<h3>Edit Notes</h3>
-				<input id="edit-note-contact" type="text">
-			</div>
-		</div>
+    <!--#endregion -->
 
-		<div id="main-contact" class="subpage hidden"></div>
+    <!--#region address book-->
 
-		<div id="bottomBar-addressBook" class="bottomBar">
-			<button class="button removeAddress" id="remove-contact">Remove</button>
-			<button class="button edit" id="edit-contact">Edit</button>
-		</div>
+    <div id="addressBook" class="appface slide-hide">
+        <h2>Address Book</h2>
+        <button class="button back" id="address-back-to-account"></button>
 
-	</div>
-	<!--#endregion -->
+        <div id="address-list" class="addresslistscrollarea">
+        </div>
 
-	<!--#region OPTIONS -->
-	<div id="options" class="appface hidden slide-hide">
-		<h2>Options</h2>
-		<h3>Auto-Lock(seconds):</h3>
-		<h4>The wallet will auto-lock after x seconds of you closing the popup extension</h4>
-		<input id="autolock-seconds-input" type="text" />
+        <div id="address-item-template" class="hidden address-item" data-id="{key}">
+            <div class="accountlistitem">
+                <div class="addresslistname">{accountId}</div>
+                <div class="addresslistcomment">{note}</div>
+            </div>
+        </div>
 
-		<div class="button-group">
-			<button class="ok" id="save-settings">Save Settings</button>
-			<button class="cancel" id="cancel-security-settings">Cancel</button>
-		</div>
-	</div>
-	<!--#endregion -->
+        <div class="bottomBar">
+            <button class="button addaccount" id="add-contact">Address</button>
 
-	<!--#region OK CANCEL buttons common to all subpages -->
-	<div class="button-group hidden" id="ok-cancel-row">
+        </div>
+    </div>
+    <!--#endregion -->
 
-		<button id="account-selected-action-confirm" class="ok">OK</button>
-		<button id="account-selected-action-cancel" class="cancel">Cancel</button>
-	</div>
-	<!--#endregion-->
+    <!--#region Add address book-->
+    <div id="add-addressBook" class="appface slide-hide">
+        <h2>Add Address </h2>
+        <input placeholder="Account ID" id="add-addressBook-id" type="text">
+        <input placeholder="Note" id="add-addressBook-note" type="text">
 
-	<!--#region Error and wait div -->
+    </div>
+    <!--#endregion -->
 
-	<div id="err-div"></div>
+    <!--#region detail address book-->
+    <div id="addressBook-details" class="appface slide-hide">
 
-	<a class="hidden" id="usd-price-link"></a>
+        <button class="button back" id="back-to-addressBook"></button>
 
-	<div id="wait">
-		<div class="lds-ring">
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
-	</div>
+        <h2>Address Details</h2>
 
-	<!--#endregion-->
+        <div id="selected-contact">
+        </div>
 
-	<!--#region Overlay combo popup-->
-	<div id="popup-list-appface" class="combo-list-appface">
-	</div>
-	<div id="popup-list" class="combo-list-box">
-	</div>
+        <div id="selected-contact-template" class="hidden addressBook">
+            <h1>{accountId}
+                <h1>
+                    <h3>{note}
+                        <h3>
+        </div>
 
-	<!--#endregion-->
 
-	<script src="bundled-libs.js"></script>
-	<script type="module" src="dist/index.js"></script>
+        <div id="contact-remove-selected" class="subpage hidden">
+            <div class="contentarea">
+                <h3>Remove this contact?</h3>
+            </div>
+        </div>
+
+        <div id="contact-edit-selected" class="subpage hidden">
+            <div class="contentarea">
+                <h3>Edit Notes</h3>
+                <input id="edit-note-contact" type="text">
+            </div>
+        </div>
+
+        <div id="main-contact" class="subpage hidden"></div>
+
+        <div id="bottomBar-addressBook" class="bottomBar">
+            <button class="button removeAddress" id="remove-contact">Remove</button>
+            <button class="button edit" id="edit-contact">Edit</button>
+        </div>
+
+    </div>
+    <!--#endregion -->
+
+    <!--#region OPTIONS -->
+    <div id="options" class="appface hidden slide-hide">
+        <h2>Options</h2>
+        <h3>Auto-Lock(seconds):</h3>
+        <h4>The wallet will auto-lock after x seconds of you closing the popup extension</h4>
+        <input id="autolock-seconds-input" type="text" />
+
+        <div class="button-group">
+            <button class="ok" id="save-settings">Save Settings</button>
+            <button class="cancel" id="cancel-security-settings">Cancel</button>
+        </div>
+    </div>
+    <!--#endregion -->
+
+    <!--#region OK CANCEL buttons common to all subpages -->
+    <div class="button-group hidden" id="ok-cancel-row">
+
+        <button id="account-selected-action-confirm" class="ok">OK</button>
+        <button id="account-selected-action-cancel" class="cancel">Cancel</button>
+    </div>
+    <!--#endregion-->
+
+    <!--#region Error and wait div -->
+
+    <div id="err-div"></div>
+
+    <a class="hidden" id="usd-price-link"></a>
+
+    <div id="wait">
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <!--#endregion-->
+
+    <!--#region Overlay combo popup-->
+    <div id="popup-list-appface" class="combo-list-appface">
+    </div>
+    <div id="popup-list" class="combo-list-box">
+    </div>
+
+    <!--#endregion-->
+
+    <script src="bundled-libs.js"></script>
+    <script type="module" src="dist/index.js"></script>
 
 </body>

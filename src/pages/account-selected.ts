@@ -762,7 +762,7 @@ async function addContactToList() {
   try {
     const contactToSave: GContact = {
       accountId: new d.El("#send-to-account-name").value,
-      note: "",
+      note: new d.El("#add-contact-note").value ,
     };
     await saveContactOnBook(contactToSave.accountId, contactToSave);
     showInitial();
