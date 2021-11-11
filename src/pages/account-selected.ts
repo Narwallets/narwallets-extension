@@ -172,7 +172,7 @@ function initPage() {
   // liquid/delayed stake
   d.onClickId("one-tab-stake", selectFirstTab);
   d.onClickId("two-tab-stake", selectSecondTab);
-  d.onClickId("show-password-request",showPassword);
+  d.onClickId("show-password-request", showPassword);
 
   seedTextElem = new d.El("#seed-phrase");
   removeButton = new d.El("button#remove");
@@ -763,7 +763,7 @@ async function addContactToList() {
   try {
     const contactToSave: GContact = {
       accountId: new d.El("#send-to-account-name").value,
-      note: "",
+      note: new d.El("#add-contact-note").value,
     };
     await saveContactOnBook(contactToSave.accountId, contactToSave);
     showInitial();
