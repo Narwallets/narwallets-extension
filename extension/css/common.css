@@ -451,8 +451,8 @@ h5 {
 #err-div>div.info {
   background-color: #e4e4e4;
   border-width    : 1px;
-  color: #191919;
-  font-weight: 300;
+  color           : #191919;
+  font-weight     : 300;
 }
 
 #err-div>div.warning {
@@ -471,4 +471,18 @@ h5 {
 
 #import-account button.big {
   margin-top: 26px;
+}
+
+.show-hide-pwd {
+  font-size  : 23px;
+  line-height: 5px;
+  color: var(--ButtonBorder) !important;
+ }
+
+.show-hide-pwd:after {
+  content: "👁";
+}
+
+.text-strike-through {
+  text-decoration-line: line-through;
 }

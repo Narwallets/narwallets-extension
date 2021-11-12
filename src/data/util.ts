@@ -101,9 +101,9 @@ export function showPassword(e :Event){
   
   if (input?.type === "password") {
     input.type = "text";
-    showHideButton.innerText = '✖';
+    showHideButton.classList.add("text-strike-through")
   } else {
     input.type = "password";
-    showHideButton.innerText = '👁';
+    showHideButton.classList.remove("text-strike-through")
   }
 }
