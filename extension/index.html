@@ -279,6 +279,23 @@
 
 	<!--#region Account details -->
 
+	<!-- Template -->
+	<div id="selected-account-template" class="hidden">
+
+		<div class="accountdetscuenta">
+			{name}
+		</div>
+		<div class="accountdetscomment">
+			{accountInfo.note}
+		</div>
+		<div class="accountdetsbalance balance">{total}</div>
+
+		<div class="accountdetsfiat hidden">
+			{totalUSD}
+		</div>
+
+	</div>
+
 	<div class="appface slide-hide" id="account-selected">
 
 		<button class="button back" id="back-to-account"></button>
@@ -294,24 +311,6 @@
 			<button class="button connect" id="acc-connect-to-page">Connect</button>
 			<button class="button disconnect hidden" id="acc-disconnect-to-page">Disconnect</button>
 		</div>
-
-		<!-- Template -->
-		<div id="selected-account-template" class="hidden">
-
-			<div class="accountdetscuenta">
-				{name}
-			</div>
-			<div class="accountdetscomment">
-				{accountInfo.note}
-			</div>
-			<div class="accountdetsbalance balance">{total}</div>
-
-			<div class="accountdetsfiat hidden">
-				{totalUSD}
-			</div>
-
-		</div>
-
 
 		<!--#region subpage SEND -->
 		<div id="account-selected-send" class="subpage hidden">

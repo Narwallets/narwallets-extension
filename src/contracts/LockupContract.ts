@@ -78,7 +78,7 @@ export class LockupContract {
       const locked = await this.getAmount("get_locked_amount")
 
       //this.accountInfo.lastBalance = ownerBal + locked
-      this.accountInfo.lockedOther = locked
+      this.accountInfo.lockedOther = locked + 35 //35 extra near required for lockup-contracts
       // const contractKnownPoolDeposited = await this.getAmount(
       //   "get_known_deposited_balance"
       // );
@@ -108,14 +108,14 @@ export class LockupContract {
   //owner calls
   //-------------------------------------------
   async stakeWith(lockupEAcc: ExtendedAccountData, newStakingPool: string, amountYoctos: string): Promise<any> {
-    if (c.yton(amountYoctos)<= 0) throw Error("invalid amount")
+    if (c.yton(amountYoctos) <= 0) throw Error("invalid amount")
 
     //refresh lockup acc info - get staking pool and balances
     if (!(await this.tryRetrieveInfo())) {
       throw Error("Error refreshing lockup contract info");
     }
 
-    let actualSP:string = await this.get_staking_pool_account_id()
+    let actualSP: string = await this.get_staking_pool_account_id()
 
     let poolAccInfo = {
       //empty info
@@ -152,7 +152,7 @@ export class LockupContract {
       //select the new staking pool
       await this.call_method("select_staking_pool", { staking_pool_account_id: newStakingPool }, c.TGas(BASE_GAS * 3))
       actualSP = newStakingPool
-      poolAccInfo = await StakingPool.getAccInfo(this.contractAccount, actualSP )
+      poolAccInfo = await StakingPool.getAccInfo(this.contractAccount, actualSP)
     }
 
     if (poolAccInfo.unstaked_balance != "0" && poolAccInfo.staked_balance == "0") { //deposited but unstaked, stake
@@ -189,7 +189,7 @@ export class LockupContract {
     }
 
     //check if it's staked or just in the pool but unstaked
-    const poolAccInfo = await StakingPool.getAccInfo(this.contractAccount, actualSP )
+    const poolAccInfo = await StakingPool.getAccInfo(this.contractAccount, actualSP)
 
     if (poolAccInfo.staked_balance == "0") {
       //nothing staked, maybe waiting to withdrawal

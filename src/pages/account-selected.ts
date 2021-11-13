@@ -626,7 +626,7 @@ async function sendClicked() {
 
     let maxAmountToSend = selectedAccountData.available;
 
-    //if it's a lock.c and we didn't add a priv key yet, use contract method "transfer" (performLockupContractSend)
+    //if it's a lock.c and we didn't add a priv key yet, consider lockup contract limits
     if (
       selectedAccountData.isLockup &&
       !selectedAccountData.accountInfo.privateKey

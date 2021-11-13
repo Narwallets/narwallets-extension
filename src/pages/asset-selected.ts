@@ -717,9 +717,8 @@ async function showAssetSendClicked() {
 
     d.showSubPage("asset-send-subpage");
     d.byId("asset-symbol").innerText = asset_selected.symbol;
-    d.byId("max-amount-send-asset").innerText = c.toStringDec(
-      asset_selected.balance
-    );
+    d.byId("max-amount-send-asset").innerText = new d.El("#account-selected .accountdetsbalance").innerText;
+    // c.toStringDec(asset_selected.balance    );
     d.onClickId("asset-send-max", function () {
       d.maxClicked("send-to-asset-amount", "#selected-asset #balance");
     });
