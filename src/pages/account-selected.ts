@@ -88,6 +88,7 @@ import {
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { activeNetworkInfo } from "../index.js";
 import { closePopupList, PopupItem, popupListOpen } from "../util/popup-list.js";
+import { ExecException } from "child_process";
 
 const THIS_PAGE = "account-selected";
 
@@ -271,9 +272,9 @@ async function refreshSelectedAcc() {
   d.showSuccess("Refreshed");
 }
 
-function usdPriceReady() {
+async function usdPriceReady() {
   selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
-  let element = document.querySelector(".accountdetsfiat") as HTMLDivElement;
+  let element = document.querySelector(".accountdetstopcenter .accountdetsfiat") as HTMLDivElement;
   element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
   element.classList.remove("hidden");
 }
