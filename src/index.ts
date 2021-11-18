@@ -143,9 +143,15 @@ function asideExpand() {
   });
 }
 
-function asideAccounts() {
+async function asideAccounts() {
   hambClicked();
   hideOkCancel();
+  const isLocked = await askBackgroundIsLocked();
+  if (isLocked) {
+    await UnlockPage_show();
+    d.showErr("You need to unlock the wallet first");
+    return;
+  }
   d.showPage("account-list-main");
 }
 
