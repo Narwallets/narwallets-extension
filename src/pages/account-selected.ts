@@ -88,7 +88,6 @@ import {
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { activeNetworkInfo } from "../index.js";
 import { closePopupList, PopupItem, popupListOpen } from "../util/popup-list.js";
-import { ExecException } from "child_process";
 
 const THIS_PAGE = "account-selected";
 
