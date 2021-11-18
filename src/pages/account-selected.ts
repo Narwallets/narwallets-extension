@@ -319,7 +319,7 @@ function addClicked() {
   showOKCancel(addOKClicked, showInitial);
 }
 
-function getKnownNEP141Contracts(): PopupItem[] {
+export function getKnownNEP141Contracts(): PopupItem[] {
   if (activeNetworkInfo.name == "testnet") {
     return [
       { text: "stNEAR - meta-v2.pool.testnet", value: "meta-v2.pool.testnet" },
@@ -350,7 +350,7 @@ async function selectTokenClicked() {
   // open popup, with what to show and what to do when clicked
   popupListOpen(items, tokenPopupListItemClicked)
 }
-function tokenPopupListItemClicked(text: string, value: string) {
+export function tokenPopupListItemClicked(text: string, value: string) {
   d.inputById("token-to-add-name").value = value
 }
 
