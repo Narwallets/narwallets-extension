@@ -69,9 +69,21 @@ Bundle includes:
 
 ## Beta Test Installation (Latest Unstable Version)
 
-* clone this repository on your machine and:
+### Clone this repository and run as unpacked extension:
+
+  * `git clone https://github.com/Narwallets/narwallets-extension.git`
+  * `cd narwallets-extension`
+  * install packages: `npm install`
+  * compile: `npm run build`
   * open chrome
   * enable Extensions Developer Mode
-  * load unpacked extension from [dir-where-you-cloned]/Narwallets-extension/extension
+  * load unpacked extension from [your-repos-dir]/narwallets-extension/extension
 
-
+### When new versions of the code are pushed
+  * `cd narwallets-extension`
+  * get changes: `git pull`
+  * install packages: `npm install` (in case there were changes)
+  * compile: `npm run build`
+  * open extension
+  * right-mouse-button-click con the extension popup, "Inspect" -> will open chrome-developer-tools
+  * press Ctrl-R on the developer-tools, that will make sure you're using the last compilation

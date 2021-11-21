@@ -17,6 +17,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": false,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "sourceMap": false
   }
 }
