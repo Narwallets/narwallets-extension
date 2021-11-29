@@ -4,6 +4,7 @@ import * as d from "./document.js";
 const POPUP_LIST_APPFACE = "popup-list-appface"
 const POPUP_LIST = "popup-list"
 let itemList :PopupItem[];
+let originalList :PopupItem[];
 
 let searchString = "";
 
@@ -73,13 +74,19 @@ const callback = function filterList(event: KeyboardEvent){
     document.removeEventListener("keydown", callback);
     
     //populate and relaunch the popup
-    popupListOpen(foundmatch, tokenPopupListItemClicked);
+    if(searchString){
+        popupListOpen(itemList, tokenPopupListItemClicked, foundmatch);
+    }else{
+        popupListOpen(itemList, tokenPopupListItemClicked);
+
+    }
 }
 
-export function popupListOpen(items: PopupItem[], clickHandler: Function) {
+export function popupListOpen(items: PopupItem[], clickHandler: Function, filtredItems?: PopupItem[]) {
     
     // populate list
-    populatePopupList(items);
+    
+    populatePopupList(filtredItems ? filtredItems : items);
     // open full body semi-transparent background
     const popupFace = d.byId(POPUP_LIST_APPFACE);
     popupFace.classList.add(d.OPEN);
