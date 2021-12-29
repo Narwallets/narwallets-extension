@@ -86,7 +86,7 @@ type callbackERR = (err: string) => void;
 
 export async function recoverState(): Promise<void> {
   State = await recoverFromLocalStorage("State", "S", EmptyState);
-  console.log("Recover state", State)
+  //console.log("Recover state", State)
 }
 
 export async function sha256PwdBase64Async(password: string): Promise<string> {
@@ -178,9 +178,9 @@ export function setCurrentUser(user: string) {
 
 export function isLocked() {
   //DEBUG
-  if (!SecureState) log("isLocked()? yes, !SecureState");
-  else if (!SecureState.hashedPass)
-    log("isLocked()? yes, !SecureState.hashedPass");
+  // if (!SecureState) log("isLocked()? yes, !SecureState");
+  // else if (!SecureState.hashedPass)
+  //   log("isLocked()? yes, !SecureState.hashedPass");
 
   return !SecureState || !SecureState.hashedPass;
 }

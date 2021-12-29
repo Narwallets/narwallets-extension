@@ -72,9 +72,9 @@ async function displayStakingPools() {
       StakingPool.getFee(item.account_id) //async get fees
         .then((fee) => {
           //debug
-          if (item.account_id.indexOf("node0") != -1) {
-            //console.log(fee)
-          }
+          // if (item.account_id.indexOf("node0") != -1) {
+          //   //console.log(fee)
+          // }
           const elem = d.byId(item.account_id)
           if (fee >= 50) elem.classList.add("hidden") //bye bye 
 

@@ -33,9 +33,9 @@ var resolvedMsg: ResolvedMsg;
 async function approveOkClicked() {
   d.showWait()
   try {
-    //ask backgroun to apply transaction
+    //ask background to apply transaction
     resolvedMsg.data = await askBackground(initialMsg)
-    //response goes to initiating tab/page, another 5-min wating spinner is there
+    //response goes to initiating tab/page, another 5-min waiting spinner is there
     chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //send resolution to original asking tab/page
     responseSent = true
     setTimeout(() => { window.close() }, 100);

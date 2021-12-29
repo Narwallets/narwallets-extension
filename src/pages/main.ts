@@ -285,7 +285,7 @@ async function tryReposition() {
       const isLocked = await askBackgroundIsLocked();
       if (!isLocked) {
         if (account) {
-          console.log("reposition ", account, reposition, assetIndex)
+          //console.log("reposition ", account, reposition, assetIndex)
           AccountSelectedPage_show(account, reposition, assetIndex);
         }
       }

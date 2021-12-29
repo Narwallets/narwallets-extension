@@ -261,7 +261,7 @@ export function switchDarkLight(): string {
   }
   isDark = !isDark;
 
-  console.log(oldlink?.href, cssFile);
+  //console.log(oldlink?.href, cssFile);
   if (oldlink && !oldlink.href.includes(cssFile)) {
     oldlink.href = cssFile;
   }
