@@ -36,7 +36,7 @@
 
 .MidBlock {
   position       : absolute;
-  top            : 149px;
+  top: 153px;
   left           : 0px;
   width          : 480px;
   padding        : 0px;
@@ -123,10 +123,10 @@
   display         : flex;
   justify-content : center;
   align-items     : center;
-  margin          : auto;
+  /* margin          : auto; */
   color           : var(--BlockText);
   background-color: var(--Block);
-  height          : 48px;
+  height: 44px;
   width           : 420px;
   overflow-wrap   : break-word;
   word-break      : break-word;
@@ -142,18 +142,23 @@
 }
 
 .accountdetscomment {
-  display      : block;
+  /* display      : block; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--BlockText);
+  background-color: var(--Block);
   margin       : auto;
-  margin-top   : 2px;
+  margin-top: 0px;
   margin-bottom: 0px;
-
   max-height : 24px;
   height     : 15px;
-  width      : 260px;
+  /* width      : 260px; */
   text-align : center;
   color      : var(--TextGeneric);
   font-size  : 12px;
   font-weight: 200;
+  padding-bottom: 5px;
 }
 
 .accountdetssymbol {
@@ -182,8 +187,8 @@
 .assetdetcontract {
   display      : block;
   margin       : auto;
-  margin-top   : 0px;
-  margin-bottom: 4px;
+  margin-top: 4px;
+  margin-bottom: 0px;
   max-height   : 24px;
   height       : 15px;
   text-align   : center;
@@ -200,17 +205,18 @@ span#icon img {
 .accountdetsbalance {
   display       : block;
   margin        : auto;
-  margin-top    : 1px;
-  margin-bottom : 11px !important;
+  margin-top: 1px;
+  margin-bottom: 0px;
+  /* margin-bottom : 11px !important; */
   max-height    : 28px;
   height        : 35px;
   width         : 370px;
   text-align    : center;
-  margin-bottom : 15px;
+  margin-bottom: 6px;
   font-size     : 28px;
   font-weight   : 200;
   color         : var(--TextRemark);
-  padding-top   : 4px;
+  /* padding-top   : 4px; */
   padding-bottom: 0px;
 }
 
@@ -238,10 +244,13 @@ span#icon img {
   width        : 260px;
   background   : transparent;
   color        : var(--TextGeneric);
-  font-size    : 15px;
+  /* font-size    : 15px; */
   font-weight  : 400;
 }
 
+.asset_in_usd {
+  padding-bottom: 18px;
+}
 .accountdetsfiat::after {
   content: " usd";
 }
@@ -315,5 +324,4 @@ span#icon img {
 
 .AdverBlock a:hover {
   color: var(--BlockText);
-
 }

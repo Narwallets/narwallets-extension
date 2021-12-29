@@ -81,7 +81,15 @@ function showAddContactPage() {
 
 function showInitial() {
   d.clearContainer("address-list");
-  d.populateUL("address-list", "address-item-template", addressContacts);
+  const TEMPLATE=`
+    <div class="address-item" data-id="{key}">
+    <div class="accountlistitem">
+      <div class="addresslistname">{accountId}</div>
+      <div class="addresslistcomment">{note}</div>
+    </div>
+  </div>
+  `;
+  d.populateUL("address-list", TEMPLATE, addressContacts);
   document.querySelectorAll("#address-list .address-item").forEach((item) => {
     item.addEventListener("click", showAddressDetails);
   });
@@ -145,9 +153,15 @@ function showAddressDetails(ev: Event) {
       const index = Number(li.id);
       if (isNaN(index)) return;
       let contact: GContact = addressContacts[index];
+      const TEMPLATE = `
+      <div id="selected-contact-template" class="addressBook">
+			  <h1>{accountId}<h1>
+					<h3>{note}<h3>
+		  </div>
+      `;
       d.appendTemplateLI(
         "selected-contact",
-        "selected-contact-template",
+        TEMPLATE,
         contact
       );
       selectedContactIndex = index;

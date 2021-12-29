@@ -53,16 +53,6 @@
 		</div>
 	</div>
 
-
-
-	<!-- Network Item Template -->
-	<div id="network-item-template" class="hidden">
-		<div data-code="{name}" class="circle {color}">{displayName}</div>
-	</div>
-
-	<!-- -->
-	<!-- <div id="err-div"></div> -->
-	<!-- -->
 	<div id="wait">
 
 		<div class="lds-ring">
@@ -278,23 +268,6 @@
 	<!--#endregion -->
 
 	<!--#region Account details -->
-
-	<!-- Template -->
-	<div id="selected-account-template" class="hidden">
-
-		<div class="accountdetscuenta">
-			{name}
-		</div>
-		<div class="accountdetscomment">
-			{accountInfo.note}
-		</div>
-		<div class="accountdetsbalance balance">{total}</div>
-
-		<div class="accountdetsfiat hidden">
-			{totalUSD}
-		</div>
-
-	</div>
 
 	<div class="appface slide-hide" id="account-selected">
 
@@ -658,18 +631,6 @@
 
 						<div id="assets-list"> </div>
 
-						<div id="asset-item-template" class="hidden asset-item" data-id="index-{key}">
-							<div class="accountdetsassets">
-								<div class="accountasseticon">{icon}</div>
-								<span class="accountassetcoin">{symbol}</span>
-								<div class="accountassettoken">{contractId}</div>
-								<div class="accountassetbalance">{balance}</div>
-								<div class="accountassetfiat"></div>
-							</div>
-						</div>
-
-
-
 					</div>
 
 					<div class="panel two">
@@ -865,14 +826,6 @@
 			<div id="accounts-list">
 			</div>
 
-			<div id="account-item-template" class="hidden account-item" data-id="{name}">
-				<div class="accountlistitem">
-					<div class="accountlistname">{name}</div>
-					<div class="accountlistbalance balance">{total}</div>
-					<div class="accountlistcomment">{accountInfo.note}</div>
-				</div>
-			</div>
-
 			<div class="total-row accountlistitem">
 				<div class="account-item-group">
 					<div class="accountlistname">Total</div>
@@ -1063,27 +1016,6 @@
 		<button class="button back" id="back-to-selected"></button>
 
 		<div class="accountdetstopcenter" id="selected-asset">
-
-		</div>
-
-
-
-		<div id="selected-asset-template" class="hidden">
-			<div class="accountdetscuenta">
-				{acc.name}
-			</div>
-			<div class="accountdetscomment">
-				{accountInfo.note}
-			</div>
-			<div class="accountdetsbalance ">
-				<span id="icon">{asset.icon}</span>
-				<span id="balance">{asset.balance}</span>
-				<span id="symbol">{asset.symbol}</span>
-
-			</div>
-			<div class="assetdetcontract">
-				{asset.contractId}
-			</div>
 		</div>
 
 		<div class="midblock">
@@ -1113,18 +1045,6 @@
 					<div class="panel one">
 
 						<div id="asset-history-details">
-						</div>
-					</div>
-
-					<div id="asset-history-template" class="hidden" data-id="{key}">
-						<div class="history-line">
-							<div class="history-icon">{icon}</div>
-							<div class="history-type">{type}&nbsp;
-								<span class="history-contract-id">{destination}</span>
-							</div>
-							<div class="history-date">{date}</div>
-							<div class="history-amount">{amount}</div>
-							<div class="history-fiat"></div>
 						</div>
 					</div>
 
@@ -1283,26 +1203,7 @@
 			</div>
 		</div>
 
-		<div id="selected-asset-template" class="hidden">
-
-			<div class="accountdetscuenta">
-				<h1>{name}</h1>
-			</div>
-			<div class="accountdetscomment">
-				<h2>{accountInfo.note}</h2>
-			</div>
-			<div class="accountdetsbalance ">
-				<h3 class="balance">{total}</h3>
-			</div>
-			<!-- <div class="accountdetsfiat">
-				<h4>{totalUSD} usd</h4>
-			</div> -->
-
-		</div>
-
 		<div class="subpage hidden"></div>
-
-
 
 	</div>
 
@@ -1317,13 +1218,6 @@
 		<button class="button back" id="address-back-to-account"></button>
 
 		<div id="address-list" class="addresslistscrollarea">
-		</div>
-
-		<div id="address-item-template" class="hidden address-item" data-id="{key}">
-			<div class="accountlistitem">
-				<div class="addresslistname">{accountId}</div>
-				<div class="addresslistcomment">{note}</div>
-			</div>
 		</div>
 
 		<div class="bottomBar">
@@ -1351,12 +1245,6 @@
 
 		<div id="selected-contact">
 		</div>
-
-		<div id="selected-contact-template" class="hidden addressBook">
-			<h1>{accountId}<h1>
-					<h3>{note}<h3>
-		</div>
-
 
 		<div id="contact-remove-selected" class="subpage hidden">
 			<div class="contentarea">

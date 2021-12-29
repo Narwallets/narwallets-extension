@@ -7,7 +7,7 @@ import {
   askBackgroundSetAccount,
   askBackgroundViewMethod,
 } from "../background/askBackground.js";
-import { Asset, assetUpdateBalance, assetUpdateMetadata, ExtendedAccountData, History, newTokenFromMetadata, updateTokenAssetFromMetadata } from "../data/account.js";
+import { Asset, assetUpdateBalance, assetUpdateMetadata, asyncRefreshAccountInfoLastBalance, ExtendedAccountData, History, newTokenFromMetadata, updateTokenAssetFromMetadata } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -30,10 +30,11 @@ import {
   ifNormalAccShowGrantAccessSubPage,
   historyWithIcons,
   historyLineClicked,
-  getAccountRecord
+  getAccountRecord,
+  refreshSaveSelectedAccount,
+  usdPriceReady
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { addressContacts, getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
 import { GContact } from "../data/Contact.js";
 import { localStorageSet } from "../data/util.js";
@@ -49,7 +50,7 @@ import {
 } from "../util/svg_const.js";
 import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
-import { nearDollarPrice } from "../data/global.js";
+import { ASSET_HISTORY_TEMPLATE, nearDollarPrice } from "../data/global.js";
 import { backToAccountsList, setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
 import { activeNetworkInfo } from "../index.js";
@@ -210,13 +211,37 @@ function reloadDetails() {
     acc: selectedAccountData,
     asset: asset_selected,
   };
-  d.appendTemplateLI("selected-asset", "selected-asset-template", templateData);
 
+  const TEMPLATE = `
+    <div id="selected-asset-template">
+    <div class="accountdetscuenta">
+      {acc.name}
+    </div>
+    <div class="accountdetscomment">
+      {accountInfo.note}
+    </div>
+    <div class="assetdetcontract">
+      {asset.contractId}
+    </div>
+    <div class="accountdetsbalance ">
+      <span id="icon">{asset.icon}</span>
+      <span id="balance">{asset.balance}</span>
+      <span id="symbol">{asset.symbol}</span>
+
+    </div>
+    <div class="asset_in_usd hidden">
+    </div>
+  </div>
+  `;
+  d.appendTemplateLI("selected-asset", TEMPLATE, templateData);
+  // set asset (stNEAR only now) price
+  if (nearDollarPrice) { usdPriceReady() }
+
+  
   d.clearContainer("asset-history-details");
-
   d.populateUL(
     "asset-history-details",
-    "asset-history-template",
+    ASSET_HISTORY_TEMPLATE,
     historyWithIcons(asset_selected.history)
   );
 }
@@ -283,7 +308,6 @@ async function confirmWithdraw() {
       await deleteAsset();
       backToSelectClicked();
     } else {
-      await refreshSaveSelectedAccount();
       reloadDetails();
       showInitial();
     }
@@ -550,7 +574,6 @@ async function restakeOkClicked() {
     foundAsset.balance += c.yton(yoctosToRestake);
     foundAsset.addHistory("stake", c.yton(yoctosToRestake));
 
-    await refreshSaveSelectedAccount();
     hideOkCancel();
     reloadDetails();
     showInitial();
@@ -892,8 +915,6 @@ async function deleteAsset() {
 
   await saveSelectedAccount();
 
-  refreshSaveSelectedAccount();
-
   populateAssets();
 
   // Save
@@ -913,19 +934,19 @@ function showInitial() {
   d.showSubPage("asset-history");
 }
 
-async function refreshSaveSelectedAccount() {
-  await searchAccounts.asyncRefreshAccountInfo(
-    selectedAccountData.name,
-    selectedAccountData.accountInfo
-  );
+// async function refreshSaveSelectedAccount() {
+//   await asyncRefreshAccountInfoLastBalance(
+//     selectedAccountData.name,
+//     selectedAccountData.accountInfo
+//   );
 
-  await saveSelectedAccount();
+//   await saveSelectedAccount();
 
-  selectedAccountData.available =
-    selectedAccountData.accountInfo.lastBalance -
-    selectedAccountData.accountInfo.lockedOther;
-  selectedAccountData.total = selectedAccountData.available;
-}
+//   selectedAccountData.available =
+//     selectedAccountData.accountInfo.lastBalance -
+//     selectedAccountData.accountInfo.lockedOther;
+//   selectedAccountData.total = selectedAccountData.available;
+// }
 
 async function saveSelectedAccount(): Promise<any> {
   return askBackgroundSetAccount(

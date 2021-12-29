@@ -63,8 +63,7 @@ export function yton(yoctos: string): number {
  * Formats a number in NEAR to a string with commas and 5 decimal places
  * @param {number} n 
  */
-function toStringDecSimple(n: number) {
-    const decimals = 5
+function toStringDecSimple(n: number, decimals: number = 5) {
     const textNoDec = Math.round(n * 10 ** decimals).toString().padStart(decimals + 1, "0");
     return textNoDec.slice(0, -decimals) + "." + textNoDec.slice(-decimals);
 }
@@ -72,8 +71,8 @@ function toStringDecSimple(n: number) {
 * Formats a number in NEAR to a string with commas and 5 decimal places
 * @param {number} n 
 */
-export function toStringDec(n: number) {
-    return addCommas(toStringDecSimple(n));
+export function toStringDec(n: number, decimals: number = 5) {
+    return addCommas(toStringDecSimple(n, decimals));
 }
 /**
  * removes extra zeroes after the decimal point

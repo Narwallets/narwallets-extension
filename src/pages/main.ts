@@ -1,7 +1,7 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
-import { Account, Asset, ExtendedAccountData } from "../data/account.js";
+import { Account, Asset, asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../data/account.js";
 import { show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 
@@ -21,7 +21,6 @@ import {
   askBackgroundViewMethod,
 } from "../background/askBackground.js";
 import { D } from "../lib/tweetnacl/core/core.js";
-import { asyncRefreshAccountInfo } from "../util/search-accounts.js";
 import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { activeNetworkInfo, asideSwitchMode, setIsDark } from "../index.js";
@@ -39,11 +38,10 @@ export const ADD_ACCOUNT = "add-account";
 export const IMPORT_OR_CREATE = "import-or-create";
 
 export const ACCOUNTS_LIST = "accounts-list";
-export const ACCOUNT_ITEM_TEMPLATE = "account-item-template";
 export const ACCOUNT_ITEM = "account-item";
 
 let lastSelectedAccount: ExtendedAccountData;
-let lastSelectedAsset: Asset;
+export let lastSelectedAsset: Asset;
 
 export function setLastSelectedAccount(data: ExtendedAccountData) {
   lastSelectedAccount = data;
@@ -159,7 +157,6 @@ export async function show() {
       //do a user exists?
       const state = await askBackgroundGetState();
 
-
       if (state.usersList.length == 0) {
         //no users => welcome new User
         d.showPage(WELCOME_NEW_USER_PAGE);
@@ -198,7 +195,16 @@ export async function show() {
     //debug
     //for(let item of list) console.log(item.accountInfo.order,item.accountInfo.type, item.name)
 
-    d.populateUL(ACCOUNTS_LIST, ACCOUNT_ITEM_TEMPLATE, list);
+    const TEMPLATE = `
+    <div class="account-item" data-id="{name}">
+      <div class="accountlistitem">
+        <div class="accountlistname">{name}</div>
+        <div class="accountlistbalance balance">{total}</div>
+        <div class="accountlistcomment">{accountInfo.note}</div>
+      </div>
+    </div>
+    `;
+    d.populateUL(ACCOUNTS_LIST, TEMPLATE, list);
 
     let total = 0;
     //connect all item to accountItemClicked
@@ -318,7 +324,7 @@ export async function refreshAllAccounts() {
       return;
     }
 
-    await asyncRefreshAccountInfo(key, accountsRecord[key]);
+    await asyncRefreshAccountInfoLastBalance(key, accountsRecord[key]);
     const extAcc = new ExtendedAccountData(key, accountsRecord[key]);
 
     if (key == lastSelectedAccount?.name) {

@@ -30,6 +30,7 @@ import {
   assetSetBalanceYoctos,
   assetUpdateBalance,
   assetUpdateMetadata,
+  asyncRefreshAccountInfoLastBalance,
 } from "../data/account.js";
 import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/util.js";
 import {
@@ -73,7 +74,7 @@ import {
   showOKCancel,
   hideOkCancel,
 } from "../util/okCancel.js";
-import { nearDollarPrice } from "../data/global.js";
+import { ASSET_HISTORY_TEMPLATE, getStNEARPrice, nearDollarPrice } from "../data/global.js";
 import { addressContacts } from "./address-book.js";
 import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/Contact.js";
@@ -201,67 +202,36 @@ export function historyLineClicked(ev: Event) {
 }
 
 export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
+
   if (selectedAccountData.accountInfo.network !== activeNetworkInfo.name) {
-    //network changed
+    // exit if network changed
     return;
   }
 
-  let accName = selectedAccountData.name;
-  const root = activeNetworkInfo.rootAccount;
-  if (
-    accName &&
-    accName.length < 60 &&
-    !accName.endsWith(root) &&
-    !(
-      activeNetworkInfo.name == "testnet" &&
-      /dev-[0-9]{13}-[0-9]{7}/.test(accName)
-    )
-  ) {
-    accName = accName + "." + root;
-  }
+  await selectedAccountData.refreshLastBalance()
 
-  // refresh balance
-  await searchAccounts.asyncRefreshAccountInfo(accName, selectedAccountData.accountInfo)
-  selectedAccountData.total = selectedAccountData.accountInfo.lastBalance;
+  updateAccountHeaderDOM();
 
   selectedAccountData.accountInfo.assets.forEach(async (asset) => {
-    if (asset.type == "stake" || asset.type == "unstake") {
-      if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
-        let poolAccInfo = await StakingPool.getAccInfo(
-          selectedAccountData.name,
-          asset.contractId
-        );
-        if (asset.symbol == "UNSTAKED") {
-          asset.balance = c.yton(poolAccInfo.unstaked_balance);
-        } else if (asset.symbol == "STAKED") {
-          asset.balance = c.yton(poolAccInfo.staked_balance);
-        }
-      } else if (asset.symbol == "STNEAR") {
-        let metaPoolResult = await askBackgroundViewMethod(
-          asset.contractId,
-          "get_account_info",
-          { account_id: selectedAccountData.name }
-        );
-        asset.balance = c.yton(metaPoolResult.st_near);
-      }
-    }
-    if (asset.type == "ft") {
-      if (asset.decimals == undefined) {
-        await assetUpdateMetadata(asset);
-      }
-      let assetBalanceNumber = await assetUpdateBalance(asset, selectedAccountData.name)
-      if (fromTimer) {
-        let index = selectedAccountData.findAssetIndex(asset.contractId, asset.symbol);
-        if (index >= 0) {
-          // update balance on-screen
-          d.qs(`#assets-list #index-${index} .accountassetbalance`).innerText = c.toStringDec(
-            assetBalanceNumber
-          );
+    await assetUpdateBalance(asset, selectedAccountData.name)
+    if (fromTimer) {
+      // update balance on-screen
+      let index = selectedAccountData.findAssetIndex(asset.contractId, asset.symbol);
+      if (index >= 0) {
+        try {
+          d.qs(`#assets-list #index-${index} .accountassetbalance`).innerText =
+            c.toStringDec(asset.balance);
+        } catch {
+          //ignore
         }
       }
     }
   });
-  await refreshSaveSelectedAccount(fromTimer);
+
+  showSelectedAccount(fromTimer);
+
+  await saveSelectedAccount(); //save
+
 }
 
 async function refreshSelectedAcc() {
@@ -271,11 +241,27 @@ async function refreshSelectedAcc() {
   d.showSuccess("Refreshed");
 }
 
-function usdPriceReady() {
+export async function usdPriceReady() {
   selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
-  let element = document.querySelector(".accountdetsfiat") as HTMLDivElement;
-  element.innerText = c.toStringDecMin(selectedAccountData.totalUSD);
-  element.classList.remove("hidden");
+  const elems = d.all(".accountdetsfiat")
+  elems.innerText = c.toStringDec(selectedAccountData.totalUSD, 2);
+  elems.show()
+  let assetUsdValue = undefined;
+  if (Pages.lastSelectedAsset.symbol == "STNEAR") {
+    const stNEARPrice = await getStNEARPrice()
+    assetUsdValue = Pages.lastSelectedAsset.balance * stNEARPrice * nearDollarPrice;
+  }
+  else if (Pages.lastSelectedAsset.symbol == "STAKED"
+    || Pages.lastSelectedAsset.symbol == "UNSTAKED"
+    || Pages.lastSelectedAsset.symbol == "wNEAR"
+  ) {
+    assetUsdValue = Pages.lastSelectedAsset.balance * nearDollarPrice;
+  }
+  if (assetUsdValue != undefined) {
+    const elems = d.all(".asset_in_usd")
+    elems.innerText = c.toStringDec(assetUsdValue, 2) + " usd";
+    elems.show()
+  }
 }
 
 function selectFirstTab() {
@@ -302,6 +288,7 @@ async function checkConnectOrDisconnect() {
   }
 }
 
+// AssetClicked
 function showAssetDetailsClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
@@ -384,7 +371,7 @@ async function addOKClicked() {
     });
 
     const asset = await addAssetToken(contractValue);
-    refreshSaveSelectedAccount();
+    await refreshSaveSelectedAccount();
     enableOKCancel();
     d.showSuccess("Added Token: " + asset.symbol);
     hideOkCancel();
@@ -430,9 +417,20 @@ async function selectAndShowAccount(accName: string) {
 export function populateAssets() {
   d.clearContainer("assets-list");
   selectedAccountData.accountInfo.assets.sort(assetSorter);
+  const TEMPLATE = `
+    <div class="asset-item" data-id="index-{key}">
+    <div class="accountdetsassets">
+      <div class="accountasseticon">{icon}</div>
+      <span class="accountassetcoin">{symbol}</span>
+      <div class="accountassettoken">{contractId}</div>
+      <div class="accountassetbalance">{balance}</div>
+      <div class="accountassetfiat"></div>
+    </div>
+  </div>
+  `;
   d.populateUL(
     "assets-list",
-    "asset-item-template",
+    TEMPLATE,
     selectedAccountData.accountInfo.assets
   );
 }
@@ -446,33 +444,58 @@ function assetSorter(asset1: Asset, asset2: Asset): number {
   }
 }
 
+/**
+ * only update data in-place(do not rebuild the DOM components)
+ */
+function updateAccountHeaderDOM() {
+
+  // only update amount
+  d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(
+    selectedAccountData.total
+  );
+
+  if (nearDollarPrice) {
+    usdPriceReady();
+  }
+
+}
+
 function showSelectedAccount(fromTimer?: boolean) {
-  //make sure available is up to date before displaying
 
-  selectedAccountData.available =
-    selectedAccountData.accountInfo.lastBalance -
-    selectedAccountData.accountInfo.lockedOther;
-
-  // After this "if" are all the actions that must be performed when this is a user-initiated refresh
+  // if "fromTimer" only update data in-place(do not rebuild the DOM components)
   if (fromTimer) {
-    // only update amount
-    d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(
-      selectedAccountData.total
-    );
+    updateAccountHeaderDOM();
     return;
   }
 
+  //make sure available is up to date before displaying
+  selectedAccountData = new ExtendedAccountData(selectedAccountData.name, selectedAccountData.accountInfo)
+
   const SELECTED_ACCOUNT = "selected-account";
+  const TEMPLATE = `
+    <div>
+      <div class="accountdetscuenta">
+        {name}
+      </div>
+      <div class="accountdetscomment">
+        {accountInfo.note}
+      </div>
+      <div class="assetdetcontract">NEAR
+      </div>
+      <div class="accountdetsbalance balance">{total}</div>
+      <div class="accountdetsfiat hidden">
+        {totalUSD}
+      </div>
+    </div>
+    `
+
   d.clearContainer(SELECTED_ACCOUNT);
   d.appendTemplateLI(
     SELECTED_ACCOUNT,
-    "selected-account-template",
+    TEMPLATE,
     selectedAccountData
   );
-
-  if (nearDollarPrice != 0) {
-    usdPriceReady();
-  }
+  updateAccountHeaderDOM();
 
   // fill assets list
   populateAssets();
@@ -482,7 +505,7 @@ function showSelectedAccount(fromTimer?: boolean) {
   d.clearContainer("account-history-details");
   d.populateUL(
     "account-history-details",
-    "asset-history-template",
+    ASSET_HISTORY_TEMPLATE,
     historyWithIcons(selectedAccountData.accountInfo.history)
   );
 }
@@ -1773,13 +1796,13 @@ async function removeAccountClicked(ev: Event) {
   }
 }
 
-async function refreshSaveSelectedAccount(fromTimer?: boolean) {
+export async function refreshSaveSelectedAccount(fromTimer?: boolean) {
   if (selectedAccountData.accountInfo.network !== activeNetworkInfo.name) {
     //network changed
     return;
   }
 
-  await searchAccounts.asyncRefreshAccountInfo(
+  await asyncRefreshAccountInfoLastBalance(
     selectedAccountData.name,
     selectedAccountData.accountInfo
   );

@@ -7,21 +7,21 @@ import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../back
 
 
 type PoolInfo = {
-      name:string;
-      slashed: string;
-      stake: string;
-      stakeY: string;
-      uptime: number;
-      fee?: number;
+  name: string;
+  slashed: string;
+  stake: string;
+  stakeY: string;
+  uptime: number;
+  fee?: number;
 }
 
-function sortCompare(a:PoolInfo, b:PoolInfo) {
+function sortCompare(a: PoolInfo, b: PoolInfo) {
   if (a.stakeY > b.stakeY) return -1;
   return 1;
 }
 
 
-function clicked(name:string) {
+function clicked(name: string) {
   //console.log(name);
   navigator.clipboard.writeText(name);
   d.showSuccess("Copied to clipboard: " + name)
@@ -39,7 +39,7 @@ async function displayStakingPools() {
     const networkInfo = await askBackgroundGetNetworkInfo()
     d.byId("net-name").innerText = networkInfo.displayName;
 
-    const list:PoolInfo[] = []
+    const list: PoolInfo[] = []
     for (let item of data.current_validators) {
       list.push({
         name: item.account_id,
@@ -53,7 +53,19 @@ async function displayStakingPools() {
 
     list.sort(sortCompare);
 
-    d.populateUL("list", "item-template", list)
+    const TEMPLATE = `
+    <li data-id="{name}">
+      <div class="name">{name}</div>
+      <div class="stake balance">Stake: {stake}</div>
+      <div class="block production">Block Production: {uptime}%</div>
+      <div class="slashed">Slashed? {slashed}</div>
+      <div class="fee-line">
+          <span class="fee">Fee: <span id="{name}-fee">?</span>%</span>
+      </div>
+      <button class="select small hidden">Copy to clip</button>
+    </li>
+    `;
+    d.populateUL("list", TEMPLATE, list)
 
     //query fees
     for (let item of data.current_validators) {
@@ -75,7 +87,7 @@ async function displayStakingPools() {
             if (fee <= 5 && fee >= 0.5) feeBox.classList.add("green")
           }
           if (fee > 0 && fee < 50) {
-            const button:HTMLElement|null = elem.querySelector("button")
+            const button: HTMLElement | null = elem.querySelector("button")
             if (button) {
               button.addEventListener("click", () => { clicked(item.account_id) })
               button.classList.remove("hidden");
@@ -106,7 +118,7 @@ async function init() {
   try {
     //rpc.addHeader("mode","no-cors")
     displayStakingPools();
-  } 
+  }
   catch (ex) {
     d.showErr(ex.message);
   }

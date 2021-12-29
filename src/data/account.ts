@@ -1,8 +1,12 @@
 import { timeStamp } from "node:console";
-import { askBackgroundViewMethod } from "../background/askBackground.js";
-import { yton, ytond } from "../util/conversions.js";
+import { askBackground, askBackgroundViewMethod } from "../background/askBackground.js";
+import { LockupContract } from "../contracts/LockupContract.js";
+import { activeNetworkInfo } from "../index.js";
+import * as c from "../util/conversions.js";
+import { getLockupContract } from "../util/search-accounts.js";
 import { TOKEN_DEFAULT_SVG } from "../util/svg_const.js";
 import { nearDollarPrice } from "./global.js";
+import * as StakingPool from "../contracts/staking-pool.js"
 
 //user NEAR accounts info type
 export class Account {
@@ -71,20 +75,34 @@ export class Asset {
 
 // note: moved outside so it works with POJOs
 export function assetSetBalanceYoctos(asset: Asset, yoctos: string): number {
-  asset.balance = ytond(yoctos, asset.decimals || 24);
+  asset.balance = c.ytond(yoctos, asset.decimals || 24);
   return asset.balance
 }
 
-export async function assetUpdateBalance(asset: Asset, accountId: string): Promise<number> {
-  if (asset.type = "ft") {
+export async function assetUpdateBalance(asset: Asset, accountId: string): Promise<void> {
+
+  if (asset.type == "stake" || asset.type == "unstake") {
+    if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
+      let poolAccInfo = await StakingPool.getAccInfo(
+        accountId,
+        asset.contractId
+      );
+      if (asset.symbol == "UNSTAKED") {
+        asset.balance = c.yton(poolAccInfo.unstaked_balance);
+      } else if (asset.symbol == "STAKED") {
+        asset.balance = c.yton(poolAccInfo.staked_balance);
+      }
+    }
+  }
+  else if (asset.type == "ft") {
+    if (asset.decimals == undefined) await assetUpdateMetadata(asset);
+
     let balanceYoctos = await askBackgroundViewMethod(
       asset.contractId, "ft_balance_of", { account_id: accountId }
     );
-    return assetSetBalanceYoctos(asset, balanceYoctos);
+    assetSetBalanceYoctos(asset, balanceYoctos);
   }
-  else {
-    throw Error("assetUpdateBalance only supports ft")
-  }
+
 }
 
 export function updateTokenAssetFromMetadata(item: Asset, metaData: any) {
@@ -143,10 +161,86 @@ export class ExtendedAccountData {
   //accessStatus: string;
   typeFull: string; //full-type + note
   accountInfo: Account;
-  total: number; //lastBalance+inThePool
-  totalUSD: number; //lastBalance+inThePool * NEAR price
-  unlockedOther: number;
-  available: number;
+  total: number = 0; //lastBalance+inThePool
+  totalUSD: number = 0; //lastBalance+inThePool * NEAR price
+  unlockedOther: number = 0;
+  available: number = 0;
+
+  constructor(name: string, accountInfo: Account) {
+    this.name = name;
+    this.accountInfo = accountInfo;
+    const typeFullTranslation: Record<string, string> = {
+      acc: "Account",
+      "lock.c": "Lockup Contract",
+    };
+    this.accountInfo.assets = accountInfo.assets;
+
+    //this.type = this.accountInfo.type;
+    this.typeFull = typeFullTranslation[this.accountInfo.type];
+    if (this.accountInfo.note) {
+      const formattedNote = " (" + this.accountInfo.note + ")";
+      //this.type += formattedNote;
+      this.typeFull += formattedNote;
+    }
+
+    this.recomputeTotals()
+    //this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
+
+    if (!this.accountInfo.assets) this.accountInfo.assets = [];
+    //if (!this.accountInfo.contacts) this.accountInfo.contacts = [];
+    // if (!this.accountInfo.staked) this.accountInfo.staked = 0;
+    // if (!this.accountInfo.unstaked) this.accountInfo.unstaked = 0;
+    // this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
+
+    /*if (accountInfo.history) {
+      accountInfo.history.forEach((element) => {
+        element.date = new Date(element.date).toLocaleString();
+      });
+    }
+    if (accountInfo.assets) {
+      accountInfo.assets.forEach((element) => {
+        if (element.history) {
+          element.history.forEach((elementInside) => {
+            elementInside.date = new Date(elementInside.date).toLocaleString();
+          });
+        }
+      });
+    }*/
+  }
+
+  recomputeTotals() {
+    if (!this.accountInfo.lockedOther) this.accountInfo.lockedOther = 0;
+
+    this.unlockedOther = this.accountInfo.lastBalance - this.accountInfo.lockedOther;
+    
+    this.available = this.accountInfo.lastBalance - this.accountInfo.lockedOther;
+    if (this.isLockup) {
+      this.available = Math.max(0, this.available - 4);
+    }
+
+    this.total = this.accountInfo.lastBalance;
+
+    this.totalUSD = this.total * nearDollarPrice;
+
+  }
+
+  async refreshLastBalance() {
+    await asyncRefreshAccountInfoLastBalance(
+      this.name,
+      this.accountInfo
+    );
+    this.recomputeTotals()
+  }
+
+  get isReadOnly() {
+    return !this.accountInfo.privateKey;
+  }
+  get isFullAccess() {
+    return !this.isReadOnly;
+  }
+  get isLockup() {
+    return this.accountInfo.type == "lock.c"
+  }
 
   findAsset(contractId: string, symbol?: string): Asset | undefined {
     for (var assetPojo of this.accountInfo.assets) {
@@ -182,70 +276,44 @@ export class ExtendedAccountData {
     }
   }
 
-  constructor(name: string, accountInfo: Account) {
-    this.name = name;
-    this.accountInfo = accountInfo;
-    const typeFullTranslation: Record<string, string> = {
-      acc: "Account",
-      "lock.c": "Lockup Contract",
-    };
-    this.accountInfo.assets = accountInfo.assets;
+}
 
-    //this.type = this.accountInfo.type;
-    this.typeFull = typeFullTranslation[this.accountInfo.type];
-    if (this.accountInfo.note) {
-      const formattedNote = " (" + this.accountInfo.note + ")";
-      //this.type += formattedNote;
-      this.typeFull += formattedNote;
-    }
-
-    //this.accessStatus = this.isReadOnly ? "Read Only" : "Full Access";
-
-    if (!this.accountInfo.assets) this.accountInfo.assets = [];
-    //if (!this.accountInfo.contacts) this.accountInfo.contacts = [];
-    // if (!this.accountInfo.staked) this.accountInfo.staked = 0;
-    // if (!this.accountInfo.unstaked) this.accountInfo.unstaked = 0;
-    // this.inThePool = this.accountInfo.staked + this.accountInfo.unstaked;
-
-    if (!this.accountInfo.lockedOther) this.accountInfo.lockedOther = 0;
-    this.unlockedOther =
-      this.accountInfo.lastBalance -
-      // this.inThePool -
-      this.accountInfo.lockedOther;
-
-    this.available =
-      this.accountInfo.lastBalance - this.accountInfo.lockedOther;
-
-    if (this.isLockup) {
-      this.available = Math.max(0, this.available - 4);
-    }
-    this.total = accountInfo.lastBalance;
-
-    this.totalUSD = this.total * nearDollarPrice;
-    /*if (accountInfo.history) {
-      accountInfo.history.forEach((element) => {
-        element.date = new Date(element.date).toLocaleString();
+export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account) {
+  const suffix = LockupContract.getLockupSuffix();
+  if (accName.endsWith(suffix)) {
+    //lockup contract
+    if (!info.ownerId) return;
+    //get lockup contract data and update info param
+    const lockup = await getLockupContract(info);
+    if (!lockup) return;
+    //
+  } else {
+    //normal account
+    let stateResultYoctos;
+    try {
+      stateResultYoctos = await askBackground({
+        code: "query-near-account",
+        accountId: accName,
       });
+    } catch (ex) {
+      let reason = ex.message.includes("name:UNKNOWN_ACCOUNT") ? `not found in ${activeNetworkInfo.name}` : ex.message;
+      throw Error(`account:"${accName}", Error:${reason}`);
     }
-    if (accountInfo.assets) {
-      accountInfo.assets.forEach((element) => {
-        if (element.history) {
-          element.history.forEach((elementInside) => {
-            elementInside.date = new Date(elementInside.date).toLocaleString();
-          });
-        }
-      });
-    }*/
-  }
 
-  get isReadOnly() {
-    return !this.accountInfo.privateKey;
-  }
-  get isFullAccess() {
-    return !this.isReadOnly;
-  }
-  get isLockup() {
-    return this.accountInfo.type == "lock.c"
-  }
+    info.lastBalance = c.yton(stateResultYoctos.amount);
 
+    // if (info.stakingPool) {
+    //     const previnThePool = info.staked + info.unstaked;
+    //     const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool)
+    //     info.staked = c.yton(stakingInfo.staked_balance)
+    //     info.unstaked = c.yton(stakingInfo.unstaked_balance)
+    //     info.rewards = previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
+    //     if (info.rewards < 0) info.rewards = 0;
+    //     info.stakingPoolPct = await StakingPool.getFee(info.stakingPool)
+    // }
+    // else {
+    //     info.staked = 0
+    //     info.unstaked = 0
+    // }
+  }
 }

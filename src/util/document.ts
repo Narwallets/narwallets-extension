@@ -395,13 +395,15 @@ export function clearContainer(containerId: string) {
 export function appendTemplate(
   elType: string,
   containerId: string,
-  templateId: string,
+  templateHtml: string,
   data: Record<string, any>
 ) {
   const newLI = document.createElement(elType) as HTMLLIElement;
-  const templateElem = byId(templateId);
+  const domParser = new DOMParser().parseFromString(templateHtml, 'text/html');
+  const templateElem = domParser.documentElement.querySelector('body')?.firstChild as HTMLElement;
+  //const templateElem = byId(templateId);
   if (!templateElem)
-    console.error("appendTemplate, template id='" + templateId + "' NOT FOUND");
+    console.error("appendTemplate, template cant be parsed");
   //-- if data-id has value, set it
   if (templateElem.dataset.id)
     newLI.id = templateReplace(templateElem.dataset.id, data); //data-id => id={x}
@@ -417,14 +419,14 @@ export function appendTemplate(
 
 export function appendTemplateLI(
   containerId: string,
-  templateId: string,
+  templateHtml: string,
   data: Record<string, any>
 ) {
-  appendTemplate("LI", containerId, templateId, data);
+  appendTemplate("LI", containerId, templateHtml, data);
 }
 export function populateSingleLI(
   containerId: string,
-  templateId: string,
+  templateHtml: string,
   multiDataObj: Record<string, any>,
   key: string
 ) {
@@ -432,15 +434,15 @@ export function populateSingleLI(
     key: key,
     ...multiDataObj[key],
   };
-  appendTemplateLI(containerId, templateId, dataItem);
+  appendTemplateLI(containerId, templateHtml, dataItem);
 }
 export function populateUL(
   containerId: string,
-  templateId: string,
+  templateHtml: string,
   multiDataObj: Record<string, any>
 ) {
   for (let key in multiDataObj) {
-    populateSingleLI(containerId, templateId, multiDataObj, key);
+    populateSingleLI(containerId, templateHtml, multiDataObj, key);
   }
 }
 
@@ -644,6 +646,12 @@ export class All {
   removeClass(className: string) {
     this.elems.forEach((item: HTMLElement) => {
       item.classList.remove(className);
+    });
+  }
+
+  set innerText(newText: string) {
+    this.elems.forEach((item: HTMLElement) => {
+      item.innerText = newText;
     });
   }
 

@@ -87,8 +87,8 @@ async function networkItemClicked(e: Event) {
     //update global state (background)
     activeNetworkInfo = await askBackgroundSetNetwork(networkName);
     //update indicator visual state
-    updateNetworkIndicatorVisualState(activeNetworkInfo );
-    Import_onNetworkChanged(activeNetworkInfo );
+    updateNetworkIndicatorVisualState(activeNetworkInfo);
+    Import_onNetworkChanged(activeNetworkInfo);
 
     // Account_onNetworkChanged(activeNetworkInfo);
     //on network-change restart the page-flow
@@ -295,7 +295,10 @@ async function initPopup() {
   d.qs("aside #address-book-side").onClick(asideAddressBook);
   d.qs("aside #darkmode").onClick(asideSwitchMode);
 
-  d.populateUL("network-items", "network-item-template", NetworkList);
+  const TEMPLATE = `<div>
+    <div data-code="{name}" class="circle {color}">{displayName}</div>
+  </div>`;
+  d.populateUL("network-items", TEMPLATE, NetworkList);
 
   //--init other pages
   d.onClickId("welcome-create-pass", welcomeCreatePassClicked);
@@ -322,13 +325,21 @@ async function initPopup() {
   return Pages.show();
 }
 
+let refreshing: boolean = false;
 function autoRefresh() {
-  //console.log(`Calling auto-refresh, selectedAccountData ${selectedAccountData} d.activePage ${d.activePage}`);
-  if (d.activePage == "account-list-main") {
-    refreshAllAccounts();
+  if (refreshing) return;
+  try {
+    refreshing = true
+    //console.log(`Calling auto-refresh, selectedAccountData ${selectedAccountData} d.activePage ${d.activePage}`);
+    if (d.activePage == "account-list-main") {
+      refreshAllAccounts();
+    }
+    else if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
+      refreshSelectedAccountAndAssets(true);
+    }
   }
-  else if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
-    refreshSelectedAccountAndAssets(true);
+  finally {
+    refreshing = false
   }
 }
 

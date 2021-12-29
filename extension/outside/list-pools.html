@@ -9,35 +9,39 @@
 </head>
 
 <body>
-<header>
-    <h1>Staking Pools List - <span id="net-name"></span></h1>
-    <hr>
-</header>
-<div class="content">
-    <ul id="list" class="list">
-        <li id="item-template" class="hidden" data-id="{name}">
-            <div class="name">{name}</div>
-            <div class="stake balance">Stake: {stake}</div>
-            <div class="block production">Block Production: {uptime}%</div>
-            <div class="slashed">Slashed? {slashed}</div>
-            <div class="fee-line">
-                <span class="fee">Fee: <span id="{name}-fee">?</span>%</span>
+    <header>
+        <h1>Staking Pools List - <span id="net-name"></span></h1>
+        <hr>
+    </header>
+    <div class="content">
+        <ul id="list" class="list">
+        </ul>
+    </div>
+    <footer>
+        <!-- -->
+        <div id="err-div"></div>
+        <!-- -->
+        <div id="wait">
+            <div class="lds-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
             </div>
-            <button class="select small hidden">Copy to clip</button>
-        </li>
-    </ul>
-</div>
-<footer>
-    <!-- -->
-    <div id="err-div"></div>
-    <!-- -->
-<div id="wait">
-	<div class="lds-ring"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-</div>
-</footer>
+        </div>
+    </footer>
 
-<script src="../bundled-libs.js"></script>
-<script type="module" src="../dist/outside/list-pools.js"></script>
+    <script src="../bundled-libs.js"></script>
+    <script type="module" src="../dist/outside/list-pools.js"></script>
 
 </body>
+
 </html>

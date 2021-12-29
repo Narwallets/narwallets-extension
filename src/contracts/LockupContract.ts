@@ -13,6 +13,7 @@ import { FunctionCall } from "../lib/near-api-lite/batch-transaction.js";
 
 import type { StakingPoolAccountInfoResult } from "./staking-pool.js";
 import { encodeHex, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
+import { activeNetworkInfo } from "../index.js";
 
 
 const BASE_GAS = 25;
@@ -36,19 +37,17 @@ export class LockupContract {
     return `${hex.slice(0, 40)}`;
   }
 
-  static async getLockupSuffix() {
-    const networkInfo = await askBackgroundGetNetworkInfo()
-    const rootAccount = networkInfo.rootAccount
+  static getLockupSuffix() {
     //HACK to test lockup contracts in testnet - until core developers provide a way to
     //create xxx.lockup.testnet accounts- we use .lockupy.testnet, that we created
-    const lockupSuffix = (rootAccount == "testnet" ? "lockupy" : "lockup")
-    return "." + lockupSuffix + "." + rootAccount;
+    const lockupSuffix = (activeNetworkInfo.name == "testnet" ? "lockupy" : "lockup")
+    return "." + lockupSuffix + "." + activeNetworkInfo.rootAccount;
   }
 
   async computeContractAccount() {
     const owner = this.accountInfo.ownerId
     if (!owner) throw Error("missing accountInfo.ownerId")
-    const suffix = await LockupContract.getLockupSuffix()
+    const suffix = LockupContract.getLockupSuffix()
     if (owner.endsWith(suffix)) throw Error("use the owner account Id to init a lockup contract instance")
     const hexName = await LockupContract.hexContractAccountAsync(owner)
     this.contractAccount = hexName + suffix;

@@ -10,7 +10,7 @@ import {
 } from "./util.js";
 import { showErr } from "../util/document.js";
 import { Account } from "./account.js"; //required for SecureState declaration
-import { askBackground } from "../background/askBackground.js";
+import { askBackground, askBackgroundViewMethod } from "../background/askBackground.js";
 import { log } from "../lib/log.js";
 
 import * as clite from "../lib/crypto-lite/crypto-primitives-browser.js";
@@ -29,6 +29,8 @@ import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import type { StateStruct } from "./state-type.js";
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 import { GContact } from "./Contact.js";
+import { activeNetworkInfo } from "../index.js";
+import { yton } from "../util/conversions.js";
 
 //---- GLOBAL STATE ----
 
@@ -304,3 +306,37 @@ export async function calculateDollarValue() {
     console.log(ex);
   }
 }
+
+export let stNEARPrice: number = 1;
+const FETCH_INTERVAL_MS = 10 * 1000 * 60; // 10 minutes in milliseconds
+let lastFetched = new Date().getTime() - FETCH_INTERVAL_MS;
+export async function getStNEARPrice(): Promise<number> {
+  if (new Date().getTime() - lastFetched <= FETCH_INTERVAL_MS) {
+    try {
+      const metapool = activeNetworkInfo.liquidStakingContract;
+      let data = await askBackgroundViewMethod(
+        metapool,
+        "get_contract_state",
+        {});
+      stNEARPrice = yton(data.st_near_price)
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
+  return stNEARPrice;
+}
+
+export const ASSET_HISTORY_TEMPLATE = `
+  <div data-id="{key}">
+    <div class="history-line">
+      <div class="history-icon">{icon}</div>
+      <div class="history-type">{type}&nbsp;
+        <span class="history-contract-id">{destination}</span>
+      </div>
+      <div class="history-date">{date}</div>
+      <div class="history-amount">{amount}</div>
+      <div class="history-fiat"></div>
+    </div>
+  </div>
+`;
+
