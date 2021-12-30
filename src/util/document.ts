@@ -401,7 +401,6 @@ export function appendTemplate(
   const newLI = document.createElement(elType) as HTMLLIElement;
   const domParser = new DOMParser().parseFromString(templateHtml, 'text/html');
   const templateElem = domParser.documentElement.querySelector('body')?.firstChild as HTMLElement;
-  //const templateElem = byId(templateId);
   if (!templateElem)
     console.error("appendTemplate, template cant be parsed");
   //-- if data-id has value, set it

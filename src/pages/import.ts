@@ -88,11 +88,11 @@ function importExistingAccount() {
 
 function displayAccountInfoAt(
   containerId: string,
-  templateId: string,
+  templateHtml: string,
   extendedAccountData: ExtendedAccountData
 ) {
   d.clearContainer(containerId);
-  d.appendTemplate("DIV", containerId, templateId, extendedAccountData);
+  d.appendTemplate("DIV", containerId, templateHtml, extendedAccountData);
 
   const container = new d.El("#" + containerId);
   // if (extendedAccountData.accountInfo.stakingPool) {
@@ -118,10 +118,22 @@ async function searchTheAccountName(accName: string) {
     lastSearchResult.mainAccountName = accName;
     lastSearchResult.mainAccount = mainAccInfo;
 
+    const TEMPLATE = `
+    <div class="account-info flex-labeled-container">
+      <div id="account-line" class="flex-labeled-row small-labels">
+        <div class="nameresult">{name}</div>
+        <div class="balanceresult balance">{accountInfo.lastBalance}</div>
+      </div>
+      <div id="staking-pool-info-line" class="flex-labeled-row small-labels hidden">
+        <div class="nameresult">At Pool {accountInfo.stakingPool}</div>
+        <div class="balanceresult balance">{inThePool}</div>
+      </div>
+    </div>
+    `;
     const mainExtData = new ExtendedAccountData(accName, mainAccInfo);
     displayAccountInfoAt(
       "searched-account-info",
-      "search-info-account-template",
+      TEMPLATE,
       mainExtData
     );
     accountSearchResults.show();
@@ -140,7 +152,7 @@ async function searchTheAccountName(accName: string) {
       );
       displayAccountInfoAt(
         "searched-lockup-account-info",
-        "search-info-account-template",
+        TEMPLATE,
         lockupExtData
       );
       searchedLockupInfo.show();
@@ -150,7 +162,7 @@ async function searchTheAccountName(accName: string) {
       await searchThePools(mainExtData);
       displayAccountInfoAt(
         "searched-account-info",
-        "search-info-account-template",
+        TEMPLATE,
         mainExtData
       );
       //Note: the lockupContract knows how much it has staked, no need to search the pools to get total balance
@@ -217,7 +229,7 @@ async function importClicked(ev: Event) {
   if (!importedMain) couldNotImport = true;
 
   if (lastSearchResult.lockupContract) {
-    lastSearchResult.lockupContract.accountInfo.note ="owner: " + lastSearchResult.lockupContract.accountInfo.ownerId
+    lastSearchResult.lockupContract.accountInfo.note = "owner: " + lastSearchResult.lockupContract.accountInfo.ownerId
     const importedLc = await importIfNew(
       "Lockup Contract",
       lastSearchResult.lockupContract.contractAccount,

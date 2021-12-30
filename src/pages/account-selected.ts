@@ -246,23 +246,26 @@ export async function usdPriceReady() {
   const elems = d.all(".accountdetsfiat")
   elems.innerText = c.toStringDec(selectedAccountData.totalUSD, 2);
   elems.show()
-  let assetUsdValue = undefined;
-  if (Pages.lastSelectedAsset.symbol == "STNEAR") {
-    const stNEARPrice = await getStNEARPrice()
-    assetUsdValue = Pages.lastSelectedAsset.balance * stNEARPrice * nearDollarPrice;
-  }
-  else if (Pages.lastSelectedAsset.symbol == "STAKED"
-    || Pages.lastSelectedAsset.symbol == "UNSTAKED"
-    || Pages.lastSelectedAsset.symbol == "wNEAR"
-  ) {
-    assetUsdValue = Pages.lastSelectedAsset.balance * nearDollarPrice;
-  }
-  if (assetUsdValue != undefined) {
-    const elems = d.all(".asset_in_usd")
-    elems.innerText = c.toStringDec(assetUsdValue, 2) + " usd";
-    elems.show()
+  if (Pages.lastSelectedAsset) {
+    let assetUsdValue = undefined;
+    if (Pages.lastSelectedAsset.symbol == "STNEAR") {
+      const stNEARPrice = await getStNEARPrice()
+      assetUsdValue = Pages.lastSelectedAsset.balance * stNEARPrice * nearDollarPrice;
+    }
+    else if (Pages.lastSelectedAsset.symbol == "STAKED"
+      || Pages.lastSelectedAsset.symbol == "UNSTAKED"
+      || Pages.lastSelectedAsset.symbol == "wNEAR"
+    ) {
+      assetUsdValue = Pages.lastSelectedAsset.balance * nearDollarPrice;
+    }
+    if (assetUsdValue != undefined) {
+      const elems = d.all(".asset_in_usd")
+      elems.innerText = c.toStringDec(assetUsdValue, 2) + " usd";
+      elems.show()
+    }
   }
 }
+
 
 function selectFirstTab() {
   stakeTabSelected = 1;

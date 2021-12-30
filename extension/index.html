@@ -765,52 +765,6 @@
 		</div>
 		<!--#endregion -->
 
-
-		<!--#region AddressBook-->
-
-		<div class="subpage hidden" id="addressBook-subpage">
-
-			<div class="wrapper">
-
-				<input class="radio one" id="address-book" name="address-book-contacts" type="radio" checked>
-
-
-				<div class="tabs">
-					<label class="tab one" id="one-tab-address" for="address-book">Account Address Book</label>
-				</div>
-
-				<div class="panels">
-
-					<div class="panel one">
-
-						<div id="contact-list"> </div>
-
-						<div id="contact-item-template" class="hidden contact-item" data-id="{key}">
-							<div class="accountdetsassets">
-								<div class="accountasseticon">{accountId}</div>
-								<span class="accountassetcoin">{alias}</span>
-								<button class="button send" id="send-to-this-contact"></button>
-								<button class="button more" id="remove-this-contact"></button>
-
-							</div>
-						</div>
-
-						<!-- <div class="accountlistitem">
-							<div class="accountlistname">{name}</div>
-							<div class="accountlistcomment">{accountInfo.note}</div>
-						</div> -->
-
-
-					</div>
-
-				</div>
-
-			</div>
-
-		</div>
-
-		<!--#endregion -->
-
 		<!--extra div -->
 		<div class="subpage hidden"></div>
 
@@ -941,18 +895,6 @@
 				</div>
 			</div>
 
-
-			<!-- Template -->
-			<div id="search-info-account-template" class="hidden account-info flex-labeled-container">
-				<div id="account-line" class="flex-labeled-row small-labels">
-					<div class="nameresult">{name}</div>
-					<div class="balanceresult balance">{accountInfo.lastBalance}</div>
-				</div>
-				<div id="staking-pool-info-line" class="flex-labeled-row small-labels hidden">
-					<div class="nameresult">At Pool {accountInfo.stakingPool}</div>
-					<div class="balanceresult balance">{inThePool}</div>
-				</div>
-			</div>
 
 			<button id="import" class="big hidden">
 				Import Account into this Wallet
