@@ -3,9 +3,11 @@ import * as d from "./document.js";
 const POPUP_LIST_APPFACE = "popup-list-appface"
 const POPUP_LIST = "popup-list"
 
-d.onClickId(POPUP_LIST_APPFACE, closePopupList)
-
 export type PopupItem = { text: string, value: string }
+
+export function initPopupHandlers(){
+    d.onClickId(POPUP_LIST_APPFACE, closePopupList)
+}
 
 export async function populatePopupList(items: PopupItem[]) {
     var options = "";

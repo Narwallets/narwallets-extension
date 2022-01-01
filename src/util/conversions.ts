@@ -41,8 +41,8 @@ export function ytonStringMin(yoctos: string): string {
  */
 export function ytond(yoctos: string, decimals: number): number {
     try {
-        const just5dec = ytonFullD(yoctos, decimals).slice(0, -decimals + 5)
-        return Number(just5dec) // truncated to 4 decimals 
+        const withDecString = ytonFullD(yoctos, decimals).slice(0, -decimals + 5)
+        return Number(withDecString) 
     }
     catch (ex) {
         console.log("ERR: yton(", yoctos, ")", ex)

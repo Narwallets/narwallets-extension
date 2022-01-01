@@ -31,6 +31,8 @@ import {
   assetUpdateBalance,
   assetUpdateMetadata,
   asyncRefreshAccountInfoLastBalance,
+  findAssetIndex,
+  findAsset,
 } from "../data/account.js";
 import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/util.js";
 import {
@@ -47,6 +49,7 @@ import {
   askBackgroundSetAccount,
   askBackgroundViewMethod,
   askBackgroundGetState,
+  askBackgroundGetAccountRecordCopy,
 } from "../background/askBackground.js";
 import {
   BatchTransaction,
@@ -80,11 +83,13 @@ import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/Contact.js";
 import {
   LIQUID_STAKE_DEFAULT_SVG,
+  RECEIVE_SVG,
   SEND_SVG,
   STAKE_DEFAULT_SVG,
   STNEAR_SVG,
   TOKEN_DEFAULT_SVG,
   UNSTAKE_DEFAULT_SVG,
+  WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { activeNetworkInfo } from "../index.js";
@@ -163,7 +168,7 @@ function initPage() {
   d.onClickId("add-note", addNoteClicked);
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
-  d.onClickId("search-pools", searchPoolsButtonClicked);
+  d.onClickId("search-pools", searchMoreAssetsButtonClicked);
   d.onClickId("address-book-button", showAddressBook);
 
   d.onClickId("refresh-button", refreshSelectedAcc);
@@ -176,10 +181,10 @@ function initPage() {
   d.onClickId("show-password-request", showPassword);
 
   seedTextElem = new d.El("#seed-phrase");
-  removeButton = new d.El("button#remove");
+  removeButton = new d.El("button#remove"); // remove priv-key or account
 
   OkCancelInit();
-  removeButton.onClick(removeAccountClicked);
+  removeButton.onClick(removeAccountClicked); // remove priv-key or account
 
   var target = document.querySelector("#usd-price-link");
   target?.addEventListener("usdPriceReady", usdPriceReady);
@@ -212,25 +217,23 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
 
   updateAccountHeaderDOM();
 
-  selectedAccountData.accountInfo.assets.forEach(async (asset) => {
-    await assetUpdateBalance(asset, selectedAccountData.name)
+  for (let asset of selectedAccountData.accountInfo.assets) {
     if (fromTimer) {
+      await assetUpdateBalance(asset, selectedAccountData.name)
       // update balance on-screen
-      let index = selectedAccountData.findAssetIndex(asset.contractId, asset.symbol);
+      let index = findAssetIndex(selectedAccountData.accountInfo, asset.contractId, asset.symbol);
       if (index >= 0) {
         try {
           d.qs(`#assets-list #index-${index} .accountassetbalance`).innerText =
             c.toStringDec(asset.balance);
-        } catch {
-          //ignore
+        } catch (ex) {
+          console.log(asset, selectedAccountData.name, `#assets-list #index-${index} .accountassetbalance`, ex)
         }
       }
     }
-  });
+  };
 
   showSelectedAccount(fromTimer);
-
-  await saveSelectedAccount(); //save
 
 }
 
@@ -242,6 +245,7 @@ async function refreshSelectedAcc() {
 }
 
 export async function usdPriceReady() {
+  if (selectedAccountData == undefined) return;
   selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
   const elems = d.all(".accountdetsfiat")
   elems.innerText = c.toStringDec(selectedAccountData.totalUSD, 2);
@@ -393,17 +397,12 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
   return item;
 }
 
-export function getAccountRecord(accName: string): Promise<Account> {
-  return askBackground({
-    code: "get-account",
-    accountId: accName,
-  });
-}
-
 async function selectAndShowAccount(accName: string) {
-  const accInfo = await getAccountRecord(accName);
+  const accInfo = await askBackgroundGetAccountRecordCopy(accName);
   if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
 
+  // get balance from chain
+  await asyncRefreshAccountInfoLastBalance(accName, accInfo);
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Pages.setLastSelectedAccount(selectedAccountData);
 
@@ -465,14 +464,14 @@ function updateAccountHeaderDOM() {
 
 function showSelectedAccount(fromTimer?: boolean) {
 
+  //make sure available is up to date before displaying
+  selectedAccountData.recomputeTotals()
+
   // if "fromTimer" only update data in-place(do not rebuild the DOM components)
   if (fromTimer) {
     updateAccountHeaderDOM();
     return;
   }
-
-  //make sure available is up to date before displaying
-  selectedAccountData = new ExtendedAccountData(selectedAccountData.name, selectedAccountData.accountInfo)
 
   const SELECTED_ACCOUNT = "selected-account";
   const TEMPLATE = `
@@ -537,7 +536,7 @@ export async function accountHasPrivateKey(): Promise<boolean> {
     if (!selectedAccountData.accountInfo.ownerId) {
       throw Error("Owner is unknown. Try importing the owner account");
     }
-    const ownerInfo = await getAccountRecord(
+    const ownerInfo = await askBackgroundGetAccountRecordCopy(
       selectedAccountData.accountInfo.ownerId
     );
     if (!ownerInfo) throw Error("The owner account is not in this wallet");
@@ -692,6 +691,9 @@ function popupListItemClicked(text: string, value: string) {
 }
 
 //----------------------
+/**
+ * Send NEAR native coin, pre-confirmation
+ */
 async function sendOKClicked() {
   try {
     //validate
@@ -736,6 +738,48 @@ async function sendOKClicked() {
 }
 
 //----------------------
+/**
+ * Send NEAR native execute
+ */
+async function performSend() {
+  try {
+    const toAccName = d.byId("send-confirmation-receiver").innerText;
+    const amountToSend = c.toNum(d.byId("send-confirmation-amount").innerText);
+
+    disableOKCancel();
+    d.showWait();
+
+    await askBackgroundTransferNear(
+      selectedAccountData.name,
+      toAccName,
+      c.ntoy(amountToSend)
+    );
+    // Note: The popup window & process can be terminated by chrome while waiting,
+    // if the user clicks elsewhere in the page.
+    // You can not rely on the code below being executed
+
+    // re-select, get new history from background, refresh balances, render data
+    await selectAndShowAccount(selectedAccountData.name);
+
+    // if dest account is in the wallet, refresh balance too
+    const destAccInfo = await askBackgroundGetAccountRecordCopy(toAccName);
+    if (destAccInfo) {
+      // refresh dest account balance from chain - do not await for it
+      asyncRefreshAccountInfoLastBalance(toAccName, destAccInfo);
+    }
+
+    d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
+    await accountCheckContactList(toAccName);
+  }
+  catch (ex) {
+    d.showErr(ex.message);
+  }
+  finally {
+    d.hideWait();
+    enableOKCancel();
+  }
+}
+//----------------------
 async function performLockupContractSend() {
   try {
     disableOKCancel();
@@ -744,7 +788,7 @@ async function performLockupContractSend() {
     const info = selectedAccountData.accountInfo;
     if (!info.ownerId) throw Error("unknown ownerId");
 
-    const owner = await getAccountRecord(info.ownerId);
+    const owner = await askBackgroundGetAccountRecordCopy(info.ownerId);
     if (!owner.privateKey) {
       throw Error("you need full access on " + info.ownerId);
     }
@@ -758,7 +802,7 @@ async function performLockupContractSend() {
 
     d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
 
-    displayReflectTransfer(amountToSend, toAccName);
+    //displayReflectTransfer(amountToSend, toAccName);
 
     await refreshSelectedAccountAndAssets();
 
@@ -1049,7 +1093,7 @@ async function performLockupContractStake() {
     const info = selectedAccountData.accountInfo;
     if (!info.ownerId) throw Error("unknown ownerId");
 
-    const owner = await getAccountRecord(info.ownerId);
+    const owner = await askBackgroundGetAccountRecordCopy(info.ownerId);
     if (!owner.privateKey) {
       throw Error("you need full access on " + info.ownerId);
     }
@@ -1069,10 +1113,10 @@ async function performLockupContractStake() {
     await lc.stakeWith(selectedAccountData, newStakingPool, amountText.replace(".", "")); //amount in yoctos
 
     selectedAccountData.accountInfo.history.push(
-      new History("STAKE", amountToStake, newStakingPool, STAKE_DEFAULT_SVG)
+      new History("STAKE", amountToStake, newStakingPool)
     )
 
-    let asset = selectedAccountData.findAsset(newStakingPool, "STAKED")
+    let asset = findAsset(selectedAccountData.accountInfo, newStakingPool, "STAKED")
     if (!asset) {
       asset = new Asset(
         newStakingPool,
@@ -1205,55 +1249,17 @@ async function performUnstake() {
 }
 
 
-function displayReflectTransfer(amountNear: number, dest: string) {
-  //sender and receiver .accountInfo.lastBalance are async updated and saved by background.ts function reflectTransfer()
-  //here we only refresh displayed account data
-  if (amountNear == 0) return;
-  selectedAccountData.accountInfo.lastBalance -= amountNear;
-  selectedAccountData.available -= amountNear;
-  selectedAccountData.total -= amountNear;
+// function displayReflectTransfer(amountNear: number, dest: string) {
+//   //sender and receiver .accountInfo.lastBalance are async updated and saved by background.ts function reflectTransfer()
+//   //here we only refresh displayed account data
+//   if (amountNear == 0) return;
+//   selectedAccountData.accountInfo.lastBalance -= amountNear;
+//   selectedAccountData.available -= amountNear;
+//   selectedAccountData.total -= amountNear;
 
-  showSelectedAccount();
-}
+//   showSelectedAccount();
+// }
 
-async function performSend() {
-  try {
-    const toAccName = d.byId("send-confirmation-receiver").innerText;
-    const amountToSend = c.toNum(d.byId("send-confirmation-amount").innerText);
-
-    disableOKCancel();
-    d.showWait();
-
-    await askBackgroundTransferNear(
-      selectedAccountData.name,
-      toAccName,
-      c.ntoy(amountToSend)
-    );
-
-    //TODO transaction history per network
-    //const transactionInfo={sender:sender, action:"transferred", amount:amountToSend, receiver:toAccName}
-    //global.state.transactions[Network.current].push(transactionInfo)
-
-    d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
-
-    selectedAccountData.accountInfo.history.unshift(
-      new History("send", amountToSend, toAccName)
-    );
-
-    displayReflectTransfer(amountToSend, toAccName);
-
-    await refreshSelectedAccountAndAssets();
-
-    await accountCheckContactList(toAccName);
-  }
-  catch (ex) {
-    d.showErr(ex.message);
-  }
-  finally {
-    d.hideWait();
-    enableOKCancel();
-  }
-}
 
 async function exploreButtonClicked() {
   localStorageSet({ reposition: "account", account: selectedAccountData.name });
@@ -1285,10 +1291,37 @@ type PoolInfo = {
   fee?: number;
 };
 //---------------------------------------------
-export async function searchThePools(exAccData: ExtendedAccountData) {
+export async function searchMoreAssets(exAccData: ExtendedAccountData) {
   let doingDiv;
   try {
-    doingDiv = d.showMsg("Searching Pools...", "info", -1);
+    doingDiv = d.showMsg("Searching Assets...", "info", -1);
+
+    // search tokens
+    for (let tokenOption of getKnownNEP141Contracts()) {
+      let resultBalanceYoctos;
+      try {
+        resultBalanceYoctos = await askBackgroundViewMethod(
+          tokenOption.value, "ft_balance_of", { account_id: exAccData.name }
+        );
+      } catch (ex) {
+        continue;
+      }
+
+      if (resultBalanceYoctos && resultBalanceYoctos != "0") {
+        let asset = findAsset(exAccData.accountInfo, tokenOption.value);
+        if (asset) {
+          assetSetBalanceYoctos(asset, resultBalanceYoctos)
+        } else {
+          // must create
+          let item = await newTokenFromMetadata(tokenOption.value)
+          let amount = assetSetBalanceYoctos(item, resultBalanceYoctos);
+          exAccData.accountInfo.assets.push(item);
+          d.showSuccess(
+            `Found! ${c.toStringDec(amount)} ${item.symbol}`
+          );
+        }
+      }
+    }
 
     let checked: Record<string, boolean> = {};
 
@@ -1336,11 +1369,7 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
 
             // has staked?
             if (c.yton(poolAccInfo.staked_balance) > 0) {
-              let asset =
-                // exAccData.accountInfo.assets.find(
-                //   (i) => i.contractId == pool.account_id && i.symbol == "STAKED"
-                // );
-                exAccData.findAsset(pool.account_id, "STAKED");
+              let asset = findAsset(exAccData.accountInfo, pool.account_id, "STAKED");
               if (asset) {
                 asset.balance = c.yton(poolAccInfo.staked_balance);
               } else {
@@ -1357,13 +1386,7 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
             }
             // has unstaked balance?
             if (c.yton(poolAccInfo.unstaked_balance) > 0) {
-              let asset =
-                // exAccData.accountInfo.assets.find(
-                //   (i) =>
-                //     i.contractId == pool.account_id && i.symbol == "UNSTAKED"
-                // );
-
-                exAccData.findAsset(pool.account_id, "UNSTAKED");
+              let asset = findAsset(exAccData.accountInfo, pool.account_id, "UNSTAKED");
               if (asset) {
                 asset.balance = c.yton(poolAccInfo.unstaked_balance);
               } else {
@@ -1383,32 +1406,6 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
       }
     }
 
-    // search tokens
-    for (let tokenOption of getKnownNEP141Contracts()) {
-      let resultBalanceYoctos;
-      try {
-        resultBalanceYoctos = await askBackgroundViewMethod(
-          tokenOption.value, "ft_balance_of", { account_id: exAccData.name }
-        );
-      } catch (ex) {
-        continue;
-      }
-
-      if (resultBalanceYoctos && resultBalanceYoctos != "0") {
-        let asset = exAccData.findAsset(tokenOption.value);
-        if (asset) {
-          assetSetBalanceYoctos(asset, resultBalanceYoctos)
-        } else {
-          // must create
-          let item = await newTokenFromMetadata(tokenOption.value)
-          let amount = assetSetBalanceYoctos(item, resultBalanceYoctos);
-          exAccData.accountInfo.assets.push(item);
-          d.showSuccess(
-            `Found! ${c.toStringDec(amount)} ${item.symbol}`
-          );
-        }
-      }
-    }
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1417,11 +1414,12 @@ export async function searchThePools(exAccData: ExtendedAccountData) {
 }
 
 //-------------------------------
-async function searchPoolsButtonClicked() {
+async function searchMoreAssetsButtonClicked() {
   d.showWait();
   try {
-    await searchThePools(selectedAccountData);
-    await refreshSelectedAccountAndAssets();
+    await searchMoreAssets(selectedAccountData)
+    await saveSelectedAccount()
+    await refreshSelectedAccountAndAssets()
   } finally {
     d.hideWait();
   }
@@ -1613,20 +1611,13 @@ async function AccountDeleteOKClicked() {
       new DeleteAccountToBeneficiary(beneficiary),
       selectedAccountData.name
     );
-
-    //remove from wallet
-    await askBackground({
-      code: "remove-account",
-      accountId: selectedAccountData.name,
-    });
-    //console.log("remove-account sent ",selectedAccountData.name)
-    // avoid reposition on removed account
-    await localStorageGetAndRemove("account");
-    //return to accounts page
-    await AccountPages_show();
-
     d.showSuccess("Account Deleted, remaining funds sent to " + beneficiary);
+
     hideOkCancel();
+
+    //remove record from wallet
+    await removeAccountRecord();
+
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1643,7 +1634,7 @@ async function AddPublicKeyToLockupOKClicked() {
     //if (!newPubKey) throw Error("Enter the public key to add")
     const owner = selectedAccountData.accountInfo.ownerId;
     if (!owner) throw Error("Lockup account owner unknown");
-    const ownerAcc = await getAccountRecord(owner);
+    const ownerAcc = await askBackgroundGetAccountRecordCopy(owner);
     const privateKey = ownerAcc.privateKey;
     if (!privateKey) throw Error("Owner Account is Read-Only");
 
@@ -1758,7 +1749,7 @@ async function makeFullAccessOKClicked() {
     selectedAccountData.accountInfo.privateKey = secretKey;
     seedTextElem.value = "";
     await saveSelectedAccount();
-    selectAndShowAccount(selectedAccountData.name);
+    await selectAndShowAccount(selectedAccountData.name);
     d.showMsg("Seed Phrase is correct. Access granted", "success");
     showInitial();
     hideOkCancel();
@@ -1777,23 +1768,30 @@ function showInitial() {
   d.showSubPage("assets");
 }
 
+async function removeAccountRecord() {
+
+  //remove record
+  await askBackground({
+    code: "remove-account",
+    accountId: selectedAccountData.name,
+  });
+  // avoid reposition on removed account
+  await localStorageGetAndRemove("account");
+  //return to main page
+  await AccountPages_show();
+}
+
+// remove priv-key or account if it was read-only
 async function removeAccountClicked(ev: Event) {
   try {
     if (selectedAccountData.isFullAccess) {
       //has full access - remove access first
       changeAccessClicked();
-      return;
+    }
+    else {
+      removeAccountRecord();
     }
 
-    //remove
-    await askBackground({
-      code: "remove-account",
-      accountId: selectedAccountData.name,
-    });
-    // avoid reposition on removed account
-    await localStorageGetAndRemove("account");
-    //return to main page
-    await AccountPages_show();
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -1831,7 +1829,7 @@ export function historyWithIcons(base: History[]) {
   // set icons
   for (let item of base) {
     let data = Object.assign({}, item);
-    if (!data.icon.startsWith("<svg")) {
+    if (!data.icon || !data.icon.startsWith("<svg")) {
       switch (data.type) {
         case "unstake":
           data.icon = UNSTAKE_DEFAULT_SVG;
@@ -1841,6 +1839,9 @@ export function historyWithIcons(base: History[]) {
           break;
         case "send":
           data.icon = SEND_SVG;
+          break;
+        case "received":
+          data.icon = RECEIVE_SVG;
           break;
         case "liquid-stake":
         case "liquid-unstake":

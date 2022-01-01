@@ -1,7 +1,7 @@
 import * as c from "./conversions.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
-import { Account, asyncRefreshAccountInfoLastBalance } from "../data/account.js";
+import { Account, asyncRefreshAccountInfoLastBalance, newAccount } from "../data/account.js";
 import { askBackground, askBackgroundGetNetworkInfo } from "../background/askBackground.js";
 import { activeNetworkInfo } from "../index.js";
 
@@ -43,8 +43,7 @@ export async function checkIfAccountExists(accName: string): Promise<boolean> {
 
 export async function searchAccount(accName: string): Promise<Account> {
   checkNotLockup(accName);
-  let result = new Account(activeNetworkInfo.name);
-  await asyncRefreshAccountInfoLastBalance(accName, result);
-
-  return result;
+  let newAccInfo = newAccount(activeNetworkInfo.name);
+  await asyncRefreshAccountInfoLastBalance(accName, newAccInfo, false);
+  return newAccInfo;
 }

@@ -30,6 +30,13 @@ return new Promise((resolve, reject) => {
   });
 }
 
+export function askBackgroundGetAccountRecordCopy(accName: string): Promise<Account> {
+  return askBackground({
+    code: "get-account",
+    accountId: accName,
+  });
+}
+
 export function askBackgroundSetAccount(
   accountId: string,
   accInfo: Account

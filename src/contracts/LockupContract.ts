@@ -6,7 +6,7 @@ import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js"
 //import * as near from "../api/near-rpc.js";
 import * as StakingPool from "./staking-pool.js";
 //import * as TX from "../api/transaction.js";
-import { Account, ExtendedAccountData } from "../data/account.js"
+import { Account, ExtendedAccountData, removeAsset } from "../data/account.js"
 import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/valid.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../background/askBackground.js";
 import { FunctionCall } from "../lib/near-api-lite/batch-transaction.js";
@@ -141,8 +141,8 @@ export class LockupContract {
         await this.call_method("unselect_staking_pool", {}, c.TGas(BASE_GAS * 3))
 
         // remove assets (twice to cover STAKED and/or UNSTAKED)
-        lockupEAcc.removeAsset(this.contractAccount)
-        lockupEAcc.removeAsset(this.contractAccount)
+        removeAsset(lockupEAcc.accountInfo, this.contractAccount)
+        removeAsset(lockupEAcc.accountInfo, this.contractAccount)
         actualSP = ""
       }
     }

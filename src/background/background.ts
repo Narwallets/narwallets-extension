@@ -15,8 +15,11 @@ import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 import type {
   FunctionCall,
   DeleteAccountToBeneficiary,
+  Transfer,
 } from "../lib/near-api-lite/batch-transaction.js";
 import type { ResolvedMessage } from "../data/state-type.js";
+import { Asset, assetAddHistory, assetAmount, assetSetBalanceYoctos, findAsset, History } from "../data/account.js";
+import { box_nonceLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 
 //version: major+minor+version, 3 digits each
 function semver(major: number, minor: number, version: number): number {
@@ -27,9 +30,6 @@ const WALLET_VERSION = semver(2, 0, 0);
 //---------- working data
 let _connectedTabs: Record<number, ConnectedTabInfo> = {};
 let _bgDataRecovered: boolean;
-
-// if the transaction include attached near, store here to update acc balance async
-let global_NearsSent = { from: "", to: "", amount: "0" };
 
 //----------------------------------------
 //-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
@@ -69,11 +69,10 @@ function runtimeMessageHandler(
   } else {
     //from internal pages like popup
     //other codes resolved by promises
-    global_NearsSent = { from: "", to: "", amount: "0" };
     getActionPromise(msg)
       .then((data) => {
         //promise resolved OK
-        setTimeout(reflectTransfer, 200); //move amounts if accounts are in the wallet
+        reflectTransfer(msg); // add history entries, move amounts if accounts are in the wallet
         sendResponse({ data: data });
       })
       .catch((ex) => {
@@ -85,214 +84,323 @@ function runtimeMessageHandler(
   return true; //a prev callback could be pending.- always return true
 }
 
-//-- reflec transfer in wallet accounts
-function reflectTransfer() {
+function reflectReception(receiver: string, amount: number, sender: string) {
+  const accounts = global.SecureState.accounts[Network.current];
+  // is the dest-account also in this wallet?
+  const destAccount = accounts[receiver];
+  if (destAccount == undefined) return;
+  destAccount.lastBalance += amount
+  destAccount.history.unshift(new History("received", amount, sender))
+}
+
+//-- reflect transfer in wallet accounts
+// no async
+function reflectTransfer(msg: any) {
+  let modified = false;
   try {
-    if (global_NearsSent.amount == "0" || !global.SecureState) return;
-    let modified = false;
-    //check if sender is in this wallet
-    if (global_NearsSent.from && global.SecureState.accounts[Network.current]) {
-      const senderAccInfo =
-        global.SecureState.accounts[Network.current][global_NearsSent.from];
-      if (senderAccInfo) {
-        senderAccInfo.lastBalance -= c.yton(global_NearsSent.amount);
-        modified = true;
+    switch (msg.code) {
+      case "apply": {
+        // apply transaction request from popup
+        // {code:"apply", signerId:<account>, tx:BatchTransaction}
+        // when resolved, send msg to content-script->page
+        const accounts = global.SecureState.accounts[Network.current];
+        if (accounts == undefined) return;
+        const signerId = msg.signerId || "...";
+        for (let item of msg.tx.items) {
+          //convert action
+          switch (item.action) {
+            case "call":
+              const f = item as FunctionCall;
+              if (f.method == "ft_transfer" || f.method == "ft_transfer_call") {
+                const contract = msg.tx.receiver;
+                const sender = signerId;
+                const receiver = f.args.receiver_id
+                const amountY = f.args.amount;
+
+                const sourceAccount = accounts[sender];
+                if (sourceAccount == undefined) break;
+                // search the asset in the source-account
+                const sourceAsset = findAsset(sourceAccount, contract)
+                if (sourceAsset) {
+                  // if found, subtract amount from balance
+                  sourceAsset.balance -= assetAmount(sourceAsset, amountY);
+                  if (sourceAsset.balance < 0) sourceAsset.balance = 0;
+                  assetAddHistory(sourceAsset, "send", assetAmount(sourceAsset, amountY), receiver)
+                }
+
+                // is the dest-account also in this wallet?
+                const destAccount = accounts[receiver];
+                if (destAccount == undefined) break;
+                // search the asset in the dest-account
+                let destAsset = findAsset(destAccount, contract);
+                if (destAsset != undefined) {
+                  // if found, add amount to balance
+                  destAsset.balance += assetAmount(destAsset, amountY);
+                  //assetAddHistory(destAsset)
+                }
+                else if (sourceAsset != undefined) {
+                  // if not found, clone from sourceAsset
+                  destAsset = Asset.newFrom(sourceAsset)
+                  assetSetBalanceYoctos(destAsset, amountY);
+                  destAccount.assets.push(destAsset)
+                }
+                if (destAsset != undefined) {
+                  assetAddHistory(destAsset, "received", assetAmount(destAsset, amountY), sender)
+                }
+                modified = true;
+              }
+              break;
+
+            case "transfer": { // NEAR native
+              const sender = signerId;
+              const receiver = msg.tx.receiver;
+              const amountY = item.attached;
+
+              const sourceAccount = accounts[sender];
+              if (sourceAccount == undefined) break;
+              sourceAccount.lastBalance -= c.yton(amountY)
+              modified = true;
+              if (sourceAccount.lastBalance < 0) sourceAccount.lastBalance = 0;
+              sourceAccount.history.unshift(new History("send", c.yton(amountY), receiver))
+
+              reflectReception(receiver, c.yton(amountY), sender);
+            }
+              break;
+
+            // commented: amount can not be determined precisely
+            // case "delete": {
+            //   const d = item as DeleteAccountToBeneficiary;
+            //   const sender = signerId;
+            //   const sourceAccount = accounts[sender];
+            //   if (sourceAccount == undefined) break;
+            //   reflectReception(d.beneficiaryAccountId,c.yton(amountY),signerId);
+            //   actions.push(TX.deleteAccount());
+            // }
+            // break;
+
+            default:
+            // other item.action
+          }
+        }
       }
-    }
-    //check if receiver is also in this wallet
-    if (global_NearsSent.to && global.SecureState.accounts[Network.current]) {
-      const receiverAccInfo =
-        global.SecureState.accounts[Network.current][global_NearsSent.to];
-      if (receiverAccInfo) {
-        receiverAccInfo.lastBalance += c.yton(global_NearsSent.amount);
-        modified = true;
+      default: {
+        //throw Error(`invalid msg.code ${JSON.stringify(msg)}`);
       }
-    }
-    if (modified) {
-      global.saveSecureState();
     }
   } catch (ex) {
-    log(ex.message);
+    console.error(ex);
+  }
+  if (modified) {
+    global.saveSecureState();
   }
 }
 
 //create a promise to resolve the action requested by the popup
 function getActionPromise(msg: Record<string, any>): Promise<any> {
   try {
-    if (msg.code == "set-network") {
-      Network.setCurrent(msg.network);
-      localStorageSet({ selectedNetwork: Network.current });
-      return Promise.resolve(Network.currentInfo());
-    } else if (msg.code == "get-network-info") {
-      return Promise.resolve(Network.currentInfo());
-    } else if (msg.code == "get-state") {
-      return Promise.resolve(global.State);
-    } else if (msg.code == "lock") {
-      global.lock(JSON.stringify(msg));
-      return Promise.resolve();
-    } else if (msg.code == "is-locked") {
-      return Promise.resolve(global.isLocked());
-    } else if (msg.code == "unlockSecureState") {
-      return global.unlockSecureStateAsync(msg.email, msg.password);
-    } else if (msg.code == "create-user") {
-      return global.createUserAsync(msg.email, msg.password);
-    } else if (msg.code == "change-password") {
-      return global.changePasswordAsync(msg.email, msg.password)
-    } else if (msg.code == "set-options") {
-      global.SecureState.advancedMode = msg.advancedMode;
-      global.SecureState.autoUnlockSeconds = msg.autoUnlockSeconds;
-      global.saveSecureState();
-      return Promise.resolve();
-    } else if (msg.code == "get-options") {
-      return Promise.resolve({
-        advancedMode: global.SecureState.advancedMode,
-        autoUnlockSeconds: global.SecureState.autoUnlockSeconds,
-      });
-    } else if (msg.code == "get-account") {
-      if (!global.SecureState.accounts[Network.current]) {
-        return Promise.resolve(undefined);
+    switch (msg.code) {
+      case "set-network": {
+        Network.setCurrent(msg.network);
+        localStorageSet({ selectedNetwork: Network.current });
+        return Promise.resolve(Network.currentInfo());
       }
-      return Promise.resolve(
-        global.SecureState.accounts[Network.current][msg.accountId]
-      );
-    } else if (msg.code == "set-account") {
-      if (!msg.accountId) return Promise.reject(Error("!msg.accountId"));
-      if (!msg.accInfo) return Promise.reject(Error("!msg.accInfo"));
-      if (!global.SecureState.accounts[msg.accInfo.network]) {
-        global.SecureState.accounts[msg.accInfo.network] = {};
+      case "get-network-info": {
+        return Promise.resolve(Network.currentInfo());
       }
-      if (!msg.accInfo.network) {
-        console.log("Account without network. ", JSON.stringify(msg.accInfo))
-      } else {
-        global.SecureState.accounts[msg.accInfo.network][msg.accountId] = msg.accInfo;
-        global.saveSecureState();
+      case "get-state": {
+        return Promise.resolve(global.State);
       }
-      return Promise.resolve();
-    } else if (msg.code == "add-contact") {
-      if (!msg.name) return Promise.reject(Error("!msg.name"));
-      if (!global.SecureState.contacts) global.SecureState.contacts = {};
-      if (!global.SecureState.contacts[Network.current]) {
-        global.SecureState.contacts[Network.current] = {};
+      case "lock": {
+        global.lock(JSON.stringify(msg));
+        return Promise.resolve();
       }
-      global.SecureState.contacts[Network.current][msg.name] = msg.contact;
-      global.saveSecureState();
-      return Promise.resolve();
-    } else if (msg.code == "set-account-order") {
-      //whe the user reorders the account list
-      try {
-        let accInfo = global.getAccount(msg.accountId);
-        accInfo.order = msg.order;
+      case "is-locked": {
+        return Promise.resolve(global.isLocked());
+      }
+      case "unlockSecureState": {
+        return global.unlockSecureStateAsync(msg.email, msg.password);
+      }
+      case "create-user": {
+        return global.createUserAsync(msg.email, msg.password);
+      }
+      case "change-password": {
+        return global.changePasswordAsync(msg.email, msg.password)
+      }
+      case "set-options": {
+        global.SecureState.advancedMode = msg.advancedMode;
+        global.SecureState.autoUnlockSeconds = msg.autoUnlockSeconds;
         global.saveSecureState();
         return Promise.resolve();
-      } catch (ex) {
-        return Promise.reject(ex);
       }
-    } else if (msg.code == "remove-account") {
-      delete global.SecureState.accounts[Network.current][msg.accountId];
-      //persist
-      global.saveSecureState();
-      return Promise.resolve();
-    } else if (msg.code == "getNetworkAccountsCount") {
-      return Promise.resolve(global.getNetworkAccountsCount());
-    } else if (msg.code == "all-address-contacts") {
-      let result;
-      if (!global.SecureState.contacts) {
-        result = {};
-      } else {
-        result = global.SecureState.contacts[Network.current];
+      case "get-options": {
+        return Promise.resolve({
+          advancedMode: global.SecureState.advancedMode,
+          autoUnlockSeconds: global.SecureState.autoUnlockSeconds,
+        });
       }
-      return Promise.resolve(result || {});
-    } else if (msg.code == "all-network-accounts") {
-      const result = global.SecureState.accounts[Network.current];
-      return Promise.resolve(result || {});
-    } else if (msg.code == "connect") {
-      if (!msg.network) msg.network = Network.current;
-      return connectToWebPage(msg.accountId, msg.network);
-    } else if (msg.code == "disconnect") {
-      return disconnectFromWebPage();
-    } else if (msg.code == "isConnected") {
-      return isConnected();
-    } else if (msg.code == "get-validators") {
-      //view-call request
-      return near.getValidators();
-    } else if (msg.code == "access-key") {
-      //check acess-key exists and get nonce
-      return near.access_key(msg.accountId, msg.publicKey);
-    } else if (msg.code == "query-near-account") {
-      //check acess-key exists and get nonce
-      return near.queryAccount(msg.accountId);
-    } else if (msg.code == "view") {
-      //view-call request
-      return near.view(msg.contract, msg.method, msg.args);
-    } else if (msg.code == "set-address-book") {
-      if (!msg.accountId) return Promise.reject(Error("!msg.accountId"));
-      if (!global.SecureState.contacts[Network.current]) global.SecureState.contacts[Network.current] = {};
-      global.SecureState.contacts[Network.current][msg.accountId] = msg.contact;
-      global.saveSecureState();
-      return Promise.resolve();
-    } else if (msg.code == "remove-address") {
-      delete global.SecureState.contacts[Network.current][msg.accountId];
-      //persist
-      global.saveSecureState();
-      return Promise.resolve();
-    } else if (msg.code == "apply") {
-      //apply transaction request from popup
-      //{code:"apply", signerId:<account>, tx:BatchTransction}
-      //when resolved, send msg to content-script->page
-      const signerId = msg.signerId || "...";
-      const accInfo = global.getAccount(signerId);
-      if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);
-      //convert wallet-api actions to near.TX.Action
-      const actions: TX.Action[] = [];
-      for (let item of msg.tx.items) {
-        //convert action
-        switch (item.action) {
-          case "call":
-            const f = item as FunctionCall;
-            actions.push(
-              TX.functionCall(
-                f.method,
-                f.args,
-                BigInt(f.gas),
-                BigInt(f.attached)
-              )
-            );
-            global_NearsSent = {
-              from: signerId,
-              to: msg.tx.receiver,
-              amount: f.attached,
-            };
-            break;
-          case "transfer":
-            actions.push(TX.transfer(BigInt(item.attached)));
-            global_NearsSent = {
-              from: signerId,
-              to: msg.tx.receiver,
-              amount: item.attached,
-            };
-            break;
-          case "delete":
-            const d = item as DeleteAccountToBeneficiary;
-            actions.push(TX.deleteAccount(d.beneficiaryAccountId));
-            break;
-          default:
-            throw Error("batchTx UNKNOWN item.action=" + item.action);
+      case "get-account": {
+        if (!global.SecureState.accounts[Network.current]) {
+          return Promise.resolve(undefined);
+        }
+        return Promise.resolve(
+          global.SecureState.accounts[Network.current][msg.accountId]
+        );
+      }
+      case "set-account": {
+        if (!msg.accountId) return Promise.reject(Error("!msg.accountId"));
+        if (!msg.accInfo) return Promise.reject(Error("!msg.accInfo"));
+        if (!msg.accInfo.network) {
+          console.log("Account without network. ", JSON.stringify(msg.accInfo))
+        } else {
+          if (!global.SecureState.accounts[msg.accInfo.network]) {
+            global.SecureState.accounts[msg.accInfo.network] = {};
+          }
+          global.SecureState.accounts[msg.accInfo.network][msg.accountId] = msg.accInfo;
+          global.saveSecureState();
+        }
+        return Promise.resolve();
+      }
+      case "add-contact": {
+        if (!msg.name) return Promise.reject(Error("!msg.name"));
+        if (!global.SecureState.contacts) global.SecureState.contacts = {};
+        if (!global.SecureState.contacts[Network.current]) {
+          global.SecureState.contacts[Network.current] = {};
+        }
+        global.SecureState.contacts[Network.current][msg.name] = msg.contact;
+        global.saveSecureState();
+        return Promise.resolve();
+      }
+      case "set-account-order": {
+        //whe the user reorders the account list
+        try {
+          let accInfo = global.getAccount(msg.accountId);
+          accInfo.order = msg.order;
+          global.saveSecureState();
+          return Promise.resolve();
+        } catch (ex) {
+          return Promise.reject(ex);
         }
       }
-      //returns the Promise required to complete this action
-      return near.broadcast_tx_commit_actions(
-        actions,
-        signerId,
-        msg.tx.receiver,
-        accInfo.privateKey || ""
-      );
+      case "remove-account": {
+        if (msg.accountId) {
+          delete global.SecureState.accounts[Network.current][msg.accountId];
+        }
+        //persist
+        global.saveSecureState();
+        return Promise.resolve();
+      }
+      case "getNetworkAccountsCount": {
+        return Promise.resolve(global.getNetworkAccountsCount());
+      }
+      case "all-address-contacts": {
+        let result;
+        if (!global.SecureState.contacts) {
+          result = {};
+        } else {
+          result = global.SecureState.contacts[Network.current];
+        }
+        return Promise.resolve(result || {});
+      }
+      case "all-network-accounts": {
+        const result = global.SecureState.accounts[Network.current];
+        return Promise.resolve(result || {});
+      }
+      case "connect": {
+        if (!msg.network) msg.network = Network.current;
+        return connectToWebPage(msg.accountId, msg.network);
+      }
+      case "disconnect": {
+        return disconnectFromWebPage();
+      }
+      case "isConnected": {
+        return isConnected();
+      }
+      case "get-validators": {
+        //view-call request
+        return near.getValidators();
+      }
+      case "access-key": {
+        //check access-key exists and get nonce
+        return near.access_key(msg.accountId, msg.publicKey);
+      }
+      case "query-near-account": {
+        //check access-key exists and get nonce
+        return near.queryAccount(msg.accountId);
+      }
+      case "view": {
+        //view-call request
+        return near.view(msg.contract, msg.method, msg.args);
+      }
+      case "set-address-book": {
+        if (!msg.accountId) return Promise.reject(Error("!msg.accountId"));
+        if (!global.SecureState.contacts[Network.current]) global.SecureState.contacts[Network.current] = {};
+        global.SecureState.contacts[Network.current][msg.accountId] = msg.contact;
+        global.saveSecureState();
+        return Promise.resolve();
+      }
+      case "remove-address": {
+        delete global.SecureState.contacts[Network.current][msg.accountId];
+        //persist
+        global.saveSecureState();
+        return Promise.resolve();
+      }
+      case "apply": {
+        //apply transaction request from popup
+        //{code:"apply", signerId:<account>, tx:BatchTransaction}
+        //when resolved, send msg to content-script->page
+        const signerId = msg.signerId || "...";
+        const accInfo = global.getAccount(signerId);
+        if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);
+        //convert wallet-api actions to near.TX.Action
+        const actions: TX.Action[] = [];
+        for (let item of msg.tx.items) {
+          //convert action
+          switch (item.action) {
+            case "call":
+              const f = item as FunctionCall;
+              actions.push(
+                TX.functionCall(
+                  f.method,
+                  f.args,
+                  BigInt(f.gas),
+                  BigInt(f.attached)
+                )
+              );
+              break;
+            case "transfer":
+              actions.push(TX.transfer(BigInt(item.attached)));
+              break;
+            case "delete":
+              const d = item as DeleteAccountToBeneficiary;
+              actions.push(TX.deleteAccount(d.beneficiaryAccountId));
+              break;
+            default:
+              throw Error("batchTx UNKNOWN item.action=" + item.action);
+          }
+        }
+        //returns the Promise required to complete this action
+        return near.broadcast_tx_commit_actions(
+          actions,
+          signerId,
+          msg.tx.receiver,
+          accInfo.privateKey || ""
+        );
+      }
+      default: {
+        throw Error(`invalid msg.code ${JSON.stringify(msg)}`);
+      }
     }
-    //default
-    throw Error(`invalid msg.code ${JSON.stringify(msg)}`);
   } catch (ex) {
     return Promise.reject(ex);
   }
 }
+/*
+    selectedAccountData.accountInfo.history.unshift(
+  new History("send", amountToSend, toAccName)
+);
+ 
+*/
+
 
 //---------------------------------------------------
 //process msgs from web-page->content-script->here
@@ -331,12 +439,12 @@ async function processMessageFromWebPage(msg: any) {
 
   switch (msg.code) {
     case "connected":
-      ctinfo.aceptedConnection = !msg.err;
+      ctinfo.acceptedConnection = !msg.err;
       ctinfo.connectedResponse = msg;
       break;
 
     case "disconnect":
-      ctinfo.aceptedConnection = false;
+      ctinfo.acceptedConnection = false;
       break;
 
     case "get-account-balance":
@@ -458,7 +566,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
  * Tries to connect to web page. (CPS style)
  * There are several steps involved
  * 1. inject proxy-content-script
- * 2. wait for injected-proxy to open the contenScriptPort
+ * 2. wait for injected-proxy to open the contentScriptPort
  * 3. send "connect"
  * 4. check response from the page
  */
@@ -499,7 +607,7 @@ function connectToWebPage(accountId: string, network: string): Promise<any> {
       };
       log("activeTabId", cpsData);
       cpsData.ctinfo = _connectedTabs[cpsData.activeTabId];
-      cpsData.ctinfo.aceptedConnection = false; //we're connecting another
+      cpsData.ctinfo.acceptedConnection = false; //we're connecting another
       cpsData.ctinfo.connectedResponse = {};
 
       //check if it responds (if it is already injected)
@@ -544,8 +652,8 @@ function continueCWP_2(cpsData: CPSDATA) {
     return continueCWP_3(cpsData);
   }
   //not injected yet. Inject/execute contentScript on activeTab
-  //contentScript replies with a chrome.runtime.sendmessage
-  //it also listens to page messages and relays via chrome.runtime.sendmessage
+  //contentScript replies with a chrome.runtime.sendMessage
+  //it also listens to page messages and relays via chrome.runtime.sendMessage
   //basically contentScript.js acts as a proxy to pass messages from ext<->tab
   log("injecting");
   try {
@@ -584,9 +692,9 @@ function continueCWP_3(cpsData: CPSDATA) {
   });
   //wait 250 for response
   setTimeout(() => {
-    if (cpsData.ctinfo.aceptedConnection) {
+    if (cpsData.ctinfo.acceptedConnection) {
       //page responded with connection info
-      cpsData.ctinfo.connectedAccountId = cpsData.accountId; //register connected acount
+      cpsData.ctinfo.connectedAccountId = cpsData.accountId; //register connected account
       return cpsData.resolve();
     } else {
       let errMsg =
@@ -599,7 +707,7 @@ function continueCWP_3(cpsData: CPSDATA) {
 
 type ConnectedTabInfo = {
   injected?: boolean;
-  aceptedConnection?: boolean;
+  acceptedConnection?: boolean;
   connectedAccountId?: string;
   connectedResponse?: any;
 };
@@ -613,9 +721,9 @@ function disconnectFromWebPage(): Promise<void> {
       const activeTabId = tabs[0].id || -1;
       if (
         _connectedTabs[activeTabId] &&
-        _connectedTabs[activeTabId].aceptedConnection
+        _connectedTabs[activeTabId].acceptedConnection
       ) {
-        _connectedTabs[activeTabId].aceptedConnection = false;
+        _connectedTabs[activeTabId].acceptedConnection = false;
         chrome.tabs.sendMessage(activeTabId, {
           dest: "page",
           code: "disconnect",
@@ -640,7 +748,7 @@ function isConnected(): Promise<boolean> {
       return resolve(
         !!(
           _connectedTabs[activeTabId] &&
-          _connectedTabs[activeTabId].aceptedConnection
+          _connectedTabs[activeTabId].acceptedConnection
         )
       );
     });
@@ -724,7 +832,7 @@ async function retrieveBgInfoFromStorage() {
   if (unlockExpire && Date.now() > unlockExpire)
     global.lock("retrieveBgInfoFromStorage");
   if (lockTimeout) clearTimeout(lockTimeout);
-  //To manage the possibilit that the user has added/removed accounts ON ANOTHER TAB
+  //To manage the possibility that the user has added/removed accounts ON ANOTHER TAB
   //we reload state & secureState from storage when the popup opens
   await global.recoverState();
   if (!global.State.dataVersion) {
@@ -747,7 +855,7 @@ async function retrieveBgInfoFromStorage() {
   log("NETWORK=", nw);
 }
 
-//returns true if loaded-upacked, developer mode
+//returns true if loaded-unpacked, developer mode
 //false if installed from the chrome store
 function isDeveloperMode() {
   return !("update_url" in chrome.runtime.getManifest());

@@ -5,11 +5,11 @@ import * as searchAccounts from "../util/search-accounts.js";
 import { isValidAccountID } from "../lib/near-api-lite/utils/valid.js";
 import * as Pages from "../pages/main.js";
 
-import { Account, ExtendedAccountData } from "../data/account.js";
+import { Account, ExtendedAccountData, newAccount } from "../data/account.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import {
   askPrivateKey,
-  searchThePools,
+  searchMoreAssets,
   show as AccountSelectedPage_show,
 } from "./account-selected.js";
 import {
@@ -101,6 +101,13 @@ function displayAccountInfoAt(
 }
 
 async function searchTheAccountName(accName: string) {
+
+  const networkAccounts = await askBackgroundAllNetworkAccounts();
+  if (networkAccounts && networkAccounts[accName]) {
+    d.showErr(`${accName} is already in the wallet`);
+    return;
+  }
+
   lastSearchResult = new SearchResult();
 
   d.showWait();
@@ -141,7 +148,7 @@ async function searchTheAccountName(accName: string) {
 
     //lockup contract?
     let lockupExtData;
-    const accInfo = new Account(activeNetworkInfo.name);
+    const accInfo = newAccount(activeNetworkInfo.name);
     accInfo.ownerId = accName;
     const lockupContract = await searchAccounts.getLockupContract(accInfo);
     if (lockupContract) {
@@ -158,8 +165,8 @@ async function searchTheAccountName(accName: string) {
       searchedLockupInfo.show();
     }
 
-    if (d.qs("#yes-search-the-pools").el.checked) {
-      await searchThePools(mainExtData);
+    if (d.qs("#yes-search-more-assets").el.checked) {
+      await searchMoreAssets(mainExtData);
       displayAccountInfoAt(
         "searched-account-info",
         TEMPLATE,

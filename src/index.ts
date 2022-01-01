@@ -32,6 +32,7 @@ import type { NetworkInfo } from "./lib/near-api-lite/network.js";
 import { calculateDollarValue } from "./data/global.js";
 import { D } from "./lib/tweetnacl/core/core.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
+import { initPopupHandlers } from "./util/popup-list.js";
 
 export const SINGLE_USER_EMAIL = "unique-user@narwallets.com"
 
@@ -53,10 +54,10 @@ const NETWORKS_LIST = "networks-list";
 
 let isDark = true;
 
-const hamb = new d.El(".hamb");
-const aside = new d.El("aside");
+let hamb: d.El;
+let aside: d.El;
 
-let isOpen = false;
+let hambIsOpen = false;
 
 export var activeNetworkInfo: NetworkInfo;
 
@@ -120,12 +121,12 @@ function welcomeCreatePassClicked() {
 function hambClicked() {
   hamb.toggleClass("open");
   aside.toggleClass("open");
-  if (!isOpen) {
+  if (!hambIsOpen) {
     d.byId("account-list-main").classList.add("hidden");
-    isOpen = true;
+    hambIsOpen = true;
   } else {
     d.byId("account-list-main").classList.remove("hidden");
-    isOpen = false;
+    hambIsOpen = false;
   }
 }
 
@@ -274,6 +275,8 @@ export function switchDarkLight(): string {
 async function initPopup() {
   chrome.alarms.clear("unlock-expired");
 
+  hamb = new d.El(".hamb");
+  aside = new d.El("aside");
   hamb.onClick(hambClicked);
 
   d.onClickId("err-div", () => {
@@ -320,6 +323,8 @@ async function initPopup() {
   window.setInterval(async function () {
     autoRefresh();
   }, 5000);
+
+  initPopupHandlers()
 
   //show main page
   return Pages.show();

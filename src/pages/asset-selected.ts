@@ -3,11 +3,12 @@ import {
   askBackground,
   askBackgroundAllNetworkAccounts,
   askBackgroundCallMethod,
+  askBackgroundGetAccountRecordCopy,
   askBackgroundGetNetworkInfo,
   askBackgroundSetAccount,
   askBackgroundViewMethod,
 } from "../background/askBackground.js";
-import { Asset, assetUpdateBalance, assetUpdateMetadata, asyncRefreshAccountInfoLastBalance, ExtendedAccountData, History, newTokenFromMetadata, updateTokenAssetFromMetadata } from "../data/account.js";
+import { Asset, assetAddHistory, assetUpdateBalance, assetUpdateMetadata, asyncRefreshAccountInfoLastBalance, ExtendedAccountData, findAsset, findAssetIndex, History, newTokenFromMetadata, updateTokenAssetFromMetadata } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -30,7 +31,6 @@ import {
   ifNormalAccShowGrantAccessSubPage,
   historyWithIcons,
   historyLineClicked,
-  getAccountRecord,
   refreshSaveSelectedAccount,
   usdPriceReady
 } from "./account-selected.js";
@@ -68,6 +68,17 @@ let contactToAdd: string;
 let metaPoolContract: MetaPool;
 let metaPoolContractData: MetaPoolContractState;
 
+
+async function asset_selected_refreshFromBackground(){
+  const refreshedInfo = await askBackgroundGetAccountRecordCopy(selectedAccountData.name)
+  //accData = acc;
+  asset_array = refreshedInfo.assets;
+  asset_index = findAssetIndex(refreshedInfo, asset_selected.contractId, asset_selected.symbol);
+  // use Object.assign(new Asset()... to convert into an instance of the class
+  asset_selected = Object.assign(new Asset(), refreshedInfo.assets[asset_index]);
+  setLastSelectedAsset(asset_selected);
+
+}
 // page init
 export async function show(
   /*acc: ExtendedAccountData,*/
@@ -99,7 +110,7 @@ export async function show(
 
   d.byId("topbar").innerText = "Assets";
 
-  reloadDetails();
+  renderAssetPage();
 
   d.byId("asset-remove").classList.remove("hidden"); // shown in all cases
 
@@ -205,7 +216,7 @@ function hideInMiddle() {
   // d.byId("asset-restake").classList.add("hidden");
 }
 
-function reloadDetails() {
+function renderAssetPage() {
   d.clearContainer("selected-asset");
   var templateData = {
     acc: selectedAccountData,
@@ -251,7 +262,7 @@ async function reStakeClicked() {
   d.onClickId("restake-max", function () {
     d.maxClicked("restake-amount", "#selected-asset #balance");
   });
-  await showOKCancel(restakeOkClicked, showInitial);
+  await showOKCancel(restakeOkClicked, showInitialSubPage);
 }
 
 async function confirmWithdraw() {
@@ -301,15 +312,15 @@ async function confirmWithdraw() {
       );
     }
 
-    asset_selected.addHistory("withdraw", amount);
+    assetAddHistory(asset_selected, "withdraw", amount);
     asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
     if (asset_selected.balance == 0) {
       await deleteAsset();
       backToSelectClicked();
     } else {
-      reloadDetails();
-      showInitial();
+      renderAssetPage();
+      showInitialSubPage();
     }
 
   }
@@ -319,7 +330,7 @@ async function confirmWithdraw() {
   finally {
     hideOkCancel();
     d.hideWait();
-    showInitial();
+    showInitialSubPage();
   }
 }
 
@@ -330,7 +341,7 @@ async function performLockupContractUnstakeAndWithdrawAll() {
     throw Error("unknown ownerId");
   }
 
-  const owner = await getAccountRecord(info.ownerId);
+  const owner = await askBackgroundGetAccountRecordCopy(info.ownerId);
   if (!owner.privateKey) {
     throw Error("you need full access on " + info.ownerId);
   }
@@ -373,7 +384,7 @@ async function assetWithdrawClicked() {
       d.byId("withdraw-amount").classList.remove("semi-transparent")
     }
 
-    showOKCancel(confirmWithdraw, showInitial);
+    showOKCancel(confirmWithdraw, showInitialSubPage);
   } catch (ex) {
     d.showErr(ex);
   }
@@ -406,7 +417,7 @@ async function delayedUnstakeClicked() {
       });
     }
 
-    await showOKCancel(delayedUnstakeOkClicked, showInitial);
+    await showOKCancel(delayedUnstakeOkClicked, showInitialSubPage);
 
   }
   catch (ex) {
@@ -440,7 +451,7 @@ async function LiquidUnstake() {
     metaPoolContractData = await metaPoolContract.get_contract_state();
 
     //searchAccounts.contractState;
-    await showOKCancel(confirmLiquidUnstake, showInitial);
+    await showOKCancel(confirmLiquidUnstake, showInitialSubPage);
   } catch (error) {
     d.showErr(error);
   }
@@ -452,7 +463,7 @@ async function confirmLiquidUnstake() {
     d.byId("liquid-unstake-confirmation-amount").innerHTML = amount;
 
     d.showSubPage("asset-selected-liquid-unstake-confirmation");
-    await showOKCancel(LiquidUnstakeOk, showInitial);
+    await showOKCancel(LiquidUnstakeOk, showInitialSubPage);
   } catch (error) {
     console.log(error)
   }
@@ -490,12 +501,12 @@ async function LiquidUnstakeOk() {
     );
 
     asset_selected.balance -= c.yton(yoctosToUnstake);
-    asset_selected.addHistory("liquid-unstake", c.yton(yoctosToUnstake));
+    assetAddHistory(asset_selected, "liquid-unstake", c.yton(yoctosToUnstake));
 
     await refreshSaveSelectedAccount();
     hideOkCancel();
-    reloadDetails();
-    showInitial();
+    renderAssetPage();
+    showInitialSubPage();
     d.showSuccess(
       "Liquid unstaked " + c.toStringDec(c.yton(yoctosToUnstake)) + " stNEAR, received " +
       c.toStringDec(c.yton(liquidUnstakeResult.near)) + " NEAR"
@@ -504,7 +515,7 @@ async function LiquidUnstakeOk() {
     // leave this for last in case it fails to add the $META asset
     if (liquidUnstakeResult.near != "0") {
       // add also liquid-unstake to main account, with the NEAR amount received
-      let hist = new History("liquid-unstake", c.yton(liquidUnstakeResult.near), "", undefined);
+      let hist = new History("liquid-unstake", c.yton(liquidUnstakeResult.near));
       selectedAccountData.accountInfo.history.unshift(hist)
     }
 
@@ -562,7 +573,7 @@ async function restakeOkClicked() {
     );
 
     asset_selected.balance -= c.yton(yoctosToRestake);
-    asset_selected.addHistory("restake", c.yton(yoctosToRestake));
+    assetAddHistory(asset_selected, "restake", c.yton(yoctosToRestake));
 
     // since we're re-staking we need to increase staked amount (or initialize it)
     let foundAsset: Asset = getOrCreateAsset(
@@ -572,11 +583,11 @@ async function restakeOkClicked() {
       "STAKE"
     );
     foundAsset.balance += c.yton(yoctosToRestake);
-    foundAsset.addHistory("stake", c.yton(yoctosToRestake));
+    assetAddHistory(foundAsset, "stake", c.yton(yoctosToRestake));
 
     hideOkCancel();
-    reloadDetails();
-    showInitial();
+    renderAssetPage();
+    showInitialSubPage();
     d.showSuccess("Restake " + c.toStringDec(c.yton(yoctosToRestake)));
   } catch (ex) {
     d.showErr(ex.message);
@@ -591,7 +602,7 @@ function getOrCreateAsset(
   type: string,
   icon: string
 ): Asset {
-  let foundAsset = selectedAccountData.findAsset(contractId, symbol);
+  let foundAsset = findAsset(selectedAccountData.accountInfo, contractId, symbol);
   if (!foundAsset) {
     foundAsset = new Asset(contractId, type, symbol, icon);
     selectedAccountData.accountInfo.assets.push(foundAsset);
@@ -650,8 +661,8 @@ async function delayedUnstakeOkClicked() {
 
     await createOrUpdateAssetUnstake(poolAccInfo, c.yton(yoctosToUnstake));
     hideOkCancel();
-    reloadDetails();
-    showInitial();
+    renderAssetPage();
+    showInitialSubPage();
     d.showSuccess("Unstaked");
   }
   catch (ex) {
@@ -726,7 +737,7 @@ function showAssetReceiveClicked() {
   d.showSubPage("asset-receive-subpage");
   d.byId("asset-receive-symbol").innerText = asset_selected.symbol;
   d.byId("asset-receive-account").innerText = selectedAccountData.name;
-  showOKCancel(showInitial, showInitial);
+  showOKCancel(showInitialSubPage, showInitialSubPage);
 }
 
 async function showAssetSendClicked() {
@@ -748,7 +759,7 @@ async function showAssetSendClicked() {
 
     d.onClickId("send-to-asset-account-select", selectAddressClicked);
 
-    showOKCancel(sendOKClicked, showInitial);
+    showOKCancel(sendOKClicked, showInitialSubPage);
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -782,7 +793,7 @@ async function sendOKClicked() {
     d.byId("asset-send-confirmation-amount").innerText = c.toStringDec(amountToSend);
     d.byId("asset-symbol-confirmation").innerText = asset_selected.symbol;
     d.byId("asset-send-confirmation-receiver").innerText = toAccName;
-    showOKCancel(performSend, showInitial); //on OK clicked, send
+    showOKCancel(performSend, showInitialSubPage); //on OK clicked, send
   }
   catch (ex) {
     d.showErr(ex.message);
@@ -843,14 +854,16 @@ async function performSend() {
     d.showWait();
 
     await nep141_transfer(asset_selected, amountToSend, toAccName)
+    // Note: The popup window & process can be terminated by chrome while waiting,
+    // if the user clicks elsewhere in the page.
+    // You can not rely on the code below being executed
 
-    hideOkCancel();
-    showInitial();
-
-    asset_selected.balance -= amountToSend;
-    asset_selected.addHistory("send", amountToSend, toAccName);
-    reloadDetails();
-    await saveSelectedAccount();
+    // get from background refreshed copy with history
+    await asset_selected_refreshFromBackground()
+    renderAssetPage()
+  
+    // show history subpage
+    showInitialSubPage();
 
     d.showSuccess(
       "Success: " +
@@ -863,8 +876,6 @@ async function performSend() {
       toAccName
     );
 
-    InternalUpdate(toAccName);
-
     assetCheckContactList(toAccName);
 
   } catch (ex) {
@@ -875,39 +886,6 @@ async function performSend() {
   }
 }
 
-async function InternalUpdate(toAccName: string) {
-  try {
-
-    // Trying to get the receiver account in the wallet. If not exist, throw error.
-    const receiverAccInfo = await askBackground({
-      code: "get-account",
-      accountId: toAccName,
-    });
-    let receiverAccountData = new ExtendedAccountData(toAccName, receiverAccInfo);
-
-    // Fill the asset for update/create
-    let item = await newTokenFromMetadata(asset_selected.contractId);
-    await assetUpdateBalance(item, receiverAccountData.name);
-
-    // Check the existence of the asset in the asset list of the account
-    let existingAssetIndex = receiverAccountData.findAssetIndex(item.contractId)
-    if (existingAssetIndex >= 0) {
-      // Update the asset.
-      item.history = receiverAccountData.accountInfo.assets[existingAssetIndex].history; // take existing history
-      receiverAccountData.accountInfo.assets[existingAssetIndex] = item;
-    } else {
-      // Create the asset.
-      receiverAccountData.accountInfo.assets.push(item);
-    }
-    // save data
-    return askBackgroundSetAccount(
-      receiverAccountData.name,
-      receiverAccountData.accountInfo
-    );
-  } catch {
-
-  }
-}
 
 async function deleteAsset() {
   asset_array.splice(asset_index, 1);
@@ -925,10 +903,10 @@ async function deleteAsset() {
 
 export function removeSelectedFromAssets() {
   d.showSubPage("asset-remove-selected");
-  showOKCancel(deleteAsset, showInitial);
+  showOKCancel(deleteAsset, showInitialSubPage);
 }
 
-function showInitial() {
+function showInitialSubPage() {
   //console.log(selectedAccountData);
   hideOkCancel();
   d.showSubPage("asset-history");
@@ -957,13 +935,13 @@ async function saveSelectedAccount(): Promise<any> {
 
 async function assetCheckContactList(address: string) {
   if (await contactExists(address)) {
-    showInitial();
+    showInitialSubPage();
     hideOkCancel();
   }
   else {
     d.showSubPage("sure-add-contact-asset");
     d.byId("asset-add-confirmation-name").innerText = address.trim();
-    showOKCancel(addContactToList, showInitial);
+    showOKCancel(addContactToList, showInitialSubPage);
   }
 }
 
@@ -974,7 +952,7 @@ async function addContactToList() {
       note: "",
     };
     await saveContactOnBook(contactToSave.accountId, contactToSave);
-    showInitial();
+    showInitialSubPage();
   } catch {
     d.showErr("Error in save contact");
   }

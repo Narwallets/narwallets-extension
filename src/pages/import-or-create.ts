@@ -3,7 +3,7 @@ import { askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../backgro
 import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
 import * as bs58 from '../lib/crypto-lite/bs58.js';
 import { show as AccountPage_show, showPrivateKeyClicked } from "./account-selected.js";
-import { Account } from "../data/account.js";
+import { Account, newAccount } from "../data/account.js";
 
 import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import type { SeedPhraseResult } from "../lib/near-api-lite/utils/seed-phrase.js";
@@ -75,7 +75,7 @@ async function createImplicitAccount_Step3() {
     d.hideErr()
     const newKeyPair = KeyPairEd25519.fromString(seedResult.secretKey);
     const accountId = encodeHex(newKeyPair.getPublicKey().data)
-    const accInfo = new Account(activeNetworkInfo.name)
+    const accInfo = newAccount(activeNetworkInfo.name)
 
     accInfo.privateKey = bs58.encode(newKeyPair.getSecretKey())
     await askBackgroundSetAccount(accountId, accInfo)

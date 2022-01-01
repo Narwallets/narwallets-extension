@@ -183,7 +183,6 @@ export async function show() {
     //show the logged-in & unlocked user their accounts
     //
     d.qs(".topbarcaption").innerText = "Accounts";
-    d.clearContainer(ACCOUNTS_LIST);
 
     //get accounts, sort by accountInfo.order and show as LI
     const accountsRecord = await askBackgroundAllNetworkAccounts();
@@ -204,6 +203,7 @@ export async function show() {
       </div>
     </div>
     `;
+    d.clearContainer(ACCOUNTS_LIST);
     d.populateUL(ACCOUNTS_LIST, TEMPLATE, list);
 
     let total = 0;
@@ -330,6 +330,11 @@ export async function refreshAllAccounts() {
     if (key == lastSelectedAccount?.name) {
       d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(extAcc.total);
       for (let i = 0; i < extAcc.accountInfo.assets.length; i++) {
+
+        if (activeNetworkInfo.name != accountsRecord[key].network) {
+          // network changed
+          return;
+        }
         let asset = extAcc.accountInfo.assets[i];
         if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
           let poolAccInfo = await StakingPool.getAccInfo(

@@ -48,6 +48,43 @@ id="svg12">
 </svg>
 `;
 
+//RECEIVE SVG
+export const RECEIVE_SVG = `
+<svg
+   viewBox="0 0 67.79 67.79"
+   version="1.1"
+   id="svg12"
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#fff;}</style>
+  </defs>
+  <ellipse
+     style="fill:#4d4d4d"
+     id="path853"
+     cx="34.277275"
+     cy="33.97995"
+     rx="32.153526"
+     ry="32.450851" />
+  <g
+     id="Capa_2"
+     data-name="Capa 2">
+    <g
+       id="Capa_1-2"
+       data-name="Capa 1">
+      <path
+         class="cls-1"
+         d="M33.9,0A33.9,33.9,0,1,0,67.79,33.9,33.9,33.9,0,0,0,33.9,0Zm0,63.82A29.93,29.93,0,1,1,63.82,33.9,29.93,29.93,0,0,1,33.9,63.82Z"
+         id="path6" />
+      <path
+         class="cls-1"
+         d="M43.16,35.41l-2.82,3.26V14.27a5.75,5.75,0,1,0-11.5,0V40.06l-4.49-4.49a5.76,5.76,0,0,0-8.13,0h0a5.74,5.74,0,0,0,0,8.13L29.64,57.12a5.69,5.69,0,0,0,1.84,1.24,5.71,5.71,0,0,0,3.11.92h.23a5.73,5.73,0,0,0,4.62-2L51.86,42.93a5.75,5.75,0,1,0-8.7-7.52Z"
+         id="path8" />
+    </g>
+  </g>
+</svg>
+`;
+
 //WITHDRAW SVG
 export const WITHDRAW_SVG = `<svg
 viewBox="0 0 67.79 67.79"

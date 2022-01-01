@@ -1,5 +1,5 @@
 import { timeStamp } from "node:console";
-import { askBackground, askBackgroundViewMethod } from "../background/askBackground.js";
+import { askBackground, askBackgroundSetAccount, askBackgroundViewMethod } from "../background/askBackground.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { activeNetworkInfo } from "../index.js";
 import * as c from "../util/conversions.js";
@@ -8,44 +8,86 @@ import { TOKEN_DEFAULT_SVG } from "../util/svg_const.js";
 import { nearDollarPrice } from "./global.js";
 import * as StakingPool from "../contracts/staking-pool.js"
 
-//user NEAR accounts info type
-export class Account {
-  public order: number;
-  public note: string;
-  public lockedOther: number;//locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
-  public assets: Asset[] = []; //assets
-  public history: History[] = []; //history
-  constructor(
-    public network: string,
-    public type: "acc" | "lock.c" = "acc",
-    public lastBalance: number = 0, // native balance from rpc:query/account & near state
-    // stakingPool?: string;
-    // staked: number = 0; // in the pool & staked
-    // unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
-    // rewards: number = 0; //Staking-pool rewards (initial staking - (staked+unstaked))
-    // stakingPoolPct?: number;
-    public privateKey?: string,
-    public ownerId?: string, //ownerId if this is a lockup-contract {type:"lock.c"}
-    //contacts: Contact[] = [];
-
-  ) {
-    this.order = 0;
-    this.note = "";
-    this.lockedOther = 0;
-    this.assets = [];
-    this.history = []
-  };
-
-  // get totalInThePool(): number {
-  //   return this.staked + this.unstaked;
-  // }
+//------------------------------------------------
+// user NEAR accounts info type
+// these are types and not classes because when serializing and deserializing to SecureState
+// all data is converted to POJO. So to avoid re-hydrating issues, let's use POJOs and static functions 
+// with a first "self" parameter
+export type Account = {
+  order: number;
+  network: string,
+  type: "acc" | "lock.c",
+  lastBalance: number, // native balance from rpc:query/account & near state
+  // stakingPool?: string;
+  // staked: number = 0; // in the pool & staked
+  // unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
+  // rewards: number = 0; //Staking-pool rewards (initial staking - (staked+unstaked))
+  // stakingPoolPct?: number;
+  privateKey?: string,
+  ownerId?: string, //ownerId if this is a lockup-contract {type:"lock.c"}
+  //contacts: Contact[] = [];
+  note: string;
+  lockedOther: number;//locked for other reasons, e.g. this is a lockup-contract {type:"lock.c"}
+  assets: Asset[];
+  history: History[];
 }
 
+export function newAccount(network: string): Account {
+  return {
+    network: network,
+    order: 0,
+    type: "acc",
+    lastBalance: 0,
+    note: "",
+    lockedOther: 0,
+    assets: [],
+    history: []
+  };
+}
+
+export function findAsset(self: Account, contractId: string, symbol?: string): Asset | undefined {
+  for (var assetPojo of self.assets) {
+    if (
+      assetPojo.contractId == contractId && (symbol == undefined || assetPojo.symbol == symbol)
+    )
+      return assetPojo; // returns a pointer
+  }
+  return undefined;
+}
+
+export function findAssetIndex(self: Account, contractId: string, symbol?: string): number {
+  let index = 0
+  for (var assetPojo of self.assets) {
+    if (
+      assetPojo.contractId == contractId && (symbol == undefined || assetPojo.symbol == symbol)
+    ) {
+      return index; // returns an index
+    }
+    index += 1
+  }
+  return -1;
+}
+
+export function removeAsset(self: Account, contractId: string, type?: string) {
+  let inx = 0;
+  for (var asset of self.assets) {
+    if (asset.contractId == contractId && (type == undefined || asset.type == type)) {
+      self.assets.splice(inx, 1)
+      break;
+    }
+    inx++
+  }
+}
+
+//------------------------------------------------
 export class Contact {
   accountId: string = "";
   alias: string = "";
 }
 
+//------------------------------------------------
+// be careful because Account.assets[] is an array of POJOs, not Assets instances (because serialization/de-serialization)
+// only asset_selected is rehydrated
 export class Asset {
 
   public balance: number = 0;
@@ -61,16 +103,31 @@ export class Asset {
     public decimals: number = 24,
   ) { };
 
-  addHistory(
-    type: string,
-    amount: number,
-    destination?: string,
-    icon?: string
-  ) {
-    let hist = new History(type, amount, destination, icon);
-    this.history.unshift(hist);
+  static newFrom(assetToClone: Asset) {
+    let result = new Asset();
+    // copy contract, type, symbol, info
+    Object.assign(result, assetToClone);
+    // clear some fields
+    result.balance = 0;
+    result.history = []
+    return result
   }
 
+}
+
+export function assetAmount(self: Asset, amountString: string): number {
+  return c.ytond(amountString, self.decimals);
+}
+
+// note: moved outside so it works with POJOs
+export function assetAddHistory(
+  self: Asset,
+  type: string,
+  amount: number,
+  destination?: string,
+) {
+  let hist = new History(type, amount, destination);
+  self.history.unshift(hist);
 }
 
 // note: moved outside so it works with POJOs
@@ -138,20 +195,13 @@ export class History {
   type: string = "send";
   amount: number = 0;
   destination: string = "";
-  icon: string = "";
+  icon: string | undefined = undefined; // auto-set on populate
 
-  constructor(type: string, amount: number, destination?: string, icon?: string) {
+  constructor(type: string, amount: number, destination?: string) {
     this.amount = amount;
     this.date = new Date().toISOString();
     this.type = type;
     this.destination = destination || "";
-    this.icon = icon || "";
-
-    // commented. use https://www.w3schools.com/csSref/css3_pr_text-overflow.asp
-    // if (destination.length> 27)
-    //     destination= destination.substring(0, 24) + "..."
-    // }
-
   }
 }
 
@@ -212,7 +262,7 @@ export class ExtendedAccountData {
     if (!this.accountInfo.lockedOther) this.accountInfo.lockedOther = 0;
 
     this.unlockedOther = this.accountInfo.lastBalance - this.accountInfo.lockedOther;
-    
+
     this.available = this.accountInfo.lastBalance - this.accountInfo.lockedOther;
     if (this.isLockup) {
       this.available = Math.max(0, this.available - 4);
@@ -242,43 +292,9 @@ export class ExtendedAccountData {
     return this.accountInfo.type == "lock.c"
   }
 
-  findAsset(contractId: string, symbol?: string): Asset | undefined {
-    for (var assetPojo of this.accountInfo.assets) {
-      if (
-        assetPojo.contractId == contractId && (symbol == undefined || assetPojo.symbol == symbol)
-      )
-        return assetPojo; // returns a pointer
-    }
-    return undefined;
-  }
-
-  findAssetIndex(contractId: string, symbol?: string): number {
-    let index = 0
-    for (var assetPojo of this.accountInfo.assets) {
-      if (
-        assetPojo.contractId == contractId && (symbol == undefined || assetPojo.symbol == symbol)
-      ) {
-        return index; // returns an index
-      }
-      index += 1
-    }
-    return -1;
-  }
-
-  removeAsset(contractId: string, type?: string) {
-    let inx = 0;
-    for (var asset of this.accountInfo.assets) {
-      if (asset.contractId == contractId && (type == undefined || asset.type == type)) {
-        this.accountInfo.assets.splice(inx, 1)
-        break;
-      }
-      inx++
-    }
-  }
-
 }
 
-export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account) {
+export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account, save:boolean=true) {
   const suffix = LockupContract.getLockupSuffix();
   if (accName.endsWith(suffix)) {
     //lockup contract
@@ -300,7 +316,12 @@ export async function asyncRefreshAccountInfoLastBalance(accName: string, info: 
       throw Error(`account:"${accName}", Error:${reason}`);
     }
 
-    info.lastBalance = c.yton(stateResultYoctos.amount);
+    let newBalance = c.yton(stateResultYoctos.amount);
+    if (newBalance != info.lastBalance) {
+      info.lastBalance = newBalance
+      // save updated balance
+      if (save) askBackgroundSetAccount(accName,info);
+    }
 
     // if (info.stakingPool) {
     //     const previnThePool = info.staked + info.unstaked;
