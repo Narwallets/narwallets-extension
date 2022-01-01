@@ -224,8 +224,8 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
       let index = findAssetIndex(selectedAccountData.accountInfo, asset.contractId, asset.symbol);
       if (index >= 0) {
         try {
-          d.qs(`#assets-list #index-${index} .accountassetbalance`).innerText =
-            c.toStringDec(asset.balance);
+          const e = document.querySelector(`#assets-list #index-${index} .accountassetbalance`) as HTMLElement
+          if (e) { e.innerText = c.toStringDec(asset.balance) }
         } catch (ex) {
           console.log(asset, selectedAccountData.name, `#assets-list #index-${index} .accountassetbalance`, ex)
         }
