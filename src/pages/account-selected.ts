@@ -220,7 +220,7 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
     if (fromTimer) {
       await assetUpdateBalance(asset, selectedAccountData.name)
       // update balance on-screen
-      const assetId=assetDivId(asset.contractId, asset.symbol)
+      const assetId=assetDivId(asset)
       try {
         const e = document.querySelector(`#assets-list #${assetId} .accountassetbalance`) as HTMLElement
         if (e) { e.innerText = c.toStringDec(asset.balance) }
@@ -297,8 +297,16 @@ function showAssetDetailsClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
-      const assetIndex = Number(li.id.replace("index-", ""));
-      if (isNaN(assetIndex)) return;
+      let assetIndex=-1;
+      let inx=0;
+      for(let item of selectedAccountData.accountInfo.assets) {
+        if (li.id == assetDivId(item)){
+          assetIndex=inx;
+          break;
+        }
+        inx++;
+      }
+      if (assetIndex==-1) return;
       AssetSelected_show(assetIndex);
     }
   }
@@ -426,7 +434,7 @@ export function populateAssets() {
       let object={};
       Object.assign(object,item);
       const extended = object as (Asset & DivIdField);
-      extended.divId=assetDivId(item.contractId,item.symbol)
+      extended.divId=assetDivId(item)
       filtered.push(extended);
     }
   }

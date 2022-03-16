@@ -55,8 +55,8 @@ export function findAsset(self: Account, contractId: string, symbol?: string): A
   return undefined;
 }
 
-export function assetDivId(contractId: string, symbol?: string): string {
-  return contractId.replace(/\./g,"-dot-").replace(/\#/g,"-hash-").replace(/\&/g,"-amp-") + (symbol=="STAKED"||symbol=="UNSTAKED"? symbol : "")
+export function assetDivId(item:Asset): string {
+  return item.contractId.replace(/\./g,"-dot-").replace(/\#/g,"-hash-").replace(/\&/g,"-amp-") + (item.symbol=="STAKED"||item.symbol=="UNSTAKED"? item.symbol : "")
 }
 
 export function findAssetIndex(self: Account, contractId: string, symbol?: string): number {
@@ -316,7 +316,8 @@ export async function asyncRefreshAccountInfoLastBalance(accName: string, info: 
         accountId: accName,
       });
     } catch (ex) {
-      let reason = ex.message.includes("name:UNKNOWN_ACCOUNT") ? `not found in ${activeNetworkInfo.name}` : ex.message;
+      const err = ex as Error
+      let reason = (err.message && err.message.includes("name:UNKNOWN_ACCOUNT")) ? `not found in ${activeNetworkInfo.name}` : err.message;
       throw Error(`account:"${accName}", Error:${reason}`);
     }
 
