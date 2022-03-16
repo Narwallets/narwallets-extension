@@ -29,10 +29,9 @@ import {
   newTokenFromMetadata,
   assetSetBalanceYoctos,
   assetUpdateBalance,
-  assetUpdateMetadata,
   asyncRefreshAccountInfoLastBalance,
-  findAssetIndex,
   findAsset,
+  assetDivId,
 } from "../data/account.js";
 import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/util.js";
 import {
@@ -221,14 +220,12 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
     if (fromTimer) {
       await assetUpdateBalance(asset, selectedAccountData.name)
       // update balance on-screen
-      let index = findAssetIndex(selectedAccountData.accountInfo, asset.contractId, asset.symbol);
-      if (index >= 0) {
-        try {
-          const e = document.querySelector(`#assets-list #index-${index} .accountassetbalance`) as HTMLElement
-          if (e) { e.innerText = c.toStringDec(asset.balance) }
-        } catch (ex) {
-          console.log(asset, selectedAccountData.name, `#assets-list #index-${index} .accountassetbalance`, ex)
-        }
+      const assetId=assetDivId(asset.contractId, asset.symbol)
+      try {
+        const e = document.querySelector(`#assets-list #${assetId} .accountassetbalance`) as HTMLElement
+        if (e) { e.innerText = c.toStringDec(asset.balance) }
+      } catch (ex) {
+        console.log(asset, selectedAccountData.name, `#assets-list #${assetId} .accountassetbalance`, ex)
       }
     }
   };
@@ -416,11 +413,25 @@ async function selectAndShowAccount(accName: string) {
   showSelectedAccount();
 }
 
+type DivIdField = { divId:string};
+
 export function populateAssets() {
-  d.clearContainer("assets-list");
+  // sort assets
   selectedAccountData.accountInfo.assets.sort(assetSorter);
+  //hide assets with 0 balance
+  let filtered: (Asset & DivIdField)[]=[];
+  // add divId field on the fly
+  for (let item of selectedAccountData.accountInfo.assets){
+    if (item.balance>0) {
+      let object={};
+      Object.assign(object,item);
+      const extended = object as (Asset & DivIdField);
+      extended.divId=assetDivId(item.contractId,item.symbol)
+      filtered.push(extended);
+    }
+  }
   const TEMPLATE = `
-    <div class="asset-item" data-id="index-{key}">
+    <div class="asset-item" id="{divId}">
     <div class="accountdetsassets">
       <div class="accountasseticon">{icon}</div>
       <span class="accountassetcoin">{symbol}</span>
@@ -430,10 +441,11 @@ export function populateAssets() {
     </div>
   </div>
   `;
+  d.clearContainer("assets-list");
   d.populateUL(
     "assets-list",
     TEMPLATE,
-    selectedAccountData.accountInfo.assets
+    filtered
   );
 }
 
@@ -1291,7 +1303,7 @@ type PoolInfo = {
   fee?: number;
 };
 //---------------------------------------------
-export async function searchMoreAssets(exAccData: ExtendedAccountData) {
+export async function searchMoreAssets(exAccData: ExtendedAccountData, includePools:boolean=true) {
   let doingDiv;
   try {
     doingDiv = d.showMsg("Searching Assets...", "info", -1);
@@ -1322,6 +1334,8 @@ export async function searchMoreAssets(exAccData: ExtendedAccountData) {
         }
       }
     }
+
+    if (!includePools) return;
 
     let checked: Record<string, boolean> = {};
 

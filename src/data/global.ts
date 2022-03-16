@@ -327,7 +327,7 @@ export async function getStNEARPrice(): Promise<number> {
 }
 
 export const ASSET_HISTORY_TEMPLATE = `
-  <div data-id="{key}">
+  <div id="{key}">
     <div class="history-line">
       <div class="history-icon">{icon}</div>
       <div class="history-type">{type}&nbsp;

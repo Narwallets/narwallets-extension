@@ -54,7 +54,7 @@ async function displayStakingPools() {
     list.sort(sortCompare);
 
     const TEMPLATE = `
-    <li data-id="{name}">
+    <li id="{name}">
       <div class="name">{name}</div>
       <div class="stake balance">Stake: {stake}</div>
       <div class="block production">Block Production: {uptime}%</div>

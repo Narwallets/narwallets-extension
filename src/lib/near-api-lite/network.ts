@@ -13,8 +13,6 @@ export type NetworkInfo = {
 
   }
   
-
-
 export const NetworkList:NetworkInfo[] = [
 
   { name: "mainnet", rootAccount: "near", displayName: "NEAR Mainnet", color: "green", 

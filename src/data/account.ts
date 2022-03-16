@@ -55,6 +55,10 @@ export function findAsset(self: Account, contractId: string, symbol?: string): A
   return undefined;
 }
 
+export function assetDivId(contractId: string, symbol?: string): string {
+  return contractId.replace(/\./g,"-dot-").replace(/\#/g,"-hash-").replace(/\&/g,"-amp-") + (symbol=="STAKED"||symbol=="UNSTAKED"? symbol : "")
+}
+
 export function findAssetIndex(self: Account, contractId: string, symbol?: string): number {
   let index = 0
   for (var assetPojo of self.assets) {

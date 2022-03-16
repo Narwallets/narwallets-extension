@@ -403,9 +403,10 @@ export function appendTemplate(
   const templateElem = domParser.documentElement.querySelector('body')?.firstChild as HTMLElement;
   if (!templateElem)
     console.error("appendTemplate, template cant be parsed");
-  //-- if data-id has value, set it
-  if (templateElem.dataset.id)
-    newLI.id = templateReplace(templateElem.dataset.id, data); //data-id => id={x}
+  //-- if id has replace-value, set it
+  if (templateElem.id && templateElem.id.startsWith("{")) {
+    newLI.id = templateReplace(templateElem.id, data); 
+  }
   //-- copy classes from template (except "hidden")
   //@ts-ignore
   newLI.classList.add(...templateElem.classList); //add all classes

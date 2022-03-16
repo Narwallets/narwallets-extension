@@ -272,8 +272,14 @@ export function switchDarkLight(): string {
 
 //-----------------------
 //executed after the background-page is available
+let initiPopupTimestamp: number=0; 
 async function initPopup() {
+  // debounce
+  if (Date.now()<initiPopupTimestamp+100) return;
+  initiPopupTimestamp=Date.now()
+  
   chrome.alarms.clear("unlock-expired");
+  console.log(new Date().toISOString(), "enter initPopup()")
 
   hamb = new d.El(".hamb");
   aside = new d.El("aside");
@@ -298,10 +304,14 @@ async function initPopup() {
   d.qs("aside #address-book-side").onClick(asideAddressBook);
   d.qs("aside #darkmode").onClick(asideSwitchMode);
 
-  const TEMPLATE = `<div>
-    <div data-code="{name}" class="circle {color}">{displayName}</div>
-  </div>`;
-  d.populateUL("network-items", TEMPLATE, NetworkList);
+  {
+    const TEMPLATE = `<div>
+      <div data-code="{name}" class="circle {color}">{displayName}</div>
+    </div>`;
+    const NLCONT = "network-items"
+    d.clearContainer(NLCONT)
+    d.populateUL(NLCONT, TEMPLATE, NetworkList);
+  }
 
   //--init other pages
   d.onClickId("welcome-create-pass", welcomeCreatePassClicked);

@@ -136,7 +136,7 @@ function displayTx(msg: TxMsg) {
           toAdd.action = JSON.stringify(item);
       }
       const TEMPLATE = `
-      <li data-id="{name}">
+      <li id="{name}">
         <div class="action">{action}</div>
         <div class="attached-near">{attached}</div>
       </li>

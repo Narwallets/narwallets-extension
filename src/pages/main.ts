@@ -195,7 +195,7 @@ export async function show() {
     //for(let item of list) console.log(item.accountInfo.order,item.accountInfo.type, item.name)
 
     const TEMPLATE = `
-    <div class="account-item" data-id="{name}">
+    <div class="account-item" id="{name}">
       <div class="accountlistitem">
         <div class="accountlistname">{name}</div>
         <div class="accountlistbalance balance">{total}</div>

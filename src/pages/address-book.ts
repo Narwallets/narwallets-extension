@@ -82,7 +82,7 @@ function showAddContactPage() {
 function showInitial() {
   d.clearContainer("address-list");
   const TEMPLATE=`
-    <div class="address-item" data-id="{key}">
+    <div class="address-item" id="{key}">
     <div class="accountlistitem">
       <div class="addresslistname">{accountId}</div>
       <div class="addresslistcomment">{note}</div>

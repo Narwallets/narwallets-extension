@@ -165,16 +165,16 @@ async function searchTheAccountName(accName: string) {
       searchedLockupInfo.show();
     }
 
-    if (d.qs("#yes-search-more-assets").el.checked) {
-      await searchMoreAssets(mainExtData);
-      displayAccountInfoAt(
-        "searched-account-info",
-        TEMPLATE,
-        mainExtData
-      );
-      //Note: the lockupContract knows how much it has staked, no need to search the pools to get total balance
-    }
-  } catch (ex) {
+    const includePools = d.qs("#yes-search-more-assets").el.checked
+    await searchMoreAssets(mainExtData, includePools);
+    displayAccountInfoAt(
+      "searched-account-info",
+      TEMPLATE,
+      mainExtData
+    );
+    //Note: the lockupContract knows how much it has staked, no need to search the pools to get total balance
+
+    } catch (ex) {
     d.showErr(ex.message);
     accountGetMessage.innerText = ex.message;
     accountGetMessage.show();
