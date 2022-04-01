@@ -67,6 +67,7 @@ export class LockupContract {
         accountId: this.contractAccount,
       });
       this.accountInfo.lastBalance = c.yton(stateResultYoctos.amount)
+      this.accountInfo.lastBalanceTimestamp = Date.now()
       firstOneOK = true;
 
       // 35 is the reserve for storage for old lockups https://github.com/near/core-contracts/blob/master/lockup/src/lib.rs

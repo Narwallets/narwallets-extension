@@ -8,7 +8,7 @@ import {
   askBackgroundSetAccount,
   askBackgroundViewMethod,
 } from "../background/askBackground.js";
-import { Asset, assetAddHistory, assetUpdateBalance, assetUpdateMetadata, asyncRefreshAccountInfoLastBalance, ExtendedAccountData, findAsset, findAssetIndex, History, newTokenFromMetadata, updateTokenAssetFromMetadata } from "../data/account.js";
+import { Asset, assetAddHistory, assetUpdateBalance, assetUpdateMetadata, asyncRefreshAccountInfoLastBalance, ExtendedAccountData, findAsset, findAssetIndex, History, newTokenFromMetadata, setAssetBalanceYoctos, updateTokenAssetFromMetadata } from "../data/account.js";
 import {
   isValidAccountID,
   isValidAmount,
@@ -32,7 +32,8 @@ import {
   historyWithIcons,
   historyLineClicked,
   refreshSaveSelectedAccount,
-  usdPriceReady
+  usdPriceReady,
+  saveSelectedAccount
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { addressContacts, getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
@@ -69,7 +70,7 @@ let metaPoolContract: MetaPool;
 let metaPoolContractData: MetaPoolContractState;
 
 
-async function asset_selected_refreshFromBackground(){
+async function asset_selected_refreshFromBackground() {
   const refreshedInfo = await askBackgroundGetAccountRecordCopy(selectedAccountData.name)
   //accData = acc;
   asset_array = refreshedInfo.assets;
@@ -100,7 +101,6 @@ export async function show(
 
   if (asset_selected.symbol == "STAKED" && asset_selected.icon == "") {
     asset_selected.icon = "STAKE";
-    await saveSelectedAccount();
   }
   d.showPage(THIS_PAGE);
   d.onClickId("back-to-selected", backToSelectClicked);
@@ -248,7 +248,7 @@ function renderAssetPage() {
   // set asset (stNEAR only now) price
   if (nearDollarPrice) { usdPriceReady() }
 
-  
+
   d.clearContainer("asset-history-details");
   d.populateUL(
     "asset-history-details",
@@ -313,7 +313,7 @@ async function confirmWithdraw() {
     }
 
     assetAddHistory(asset_selected, "withdraw", amount);
-    asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
+    if (asset_selected.balance) asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
     if (asset_selected.balance == 0) {
       await deleteAsset();
@@ -500,7 +500,7 @@ async function LiquidUnstakeOk() {
       selectedAccountData.name
     );
 
-    asset_selected.balance -= c.yton(yoctosToUnstake);
+    if (asset_selected.balance) asset_selected.balance -= c.yton(yoctosToUnstake);
     assetAddHistory(asset_selected, "liquid-unstake", c.yton(yoctosToUnstake));
 
     await refreshSaveSelectedAccount();
@@ -572,7 +572,7 @@ async function restakeOkClicked() {
       selectedAccountData.name
     );
 
-    asset_selected.balance -= c.yton(yoctosToRestake);
+    if (asset_selected.balance) asset_selected.balance -= c.yton(yoctosToRestake);
     assetAddHistory(asset_selected, "restake", c.yton(yoctosToRestake));
 
     // since we're re-staking we need to increase staked amount (or initialize it)
@@ -582,7 +582,7 @@ async function restakeOkClicked() {
       "stake",
       "STAKE"
     );
-    foundAsset.balance += c.yton(yoctosToRestake);
+    if (foundAsset.balance != undefined) foundAsset.balance += c.yton(yoctosToRestake);
     assetAddHistory(foundAsset, "stake", c.yton(yoctosToRestake));
 
     hideOkCancel();
@@ -687,7 +687,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
   };
 
   if (unstakedAsset) {
-    unstakedAsset.balance = c.yton(poolAccInfo.unstaked_balance) + amountToUnstake;
+    setAssetBalanceYoctos(unstakedAsset, c.ntoy(c.yton(poolAccInfo.unstaked_balance) + amountToUnstake));
   } else {
     // not existent in wallet
     if (asset_selected.symbol == "STAKED") {
@@ -697,7 +697,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
         "UNSTAKED",
         UNSTAKE_DEFAULT_SVG
       );
-      unstakedAsset.balance = amountToUnstake
+      setAssetBalanceYoctos(unstakedAsset, c.ntoy(amountToUnstake));
       selectedAccountData.accountInfo.assets.push(unstakedAsset);
     } else if (asset_selected.symbol == "STNEAR") {
       // Can't unstake STNEAR if there's no STNEAR asset
@@ -784,7 +784,7 @@ async function sendOKClicked() {
     const amountToSend = d.getNumber("#send-to-asset-amount");
     if (!isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
     if (!isValidAmount(amountToSend)) throw Error("Amount should be a positive integer");
-    if (amountToSend > asset_selected.balance) throw Error("Amount exceeds available balance");
+    if (asset_selected.balance && amountToSend > asset_selected.balance) throw Error("Amount exceeds available balance");
 
     let accountExists = await searchAccounts.checkIfAccountExists(toAccName);
     if (!accountExists) throw Error("Receiver Account does not exists");
@@ -861,7 +861,7 @@ async function performSend() {
     // get from background refreshed copy with history
     await asset_selected_refreshFromBackground()
     renderAssetPage()
-  
+
     // show history subpage
     showInitialSubPage();
 
@@ -925,13 +925,6 @@ function showInitialSubPage() {
 //     selectedAccountData.accountInfo.lockedOther;
 //   selectedAccountData.total = selectedAccountData.available;
 // }
-
-async function saveSelectedAccount(): Promise<any> {
-  return askBackgroundSetAccount(
-    selectedAccountData.name,
-    selectedAccountData.accountInfo
-  );
-}
 
 async function assetCheckContactList(address: string) {
   if (await contactExists(address)) {

@@ -1,8 +1,8 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
-import { Account, Asset, asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../data/account.js";
-import { show as AccountSelectedPage_show } from "./account-selected.js";
+import { Account, Asset, setAssetBalanceYoctos, asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../data/account.js";
+import { selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 
 import {
@@ -13,17 +13,14 @@ import {
 } from "../data/util.js";
 import {
   askBackground,
-  askBackgroundAllAddressContact,
   askBackgroundAllNetworkAccounts,
   askBackgroundGetState,
   askBackgroundIsLocked,
-  askBackgroundSetAccount,
-  askBackgroundViewMethod,
 } from "../background/askBackground.js";
 import { D } from "../lib/tweetnacl/core/core.js";
 import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { activeNetworkInfo, asideSwitchMode, setIsDark } from "../index.js";
+import { activeNetworkInfo, asideSwitchMode, autoRefresh, setIsDark } from "../index.js";
 import { hideOkCancel } from "../util/okCancel.js";
 
 //--- content sections at MAIN popup.html
@@ -40,8 +37,8 @@ export const IMPORT_OR_CREATE = "import-or-create";
 export const ACCOUNTS_LIST = "accounts-list";
 export const ACCOUNT_ITEM = "account-item";
 
-let lastSelectedAccount: ExtendedAccountData;
-export let lastSelectedAsset: Asset;
+let lastSelectedAccount: ExtendedAccountData | undefined;
+export let lastSelectedAsset: Asset | undefined;
 
 export function setLastSelectedAccount(data: ExtendedAccountData) {
   lastSelectedAccount = data;
@@ -187,8 +184,11 @@ export async function show() {
     //get accounts, sort by accountInfo.order and show as LI
     const accountsRecord = await askBackgroundAllNetworkAccounts();
     const list: ExtendedAccountData[] = [];
+    let needRefresh = false;
     for (let key in accountsRecord) {
-      list.push(new ExtendedAccountData(key, accountsRecord[key]));
+      const e = new ExtendedAccountData(key, accountsRecord[key])
+      list.push(e);
+      if (e.total == undefined) { needRefresh = true }
     }
     list.sort(sortByOrder);
     //debug
@@ -253,6 +253,8 @@ export async function show() {
     //d.qs("#disconnect-line").showIf(isConnected);
 
     await tryReposition();
+    // start refreshing account list (unless reposition)
+    refreshAccountListBalances()
 
   } catch (ex) {
     await UnlockPage_show(); //show the unlock-page
@@ -264,7 +266,6 @@ export async function show() {
 export function backToAccountsClicked() {
   d.clearContainer("assets-list");
   d.showPage("account-list-main");
-  d.showSubPage("assets");
   hideOkCancel()
 }
 
@@ -293,74 +294,84 @@ async function tryReposition() {
   }
 }
 
-export function backToAccountsList() {
+export async function backToAccountsList() {
   //remove selected account auto-click
   localStorageRemove("account");
-  show();
+  selectedAccountData.name = ""; // mark as no account selected
+  await show();
+  autoRefresh();
 }
 
 //---------------------------------------------------
 //-- account item clicked => account selected Page --
 //---------------------------------------------------
-export function accountItemClicked(ev: Event) {
+export async function accountItemClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
       const accName = li.id; // d.getClosestChildText(".account-item", ev.target, ".name");
       if (!accName) return;
-      AccountSelectedPage_show(accName, undefined);
+      await AccountSelectedPage_show(accName, undefined);
+      autoRefresh()
     }
   }
 }
 
 
-export async function refreshAllAccounts() {
-  const accountsRecord = await askBackgroundAllNetworkAccounts();
-
-  for (let key in accountsRecord) {
-
-    if (activeNetworkInfo.name != accountsRecord[key].network) {
-      // network changed
-      return;
+export function updateScreen(selector: string, amount: number | undefined) {
+  try {
+    const e = document.querySelector(selector) as HTMLElement
+    if (e) {
+      console.log("updateScreen", selector, amount);
+      e.innerText = c.toStringDec(amount)
+    } else {
+      console.log("WARN updateScreen selector", selector, "not found")
     }
+  } catch (ex) {
+    console.log("updateScreen", selector, ex)
+  }
+}
 
-    await asyncRefreshAccountInfoLastBalance(key, accountsRecord[key]);
-    const extAcc = new ExtendedAccountData(key, accountsRecord[key]);
+let refreshingAccountListBalances = false;
+export async function refreshAccountListBalances() {
+  if (d.activePage !== "account-list-main") {
+    // user changed page / reposition
+    return;
+  }
+  if (refreshingAccountListBalances) return;
+  refreshingAccountListBalances = true
+  try {
+    const accountsRecord = await askBackgroundAllNetworkAccounts();
+    const list: ExtendedAccountData[] = [];
+    for (let key in accountsRecord) {
+      list.push(new ExtendedAccountData(key, accountsRecord[key]));
+    }
+    // refresh in user-defined order
+    list.sort(sortByOrder);
 
-    if (key == lastSelectedAccount?.name) {
-      d.qs("#selected-account .accountdetsbalance").innerText = c.toStringDec(extAcc.total);
-      for (let i = 0; i < extAcc.accountInfo.assets.length; i++) {
+    console.log("refreshAccountListBalances", list.length, d.activePage);
+    let grandTotal = 0;
+    for (let e of list) {
+      // refresh in memory
+      await asyncRefreshAccountInfoLastBalance(e.name, e.accountInfo);
 
-        if (activeNetworkInfo.name != accountsRecord[key].network) {
-          // network changed
-          return;
-        }
-        let asset = extAcc.accountInfo.assets[i];
-        if (asset.symbol == "UNSTAKED" || asset.symbol == "STAKED") {
-          let poolAccInfo = await StakingPool.getAccInfo(
-            extAcc.name,
-            asset.contractId
-          );
-          if (asset.symbol == "UNSTAKED") {
-            asset.balance = c.yton(poolAccInfo.unstaked_balance);
-          } else {
-            asset.balance = c.yton(poolAccInfo.staked_balance);
-          }
-        } else {
-          let tokenAccBalance = await askBackgroundViewMethod(
-            asset.contractId,
-            "ft_balance_of",
-            { account_id: extAcc.name }
-          );
-          asset.balance = c.yton(tokenAccBalance);
-        }
-
-        if (asset.contractId == lastSelectedAsset?.contractId && asset.symbol == lastSelectedAsset.symbol) {
-          d.qs("#selected-asset #balance").innerText = c.toStringDec(asset.balance);
-        }
+      if (d.activePage !== "account-list-main") {
+        // user changed page, no need to continue refreshing main list
+        return;
       }
+
+      e.recomputeTotals()
+      grandTotal += (e.total || 0)
+
+      // update on screen
+      updateScreen(`#accounts-list [id='${e.name}'] .accountlistbalance`, e.total)
+
     }
-    await askBackgroundSetAccount(key, accountsRecord[key]);
+
+    // update grandtotal on the screen
+    updateScreen(`#account-list-main .accountlistbalance.total`, grandTotal)
+  } finally {
+    refreshingAccountListBalances = false;
   }
 
 }

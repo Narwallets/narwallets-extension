@@ -91,7 +91,7 @@ import {
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { activeNetworkInfo, autoRefresh } from "../index.js";
+import { activeNetworkInfo } from "../index.js";
 import { closePopupList, PopupItem, popupListOpen } from "../util/popup-list.js";
 
 const THIS_PAGE = "account-selected";
@@ -142,7 +142,6 @@ export async function show(
   }
   localStorageSet({ reposition: "account", account: accName });
   checkConnectOrDisconnect();
-  autoRefresh()
 }
 
 
@@ -171,7 +170,7 @@ function initPage() {
   d.onClickId("search-pools", searchMoreAssetsButtonClicked);
   d.onClickId("address-book-button", showAddressBook);
 
-  //d.onClickId("refresh-button", refreshSelectedAcc);
+  d.onClickId("refresh-button", refreshSelectedAcc);
   d.onClickId("back-to-account", backLinkClicked);
   d.onClickId("delete-account", DeleteAccount);
 
@@ -221,7 +220,7 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
 
   for (let asset of accInfo.assets) {
     if (d.activePage !== "account-selected" && d.activePage !== "AccountAssetDetail") {
-      // user left account-selected+assets page
+      // user leaved assets page
       break;
     }
     await assetUpdateBalance(asset, accName)
@@ -242,13 +241,15 @@ export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
   // save updated info (even if partial)
   await askBackgroundSetAccount(accName, accInfo);
 
+  showSelectedAccount(fromTimer);
 }
 
-// async function refreshSelectedAcc() {
-//   await refreshSelectedAccountAndAssets();
-//   showInitial();
-//   d.showSuccess("Refreshed");
-// }
+async function refreshSelectedAcc() {
+  await refreshSelectedAccountAndAssets();
+  showInitial();
+
+  d.showSuccess("Refreshed");
+}
 
 export async function usdPriceReady() {
   if (selectedAccountData == undefined) return;
@@ -324,7 +325,7 @@ function showAssetDetailsClicked(ev: Event) {
 function addClicked() {
   d.showSubPage("add-subpage");
   d.onClickId("token-combo-select", selectTokenClicked);
-  showOKCancel(addOKClicked, switchToAssetsSupbage);
+  showOKCancel(addOKClicked, showInitial);
 }
 
 function getKnownNEP141Contracts(): PopupItem[] {
@@ -416,9 +417,16 @@ async function selectAndShowAccount(accName: string) {
   if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
 
   // get balance from chain (launch async)
+  asyncRefreshAccountInfoLastBalance(accName, accInfo);
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Pages.setLastSelectedAccount(selectedAccountData);
 
+  // if (accInfo.ownerId && accInfo.type == "lock.c" && !accInfo.privateKey) {
+  //   //lock.c is read-only, but do we have full access on the owner?
+  //   const ownerInfo = await getAccountRecord(accInfo.ownerId);
+  //   if (ownerInfo && ownerInfo.privateKey)
+  //     selectedAccountData.accessStatus = "Owner";
+  // }
   showSelectedAccount();
 }
 
@@ -489,8 +497,17 @@ function updateAccountHeaderDOM() {
 
 }
 
-// re-renders SelectedAccountHeader
-function renderSelectedAccountHeader(){
+function showSelectedAccount(fromTimer?: boolean) {
+
+  if (selectedAccountData.name == "") return;
+
+  //make sure available is up to date before displaying
+  selectedAccountData.recomputeTotals()
+
+  // fast update to erase previous data
+  updateAccountHeaderDOM();
+  // if "fromTimer" only update data in-place(do not rebuild the DOM components)
+  if (fromTimer) { return; }
 
   const SELECTED_ACCOUNT = "selected-account";
   const TEMPLATE = `
@@ -518,26 +535,9 @@ function renderSelectedAccountHeader(){
   );
   updateAccountHeaderDOM();
 
-}
-
-
-//
-// shows a specific account and its assets
-//
-function showSelectedAccount() {
-
-  if (selectedAccountData.name == "") return;
-
-  //make sure available is up to date before displaying
-  selectedAccountData.recomputeTotals()
-
-  // fast update to erase previous data
-  updateAccountHeaderDOM();
-  renderSelectedAccountHeader();
-
   // fill assets list
   populateAssets();
-  switchToAssetsSupbage()
+  d.showSubPage("assets");
 
   // fill account activity list
   d.clearContainer("account-history-details");
@@ -546,9 +546,6 @@ function showSelectedAccount() {
     ASSET_HISTORY_TEMPLATE,
     historyWithIcons(selectedAccountData.accountInfo.history)
   );
-
-  // start a refresh of assets balances from chain
-  refreshSelectedAccountAndAssets()
 }
 
 type StateResult = {
@@ -606,21 +603,21 @@ function showGotoOwner() {
     d.byId("account-selected-open-owner-name").innerText =
       selectedAccountData.accountInfo.ownerId;
     d.showSubPage("account-selected-open-owner");
-    showOKCancel(GotoOwnerOkHandler, switchToAssetsSupbage);
+    showOKCancel(GotoOwnerOkHandler, showInitial);
   }
 }
 
 export function ifNormalAccShowGrantAccessSubPage() {
   if (!selectedAccountData.isLockup) {
     d.showSubPage("account-selected-ok-to-grant-access");
-    showOKCancel(changeAccessClicked, switchToAssetsSupbage);
+    showOKCancel(changeAccessClicked, showInitial);
   }
 }
 
 function receiveClicked() {
   d.showSubPage("account-selected-receive");
   d.byId("account-selected-receive-name").innerText = selectedAccountData.name;
-  showOKCancel(switchToAssetsSupbage, switchToAssetsSupbage);
+  showOKCancel(showInitial, showInitial);
   showGotoOwner(); //if this is a lock.c shows the "goto owner" page
 }
 
@@ -712,7 +709,7 @@ async function sendClicked() {
       });
       d.showSubPage("account-selected-send");
       d.onClickId("current-to-send-address", selectAddressClicked)
-      showOKCancel(sendOKClicked, switchToAssetsSupbage);
+      showOKCancel(sendOKClicked, showInitial);
     }
   } catch (ex) {
     d.showErr(ex.message);
@@ -770,7 +767,7 @@ async function sendOKClicked() {
     d.byId("send-confirmation-amount").innerText = c.toStringDec(amountToSend);
     d.byId("send-confirmation-receiver").innerText = toAccName;
 
-    showOKCancel(performer, switchToAssetsSupbage); //on OK clicked, send
+    showOKCancel(performer, showInitial); //on OK clicked, send
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -859,12 +856,12 @@ async function performLockupContractSend() {
 //----------------------
 async function accountCheckContactList(address: string) {
   if (await contactExists(address)) {
-    switchToAssetsSupbage();
+    showInitial();
     hideOkCancel();
   } else {
     d.showSubPage("sure-add-contact");
     d.byId("add-confirmation-name").innerText = address.trim();
-    showOKCancel(addContactToList, switchToAssetsSupbage);
+    showOKCancel(addContactToList, showInitial);
   }
 }
 
@@ -875,7 +872,7 @@ async function addContactToList() {
       note: new d.El("#add-contact-note").value,
     };
     await saveContactOnBook(contactToSave.accountId, contactToSave);
-    switchToAssetsSupbage();
+    showInitial();
   } catch {
     d.showErr("Error in save contact");
   } finally {
@@ -914,7 +911,7 @@ async function stakeClicked() {
     if (amountToStake < 0) amountToStake = 0;
 
     d.showSubPage("account-selected-stake");
-    showOKCancel(performer, switchToAssetsSupbage);
+    showOKCancel(performer, showInitial);
 
     if (selectedAccountData.isLockup && lc) {
       stakeAmountBox.value = c.ytonFull(lc.accountBalanceYoctos)
@@ -1111,7 +1108,7 @@ async function performStake() {
 
     d.showSuccess(`Staked ${amountToStake} NEAR`);
     hideOkCancel();
-    switchToAssetsSupbage();
+    showInitial();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1174,7 +1171,7 @@ async function performLockupContractStake() {
     await refreshSaveSelectedAccount();
 
     d.showSuccess(`Staked ${amountToStake} NEAR`);
-    switchToAssetsSupbage();
+    showInitial();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1280,7 +1277,7 @@ async function performUnstake() {
     //refresh status
     await refreshSaveSelectedAccount();
 
-    switchToAssetsSupbage();
+    showInitial();
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1481,14 +1478,14 @@ function showPublicKeyClicked() {
     //we don't have any key for ReadOnly accounts
     d.showErr("Account is read only");
     d.showSubPage("account-selected-make-full-access");
-    showOKCancel(makeFullAccessOKClicked, switchToAssetsSupbage);
+    showOKCancel(makeFullAccessOKClicked, showInitial);
   } else {
     //normal acc priv key
     d.showSubPage("account-selected-show-public-key");
     d.byId("account-selected-public-key").innerText = getPublicKey(
       selectedAccountData.accountInfo.privateKey || ""
     );
-    showOKCancel(switchToAssetsSupbage, switchToAssetsSupbage);
+    showOKCancel(showInitial, showInitial);
   }
 }
 
@@ -1500,12 +1497,12 @@ export function showPrivateKeyClicked() {
     //we don't have any key for ReadOnly accounts
     d.showErr("Account is read only");
     d.showSubPage("account-selected-make-full-access");
-    showOKCancel(makeFullAccessOKClicked, switchToAssetsSupbage);
+    showOKCancel(makeFullAccessOKClicked, showInitial);
   } else {
     //normal acc priv key
 
     d.showSubPage("request-password");
-    showOKCancel(showPrivateKeyValidationPasswordClicked, switchToAssetsSupbage);
+    showOKCancel(showPrivateKeyValidationPasswordClicked, showInitial);
   }
 }
 
@@ -1529,7 +1526,7 @@ async function showPrivateKeyValidationPasswordClicked() {
   d.showSubPage("account-selected-show-private-key");
   d.byId("account-selected-private-key").innerText =
     selectedAccountData.accountInfo.privateKey || "";
-  showOKCancel(switchToAssetsSupbage, switchToAssetsSupbage);
+  showOKCancel(showInitial, showInitial);
 }
 
 //---------------------------------------
@@ -1549,7 +1546,7 @@ export function changeAccessClicked() {
   if (selectedAccountData.isFullAccess) {
     d.showSubPage("account-selected-make-read-only");
     d.inputById("account-name-confirm").value = "";
-    showOKCancel(makeReadOnlyOKClicked, switchToAssetsSupbage);
+    showOKCancel(makeReadOnlyOKClicked, showInitial);
   } else {
     //is ReadOnly
     askPrivateKey();
@@ -1558,7 +1555,7 @@ export function changeAccessClicked() {
 
 export function askPrivateKey() {
   d.showSubPage("account-selected-make-full-access");
-  showOKCancel(makeFullAccessOKClicked, switchToAssetsSupbage);
+  showOKCancel(makeFullAccessOKClicked, showInitial);
 }
 
 //---------------------------------------
@@ -1571,7 +1568,7 @@ function LockupAddPublicKey() {
   d.hideErr();
   //d.inputById("add-public-key").value = ""
   d.showSubPage("account-selected-add-public-key");
-  showOKCancel(AddPublicKeyToLockupOKClicked, switchToAssetsSupbage);
+  showOKCancel(AddPublicKeyToLockupOKClicked, showInitial);
 }
 
 //---------------------------------------
@@ -1579,7 +1576,7 @@ function addNoteClicked() {
   d.hideErr();
   d.showSubPage("account-selected-add-note");
   d.inputById("add-note").value = selectedAccountData.accountInfo.note || "";
-  showOKCancel(addNoteOKClicked, switchToAssetsSupbage);
+  showOKCancel(addNoteOKClicked, showInitial);
 }
 
 function showAddressBook() {
@@ -1592,9 +1589,9 @@ async function addNoteOKClicked() {
   d.hideErr();
   selectedAccountData.accountInfo.note = d.inputById("add-note").value.trim();
   await saveSelectedAccount();
-  renderSelectedAccountHeader();
+  showSelectedAccount();
   hideOkCancel();
-  switchToAssetsSupbage()
+  showInitial();
 }
 
 //---------------------------------------
@@ -1612,7 +1609,7 @@ async function DeleteAccount() {
 
     d.onClickId("beneficiary-address-combo-select", selectBeneficiaryAddressClicked);
 
-    showOKCancel(AccountDeleteOKClicked, switchToAssetsSupbage);
+    showOKCancel(AccountDeleteOKClicked, showInitial);
   } catch (ex) {
     d.showErr(ex.message);
   } finally {
@@ -1719,7 +1716,7 @@ async function AddPublicKeyToLockupOKClicked() {
         }
       }
     }
-    switchToAssetsSupbage();
+    showInitial();
   } catch (ex) {
     if (
       ex.message.indexOf("assertion failed") != -1 &&
@@ -1746,7 +1743,7 @@ async function makeReadOnlyOKClicked() {
       //selectedAccountData.accessStatus = "Read Only";
       showSelectedAccount();
       d.showMsg("Account access removed", "success");
-      switchToAssetsSupbage();
+      showInitial();
       hideOkCancel();
     }
   } catch (ex) {
@@ -1794,7 +1791,7 @@ async function makeFullAccessOKClicked() {
     await saveSelectedAccount();
     await selectAndShowAccount(selectedAccountData.name);
     d.showMsg("Seed Phrase is correct. Access granted", "success");
-    renderSelectedAccountHeader();
+    showInitial();
     hideOkCancel();
   } catch (ex) {
     d.showErr(ex.message);
@@ -1804,16 +1801,12 @@ async function makeFullAccessOKClicked() {
   }
 }
 
-function switchToAssetsSupbage(){
+function showInitial() {
+  d.removeGlobalKeyPress();
+  showSelectedAccount();
+  populateAssets();
   d.showSubPage("assets");
 }
-
-// function showInitial() {
-//   d.removeGlobalKeyPress();
-//   showSelectedAccount();
-//   populateAssets();
-//   switchToAssetsSupbage();
-// }
 
 async function removeAccountRecord() {
 
@@ -1856,7 +1849,7 @@ export async function refreshSaveSelectedAccount(fromTimer?: boolean) {
   );
   await saveSelectedAccount(); //save
 
-  showSelectedAccount();
+  showSelectedAccount(fromTimer);
 }
 
 async function refreshClicked(ev: Event) {

@@ -233,6 +233,7 @@ export function showByClass(id: string, className: string) {
  */
 export function showPage(id: string) {
   activePage = id;
+  console.log("activePage=",id)
   showByClass(id, "appface");
 }
 export function showSubPage(id: string) {
@@ -365,8 +366,11 @@ export function templateReplace(
   for (const key in obj) {
     let value = obj[key];
     let text = "";
-    if (value == null || value == undefined) {
+    if (value == null) {
       text = "";
+    }
+    if (value == undefined) {
+      text = "-- ";
     } else if (typeof value === "number") {
       text = numberFormatFunction(value, key);
     } else if (typeof value === "object") {
@@ -401,8 +405,9 @@ export function appendTemplate(
   const newLI = document.createElement(elType) as HTMLLIElement;
   const domParser = new DOMParser().parseFromString(templateHtml, 'text/html');
   const templateElem = domParser.documentElement.querySelector('body')?.firstChild as HTMLElement;
-  if (!templateElem)
+  if (!templateElem) {
     console.error("appendTemplate, template cant be parsed");
+  }
   //-- if id has replace-value, set it
   if (templateElem.id && templateElem.id.startsWith("{")) {
     newLI.id = templateReplace(templateElem.id, data); 

@@ -71,7 +71,8 @@ function toStringDecSimple(n: number, decimals: number = 5) {
 * Formats a number in NEAR to a string with commas and 5 decimal places
 * @param {number} n 
 */
-export function toStringDec(n: number, decimals: number = 5) {
+export function toStringDec(n: number|undefined, decimals: number = 5) {
+    if (n==undefined) return "-- ";
     return addCommas(toStringDecSimple(n, decimals));
 }
 /**

@@ -18,6 +18,7 @@ export type Account = {
   network: string,
   type: "acc" | "lock.c",
   lastBalance: number, // native balance from rpc:query/account & near state
+  lastBalanceTimestamp: number, // native balance from rpc:query/account & near state
   // stakingPool?: string;
   // staked: number = 0; // in the pool & staked
   // unstaked: number = 0; // in the pool & unstaked (maybe can withdraw)
@@ -38,6 +39,7 @@ export function newAccount(network: string): Account {
     order: 0,
     type: "acc",
     lastBalance: 0,
+    lastBalanceTimestamp: 0,
     note: "",
     lockedOther: 0,
     assets: [],
@@ -55,8 +57,10 @@ export function findAsset(self: Account, contractId: string, symbol?: string): A
   return undefined;
 }
 
-export function assetDivId(item:Asset): string {
-  return item.contractId.replace(/\./g,"-dot-").replace(/\#/g,"-hash-").replace(/\&/g,"-amp-") + (item.symbol=="STAKED"||item.symbol=="UNSTAKED"? item.symbol : "")
+export function assetDivId(item: Asset): string {
+  // warning this id is not a valid selector, use [id="a.b.c."] for document.querySelector
+  return item.symbol + "." + item.contractId
+  //return item.contractId.replace(/\./g, "-dot-").replace(/\#/g, "-hash-").replace(/\&/g, "-amp-") + (item.symbol == "STAKED" || item.symbol == "UNSTAKED" ? item.symbol : "")
 }
 
 export function findAssetIndex(self: Account, contractId: string, symbol?: string): number {
@@ -94,7 +98,8 @@ export class Contact {
 // only asset_selected is rehydrated
 export class Asset {
 
-  public balance: number = 0;
+  public balance: number | undefined = undefined;
+  public balanceTimestamp: number = 0;
   public spec: string = ""; // ft metadata spec
   public url: string = ""; // ft metadata url
   history: History[] = [];
@@ -135,8 +140,9 @@ export function assetAddHistory(
 }
 
 // note: moved outside so it works with POJOs
-export function assetSetBalanceYoctos(asset: Asset, yoctos: string): number {
+export function setAssetBalanceYoctos(asset: Asset, yoctos: string): number {
   asset.balance = c.ytond(yoctos, asset.decimals || 24);
+  asset.balanceTimestamp = Date.now()
   return asset.balance
 }
 
@@ -149,9 +155,9 @@ export async function assetUpdateBalance(asset: Asset, accountId: string): Promi
         asset.contractId
       );
       if (asset.symbol == "UNSTAKED") {
-        asset.balance = c.yton(poolAccInfo.unstaked_balance);
+        setAssetBalanceYoctos(asset, poolAccInfo.unstaked_balance);
       } else if (asset.symbol == "STAKED") {
-        asset.balance = c.yton(poolAccInfo.staked_balance);
+        setAssetBalanceYoctos(asset, poolAccInfo.staked_balance);
       }
     }
   }
@@ -161,7 +167,7 @@ export async function assetUpdateBalance(asset: Asset, accountId: string): Promi
     let balanceYoctos = await askBackgroundViewMethod(
       asset.contractId, "ft_balance_of", { account_id: accountId }
     );
-    assetSetBalanceYoctos(asset, balanceYoctos);
+    setAssetBalanceYoctos(asset, balanceYoctos);
   }
 
 }
@@ -215,8 +221,8 @@ export class ExtendedAccountData {
   //accessStatus: string;
   typeFull: string; //full-type + note
   accountInfo: Account;
-  total: number = 0; //lastBalance+inThePool
-  totalUSD: number = 0; //lastBalance+inThePool * NEAR price
+  total: number | undefined = undefined; //lastBalance+inThePool
+  totalUSD: number | undefined = undefined; //lastBalance+inThePool * NEAR price
   unlockedOther: number = 0;
   available: number = 0;
 
@@ -272,10 +278,15 @@ export class ExtendedAccountData {
       this.available = Math.max(0, this.available - 4);
     }
 
-    this.total = this.accountInfo.lastBalance;
-
-    this.totalUSD = this.total * nearDollarPrice;
-
+    // 1 min valid cache
+    if (this.accountInfo.lastBalanceTimestamp == undefined || this.accountInfo.lastBalanceTimestamp < Date.now() - 60 * 1000) {
+      this.total = undefined;
+      this.totalUSD = undefined;
+    }
+    else {
+      this.total = this.accountInfo.lastBalance;
+      this.totalUSD = this.total * nearDollarPrice;
+    }
   }
 
   async refreshLastBalance() {
@@ -298,48 +309,27 @@ export class ExtendedAccountData {
 
 }
 
-export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account, save:boolean=true) {
-  const suffix = LockupContract.getLockupSuffix();
-  if (accName.endsWith(suffix)) {
-    //lockup contract
-    if (!info.ownerId) return;
-    //get lockup contract data and update info param
-    const lockup = await getLockupContract(info);
-    if (!lockup) return;
-    //
-  } else {
-    //normal account
-    let stateResultYoctos;
-    try {
-      stateResultYoctos = await askBackground({
-        code: "query-near-account",
-        accountId: accName,
-      });
-    } catch (ex) {
-      const err = ex as Error
-      let reason = (err.message && err.message.includes("name:UNKNOWN_ACCOUNT")) ? `not found in ${activeNetworkInfo.name}` : err.message;
-      throw Error(`account:"${accName}", Error:${reason}`);
-    }
+export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account, save: boolean = true) {
 
-    let newBalance = c.yton(stateResultYoctos.amount);
-    if (newBalance != info.lastBalance) {
-      info.lastBalance = newBalance
-      // save updated balance
-      if (save) askBackgroundSetAccount(accName,info);
-    }
-
-    // if (info.stakingPool) {
-    //     const previnThePool = info.staked + info.unstaked;
-    //     const stakingInfo = await StakingPool.getAccInfo(accName, info.stakingPool)
-    //     info.staked = c.yton(stakingInfo.staked_balance)
-    //     info.unstaked = c.yton(stakingInfo.unstaked_balance)
-    //     info.rewards = previnThePool > 0 ? info.staked + info.unstaked - previnThePool : 0;
-    //     if (info.rewards < 0) info.rewards = 0;
-    //     info.stakingPoolPct = await StakingPool.getFee(info.stakingPool)
-    // }
-    // else {
-    //     info.staked = 0
-    //     info.unstaked = 0
-    // }
+  let stateResultYoctos;
+  try {
+    stateResultYoctos = await askBackground({
+      code: "query-near-account",
+      accountId: accName,
+    });
+  } catch (ex) {
+    const err = ex as Error
+    let reason = (err.message && err.message.includes("name:UNKNOWN_ACCOUNT")) ? `not found in ${activeNetworkInfo.name}` : err.message;
+    throw Error(`account:"${accName}", Error:${reason}`);
   }
+  let newBalance = c.yton(stateResultYoctos.amount);
+
+  info.lastBalance = newBalance
+  info.lastBalanceTimestamp = Date.now()
+  // save updated balance
+  if (save) {
+    askBackgroundSetAccount(accName, info);
+  }
+
+
 }

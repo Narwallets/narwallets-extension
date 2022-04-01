@@ -104,7 +104,6 @@ function backToAccountsClicked() {
   } else {
     d.clearContainer("address-list");
     d.showPage("account-list-main");
-    d.showSubPage("assets");
     hideOkCancel();
   }
 }

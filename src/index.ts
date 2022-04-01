@@ -2,7 +2,7 @@ import * as d from "./util/document.js";
 import * as Pages from "./pages/main.js";
 import { NetworkList } from "./lib/near-api-lite/network.js";
 
-import { refreshAllAccounts } from "./pages/main.js";
+import { refreshAccountListBalances } from "./pages/main.js";
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ChangePass_addListeners } from "./pages/change-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
@@ -11,7 +11,7 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { refreshSelectedAccountAndAssets, selectedAccountData, show as AccountSelectedPage_show } from "./pages/account-selected.js";
+import { refreshSelectedAccountAndAssets, selectedAccountData } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
 import { show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
@@ -272,12 +272,12 @@ export function switchDarkLight(): string {
 
 //-----------------------
 //executed after the background-page is available
-let initiPopupTimestamp: number=0; 
+let initPopupTimestamp: number = 0;
 async function initPopup() {
   // debounce
-  if (Date.now()<initiPopupTimestamp+100) return;
-  initiPopupTimestamp=Date.now()
-  
+  if (Date.now() < initPopupTimestamp + 100) return;
+  initPopupTimestamp = Date.now()
+
   chrome.alarms.clear("unlock-expired");
   console.log(new Date().toISOString(), "enter initPopup()")
 
@@ -308,9 +308,9 @@ async function initPopup() {
     const TEMPLATE = `<div>
       <div data-code="{name}" class="circle {color}">{displayName}</div>
     </div>`;
-    const NLCONT = "network-items"
-    d.clearContainer(NLCONT)
-    d.populateUL(NLCONT, TEMPLATE, NetworkList);
+    const NET_LIST_CONTAINER = "network-items"
+    d.clearContainer(NET_LIST_CONTAINER)
+    d.populateUL(NET_LIST_CONTAINER, TEMPLATE, NetworkList);
   }
 
   //--init other pages
@@ -329,32 +329,37 @@ async function initPopup() {
 
   calculateDollarValue();
 
+  initPopupHandlers()
+
   // set auto-refresh based on page shown
+  // first
+  setTimeout(autoRefresh, 200);
+  // then every 10 secs
   window.setInterval(async function () {
     autoRefresh();
-  }, 5000);
-
-  initPopupHandlers()
+  }, 10000);
 
   //show main page
   return Pages.show();
 }
 
 let refreshing: boolean = false;
-function autoRefresh() {
+export async function autoRefresh() {
+  console.log(refreshing ? "SKIP" : "DO", "autoRefresh enter", d.activePage, "already refreshing?", refreshing)
   if (refreshing) return;
   try {
     refreshing = true
     //console.log(`Calling auto-refresh, selectedAccountData ${selectedAccountData} d.activePage ${d.activePage}`);
     if (d.activePage == "account-list-main") {
-      refreshAllAccounts();
+      await refreshAccountListBalances();
     }
     else if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
-      refreshSelectedAccountAndAssets(true);
+      await refreshSelectedAccountAndAssets(true);
     }
   }
   finally {
     refreshing = false
+    console.log("autoRefresh EXIT", d.activePage)
   }
 }
 

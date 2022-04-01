@@ -18,7 +18,7 @@ import type {
   Transfer,
 } from "../lib/near-api-lite/batch-transaction.js";
 import type { ResolvedMessage } from "../data/state-type.js";
-import { Asset, assetAddHistory, assetAmount, assetSetBalanceYoctos, findAsset, History } from "../data/account.js";
+import { Asset, assetAddHistory, assetAmount, setAssetBalanceYoctos, findAsset, History } from "../data/account.js";
 import { box_nonceLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 
 //version: major+minor+version, 3 digits each
@@ -121,7 +121,7 @@ function reflectTransfer(msg: any) {
                 if (sourceAccount == undefined) break;
                 // search the asset in the source-account
                 const sourceAsset = findAsset(sourceAccount, contract)
-                if (sourceAsset) {
+                if (sourceAsset && sourceAsset.balance!=undefined) {
                   // if found, subtract amount from balance
                   sourceAsset.balance -= assetAmount(sourceAsset, amountY);
                   if (sourceAsset.balance < 0) sourceAsset.balance = 0;
@@ -133,7 +133,7 @@ function reflectTransfer(msg: any) {
                 if (destAccount == undefined) break;
                 // search the asset in the dest-account
                 let destAsset = findAsset(destAccount, contract);
-                if (destAsset != undefined) {
+                if (destAsset != undefined && destAsset.balance!=undefined) {
                   // if found, add amount to balance
                   destAsset.balance += assetAmount(destAsset, amountY);
                   //assetAddHistory(destAsset)
@@ -141,7 +141,7 @@ function reflectTransfer(msg: any) {
                 else if (sourceAsset != undefined) {
                   // if not found, clone from sourceAsset
                   destAsset = Asset.newFrom(sourceAsset)
-                  assetSetBalanceYoctos(destAsset, amountY);
+                  setAssetBalanceYoctos(destAsset, amountY);
                   destAccount.assets.push(destAsset)
                 }
                 if (destAsset != undefined) {
