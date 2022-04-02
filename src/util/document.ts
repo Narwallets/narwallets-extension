@@ -233,7 +233,7 @@ export function showByClass(id: string, className: string) {
  */
 export function showPage(id: string) {
   activePage = id;
-  console.log("activePage=",id)
+  //console.log("activePage=",id)
   showByClass(id, "appface");
 }
 export function showSubPage(id: string) {

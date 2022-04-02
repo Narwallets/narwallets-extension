@@ -707,7 +707,7 @@ async function sendClicked() {
       maxAmountToSend = selectedAccountData.unlockedOther;
     }
     const amountLockedMsg = selectedAccountData.accountInfo.lockedOther? " (" + selectedAccountData.accountInfo.lockedOther + " is locked)": "";
-    if (amountLockedMsg!=="") console.log(amountLockedMsg)
+    //if (amountLockedMsg!=="") console.log(amountLockedMsg)
     //check amount
     if (maxAmountToSend <= 0) {
       d.showErr("Not enough balance to send" + amountLockedMsg);

@@ -279,7 +279,7 @@ async function initPopup() {
   initPopupTimestamp = Date.now()
 
   chrome.alarms.clear("unlock-expired");
-  console.log(new Date().toISOString(), "enter initPopup()")
+  //console.log(new Date().toISOString(), "enter initPopup()")
 
   hamb = new d.El(".hamb");
   aside = new d.El("aside");

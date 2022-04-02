@@ -322,7 +322,7 @@ export function updateScreen(selector: string, amount: number | undefined) {
   try {
     const e = document.querySelector(selector) as HTMLElement
     if (e) {
-      console.log("updateScreen", selector, amount);
+      //console.log("updateScreen", selector, amount);
       e.innerText = c.toStringDec(amount)
     } else {
       console.log("WARN updateScreen selector", selector, "not found")
