@@ -294,6 +294,14 @@ export class ExtendedAccountData {
       this.name,
       this.accountInfo
     );
+    try {
+      if (this.accountInfo.type == "lock.c") {
+        const locked = await askBackgroundViewMethod(this.name, "get_locked_amount", {})
+        this.accountInfo.lockedOther = c.yton(locked) + 35 // 35 NEAR are locked in lock-accounts to backup storage
+      }
+    } catch (ex) {
+      console.error(ex)
+    }
     this.recomputeTotals()
   }
 

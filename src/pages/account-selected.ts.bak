@@ -697,6 +697,7 @@ async function sendClicked() {
 
     //check amount
     if (maxAmountToSend <= 0) {
+      console.log(accountInfo.lockedOther)
       d.showErr("Not enough balance to send");
     } else {
       d.byId("max-amount-send").innerText = c.toStringDec(maxAmountToSend);

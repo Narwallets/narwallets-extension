@@ -205,7 +205,7 @@ export function historyLineClicked(ev: Event) {
   }
 }
 
-export async function refreshSelectedAccountAndAssets(fromTimer?: boolean) {
+export async function refreshSelectedAccountAndAssets() {
 
   // save because user can set selectedAccountData.name="" (by going to the account list) in the middle of the refresh
   const accName = selectedAccountData.name
@@ -481,7 +481,16 @@ function updateAccountHeaderDOM() {
 
   // only update amount
   const el = document.querySelector("#selected-account .accountdetsbalance") as HTMLElement;
-  if (el) el.innerText = c.toStringDec(selectedAccountData.total);
+  if (el) {
+    el.innerText = c.toStringDec(selectedAccountData.total);
+    if (selectedAccountData.isLockup && selectedAccountData.accountInfo.lockedOther>0) {
+      el.innerText = el.innerText + ` (${c.toStringDec(selectedAccountData.accountInfo.lockedOther)} locked)`
+      el.classList.add("small")
+    }
+    else {
+      el.classList.remove("small")
+    }
+  }
 
   if (nearDollarPrice) {
     usdPriceReady();
@@ -697,17 +706,18 @@ async function sendClicked() {
     ) {
       maxAmountToSend = selectedAccountData.unlockedOther;
     }
-
+    const amountLockedMsg = selectedAccountData.accountInfo.lockedOther? " (" + selectedAccountData.accountInfo.lockedOther + " is locked)": "";
+    if (amountLockedMsg!=="") console.log(amountLockedMsg)
     //check amount
     if (maxAmountToSend <= 0) {
-      d.showErr("Not enough balance to send");
+      d.showErr("Not enough balance to send" + amountLockedMsg);
     } else {
-      d.byId("max-amount-send").innerText = c.toStringDec(maxAmountToSend);
+      //d.byId("max-amount-send").innerText = c.toStringDec(maxAmountToSend);
       d.onClickId("send-max", function () {
         d.maxClicked(
           "send-to-account-amount",
-          "#max-amount-send",
-          0.1
+          "#account-selected .accountdetsbalance",
+          selectedAccountData.accountInfo.lockedOther
         );
       });
       d.showSubPage("account-selected-send");
@@ -918,7 +928,7 @@ async function stakeClicked() {
 
     if (selectedAccountData.isLockup && lc) {
       stakeAmountBox.value = c.ytonFull(lc.accountBalanceYoctos)
-      d.qs("#max-stake-amount-2-label").innerText = stakeAmountBox.value;
+      //d.qs("#max-stake-amount-2-label").innerText = stakeAmountBox.value;
       stakeAmountBox.disabled = true;
       stakeAmountBox.classList.add("semi-transparent");
     }
@@ -928,23 +938,23 @@ async function stakeClicked() {
 
       d.qs("#liquid-stake-radio").el.checked = true;
       d.inputById("stake-with-staking-pool").value = "";
-      d.qs("#max-stake-amount-1").innerText = c.toStringDec(
-        Math.max(0, amountToStake - removeFromMax)
-      );
-      d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(
-        Math.max(0, amountToStake - removeFromMax)
-      );
+      // d.qs("#max-stake-amount-1").innerText = c.toStringDec(
+      //   Math.max(0, amountToStake - removeFromMax)
+      // );
+      // d.qs("#max-stake-amount-2-label").innerText = c.toStringDec(
+      //   Math.max(0, amountToStake - removeFromMax)
+      // );
       d.onClickId("liquid-stake-max", function () {
         d.maxClicked(
           "stake-amount-liquid",
-          "#max-stake-amount-1",
+          "#account-selected .accountdetsbalance",
           removeFromMax
         );
       });
       d.onClickId("max-stake-amount-2-button", function () {
         d.maxClicked(
           "stake-amount",
-          "#max-stake-amount-2-label",
+          "#account-selected .accountdetsbalance",
           removeFromMax
         );
       });
@@ -1884,6 +1894,7 @@ export function historyWithIcons(base: History[]) {
           break;
         case "stake":
         case "staked":
+        case "restake":
           data.icon = STAKE_DEFAULT_SVG;
           break;
         case "send":

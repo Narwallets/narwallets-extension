@@ -101,6 +101,7 @@ export function toStringDecMin(n: number) {
  * @param {string} str
  */
 export function toNum(str: string): number {
+    if (str.includes(" ")) str=str.slice(0,str.indexOf(" "));
     return Number(str.replace(/,/g, ""))
 }
 

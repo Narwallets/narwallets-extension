@@ -345,7 +345,7 @@ async function initPopup() {
 
 let refreshing: boolean = false;
 export async function autoRefresh() {
-  console.log(refreshing ? "SKIP" : "DO", "autoRefresh enter", d.activePage, "already refreshing?", refreshing)
+  //console.log(refreshing ? "SKIP" : "DO", "autoRefresh enter", d.activePage, "already refreshing?", refreshing)
   if (refreshing) return;
   try {
     refreshing = true
@@ -354,12 +354,12 @@ export async function autoRefresh() {
       await refreshAccountListBalances();
     }
     else if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
-      await refreshSelectedAccountAndAssets(true);
+      await refreshSelectedAccountAndAssets();
     }
   }
   finally {
     refreshing = false
-    console.log("autoRefresh EXIT", d.activePage)
+    //console.log("autoRefresh EXIT", d.activePage)
   }
 }
 

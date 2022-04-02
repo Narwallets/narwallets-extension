@@ -219,6 +219,11 @@ span#icon img {
   /* padding-top   : 4px; */
   padding-bottom: 0px;
 }
+.accountdetsbalance.small {
+  font-size : 20px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
 
 .accountdetsbalance svg {
   background-color   : transparent;

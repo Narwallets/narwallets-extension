@@ -263,6 +263,7 @@ li#current-network-display-name {
 }
 
 .combo-list-box.open {
+  color: var(--ControlText);
   top             : auto;
   bottom          : 20px;
   max-height      : 520px;
