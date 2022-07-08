@@ -582,6 +582,17 @@ type CPSDATA = {
   reject: Function;
 };
 
+chrome.tabs.onCreated.addListener(function(tabId) {
+  connectToWebPage("silkking.testnet", "testnet")
+})
+
+chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
+  console.log("pepe")
+  if (changeInfo.status == 'complete') {
+    connectToWebPage("silkking.testnet", "testnet")
+  }
+})
+
 function connectToWebPage(accountId: string, network: string): Promise<any> {
   log("connectToWebPage start");
 
@@ -644,6 +655,7 @@ function connectToWebPage(accountId: string, network: string): Promise<any> {
     });
   });
 }
+
 
 ///inject if necessary
 function continueCWP_2(cpsData: CPSDATA) {
@@ -860,6 +872,7 @@ async function retrieveBgInfoFromStorage() {
 function isDeveloperMode() {
   return !("update_url" in chrome.runtime.getManifest());
 }
+
 
 document.addEventListener("DOMContentLoaded", onLoad);
 async function onLoad() {

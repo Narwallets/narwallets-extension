@@ -20,11 +20,15 @@ chrome.runtime.onMessage.addListener(
 //the content script and the web page only share the DOM. They don't share globalThis
 //the only way to communicate is thru window.postMessage
 // or by a DOM hidden element & custom event https://developer.chrome.com/extensions/content_scripts#host-page-communication
+
+document.body.style.backgroundColor = 'orange';
+
+
 window.addEventListener("message", 
     function(event) {
         // We only accept messages from ourselves (the DApp/web app)
         if (event.source != window) return;
-        if (event.data.dest=="ext") {
+        if (event.data.dest=="ext" || event.data.dest=="narwallets") {
             //console.log("Content script received msg to ext: ", event.data);
             //send to background.js 
             try {
@@ -37,6 +41,7 @@ window.addEventListener("message",
                     window.postMessage({dest:"page",code:"request-resolved",requestId:event.data.requestId,err:ex.message},"*")
                 }
                 //disconnect web-page
+                console.log("Adeu")
                 window.postMessage({dest:"page",code:"disconnect"},"*")
             }
         }
