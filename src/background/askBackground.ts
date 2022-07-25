@@ -8,7 +8,7 @@ import {
   Transfer,
 } from "../lib/near-api-lite/batch-transaction.js";
 import { log } from "../lib/log.js";
-import { GContact } from "../data/Contact.js";
+import { GContact } from "../data/contact.js";
 
 //ask background, wait for response, return a Promise
 export function askBackground(requestPayload: any): Promise<any> {

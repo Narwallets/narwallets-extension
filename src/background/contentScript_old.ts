@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener(
 //the only way to communicate is thru window.postMessage
 // or by a DOM hidden element & custom event https://developer.chrome.com/extensions/content_scripts#host-page-communication
 
-document.body.style.backgroundColor = 'orange';
+document.body.style.backgroundColor = 'yellow';
 
 
 window.addEventListener("message", 

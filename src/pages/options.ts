@@ -3,7 +3,7 @@ import {
   askBackground,
 } from "../background/askBackground.js";
 import * as Pages from "./main.js";
-import { GContact } from "../data/Contact.js";
+import { GContact } from "../data/contact.js";
 import * as d from "../util/document.js";
 
 export let addressContacts: GContact[] = [];

@@ -28,7 +28,7 @@ const INVALID_USER_OR_PASS = "Invalid Password";
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import type { StateStruct } from "./state-type.js";
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
-import { GContact } from "./Contact.js";
+import { GContact } from "./contact.js";
 import { activeNetworkInfo } from "../index.js";
 import { yton } from "../util/conversions.js";
 

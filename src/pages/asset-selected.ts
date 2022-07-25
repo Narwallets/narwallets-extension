@@ -37,7 +37,7 @@ import {
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { addressContacts, getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
-import { GContact } from "../data/Contact.js";
+import { GContact } from "../data/contact.js";
 import { localStorageSet } from "../data/util.js";
 import { contactExists } from '../pages/address-book.js'
 import {

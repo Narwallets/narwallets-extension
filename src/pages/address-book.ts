@@ -5,7 +5,7 @@ import {
   askBackgroundAllAddressContact,
   askBackgroundAllNetworkAccounts,
 } from "../background/askBackground.js";
-import { contactPlusNote, GContact } from "../data/Contact.js";
+import { contactPlusNote, GContact } from "../data/contact.js";
 import { saveSecureState } from "../data/global.js";
 import { D } from "../lib/tweetnacl/core/core.js";
 import * as d from "../util/document.js";

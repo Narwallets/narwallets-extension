@@ -6,7 +6,7 @@ import { SINGLE_USER_EMAIL } from "../index.js"
 import { showPassword } from "../data/util.js"
 
 async function unlockClicked(ev :Event) {
-
+  console.log("Unlock clicked")
   //const emailEl = d.inputById("unlock-email")
   const passEl = d.inputById("unlock-pass")
   const email = SINGLE_USER_EMAIL; //emailEl.value
@@ -22,11 +22,16 @@ async function unlockClicked(ev :Event) {
   try {
     await askBackground({code:"unlockSecureState",email:email, password:password})
     const numAccounts=await askBackground({code:"getNetworkAccountsCount"})
+    console.log("Accounts: ", numAccounts)
     if (numAccounts == 0) {
-      d.showPage("import-or-create"); //auto-add account after unlock
-    }
-    else {
-      await MainPage_show()
+      d.showPage("import-or-create"); //auto-add account after unlock      
+    } else {
+      const wasCalled = await askBackground({code:"callGlobalSendResponse"})
+      if(!wasCalled) {
+        await MainPage_show()
+      } else {
+        window.close()
+      }
     }
   }
   catch (ex) {
@@ -36,7 +41,7 @@ async function unlockClicked(ev :Event) {
 }
 
 export async function show() {
-  
+  console.log("Showing unlock page")
   d.onClickId("unlock", unlockClicked);
 
   d.onEnterKey("unlock-pass", unlockClicked)

@@ -146,6 +146,7 @@ async function disconnectFromWepPageClicked() {
 //--------------------------
 export async function show() {
   try {
+    console.log("Hello 3")
     d.hideErr();
 
     //is locked?

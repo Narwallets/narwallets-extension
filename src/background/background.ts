@@ -12,14 +12,19 @@ import * as TX from "../lib/near-api-lite/transaction.js";
 
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 
-import type {
+import {
   FunctionCall,
   DeleteAccountToBeneficiary,
   Transfer,
+  BatchAction,
 } from "../lib/near-api-lite/batch-transaction.js";
 import type { ResolvedMessage } from "../data/state-type.js";
 import { Asset, assetAddHistory, assetAmount, setAssetBalanceYoctos, findAsset, History } from "../data/account.js";
 import { box_nonceLength } from "../lib/naclfast-secret-box/nacl-fast.js";
+import { accountHasPrivateKey, selectedAccountData } from "../pages/account-selected.js";
+import { META_SVG } from "../util/svg_const.js";
+
+export let globalSendResponse: Function | undefined = undefined
 
 //version: major+minor+version, 3 digits each
 function semver(major: number, minor: number, version: number): number {
@@ -49,6 +54,7 @@ function runtimeMessageHandler(
   const fromPage = !url.startsWith(
     "chrome-extension://" + chrome.runtime.id + "/"
   );
+  const fromWs = msg.src? msg.src == "ws" : false
 
   //console.log("runtimeMessage received ",sender, url)
   log(
@@ -56,16 +62,19 @@ function runtimeMessageHandler(
     (fromPage ? "FROM PAGE " : "from popup ") +
     JSON.stringify(msg)
   );
+  console.log("Message received")
   if (msg.dest != "ext") {
     sendResponse({ err: "msg.dest must be 'ext'" });
+  } else if(fromWs) {
+    resolveFromWalletSelector(msg, sendResponse)
   } else if (fromPage) {
     // from web-app/tab -> content-script
     // process separated from internal requests for security
     msg.url = url; //add source
     msg.tabId = sender.tab ? sender.tab.id : -1; //add tab.id
-    setTimeout(() => {
-      processMessageFromWebPage(msg);
-    }, 100); //execute async
+    // setTimeout(() => {
+    //   processMessageFromWebPage(msg);
+    // }, 100); //execute async
   } else {
     //from internal pages like popup
     //other codes resolved by promises
@@ -82,6 +91,79 @@ function runtimeMessageHandler(
     //returning void cancels all pending callbacks
   }
   return true; //a prev callback could be pending.- always return true
+}
+
+async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Function) {
+  switch(msg.code) {
+    case "is-installed":
+      sendResponse({id: msg.id, code: msg.code, data: true})
+      break
+    case "is-signed-in":
+      sendResponse({id: msg.id, code: msg.code, data: !global.isLocked() })
+      break
+    case "sign-in":
+    case "get-account-id":
+      if(global.isLocked()) {
+        const width = 500;
+        const height = 540;
+        const tabId = 
+        chrome.windows.create({
+          url: "index.html",
+          type: "popup",
+          left: screen.width / 2 - width / 2,
+          top: screen.height / 2 - height / 2,
+          width: width,
+          height: height,
+          focused: true,
+        });
+        console.log("Setting global send response")
+        globalSendResponse = function() {
+          localStorageGet("currentAccountId").then(accName => sendResponse({id: msg.id, code: msg.code, data: accName}))
+          globalSendResponse = undefined
+        }
+        console.log("Global send response set: ", globalSendResponse)
+        // setTimeout(() => {
+        //   sendResponse({accountId: "", error: "Wallet is locked"})
+        //   globalSendResponse = undefined
+        // }, 5000)
+      } else {
+        localStorageGet("currentAccountId").then(accName => sendResponse({id: msg.id, code: msg.code, data: accName}))
+      }
+      break
+      case "sign-and-send-transaction":
+        console.log("Received signAndSendTransaction", msg.params.actions)
+        const signerId = await localStorageGet("currentAccountId")
+        const accInfo = global.getAccount(signerId);
+        const actions = msg.params.actions.map((action: any) => {
+          const a = createCorrespondingAction(action)
+          console.log("Created")
+          return a
+        })
+        near.broadcast_tx_commit_actions(
+          actions,
+          signerId,
+          msg.params.receiverId,
+          accInfo.privateKey || ""
+        );
+        break
+      default:
+        sendResponse({id: msg.id, code: msg.code, error: `Code ${msg.code} not found`})
+  }
+}
+
+function createCorrespondingAction(action: any): TX.Action {
+  console.log(action)
+  if(action.methodName) {
+    console.log("Creating functionCall")
+    return TX.functionCall(action.methodName, action.args, action.gas, action.attached)
+    // return new TX.Action(action)
+    // return new TX.Action(action.method, action.args, action.gas, action.attached)
+  // } else if(action.beneficiaryAccountId) {
+  //   return new DeleteAccountToBeneficiary(action.beneficiaryAccountId)
+  // } else if(action.attached) {
+  //   return new Transfer(action.attached)
+  }
+  throw new Error(`There is no action that matches input: ${action}`)
 }
 
 function reflectReception(receiver: string, amount: number, sender: string) {
@@ -199,6 +281,15 @@ function reflectTransfer(msg: any) {
 function getActionPromise(msg: Record<string, any>): Promise<any> {
   try {
     switch (msg.code) {
+      case "callGlobalSendResponse":
+        if(!globalSendResponse) {
+          return Promise.resolve(false)
+        }
+        globalSendResponse()
+        return Promise.resolve(true)
+      case "get-account-id": {
+        return Promise.resolve(selectedAccountData.name)
+      }
       case "set-network": {
         Network.setCurrent(msg.network);
         localStorageSet({ selectedNetwork: Network.current });
@@ -305,10 +396,11 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
         const result = global.SecureState.accounts[Network.current];
         return Promise.resolve(result || {});
       }
-      case "connect": {
-        if (!msg.network) msg.network = Network.current;
-        return connectToWebPage(msg.accountId, msg.network);
-      }
+      // case "connect": {
+      //   if (!msg.network) msg.network = Network.current;
+      //   return connectToWebPage(msg.accountId, msg.network);
+      // }
+      
       case "disconnect": {
         return disconnectFromWebPage();
       }
@@ -438,6 +530,40 @@ async function processMessageFromWebPage(msg: any) {
   );
 
   switch (msg.code) {
+    case "sign-in": {
+      //load popup window for the user to approve
+      // if(await accountHasPrivateKey()) {
+      //   console.log("Private key", selectedAccountData)
+      // }
+      // console.log("Signing in", selectedAccountData)
+      // const width = 500;
+      // const height = 540;
+      // chrome.windows.create({
+      //   url: "index.html",
+      //   type: "popup",
+      //   left: screen.width / 2 - width / 2,
+      //   top: screen.height / 2 - height / 2,
+      //   width: width,
+      //   height: height,
+      //   focused: true,
+      // });
+      // if(global.isLocked()) {
+      //   const width = 500;
+      //   const height = 540;
+      //   chrome.windows.create({
+      //     url: "index.html",
+      //     type: "popup",
+      //     left: screen.width / 2 - width / 2,
+      //     top: screen.height / 2 - height / 2,
+      //     width: width,
+      //     height: height,
+      //     focused: true,
+      //   });
+      // } else {
+      //   resolvedMsg.data = {accessKey: "", error: undefined}
+      //   chrome.tabs.sendMessage(resolvedMsg.tabId, resolvedMsg);
+      // }
+    }
     case "connected":
       ctinfo.acceptedConnection = !msg.err;
       ctinfo.connectedResponse = msg;
@@ -582,140 +708,140 @@ type CPSDATA = {
   reject: Function;
 };
 
-chrome.tabs.onCreated.addListener(function(tabId) {
-  connectToWebPage("silkking.testnet", "testnet")
-})
+// chrome.tabs.onCreated.addListener(function(tabId) {
+//   connectToWebPage("silkking.testnet", "testnet")
+// })
 
-chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
-  console.log("pepe")
-  if (changeInfo.status == 'complete') {
-    connectToWebPage("silkking.testnet", "testnet")
-  }
-})
+// chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
+//   console.log("pepe")
+//   if (changeInfo.status == 'complete') {
+//     connectToWebPage("silkking.testnet", "testnet")
+//   }
+// })
 
-function connectToWebPage(accountId: string, network: string): Promise<any> {
-  log("connectToWebPage start");
+// function connectToWebPage(accountId: string, network: string): Promise<any> {
+//   log("connectToWebPage start");
 
-  return new Promise((resolve, reject) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      if (chrome.runtime.lastError)
-        return reject(Error(chrome.runtime.lastError.message));
+//   return new Promise((resolve, reject) => {
+//     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+//       if (chrome.runtime.lastError)
+//         return reject(Error(chrome.runtime.lastError.message));
 
-      const activeTabId = (tabs[0] ? tabs[0].id : -1) || -1;
-      if (activeTabId == -1) return reject(Error("no activeTabId"));
+//       const activeTabId = (tabs[0] ? tabs[0].id : -1) || -1;
+//       if (activeTabId == -1) return reject(Error("no activeTabId"));
 
-      if (!_connectedTabs) _connectedTabs = {};
-      if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId] = {};
+//       if (!_connectedTabs) _connectedTabs = {};
+//       if (!_connectedTabs[activeTabId]) _connectedTabs[activeTabId] = {};
 
-      const cpsData: CPSDATA = {
-        accountId: accountId,
-        network: network,
-        activeTabId: activeTabId,
-        url: tabs[0].url,
-        ctinfo: _connectedTabs[activeTabId],
-        resolve: resolve,
-        reject: reject,
-      };
-      log("activeTabId", cpsData);
-      cpsData.ctinfo = _connectedTabs[cpsData.activeTabId];
-      cpsData.ctinfo.acceptedConnection = false; //we're connecting another
-      cpsData.ctinfo.connectedResponse = {};
+//       const cpsData: CPSDATA = {
+//         accountId: accountId,
+//         network: network,
+//         activeTabId: activeTabId,
+//         url: tabs[0].url,
+//         ctinfo: _connectedTabs[activeTabId],
+//         resolve: resolve,
+//         reject: reject,
+//       };
+//       log("activeTabId", cpsData);
+//       cpsData.ctinfo = _connectedTabs[cpsData.activeTabId];
+//       cpsData.ctinfo.acceptedConnection = false; //we're connecting another
+//       cpsData.ctinfo.connectedResponse = {};
 
-      //check if it responds (if it is already injected)
-      try {
-        if (chrome.runtime.lastError) throw Error(chrome.runtime.lastError);
-        if (!tabs || !tabs[0]) throw Error("can access chrome tabs");
+//       //check if it responds (if it is already injected)
+//       try {
+//         if (chrome.runtime.lastError) throw Error(chrome.runtime.lastError);
+//         if (!tabs || !tabs[0]) throw Error("can access chrome tabs");
 
-        chrome.tabs.sendMessage(
-          cpsData.activeTabId,
-          { code: "ping" },
-          function (response) {
-            if (chrome.runtime.lastError) {
-              response = undefined;
-            }
-            if (!response) {
-              //not responding, set injected status to false
-              cpsData.ctinfo.injected = false;
-              //console.error(JSON.stringify(chrome.runtime.lastError));
-            } else {
-              //responded set injected status
-              cpsData.ctinfo.injected = true;
-            }
-            //CPS
-            return continueCWP_2(cpsData);
-          }
-        );
-      } catch (ex) {
-        //err trying to talk to the page, set injected status
-        cpsData.ctinfo.injected = false;
-        log(ex);
-        //CPS
-        return continueCWP_2(cpsData);
-      }
-    });
-  });
-}
+//         chrome.tabs.sendMessage(
+//           cpsData.activeTabId,
+//           { code: "ping" },
+//           function (response) {
+//             if (chrome.runtime.lastError) {
+//               response = undefined;
+//             }
+//             if (!response) {
+//               //not responding, set injected status to false
+//               cpsData.ctinfo.injected = false;
+//               //console.error(JSON.stringify(chrome.runtime.lastError));
+//             } else {
+//               //responded set injected status
+//               cpsData.ctinfo.injected = true;
+//             }
+//             //CPS
+//             return continueCWP_2(cpsData);
+//           }
+//         );
+//       } catch (ex) {
+//         //err trying to talk to the page, set injected status
+//         cpsData.ctinfo.injected = false;
+//         log(ex);
+//         //CPS
+//         return continueCWP_2(cpsData);
+//       }
+//     });
+//   });
+// }
 
 
 ///inject if necessary
-function continueCWP_2(cpsData: CPSDATA) {
-  if (cpsData.ctinfo.injected) {
-    //if responded, it was injected, continue
-    return continueCWP_3(cpsData);
-  }
-  //not injected yet. Inject/execute contentScript on activeTab
-  //contentScript replies with a chrome.runtime.sendMessage
-  //it also listens to page messages and relays via chrome.runtime.sendMessage
-  //basically contentScript.js acts as a proxy to pass messages from ext<->tab
-  log("injecting");
-  try {
-    chrome.tabs.executeScript(
-      { file: "dist/background/contentScript.js" },
-      function () {
-        if (chrome.runtime.lastError) {
-          log(JSON.stringify(chrome.runtime.lastError));
-          return cpsData.reject(chrome.runtime.lastError);
-        } else {
-          //injected ok
-          cpsData.ctinfo.injected = true;
-          //CPS
-          return continueCWP_3(cpsData);
-        }
-      }
-    );
-  } catch (ex) {
-    return cpsData.reject(ex);
-  }
-}
+// function continueCWP_2(cpsData: CPSDATA) {
+//   if (cpsData.ctinfo.injected) {
+//     //if responded, it was injected, continue
+//     return continueCWP_3(cpsData);
+//   }
+//   //not injected yet. Inject/execute contentScript on activeTab
+//   //contentScript replies with a chrome.runtime.sendMessage
+//   //it also listens to page messages and relays via chrome.runtime.sendMessage
+//   //basically contentScript.js acts as a proxy to pass messages from ext<->tab
+//   log("injecting");
+//   try {
+//     chrome.tabs.executeScript(
+//       { file: "dist/background/contentScript.js" },
+//       function () {
+//         if (chrome.runtime.lastError) {
+//           log(JSON.stringify(chrome.runtime.lastError));
+//           return cpsData.reject(chrome.runtime.lastError);
+//         } else {
+//           //injected ok
+//           cpsData.ctinfo.injected = true;
+//           //CPS
+//           return continueCWP_3(cpsData);
+//         }
+//       }
+//     );
+//   } catch (ex) {
+//     return cpsData.reject(ex);
+//   }
+// }
 
 ///send connect order
-function continueCWP_3(cpsData: CPSDATA) {
-  cpsData.ctinfo.connectedResponse = { err: undefined };
-  log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url);
-  //send connect order via content script. a response will be received later
-  chrome.tabs.sendMessage(cpsData.activeTabId, {
-    dest: "page",
-    code: "connect",
-    data: {
-      accountId: cpsData.accountId,
-      network: cpsData.network,
-      version: WALLET_VERSION,
-    },
-  });
-  //wait 250 for response
-  setTimeout(() => {
-    if (cpsData.ctinfo.acceptedConnection) {
-      //page responded with connection info
-      cpsData.ctinfo.connectedAccountId = cpsData.accountId; //register connected account
-      return cpsData.resolve();
-    } else {
-      let errMsg =
-        cpsData.ctinfo.connectedResponse.err ||
-        "not responding / Not a Narwallets-compatible Web App";
-      return cpsData.reject(Error(cpsData.url + ": " + errMsg));
-    }
-  }, 250);
-}
+// function continueCWP_3(cpsData: CPSDATA) {
+//   cpsData.ctinfo.connectedResponse = { err: undefined };
+//   log("chrome.tabs.sendMessage to", cpsData.activeTabId, cpsData.url);
+//   //send connect order via content script. a response will be received later
+//   chrome.tabs.sendMessage(cpsData.activeTabId, {
+//     dest: "page",
+//     code: "connect",
+//     data: {
+//       accountId: cpsData.accountId,
+//       network: cpsData.network,
+//       version: WALLET_VERSION,
+//     },
+//   });
+//   //wait 250 for response
+//   setTimeout(() => {
+//     if (cpsData.ctinfo.acceptedConnection) {
+//       //page responded with connection info
+//       cpsData.ctinfo.connectedAccountId = cpsData.accountId; //register connected account
+//       return cpsData.resolve();
+//     } else {
+//       let errMsg =
+//         cpsData.ctinfo.connectedResponse.err ||
+//         "not responding / Not a Narwallets-compatible Web App";
+//       return cpsData.reject(Error(cpsData.url + ": " + errMsg));
+//     }
+//   }, 250);
+// }
 
 type ConnectedTabInfo = {
   injected?: boolean;

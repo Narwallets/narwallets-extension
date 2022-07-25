@@ -79,7 +79,7 @@ import {
 import { ASSET_HISTORY_TEMPLATE, getStNEARPrice, nearDollarPrice } from "../data/global.js";
 import { addressContacts } from "./address-book.js";
 import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
-import { GContact } from "../data/Contact.js";
+import { GContact } from "../data/contact.js";
 import {
   LIQUID_STAKE_DEFAULT_SVG,
   RECEIVE_SVG,
@@ -141,6 +141,7 @@ export async function show(
     }
   }
   localStorageSet({ reposition: "account", account: accName });
+  localStorageSet({ currentAccountId: accName })
   checkConnectOrDisconnect();
   autoRefresh()
 }
@@ -634,7 +635,7 @@ function receiveClicked() {
 }
 
 //--------------------------------
-async function connectToWebAppClicked(): Promise<any> {
+export async function connectToWebAppClicked(): Promise<any> {
   d.showWait();
   try {
     await askBackground({
