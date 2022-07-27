@@ -136,9 +136,10 @@ async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse:
         const accInfo = global.getAccount(signerId);
         const actions = msg.params.actions.map((action: any) => {
           const a = createCorrespondingAction(action)
-          console.log("Created")
+          console.log("Created", a)
           return a
         })
+        console.log("Actions", actions)
         near.broadcast_tx_commit_actions(
           actions,
           signerId,
@@ -155,7 +156,7 @@ function createCorrespondingAction(action: any): TX.Action {
   console.log(action)
   if(action.methodName) {
     console.log("Creating functionCall")
-    return TX.functionCall(action.methodName, action.args, action.gas, action.attached)
+    return TX.functionCall(action.methodName, action.args, action.gas, action.deposit)
     // return new TX.Action(action)
     // return new TX.Action(action.method, action.args, action.gas, action.attached)
   // } else if(action.beneficiaryAccountId) {
