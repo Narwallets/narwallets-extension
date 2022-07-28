@@ -19,7 +19,7 @@ import {
   BatchAction,
 } from "../lib/near-api-lite/batch-transaction.js";
 import type { ResolvedMessage } from "../data/state-type.js";
-import { Asset, assetAddHistory, assetAmount, setAssetBalanceYoctos, findAsset, History } from "../data/account.js";
+import { Asset, assetAddHistory, assetAmount, setAssetBalanceYoctos, findAsset, History, Account } from "../data/account.js";
 import { box_nonceLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { accountHasPrivateKey, selectedAccountData } from "../pages/account-selected.js";
 import { META_SVG } from "../util/svg_const.js";
@@ -94,12 +94,20 @@ function runtimeMessageHandler(
 }
 
 async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Function) {
+  let signerId = await localStorageGet("currentAccountId")
+  let accInfo = global.getAccount(signerId);
+  let actions: TX.Action[] = []
   switch(msg.code) {
     case "is-installed":
       sendResponse({id: msg.id, code: msg.code, data: true})
       break
     case "is-signed-in":
       sendResponse({id: msg.id, code: msg.code, data: !global.isLocked() })
+      break
+    case "sign-out":
+      // await disconnectFromWebPage()
+      sendResponse({id: msg.id, code: msg.code, data: true })
+      // ctinfo.acceptedConnection = false;
       break
     case "sign-in":
     case "get-account-id":
@@ -131,31 +139,65 @@ async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse:
       }
       break
       case "sign-and-send-transaction":
-        console.log("Received signAndSendTransaction", msg.params.actions)
-        const signerId = await localStorageGet("currentAccountId")
-        const accInfo = global.getAccount(signerId);
-        const actions = msg.params.actions.map((action: any) => {
-          const a = createCorrespondingAction(action)
-          console.log("Created", a)
-          return a
+      
+        console.log("Received signAndSendTransaction", msg.params)
+        // actions = msg.params.actions.map((action: any) => {
+        //   const a = createCorrespondingAction(action)
+        //   return a
+        // })
+        // near.broadcast_tx_commit_actions(
+        //   actions,
+        //   signerId,
+        //   msg.params.receiverId,
+        //   accInfo.privateKey || ""
+        // )
+        mapAndCommitActions(msg.params, signerId, accInfo).then(res => {
+          console.log(res)
+          sendResponse({id: msg.id, code: msg.code, data: res})
         })
-        console.log("Actions", actions)
-        near.broadcast_tx_commit_actions(
-          actions,
-          signerId,
-          msg.params.receiverId,
-          accInfo.privateKey || ""
-        );
+
         break
+      case "sign-and-send-transactions":
+        console.log("Received signAndSendTransactions", msg.params)
+        const responsesPromises = msg.params.map(async (param: any) => {
+          return mapAndCommitActions(param, signerId, accInfo)
+        });
+        const responses = await Promise.all(responsesPromises)
+        sendResponse({id: msg.id, code: msg.code, data: responses})
+        // actions = msg.params.map((action: any) => {
+        //   const a = createCorrespondingAction(action)
+        //   return a
+        // })
+        // near.broadcast_tx_commit_actions(
+        //   actions,
+        //   signerId,
+        //   msg.params.receiverId,
+        //   accInfo.privateKey || ""
+        // ).then(res => {
+        //   console.log(res)
+        //   sendResponse({id: msg.id, code: msg.code, data: res})
+        // })
       default:
         sendResponse({id: msg.id, code: msg.code, error: `Code ${msg.code} not found`})
   }
 }
 
+function mapAndCommitActions(params: any, signerId: string, accInfo: Account): Promise<any> {
+  const actions = params.actions.map((action: any) => {
+    const a = createCorrespondingAction(action)
+    return a
+  })
+  return near.broadcast_tx_commit_actions(
+    actions,
+    signerId,
+    params.receiverId,
+    accInfo.privateKey || ""
+  )
+}
+
 function createCorrespondingAction(action: any): TX.Action {
-  console.log(action)
   if(action.methodName) {
-    console.log("Creating functionCall")
+    action.gas = "1000000000000"
     return TX.functionCall(action.methodName, action.args, action.gas, action.deposit)
     // return new TX.Action(action)
     // return new TX.Action(action.method, action.args, action.gas, action.attached)

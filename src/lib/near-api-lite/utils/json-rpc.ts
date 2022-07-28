@@ -84,7 +84,6 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
         while (true) {
             let fetchResult = await fetch(rpcUrl, rpcOptions);
             let response = await fetchResult.json()
-
             if (!fetchResult.ok) throw new Error(rpcUrl + " " + fetchResult.status + " " + fetchResult.statusText)
 
             let error = response.error
@@ -97,7 +96,7 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
                 }
             }
             if (error) {
-                console.log(error)
+                
                 const errorMessage = formatJSONErr(error);
                 if (error.data === 'Timeout' || errorMessage.indexOf('Timeout error') != -1) {
                     const err = new Error('jsonRpc has timed out')
