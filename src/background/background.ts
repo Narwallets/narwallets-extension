@@ -95,7 +95,7 @@ function runtimeMessageHandler(
 
 async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Function) {
   let signerId = await localStorageGet("currentAccountId")
-  let accInfo = global.getAccount(signerId);
+  let accInfo: Account
   let actions: TX.Action[] = []
   switch(msg.code) {
     case "is-installed":
@@ -151,6 +151,7 @@ async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse:
         //   msg.params.receiverId,
         //   accInfo.privateKey || ""
         // )
+        accInfo = global.getAccount(signerId);
         mapAndCommitActions(msg.params, signerId, accInfo).then(res => {
           console.log(res)
           sendResponse({id: msg.id, code: msg.code, data: res})
@@ -159,35 +160,24 @@ async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse:
         break
       case "sign-and-send-transactions":
         console.log("Received signAndSendTransactions", msg.params)
-        const responsesPromises = msg.params.map(async (param: any) => {
-          return mapAndCommitActions(param, signerId, accInfo)
-        });
-        const responses = await Promise.all(responsesPromises)
+        accInfo = global.getAccount(signerId);
+        let responses: any[] = []
+        for(let i = 0; i < msg.params.length; i++) {
+          responses.push(await mapAndCommitActions(msg.params[i], signerId, accInfo))
+        }
         sendResponse({id: msg.id, code: msg.code, data: responses})
-        // actions = msg.params.map((action: any) => {
-        //   const a = createCorrespondingAction(action)
-        //   return a
-        // })
-        // near.broadcast_tx_commit_actions(
-        //   actions,
-        //   signerId,
-        //   msg.params.receiverId,
-        //   accInfo.privateKey || ""
-        // ).then(res => {
-        //   console.log(res)
-        //   sendResponse({id: msg.id, code: msg.code, data: res})
-        // })
+        break
       default:
         sendResponse({id: msg.id, code: msg.code, error: `Code ${msg.code} not found`})
   }
 }
 
-function mapAndCommitActions(params: any, signerId: string, accInfo: Account): Promise<any> {
+async function mapAndCommitActions(params: any, signerId: string, accInfo: Account): Promise<any> {
   const actions = params.actions.map((action: any) => {
     const a = createCorrespondingAction(action)
     return a
   })
-  return near.broadcast_tx_commit_actions(
+  return await near.broadcast_tx_commit_actions(
     actions,
     signerId,
     params.receiverId,
@@ -199,12 +189,10 @@ function createCorrespondingAction(action: any): TX.Action {
   if(action.methodName) {
     action.gas = "1000000000000"
     return TX.functionCall(action.methodName, action.args, action.gas, action.deposit)
-    // return new TX.Action(action)
-    // return new TX.Action(action.method, action.args, action.gas, action.attached)
-  // } else if(action.beneficiaryAccountId) {
-  //   return new DeleteAccountToBeneficiary(action.beneficiaryAccountId)
-  // } else if(action.attached) {
-  //   return new Transfer(action.attached)
+  } else if(action.beneficiaryAccountId) {
+    return TX.deleteAccount(action.beneficiaryAccountId)
+  } else if(action.attached) {
+    return TX.transfer(action.attached)
   }
   throw new Error(`There is no action that matches input: ${action}`)
 }

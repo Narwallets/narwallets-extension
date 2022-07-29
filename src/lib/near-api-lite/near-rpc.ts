@@ -141,7 +141,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
     // each transaction requires a unique number or nonce
     // this is created by taking the current nonce and incrementing it
     const nonce = ++accessKey.nonce;
-
+    
     const transaction = TX.createTransaction(
         signerId,
         publicKey,
