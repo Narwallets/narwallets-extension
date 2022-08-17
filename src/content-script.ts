@@ -99,7 +99,7 @@ window.addEventListener("message", (event) => {
     // Sending message to narwallets extension
     return chrome.runtime.sendMessage(event.data, function (response) {
       console.log("Posting message for page with response ", response)
-      // Send response to wallet-selector
+      // Send response to wallet-selector on callback
       window.postMessage(
         {
           type: "nw",
