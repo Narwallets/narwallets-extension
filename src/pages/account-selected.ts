@@ -161,7 +161,6 @@ function initPage() {
   //d.onClickId("acc-disconnect-to-page", disconnectFromPageClicked);
 
   // more tab
-  d.onClickId("access", removePrivateKeyClicked);
   d.onClickId("list-pools", listPoolsClicked);
   d.onClickId("add", addClicked);
   d.onClickId("show-public-key", showPublicKeyClicked);
@@ -184,7 +183,7 @@ function initPage() {
   d.onClickId("show-password-request", showPassword);
 
   seedTextElem = new d.El("#seed-phrase");
-  
+
   OkCancelInit();
 
   var target = document.querySelector("#usd-price-link");
@@ -484,7 +483,7 @@ function updateAccountHeaderDOM() {
   const el = document.querySelector("#selected-account .accountdetsbalance") as HTMLElement;
   if (el) {
     el.innerText = c.toStringDec(selectedAccountData.total);
-    if (selectedAccountData.isLockup && selectedAccountData.accountInfo.lockedOther>0) {
+    if (selectedAccountData.isLockup && selectedAccountData.accountInfo.lockedOther > 0) {
       el.innerText = el.innerText + ` (${c.toStringDec(selectedAccountData.accountInfo.lockedOther)} locked)`
       el.classList.add("small")
     }
@@ -500,7 +499,7 @@ function updateAccountHeaderDOM() {
 }
 
 // re-renders SelectedAccountHeader
-function renderSelectedAccountHeader(){
+function renderSelectedAccountHeader() {
 
   const SELECTED_ACCOUNT = "selected-account";
   const TEMPLATE = `
@@ -707,7 +706,7 @@ async function sendClicked() {
     ) {
       maxAmountToSend = selectedAccountData.unlockedOther;
     }
-    const amountLockedMsg = selectedAccountData.accountInfo.lockedOther? " (" + selectedAccountData.accountInfo.lockedOther + " is locked)": "";
+    const amountLockedMsg = selectedAccountData.accountInfo.lockedOther ? " (" + selectedAccountData.accountInfo.lockedOther + " is locked)" : "";
     //if (amountLockedMsg!=="") console.log(amountLockedMsg)
     //check amount
     if (maxAmountToSend <= 0) {
@@ -723,7 +722,7 @@ async function sendClicked() {
       });
       d.showSubPage("account-selected-send");
       d.onClickId("current-to-send-address", selectAddressClicked)
-      showOKCancel(sendOKClicked, switchToAssetsSupbage);
+      showOKCancel(sendOKClicked, switchToAssetsSupbage, false);
     }
   } catch (ex) {
     d.showErr(ex.message);
@@ -1544,7 +1543,7 @@ async function showPrivateKeyValidationPasswordClicked() {
 }
 
 
-  //---------------------------------------
+//---------------------------------------
 export function startProcessRemovePrivKey() {
   if (selectedAccountData.isFullAccess) {
     d.showSubPage("account-selected-make-read-only");
@@ -1747,8 +1746,8 @@ async function makeReadOnlyOKClicked() {
       await saveSelectedAccount();
       //selectedAccountData.accessStatus = "Read Only";
       showSelectedAccount();
-      d.showMsg(`Account ${localGlobalAlsoRemoveAccount?"":"access "} removed`, "success");
-      if(localGlobalAlsoRemoveAccount){
+      d.showMsg(`Account ${localGlobalAlsoRemoveAccount ? "" : "access "} removed`, "success");
+      if (localGlobalAlsoRemoveAccount) {
         hideOkCancel();
         removeAccountRecord_and_go_to_account_pages();
       }
@@ -1812,7 +1811,7 @@ async function makeFullAccessOKClicked() {
   }
 }
 
-function switchToAssetsSupbage(){
+function switchToAssetsSupbage() {
   d.showSubPage("assets");
 }
 

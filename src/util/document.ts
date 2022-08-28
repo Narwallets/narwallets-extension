@@ -95,6 +95,7 @@ export function onGlobalKeyPress(handler: (ev: Event) => void, key: string) {
       }
     };
     document.addEventListener("keypress", globalEnterKeyPress);
+    console.log('document.addEventListener("keypress")')
   } catch (ex) {
     console.error("ERR: onGlobalKeyPress() " + ex.message);
   }
@@ -107,6 +108,7 @@ export function removeGlobalKeyPress() {
   try {
     document.removeEventListener("keypress", globalEnterKeyPress);
     globalEnterKeyPress = () => { };
+    console.log('document.removeEventListener("keypress")')
   } catch (ex) {
     console.error("ERR: removeGlobalKeyPress() " + ex.message);
   }

@@ -3,18 +3,23 @@ import * as d from "./document.js";
 
 const POPUP_LIST_APPFACE = "popup-list-appface"
 const POPUP_LIST = "popup-list"
-let itemList :PopupItem[];
-let originalList :PopupItem[];
+let popupItemList: PopupItem[];
+let originalList: PopupItem[];
 
 let searchString = "";
 
 export type PopupItem = { text: string, value: string }
 
-export function initPopupHandlers(){
+export function initPopupHandlers() {
     d.onClickId(POPUP_LIST_APPFACE, closePopupList)
 }
 
+let popupClickHandler: Function; 
+
 export async function populatePopupList(items: PopupItem[]) {
+
+    if (!popupClickHandler) throw Error("!popupClickHandler");
+
     var options = "";
     if (items.length == 0) {
         options = `<option value="">-- no data --</option>`
@@ -24,7 +29,24 @@ export async function populatePopupList(items: PopupItem[]) {
         const text = item.text.length < 48 ? item.text : item.text.slice(0, 22) + "..." + item.text.slice(-22)
         options += `<option value="${value}">${text}</option>`;
     }
-    d.byId(POPUP_LIST).innerHTML = options;
+
+    const selectionBox = d.byId(POPUP_LIST);
+    selectionBox.innerHTML = options;
+
+    // connect items with click handler and select one
+    if (popupSelectedIndex > items.length - 1) popupSelectedIndex = Math.max(items.length - 1, 0);
+    selectionBox.querySelectorAll("option").forEach((option: Element, index: number) => {
+        option.addEventListener(d.CLICK, (ev: Event) => {
+            let target = ev.target as HTMLOptionElement
+            popupClickHandler(target.innerHTML, target.value)
+            closePopupList()
+        });
+        if (index == popupSelectedIndex) {
+            option.classList.add("selected")
+        }
+    });
+
+    document.addEventListener("keydown", onPopupKeyDown);
 }
 
 export function closePopupList() {
@@ -32,10 +54,18 @@ export function closePopupList() {
     d.byId(POPUP_LIST_APPFACE).classList.remove(d.OPEN); //hides
     searchString = "";
     d.byId("list-filter").classList.add('hidden')
-    document.removeEventListener("keydown", callback);
+    document.removeEventListener("keydown", onPopupKeyDown);
 }
 
-const callback = function filterList(event: KeyboardEvent){
+function markItemAsSelected() {
+    const selectionBox = d.byId(POPUP_LIST);
+    const nodeList = selectionBox.querySelectorAll("option")
+    nodeList.forEach((option: Element, index: number) => {
+        if (index == popupSelectedIndex) option.classList.add("selected"); else option.classList.remove("selected");
+    })
+}
+
+function onPopupKeyDown(event: KeyboardEvent) {
 
     //If ESC key, close the popup
     if (event.key === "Escape") {
@@ -44,67 +74,86 @@ const callback = function filterList(event: KeyboardEvent){
         return;
     }
 
-    //If special keys, do nothing
-    if(event.key =='Control' || event.key == 'Alt' ||event.key == 'Shift' || event.key == 'Enter' || event.key == 'CapsLock' || event.key == 'Tab')
+    //If Enter key, same as click on selected
+    if (event.key === "Enter") {
+        event.preventDefault();
+        const selectionBox = d.byId(POPUP_LIST);
+        const target = selectionBox.querySelectorAll("option").item(popupSelectedIndex) as HTMLOptionElement
+        popupClickHandler(target.innerHTML, target.value)
+        closePopupList()
         return;
-    
-    
-    var foundmatch = [];
+    }
 
-    //If backspace, delete last char. Else, add a char 
-    if(event.code == 'Backspace'){
-    searchString = searchString.slice(0,searchString.length-1);
-        if(searchString.length == 0){
+    // only backspace or A-Z a-z 0-9 _-.
+    if (!(
+        event.code == 'Backspace' ||
+        event.code == 'ArrowDown' ||
+        event.code == 'ArrowUp' ||
+        (event.key.length == 1 && /[A-Za-z0-9\_\-\.]/.test(event.key))
+    )) {
+        return;
+    }
+
+    // If backspace, delete last char. Else, add a char 
+    if (event.code == 'Backspace') {
+        searchString = searchString.slice(0, searchString.length - 1);
+        if (searchString.length == 0) {
             d.byId("list-filter").classList.add('hidden');
-
         }
-    }else{
+    }
+    else if (event.code == 'ArrowDown') {
+        popupSelectedIndex += 1
+        if (popupSelectedIndex >= popupItemList.length) popupSelectedIndex = popupItemList.length - 1;
+        markItemAsSelected()
+    }
+    else if (event.code == 'ArrowUp') {
+        popupSelectedIndex -= 1
+        if (popupSelectedIndex < 0) popupSelectedIndex = 0;
+        markItemAsSelected()
+    }
+    else {
         searchString = searchString + event.key;
         d.byId("list-filter").classList.remove('hidden');
     }
 
+    var foundmatch = [];
     //Search in the itemList a match, and add to foundmatch
-    for(let i=0; i < itemList.length; i++){
-        if(itemList[i].value.match(searchString.toLowerCase())){
-         foundmatch.push(itemList[i]);
-     }
+    for (let i = 0; i < popupItemList.length; i++) {
+        if (popupItemList[i].value.match(searchString.toLowerCase())) {
+            foundmatch.push(popupItemList[i]);
+        }
     }
     //Edit div with searchstring
     d.byId("list-filter").innerHTML = searchString;
 
     //remove event to prevent duplicated
-    document.removeEventListener("keydown", callback);
-    
-    //populate and relaunch the popup
-    if(searchString){
-        popupListOpen(itemList, tokenPopupListItemClicked, foundmatch);
-    }else{
-        popupListOpen(itemList, tokenPopupListItemClicked);
+    document.removeEventListener("keydown", onPopupKeyDown);
 
+    // re-populate the popup
+    if (searchString) {
+        populatePopupList(foundmatch);
+    }
+    else {
+        populatePopupList(popupItemList);
     }
 }
 
-export function popupListOpen(items: PopupItem[], clickHandler: Function, filtredItems?: PopupItem[]) {
-    
-    // populate list
-    
-    populatePopupList(filtredItems ? filtredItems : items);
+function setItemsClickListener() {
+}
+
+export let popupSelectedIndex: number = 0;
+export function popupListOpen(items: PopupItem[], clickHandler: Function) {
+
+    // initial populate list
+    popupClickHandler = clickHandler
+    populatePopupList(items);
     // open full body semi-transparent background
     const popupFace = d.byId(POPUP_LIST_APPFACE);
     popupFace.classList.add(d.OPEN);
     // open select box
     const selectionBox = d.byId(POPUP_LIST);
     selectionBox.classList.add(d.OPEN);
-    // connect items with click handler
-    selectionBox.querySelectorAll("option").forEach((option: Element) => {
-        option.addEventListener(d.CLICK, (ev: Event) => {
-            let target = ev.target as HTMLOptionElement
-            clickHandler(target.innerHTML, target.value)
-            closePopupList()
-        });
-    });
-    itemList = items;
-   
-    document.addEventListener("keydown", callback);
- 
+
+    popupItemList = items;
+
 }

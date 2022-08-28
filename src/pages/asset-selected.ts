@@ -759,7 +759,7 @@ async function showAssetSendClicked() {
 
     d.onClickId("send-to-asset-account-select", selectAddressClicked);
 
-    showOKCancel(sendOKClicked, showInitialSubPage);
+    showOKCancel(sendOKClicked, showInitialSubPage, false);
   } catch (ex) {
     d.showErr(ex.message);
   }

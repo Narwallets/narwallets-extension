@@ -39,10 +39,11 @@ export function cancelClicked(ev: Event) {
 
 export function showOKCancel(
   OKHandler: d.ClickHandler,
-  CancelHandler: d.ClickHandler
+  CancelHandler: d.ClickHandler,
+  enterMeansOk:boolean=true
 ) {
   //normalizo funcionalidad
-  d.onGlobalKeyPress(OKHandler, d.ENTER);
+  console.log("showOKCancel", OKHandler.name, CancelHandler.name, enterMeansOk)
   cancelBtn.innerText = "Cancel";
   confirmBtn.hidden = false;
 
@@ -50,7 +51,7 @@ export function showOKCancel(
   confirmFunction = OKHandler;
   cancelFunction = CancelHandler;
   okCancelRow.show();
-  enableOKCancel();
+  enableOKCancel(enterMeansOk);
   if (OKHandler === CancelHandler) {
     singleButton();
   }
@@ -61,11 +62,11 @@ export function disableOKCancel() {
   cancelBtn.disabled = true;
   d.removeGlobalKeyPress();
 }
-export function enableOKCancel() {
+export function enableOKCancel(enterMeansOk:boolean=true) {
   confirmBtn.disabled = false;
   cancelBtn.disabled = false;
   cancelBtn.hidden = false;
-  d.onGlobalKeyPress(confirmFunction, d.ENTER);
+  if (enterMeansOk) d.onGlobalKeyPress(confirmFunction, d.ENTER); else d.removeGlobalKeyPress();
 }
 
 export function singleButton() {

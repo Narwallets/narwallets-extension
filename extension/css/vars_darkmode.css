@@ -40,8 +40,9 @@ body {
 
 	--TextGeneric:rgb(203 223 255);
 
-	--HoverColor:rgb(36, 51, 100);
-	/* color de hover en las listas */
+	--HoverColor:rgb(83 96 139 / 27%);
+	--SelectedColor:rgb(36, 51, 100);
+	/* color de hover y selected en las listas */
 
 	--HighLight:rgb(189, 139, 1);
 	/* color para textos importantes */
