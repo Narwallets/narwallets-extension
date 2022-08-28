@@ -1,7 +1,12 @@
+import { getKnownNEP141Contracts, tokenPopupListItemClicked } from "../pages/account-selected.js";
 import * as d from "./document.js";
 
 const POPUP_LIST_APPFACE = "popup-list-appface"
 const POPUP_LIST = "popup-list"
+let itemList :PopupItem[];
+let originalList :PopupItem[];
+
+let searchString = "";
 
 export type PopupItem = { text: string, value: string }
 
@@ -25,20 +30,65 @@ export async function populatePopupList(items: PopupItem[]) {
 export function closePopupList() {
     d.byId(POPUP_LIST).classList.remove(d.OPEN); //hides
     d.byId(POPUP_LIST_APPFACE).classList.remove(d.OPEN); //hides
-    document.removeEventListener("keydown", checkEscKeyPressed);
+    searchString = "";
+    d.byId("list-filter").classList.add('hidden')
+    document.removeEventListener("keydown", callback);
 }
 
-function checkEscKeyPressed(event: KeyboardEvent) {
+const callback = function filterList(event: KeyboardEvent){
+
+    //If ESC key, close the popup
     if (event.key === "Escape") {
-        event.preventDefault()
-        closePopupList()
+        closePopupList();
+        event.preventDefault();
+        return;
+    }
+
+    //If special keys, do nothing
+    if(event.key =='Control' || event.key == 'Alt' ||event.key == 'Shift' || event.key == 'Enter' || event.key == 'CapsLock' || event.key == 'Tab')
+        return;
+    
+    
+    var foundmatch = [];
+
+    //If backspace, delete last char. Else, add a char 
+    if(event.code == 'Backspace'){
+    searchString = searchString.slice(0,searchString.length-1);
+        if(searchString.length == 0){
+            d.byId("list-filter").classList.add('hidden');
+
+        }
+    }else{
+        searchString = searchString + event.key;
+        d.byId("list-filter").classList.remove('hidden');
+    }
+
+    //Search in the itemList a match, and add to foundmatch
+    for(let i=0; i < itemList.length; i++){
+        if(itemList[i].value.match(searchString.toLowerCase())){
+         foundmatch.push(itemList[i]);
+     }
+    }
+    //Edit div with searchstring
+    d.byId("list-filter").innerHTML = searchString;
+
+    //remove event to prevent duplicated
+    document.removeEventListener("keydown", callback);
+    
+    //populate and relaunch the popup
+    if(searchString){
+        popupListOpen(itemList, tokenPopupListItemClicked, foundmatch);
+    }else{
+        popupListOpen(itemList, tokenPopupListItemClicked);
+
     }
 }
 
-
-export function popupListOpen(items: PopupItem[], clickHandler: Function) {
+export function popupListOpen(items: PopupItem[], clickHandler: Function, filtredItems?: PopupItem[]) {
+    
     // populate list
-    populatePopupList(items);
+    
+    populatePopupList(filtredItems ? filtredItems : items);
     // open full body semi-transparent background
     const popupFace = d.byId(POPUP_LIST_APPFACE);
     popupFace.classList.add(d.OPEN);
@@ -53,7 +103,8 @@ export function popupListOpen(items: PopupItem[], clickHandler: Function) {
             closePopupList()
         });
     });
-    document.addEventListener("keydown", checkEscKeyPressed);
+    itemList = items;
+   
+    document.addEventListener("keydown", callback);
+ 
 }
-
-
