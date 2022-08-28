@@ -11,7 +11,7 @@ import {
 import { Asset, assetAddHistory, assetUpdateBalance, assetUpdateMetadata, asyncRefreshAccountInfoLastBalance, ExtendedAccountData, findAsset, findAssetIndex, History, newTokenFromMetadata, setAssetBalanceYoctos, updateTokenAssetFromMetadata } from "../data/account.js";
 import {
   isValidAccountID,
-  isValidAmount,
+  CheckValidAmount,
 } from "../lib/near-api-lite/utils/valid.js";
 import * as d from "../util/document.js";
 import {
@@ -479,7 +479,7 @@ async function LiquidUnstakeOk() {
     }
     const amountString = d.byId("liquid-unstake-confirmation-amount").innerHTML.trim()
     const amount = c.toNum(amountString);
-    if (!isValidAmount(amount)) throw Error("Amount is not valid");
+    CheckValidAmount(amount)
 
     const actualSP = asset_selected.contractId;
 
@@ -548,7 +548,7 @@ async function restakeOkClicked() {
       throw Error("you need full access on " + selectedAccountData.name);
 
     const amount = c.toNum(d.inputById("restake-amount").value);
-    if (!isValidAmount(amount)) throw Error("Amount is not valid");
+    CheckValidAmount(amount)
 
     const actualSP = asset_selected.contractId;
 
@@ -640,7 +640,7 @@ async function delayedUnstakeOkClicked() {
     }
     else {
       const amount = c.toNum(d.inputById("delayed-unstake-amount").value);
-      if (!isValidAmount(amount)) throw Error("Amount is not valid");
+      CheckValidAmount(amount)
       yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
       if (yoctosToUnstake == poolAccInfo.staked_balance) {
         await askBackgroundCallMethod(
@@ -781,9 +781,9 @@ async function sendOKClicked() {
   try {
     //validate
     const toAccName = new d.El("#send-to-asset-account").value;
-    const amountToSend = d.getNumber("#send-to-asset-amount");
     if (!isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
-    if (!isValidAmount(amountToSend)) throw Error("Amount should be a positive integer");
+    const amountToSend = d.getNumber("#send-to-account-amount");
+    CheckValidAmount(amountToSend)
     if (asset_selected.balance && amountToSend > asset_selected.balance) throw Error("Amount exceeds available balance");
 
     let accountExists = await searchAccounts.checkIfAccountExists(toAccName);

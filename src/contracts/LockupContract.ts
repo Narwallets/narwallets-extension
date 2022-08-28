@@ -7,7 +7,7 @@ import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js"
 import * as StakingPool from "./staking-pool.js";
 //import * as TX from "../api/transaction.js";
 import { Account, ExtendedAccountData, removeAsset } from "../data/account.js"
-import { isValidAccountID, isValidAmount } from "../lib/near-api-lite/utils/valid.js";
+import { isValidAccountID, CheckValidAmount } from "../lib/near-api-lite/utils/valid.js";
 import { askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../background/askBackground.js";
 import { FunctionCall } from "../lib/near-api-lite/batch-transaction.js";
 
@@ -169,7 +169,7 @@ export class LockupContract {
   //-------------------------------
   async transfer(amountNear: number, receiverId: string): Promise<any> {
 
-    if (!isValidAmount(amountNear)) throw Error("invalid amount")
+    CheckValidAmount(amountNear)
     if (!isValidAccountID(receiverId)) throw Error("invalid receiver account Id")
 
     //try to transfer

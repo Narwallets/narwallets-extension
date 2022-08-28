@@ -7,7 +7,7 @@ import * as Pages from "../pages/main.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import {
   isValidAccountID,
-  isValidAmount,
+  CheckValidAmount,
 } from "../lib/near-api-lite/utils/valid.js";
 import {
   checkSeedPhrase,
@@ -747,13 +747,11 @@ async function sendOKClicked() {
   try {
     //validate
     const toAccName = new d.El("#send-to-account-name").value;
-    const amountToSend = d.getNumber("#send-to-account-amount");
     if (!isValidAccountID(toAccName)) {
       throw Error("Receiver Account Id is invalid");
     }
-    if (!isValidAmount(amountToSend)) {
-      throw Error("Amount should be a positive integer");
-    }
+    const amountToSend = d.getNumber("#send-to-account-amount");
+    CheckValidAmount(amountToSend)
 
     //select send procedure
     let performer;
@@ -1003,11 +1001,10 @@ async function performStake() {
     }
 
     //const amountToStake = info.lastBalance - info.staked - 36
-    if (!isValidAmount(amountToStake)) {
-      throw Error("Amount should be a positive integer");
+    CheckValidAmount(amountToStake)
+    if (liquidStake && amountToStake < 1) {
+      throw Error("Stake at least 1 NEAR");
     }
-    if (liquidStake && amountToStake < 10)
-      throw Error("Stake at least 10 NEAR");
 
     let poolAccInfo = {
       //empty info
@@ -1151,12 +1148,10 @@ async function performLockupContractStake() {
 
     const amountText = d.inputById("stake-amount").value
     const amountToStake = c.toNum(amountText);
-    if (!isValidAmount(amountToStake)) {
-      throw Error("Amount should be a positive integer");
-    }
+    CheckValidAmount(amountToStake)
     const liquidStake = stakeTabSelected == 1;
-    if (liquidStake && amountToStake < 10) {
-      throw Error("Stake at least 10 NEAR");
+    if (liquidStake && amountToStake < 1) {
+      throw Error("Stake at least 1 NEAR");
     }
 
     const lc = new LockupContract(info);
@@ -1278,7 +1273,7 @@ async function performUnstake() {
     const modeUnstake = !modeWithdraw;
 
     const amount = c.toNum(d.inputById("unstake-amount").value);
-    if (!isValidAmount(amount)) throw Error("Amount is not valid");
+    CheckValidAmount(amount)
 
     if (!selectedAccountData.isFullAccess)
       throw Error("you need full access on " + selectedAccountData.name);

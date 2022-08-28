@@ -2,7 +2,7 @@
  * check if this is a valid near account id (syntax-wise)
  * @param accountId 
  */
-export function isValidAccountID(accountId:string):boolean {
+export function isValidAccountID(accountId: string): boolean {
     const MIN_ACCOUNT_ID_LEN = 2;
     const MAX_ACCOUNT_ID_LEN = 64; //implicit accounts have 64 hex chars
     if (accountId.length < MIN_ACCOUNT_ID_LEN ||
@@ -27,15 +27,11 @@ export function isValidAccountID(accountId:string):boolean {
     return !last_char_is_separator;
 }
 
-export function isValidAmount(amount:number):boolean {
-    if (isNaN(amount))
-        return false;
-    if (amount < 0)
-        return false;
-    return true;
+export function CheckValidAmount(amount: number) {
+    if (isNaN(amount) || amount <= 0) throw Error("Invalid amount")
 }
 
-export function isValidEmail(email:string) :boolean {
+export function isValidEmail(email: string): boolean {
 
     let matches = email.match(/(?!.*\.\.)(^[^\.][^@\s]+@[^@\s]+\.[^@\s\.]+$)/);
     if (!matches || matches.length == 0) {
