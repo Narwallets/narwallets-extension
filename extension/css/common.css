@@ -16,14 +16,15 @@ h2 {
 
 h3 {
   color      : var(--TextGeneric);
-  font-size  : 18px;
+  font-size: 17px;
   font-weight: 200;
   display    : block;
   width      : 400px;
   height     : auto;
   word-wrap  : break-word;
   margin     : auto;
-  padding    : 2px;
+  padding: 8px 1px 0px;
+  line-height: 1.25em;
 }
 
 .sep30 {
@@ -120,8 +121,8 @@ h5 {
   width              : 40px;
   height             : 40px;
   display            : inline-block;
-  top                : 0px;
-  left               : 4px;
+  top: 2px;
+  left: 6px;
   margin-left        : 0px;
   padding            : 0px;
   background-image   : url("../images/logo_48.png");
@@ -138,8 +139,8 @@ h5 {
   width      : 150px;
   height     : 16px;
   display    : inline-flex;
-  top        : 8px;
-  left       : 46px;
+  top: 11px;
+  left: 49px;
   margin-left: 0px;
   padding    : 0px;
   font-size  : 16px;
@@ -465,8 +466,10 @@ h5 {
   padding-top: 18px;
 }
 
-#import-account button {
-  border: 1px solid var(--HighLight);
+#import-account button#net-root {
+  /* border: 1px solid var(--HighLight); */
+  width: 84px;
+  left: 359px;
 }
 
 #import-account button.big {

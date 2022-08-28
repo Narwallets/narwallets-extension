@@ -45,43 +45,46 @@
 
 .morepage {
   position     : relative;
-  width        : 480px;
-  height       : 60px;
+  width: 456px;
+  height: 66px;
   color        : white;
-  padding      : 0px;
+  padding: 0px;
   margin       : 0px;
   border-radius: 0px;
   background   : var(--Background);
   border-style : none;
+  left: 6px;
 }
 
 .morepage:hover {
   background: var(--HoverColor);
+  border-radius: 8px;
 }
 
 .morepage h1 {
   position   : absolute;
   display    : block;
-  padding    : 2px;
-  margin     : 0px;
-  left       : 0px;
-  top        : 0px;
-  width      : 480px;
-  height     : 15px;
+  padding: 3px 9px;
+  margin: 1px;
+  left: 7px;
+  top: 3px;
+  width: 402px;
+  height: 15px;
   font-weight: 200;
   font-size  : 14px;
   background : var(--Block);
   color      : var(--BlockText);
   text-align : left;
+  border-radius: 8px;
 }
 
 .morepage h2 {
   position     : absolute;
   padding      : 0px;
   margin       : 0px;
-  left         : 5px;
-  top          : 21px;
-  width        : 470px;
+  left: 17px;
+  top: 28px;
+  width: 434px;
   text-align   : left;
   font-weight  : 100;
   font-size    : 12px;

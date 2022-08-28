@@ -82,6 +82,7 @@
 
 .accountdetsassets:hover {
   background-color: var(--HoverColor);
+  border-radius: 6px;
 }
 
 .accountassetcoin {

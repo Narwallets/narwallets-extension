@@ -142,7 +142,7 @@ export async function show(
   }
   localStorageSet({ reposition: "account", account: accName });
   localStorageSet({ currentAccountId: accName })
-  checkConnectOrDisconnect();
+  //checkConnectOrDisconnect();
   autoRefresh()
 }
 
@@ -157,15 +157,17 @@ function initPage() {
   d.onClickId("receive", receiveClicked);
   d.onClickId("send", sendClicked);
   d.onClickId("stake", stakeClicked);
-  d.onClickId("acc-connect-to-page", connectToWebAppClicked);
-  d.onClickId("acc-disconnect-to-page", disconnectFromPageClicked);
+  //d.onClickId("acc-connect-to-page", connectToWebAppClicked);
+  //d.onClickId("acc-disconnect-to-page", disconnectFromPageClicked);
 
   // more tab
-  d.onClickId("access", changeAccessClicked);
+  d.onClickId("access", removePrivateKeyClicked);
   d.onClickId("list-pools", listPoolsClicked);
   d.onClickId("add", addClicked);
   d.onClickId("show-public-key", showPublicKeyClicked);
   d.onClickId("show-private-key", showPrivateKeyClicked);
+  d.onClickId("remove-private-key", removePrivateKeyClicked);
+  d.onClickId("remove-account", removeAccountClicked);
   d.onClickId("add-note", addNoteClicked);
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
@@ -182,10 +184,8 @@ function initPage() {
   d.onClickId("show-password-request", showPassword);
 
   seedTextElem = new d.El("#seed-phrase");
-  removeButton = new d.El("button#remove"); // remove priv-key or account
-
+  
   OkCancelInit();
-  removeButton.onClick(removeAccountClicked); // remove priv-key or account
 
   var target = document.querySelector("#usd-price-link");
   target?.addEventListener("usdPriceReady", usdPriceReady);
@@ -286,21 +286,21 @@ function selectSecondTab() {
   stakeTabSelected = 2;
 }
 
-async function checkConnectOrDisconnect() {
-  var a = await askBackground({
-    code: "isConnected",
-  });
-  const connectButton = d.byId("acc-connect-to-page");
-  const disconnectButton = d.byId("acc-disconnect-to-page");
+// async function checkConnectOrDisconnect() {
+//   var a = await askBackground({
+//     code: "isConnected",
+//   });
+//   const connectButton = d.byId("acc-connect-to-page");
+//   const disconnectButton = d.byId("acc-disconnect-to-page");
 
-  if (a) {
-    disconnectButton.classList.remove("hidden");
-    connectButton.classList.add("hidden");
-  } else {
-    disconnectButton.classList.add("hidden");
-    connectButton.classList.remove("hidden");
-  }
-}
+//   if (a) {
+//     disconnectButton.classList.remove("hidden");
+//     connectButton.classList.add("hidden");
+//   } else {
+//     disconnectButton.classList.add("hidden");
+//     connectButton.classList.remove("hidden");
+//   }
+// }
 
 // AssetClicked
 function showAssetDetailsClicked(ev: Event) {
@@ -623,7 +623,7 @@ function showGotoOwner() {
 export function ifNormalAccShowGrantAccessSubPage() {
   if (!selectedAccountData.isLockup) {
     d.showSubPage("account-selected-ok-to-grant-access");
-    showOKCancel(changeAccessClicked, switchToAssetsSupbage);
+    showOKCancel(askPrivateKey, switchToAssetsSupbage);
   }
 }
 
@@ -634,37 +634,37 @@ function receiveClicked() {
   showGotoOwner(); //if this is a lock.c shows the "goto owner" page
 }
 
+// //--------------------------------
+// export async function connectToWebAppClicked(): Promise<any> {
+//   d.showWait();
+//   try {
+//     await askBackground({
+//       code: "connect",
+//       accountId: selectedAccountData.name,
+//     });
+//     d.showSuccess("connected");
+//     window.close();
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     await checkConnectOrDisconnect();
+//     d.hideWait();
+//   }
+// }
 //--------------------------------
-export async function connectToWebAppClicked(): Promise<any> {
-  d.showWait();
-  try {
-    await askBackground({
-      code: "connect",
-      accountId: selectedAccountData.name,
-    });
-    d.showSuccess("connected");
-    window.close();
-  } catch (ex) {
-    d.showErr(ex.message);
-  } finally {
-    await checkConnectOrDisconnect();
-    d.hideWait();
-  }
-}
-//--------------------------------
-async function disconnectFromPageClicked() {
-  try {
-    await askBackground({ code: "disconnect" });
-    d.showSuccess("disconnected");
-    const buttonClass = d.byId("acc-connect-to-page");
-    buttonClass.classList.remove("disconnect");
-    buttonClass.classList.add("connect");
-  } catch (ex) {
-    d.showErr(ex.message);
-  } finally {
-    await checkConnectOrDisconnect();
-  }
-}
+// async function disconnectFromPageClicked() {
+//   try {
+//     await askBackground({ code: "disconnect" });
+//     d.showSuccess("disconnected");
+//     const buttonClass = d.byId("acc-connect-to-page");
+//     buttonClass.classList.remove("disconnect");
+//     buttonClass.classList.add("connect");
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//   } finally {
+//     await checkConnectOrDisconnect();
+//   }
+// }
 
 //--------------------------------
 // deprecated, use AccountHasPrivateKey
@@ -1543,31 +1543,21 @@ async function showPrivateKeyValidationPasswordClicked() {
   showOKCancel(switchToAssetsSupbage, switchToAssetsSupbage);
 }
 
-//---------------------------------------
-function accessLabelClicked() {
-  if (selectedAccountData.accountInfo.type == "lock.c") {
-    showGotoOwner();
-  } else {
-    changeAccessClicked();
-  }
-}
 
-//---------------------------------------
-export function changeAccessClicked() {
-  d.hideErr();
-  seedTextElem.value = "";
-
+  //---------------------------------------
+export function startProcessRemovePrivKey() {
   if (selectedAccountData.isFullAccess) {
     d.showSubPage("account-selected-make-read-only");
     d.inputById("account-name-confirm").value = "";
     showOKCancel(makeReadOnlyOKClicked, switchToAssetsSupbage);
   } else {
-    //is ReadOnly
-    askPrivateKey();
+    d.showErr("Account has no priv key");
   }
 }
 
 export function askPrivateKey() {
+  d.hideErr();
+  seedTextElem.value = "";
   d.showSubPage("account-selected-make-full-access");
   showOKCancel(makeFullAccessOKClicked, switchToAssetsSupbage);
 }
@@ -1670,7 +1660,7 @@ async function AccountDeleteOKClicked() {
     hideOkCancel();
 
     //remove record from wallet
-    await removeAccountRecord();
+    await removeAccountRecord_and_go_to_account_pages();
 
   } catch (ex) {
     d.showErr(ex.message);
@@ -1745,6 +1735,7 @@ async function AddPublicKeyToLockupOKClicked() {
   }
 }
 
+let localGlobalAlsoRemoveAccount = false;
 //-----------------------------------
 async function makeReadOnlyOKClicked() {
   try {
@@ -1756,9 +1747,15 @@ async function makeReadOnlyOKClicked() {
       await saveSelectedAccount();
       //selectedAccountData.accessStatus = "Read Only";
       showSelectedAccount();
-      d.showMsg("Account access removed", "success");
-      switchToAssetsSupbage();
-      hideOkCancel();
+      d.showMsg(`Account ${localGlobalAlsoRemoveAccount?"":"access "} removed`, "success");
+      if(localGlobalAlsoRemoveAccount){
+        hideOkCancel();
+        removeAccountRecord_and_go_to_account_pages();
+      }
+      else {
+        switchToAssetsSupbage();
+        hideOkCancel();
+      }
     }
   } catch (ex) {
     d.showErr(ex.message);
@@ -1826,8 +1823,7 @@ function switchToAssetsSupbage(){
 //   switchToAssetsSupbage();
 // }
 
-async function removeAccountRecord() {
-
+async function removeAccountRecord_and_go_to_account_pages() {
   //remove record
   await askBackground({
     code: "remove-account",
@@ -1839,15 +1835,32 @@ async function removeAccountRecord() {
   await AccountPages_show();
 }
 
-// remove priv-key or account if it was read-only
+//---------------------------------------
+export function removePrivateKeyClicked(ev: Event) {
+  try {
+    if (selectedAccountData.isFullAccess) {
+      localGlobalAlsoRemoveAccount = false;
+      startProcessRemovePrivKey();
+    }
+    else {
+      throw new Error("No private key for the account");
+    }
+  } catch (ex) {
+    d.showErr(ex.message);
+  }
+}
+
+//---------------------------------------
+// remove account from wallet
 async function removeAccountClicked(ev: Event) {
   try {
     if (selectedAccountData.isFullAccess) {
-      //has full access - remove access first
-      changeAccessClicked();
+      // has full access - remove access and then the account 
+      localGlobalAlsoRemoveAccount = true;
+      startProcessRemovePrivKey();
     }
     else {
-      removeAccountRecord();
+      removeAccountRecord_and_go_to_account_pages();
     }
 
   } catch (ex) {
