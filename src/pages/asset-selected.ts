@@ -55,7 +55,7 @@ import { ASSET_HISTORY_TEMPLATE, nearDollarPrice } from "../data/global.js";
 import { backToAccountsList, setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
 import { activeNetworkInfo } from "../index.js";
-import { popupListOpen } from "../util/popup-list.js";
+import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 
 const THIS_PAGE = "AccountAssetDetail";
@@ -757,7 +757,8 @@ async function showAssetSendClicked() {
       d.maxClicked("send-to-asset-amount", "#selected-asset #balance");
     });
 
-    d.onClickId("send-to-asset-account-select", selectAddressClicked);
+    popupComboConfigure("send-to-asset-account", "send-to-asset-account-select", selectAddressClicked)
+    d.onEnterAndAmount("send-to-asset-amount", sendOKClicked )
 
     showOKCancel(sendOKClicked, showInitialSubPage, false);
   } catch (ex) {
@@ -782,7 +783,7 @@ async function sendOKClicked() {
     //validate
     const toAccName = new d.El("#send-to-asset-account").value;
     if (!isValidAccountID(toAccName)) throw Error("Receiver Account Id is invalid");
-    const amountToSend = d.getNumber("#send-to-account-amount");
+    const amountToSend = d.getNumber("#send-to-asset-amount");
     CheckValidAmount(amountToSend)
     if (asset_selected.balance && amountToSend > asset_selected.balance) throw Error("Amount exceeds available balance");
 

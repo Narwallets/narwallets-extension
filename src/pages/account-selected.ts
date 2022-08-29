@@ -92,7 +92,7 @@ import {
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { activeNetworkInfo, autoRefresh } from "../index.js";
-import { closePopupList, PopupItem, popupListOpen } from "../util/popup-list.js";
+import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 
 const THIS_PAGE = "account-selected";
 
@@ -339,6 +339,7 @@ export function getKnownNEP141Contracts(): PopupItem[] {
       { text: "stNEAR - meta-pool.near", value: "meta-pool.near" },
       { text: "$META - meta-token.near", value: "meta-token.near" },
       { text: "REF - ref.finance", value: "token.v2.ref-finance.near" },
+      { text: "xREF - ref.finance", value: "xtoken.ref-finance.near" },
       { text: "Paras - token.paras.near", value: "token.paras.near" },
       { text: "wNEAR - wrap.near", value: "wrap.near" },
       { text: "nWBTC- (bridged)", value: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near" },
@@ -348,6 +349,10 @@ export function getKnownNEP141Contracts(): PopupItem[] {
       { text: "nUNI - (bridged)", value: "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near" },
       { text: "nLINK- (bridged)", value: "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near" },
       { text: "BANANA - berryclub.ek.near", value: "berryclub.ek.near" },
+      { text: "DBIO - dbio.near", value: "dbio.near" },
+      { text: "OCT - Octopus Network (bridged)", value: "f5cfbc74057c610c8ef151a439252680ac68c6dc.factory.bridge.near" },
+      { text: "USN", value: "usn" },
+      
     ]
   }
 }
@@ -721,7 +726,8 @@ async function sendClicked() {
         );
       });
       d.showSubPage("account-selected-send");
-      d.onClickId("current-to-send-address", selectAddressClicked)
+      popupComboConfigure("send-to-account-name", "send-to-account-name-dropdown", selectAddressClicked)
+      d.onEnterAndAmount("send-to-account-amount", sendOKClicked )
       showOKCancel(sendOKClicked, switchToAssetsSupbage, false);
     }
   } catch (ex) {

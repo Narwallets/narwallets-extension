@@ -1,7 +1,7 @@
 import * as d from "./document.js";
 
-export let confirmFunction: (ev: Event) => void = function (ev) {};
-export let cancelFunction: (ev: Event) => void = function (ev) {};
+export let confirmFunction: (ev: Event) => void = function (ev) { };
+export let cancelFunction: (ev: Event) => void = function (ev) { };
 
 let okCancelRow: d.El;
 let confirmBtn: d.El;
@@ -40,10 +40,9 @@ export function cancelClicked(ev: Event) {
 export function showOKCancel(
   OKHandler: d.ClickHandler,
   CancelHandler: d.ClickHandler,
-  enterMeansOk:boolean=true
+  enterMeansOk: boolean = true
 ) {
-  //normalizo funcionalidad
-  console.log("showOKCancel", OKHandler.name, CancelHandler.name, enterMeansOk)
+  // console.log("showOKCancel", OKHandler.name, CancelHandler.name, enterMeansOk)
   cancelBtn.innerText = "Cancel";
   confirmBtn.hidden = false;
 
@@ -62,7 +61,7 @@ export function disableOKCancel() {
   cancelBtn.disabled = true;
   d.removeGlobalKeyPress();
 }
-export function enableOKCancel(enterMeansOk:boolean=true) {
+export function enableOKCancel(enterMeansOk: boolean = true) {
   confirmBtn.disabled = false;
   cancelBtn.disabled = false;
   cancelBtn.hidden = false;

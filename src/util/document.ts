@@ -125,6 +125,10 @@ export function onEnterKey(textId: string, clickHandler: (ev: Event) => void) {
   });
 }
 
+export function onEnterAndAmount(textId: string, clickHandler: (ev: Event) => void) {
+  onEnterKey(textId, (ev: Event)=>{ if (getNumber("#"+textId)) clickHandler(ev) } )
+}
+
 /**
  * add an event when is pressed in an input-box
  * @param textId
@@ -188,11 +192,11 @@ export function maxClicked(id: string, selector: string, subtract: number = 0) {
  * removes class=hidden from a DIV with id=id & class=className
  * @param id
  */
-export function showByClass(id: string, className: string) {
+export function showByClass(id: string, className: string): Element {
   const toShow = document.querySelectorAll("." + className + "#" + id)[0];
   if (!toShow) {
     console.error("." + className + "#" + id, "NOT FOUND");
-    return;
+    return undefined as unknown as Element;
   }
   //clear all input fields
   toShow.querySelectorAll("input").forEach((item) => (item.value = ""));
@@ -227,6 +231,7 @@ export function showByClass(id: string, className: string) {
   //console.log("show",toShow.id)
   toShow.classList.remove(HIDDEN);
   // }, 300);
+  return toShow;
 }
 /**
  * showByClass(id)
@@ -240,10 +245,14 @@ export function showPage(id: string) {
 }
 export function showSubPage(id: string) {
   var stackTrace = Error().stack;
-  showByClass(id, "subpage");
-  let primerRadio = document.querySelectorAll("#" + id + ".subpage .radio.one");
-  if (primerRadio.length > 0) {
-    (primerRadio[0] as HTMLInputElement).checked = true;
+  const subpage = showByClass(id, "subpage");
+  let firstRadio = subpage.querySelectorAll(".radio.one");
+  if (firstRadio.length > 0) {
+    (firstRadio[0] as HTMLInputElement).checked = true;
+  }
+  let firstInput = subpage.querySelectorAll('input:not([type="hidden"])');
+  if (firstInput.length > 0) {
+    (firstInput[0] as HTMLInputElement).focus();
   }
 }
 

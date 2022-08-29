@@ -14,7 +14,9 @@ export function initPopupHandlers() {
     d.onClickId(POPUP_LIST_APPFACE, closePopupList)
 }
 
-let popupClickHandler: Function; 
+let popupClickHandler: Function;
+
+export let popupOpened: boolean = false;
 
 export async function populatePopupList(items: PopupItem[]) {
 
@@ -42,6 +44,7 @@ export async function populatePopupList(items: PopupItem[]) {
             closePopupList()
         });
         if (index == popupSelectedIndex) {
+
             option.classList.add("selected")
         }
     });
@@ -50,11 +53,13 @@ export async function populatePopupList(items: PopupItem[]) {
 }
 
 export function closePopupList() {
-    d.byId(POPUP_LIST).classList.remove(d.OPEN); //hides
+    const selectionBox = d.byId(POPUP_LIST);
+    selectionBox.classList.remove(d.OPEN); //hides
     d.byId(POPUP_LIST_APPFACE).classList.remove(d.OPEN); //hides
     searchString = "";
     d.byId("list-filter").classList.add('hidden')
     document.removeEventListener("keydown", onPopupKeyDown);
+    popupOpened = false;
 }
 
 function markItemAsSelected() {
@@ -67,16 +72,19 @@ function markItemAsSelected() {
 
 function onPopupKeyDown(event: KeyboardEvent) {
 
+    // console.log("onPopupKeyDown",popupOpened,JSON.stringify(event))
+    event.cancelBubble = true;
+    if (event.stopPropagation) event.stopPropagation();
+    event.preventDefault();
+
     //If ESC key, close the popup
     if (event.key === "Escape") {
         closePopupList();
-        event.preventDefault();
         return;
     }
 
     //If Enter key, same as click on selected
     if (event.key === "Enter") {
-        event.preventDefault();
         const selectionBox = d.byId(POPUP_LIST);
         const target = selectionBox.querySelectorAll("option").item(popupSelectedIndex) as HTMLOptionElement
         popupClickHandler(target.innerHTML, target.value)
@@ -126,9 +134,6 @@ function onPopupKeyDown(event: KeyboardEvent) {
     //Edit div with searchstring
     d.byId("list-filter").innerHTML = searchString;
 
-    //remove event to prevent duplicated
-    document.removeEventListener("keydown", onPopupKeyDown);
-
     // re-populate the popup
     if (searchString) {
         populatePopupList(foundmatch);
@@ -136,9 +141,6 @@ function onPopupKeyDown(event: KeyboardEvent) {
     else {
         populatePopupList(popupItemList);
     }
-}
-
-function setItemsClickListener() {
 }
 
 export let popupSelectedIndex: number = 0;
@@ -155,5 +157,17 @@ export function popupListOpen(items: PopupItem[], clickHandler: Function) {
     selectionBox.classList.add(d.OPEN);
 
     popupItemList = items;
+    popupOpened = true;
+}
 
+/* configure a input + drop-down button */
+export function popupComboConfigure(inputId: string, dropDownId: string, dropDownHandler: (ev: Event) => void) {
+
+    if (inputId) {
+        d.byId(inputId).addEventListener("keydown", (event: KeyboardEvent) => {
+            // console.log("input keyup",popupOpened,JSON.stringify(event))
+            if (!popupOpened && (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "Enter")) dropDownHandler(event);
+        });
+    }
+    if (dropDownId) d.onClickId(dropDownId, dropDownHandler)
 }
