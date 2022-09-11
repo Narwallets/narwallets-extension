@@ -76,7 +76,7 @@ import {
   showOKCancel,
   hideOkCancel,
 } from "../util/okCancel.js";
-import { ASSET_HISTORY_TEMPLATE, getStNEARPrice, nearDollarPrice } from "../data/global.js";
+import { ASSET_HISTORY_TEMPLATE, getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/global.js";
 import { addressContacts } from "./address-book.js";
 import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/contact.js";
@@ -219,6 +219,8 @@ export async function refreshSelectedAccountAndAssets() {
   await selectedAccountData.refreshLastBalance()
   updateAccountHeaderDOM();
 
+  await getNarwalletsMetrics()
+
   for (let asset of accInfo.assets) {
     if (d.activePage !== "account-selected" && d.activePage !== "AccountAssetDetail") {
       // user left account-selected+assets page
@@ -227,7 +229,8 @@ export async function refreshSelectedAccountAndAssets() {
     await assetUpdateBalance(asset, accName)
     // update balance on-screen
     const assetId = assetDivId(asset)
-    Pages.updateScreen(`#assets-list [id='${assetId}'] .accountassetbalance`, asset.balance)
+    Pages.updateScreenNum(`#assets-list [id='${assetId}'] .accountassetbalance`, asset.balance)
+    Pages.updateScreen(`#assets-list [id='${assetId}'] .accountassetfiat`, getUsdValue(asset))
     if (Pages.lastSelectedAsset && asset.contractId == Pages.lastSelectedAsset.contractId && asset.symbol == Pages.lastSelectedAsset.symbol) {
       // only update amount
       const el = document.querySelector("#selected-asset #balance") as HTMLElement;
@@ -257,21 +260,21 @@ export async function usdPriceReady() {
   elems.innerText = c.toStringDec(selectedAccountData.totalUSD, 2);
   elems.show()
   if (Pages.lastSelectedAsset) {
-    let assetUsdValue = undefined;
-    if (Pages.lastSelectedAsset.balance != undefined) {
-      if (Pages.lastSelectedAsset.symbol == "STNEAR") {
-        const stNEARPrice = await getStNEARPrice()
-        assetUsdValue = Pages.lastSelectedAsset.balance * stNEARPrice * nearDollarPrice;
-      }
-      else if (Pages.lastSelectedAsset.symbol == "STAKED"
-        || Pages.lastSelectedAsset.symbol == "UNSTAKED"
-        || Pages.lastSelectedAsset.symbol == "wNEAR"
-      ) {
-        assetUsdValue = Pages.lastSelectedAsset.balance * nearDollarPrice;
-      }
-    }
+    let assetUsdValue = getUsdValue(Pages.lastSelectedAsset)
+    // if (Pages.lastSelectedAsset.balance != undefined) {
+    //   if (Pages.lastSelectedAsset.symbol == "STNEAR") {
+    //     await getNarwalletsMetrics()
+    //     if (narwalletsMetrics) assetUsdValue = Pages.lastSelectedAsset.balance * narwalletsMetrics.st_near_price * nearDollarPrice;
+    //   }
+    //   else if (Pages.lastSelectedAsset.symbol == "STAKED"
+    //     || Pages.lastSelectedAsset.symbol == "UNSTAKED"
+    //     || Pages.lastSelectedAsset.symbol == "wNEAR"
+    //   ) {
+    //     assetUsdValue = Pages.lastSelectedAsset.balance * nearDollarPrice;
+    //   }
+    // }
     const elems = d.all(".asset_in_usd")
-    elems.innerText = c.toStringDec(assetUsdValue, 2) + " usd";
+    elems.innerText = assetUsdValue;
     elems.show()
   }
 }
@@ -352,7 +355,7 @@ export function getKnownNEP141Contracts(): PopupItem[] {
       { text: "DBIO - dbio.near", value: "dbio.near" },
       { text: "OCT - Octopus Network (bridged)", value: "f5cfbc74057c610c8ef151a439252680ac68c6dc.factory.bridge.near" },
       { text: "USN", value: "usn" },
-      
+
     ]
   }
 }
@@ -439,6 +442,29 @@ function assetSorter(asset1: Asset, asset2: Asset): number {
 
 type DivIdField = { divId: string };
 
+export function getUsdValue(asset: Asset): string {
+  if (!nearDollarPrice || !asset.balance) return "";
+  let assetUsdValue;
+  if (asset.symbol == "STNEAR" && narwalletsMetrics) {
+    assetUsdValue = asset.balance * narwalletsMetrics.st_near_price * nearDollarPrice;
+  }
+  else if (asset.symbol == "$META" && narwalletsMetrics) {
+    assetUsdValue = asset.balance * narwalletsMetrics.ref_meta_price * narwalletsMetrics.st_near_price * nearDollarPrice;
+  }
+
+  else if (asset.symbol == "STAKED"
+    || asset.symbol == "UNSTAKED"
+    || asset.symbol == "wNEAR"
+  ) {
+    assetUsdValue = asset.balance * nearDollarPrice;
+  }
+  else {
+    return "";
+  }
+
+  return c.toStringDec(assetUsdValue, 2) + " usd";
+}
+
 export function populateAssets() {
   // sort assets
   selectedAccountData.accountInfo.assets.sort(assetSorter);
@@ -449,8 +475,9 @@ export function populateAssets() {
     // note do not filter for asset.balance==0, it's confusing because the user do not sees the asset
     let object = {};
     Object.assign(object, item);
-    const extended = object as (Asset & DivIdField);
+    const extended = object as (Asset & DivIdField & { usdvalue: string });
     extended.divId = assetDivId(item)
+    extended.usdvalue = getUsdValue(item)
     const staleSeconds =
       (extended.symbol == "STAKED" || extended.symbol == "UNSTAKED") ? 30 * 60 : // 30 minutes staked/unstaked balance considered valid
         60;
@@ -466,7 +493,7 @@ export function populateAssets() {
       <span class="accountassetcoin">{symbol}</span>
       <div class="accountassettoken">{contractId}</div>
       <div class="accountassetbalance">{balance}</div>
-      <div class="accountassetfiat"></div>
+      <div class="accountassetfiat">{usdvalue}</div>
     </div>
   </div>
   `;
@@ -727,7 +754,7 @@ async function sendClicked() {
       });
       d.showSubPage("account-selected-send");
       popupComboConfigure("send-to-account-name", "send-to-account-name-dropdown", selectAddressClicked)
-      d.onEnterAndAmount("send-to-account-amount", sendOKClicked )
+      d.onEnterAndAmount("send-to-account-amount", sendOKClicked)
       showOKCancel(sendOKClicked, switchToAssetsSupbage, false);
     }
   } catch (ex) {

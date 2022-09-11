@@ -318,12 +318,12 @@ export async function accountItemClicked(ev: Event) {
 }
 
 
-export function updateScreen(selector: string, amount: number | undefined) {
+export function updateScreen(selector: string, value: string) {
   try {
     const e = document.querySelector(selector) as HTMLElement
     if (e) {
       //console.log("updateScreen", selector, amount);
-      e.innerText = c.toStringDec(amount)
+      e.innerText = value
     } else {
       console.log("WARN updateScreen selector", selector, "not found")
     }
@@ -331,6 +331,10 @@ export function updateScreen(selector: string, amount: number | undefined) {
     console.log("updateScreen", selector, ex)
   }
 }
+export function updateScreenNum(selector: string, amount: number | undefined) {
+  updateScreen(selector,c.toStringDec(amount))
+}
+
 
 let refreshingAccountListBalances = false;
 export async function refreshAccountListBalances() {
@@ -364,12 +368,12 @@ export async function refreshAccountListBalances() {
       grandTotal += (e.total || 0)
 
       // update on screen
-      updateScreen(`#accounts-list [id='${e.name}'] .accountlistbalance`, e.total)
+      updateScreenNum(`#accounts-list [id='${e.name}'] .accountlistbalance`, e.total)
 
     }
 
     // update grandtotal on the screen
-    updateScreen(`#account-list-main .accountlistbalance.total`, grandTotal)
+    updateScreenNum(`#account-list-main .accountlistbalance.total`, grandTotal)
   } finally {
     refreshingAccountListBalances = false;
   }
