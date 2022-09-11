@@ -2,7 +2,7 @@ import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
 import { Account, Asset, setAssetBalanceYoctos, asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../data/account.js";
-import { selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
+import { selectAccountPopupList, selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 
 import {
@@ -30,12 +30,12 @@ export const CHANGE_PASSWORD = "change-password";
 
 export const UNLOCK = "unlock";
 
-export const ACCOUNT_LIST_MAIN = "account-list-main";
-export const ADD_ACCOUNT = "add-account";
+// export const ACCOUNT_LIST_MAIN = "account-list-main";
+// export const ADD_ACCOUNT = "add-account";
 export const IMPORT_OR_CREATE = "import-or-create";
 
-export const ACCOUNTS_LIST = "accounts-list";
-export const ACCOUNT_ITEM = "account-item";
+// export const ACCOUNTS_LIST = "accounts-list";
+// export const ACCOUNT_ITEM = "account-item";
 
 let lastSelectedAccount: ExtendedAccountData | undefined;
 export let lastSelectedAsset: Asset | undefined;
@@ -48,7 +48,7 @@ export function setLastSelectedAsset(data: Asset) {
   lastSelectedAsset = data;
 }
 
-let draggingEl: HTMLElement;
+/*let draggingEl: HTMLElement;
 function accountItem_drag(ev: Event) {
   ev.preventDefault();
   if (!draggingEl) {
@@ -115,33 +115,34 @@ async function accountItem_dragend(ev: Event) {
     order++;
   });
 }
+*/
 
 //--------------------------
-function sortByOrder(a: ExtendedAccountData, b: ExtendedAccountData) {
-  if (a.accountInfo.order > b.accountInfo.order) return 1;
-  return -1;
-}
+// function sortByOrder(a: ExtendedAccountData, b: ExtendedAccountData) {
+//   if (a.accountInfo.order > b.accountInfo.order) return 1;
+//   return -1;
+// }
 
 export function addAccountClicked() {
-  d.onClickId("add-account-back-to-account", backToAccountsClicked);
+  d.onClickId("add-account-back-to-account", backToMainPageClicked);
   d.showPage(IMPORT_OR_CREATE);
 }
 
-async function disconnectFromWepPageClicked() {
-  const button = d.qs("#disconnect-from-web-page");
-  button.enabled = false;
-  try {
-    await askBackground({ code: "disconnect" });
-    d.showSuccess("disconnected");
-    setTimeout(function () {
-      d.qs("#disconnect-line").hide();
-      button.enabled = true;
-    }, 1000);
-  } catch (ex) {
-    d.showErr(ex.message);
-    button.enabled = true;
-  }
-}
+// async function disconnectFromWepPageClicked() {
+//   const button = d.qs("#disconnect-from-web-page");
+//   button.enabled = false;
+//   try {
+//     await askBackground({ code: "disconnect" });
+//     d.showSuccess("disconnected");
+//     setTimeout(function () {
+//       d.qs("#disconnect-line").hide();
+//       button.enabled = true;
+//     }, 1000);
+//   } catch (ex) {
+//     d.showErr(ex.message);
+//     button.enabled = true;
+//   }
+// }
 
 //--------------------------
 export async function show() {
@@ -179,82 +180,81 @@ export async function show() {
     //
     //show the logged-in & unlocked user their accounts
     //
-    d.qs(".topbarcaption").innerText = "Accounts";
-
-    //get accounts, sort by accountInfo.order and show as LI
-    const accountsRecord = await askBackgroundAllNetworkAccounts();
-    const list: ExtendedAccountData[] = [];
-    let needRefresh = false;
-    for (let key in accountsRecord) {
-      const e = new ExtendedAccountData(key, accountsRecord[key])
-      list.push(e);
-      if (e.total == undefined) { needRefresh = true }
-    }
-    list.sort(sortByOrder);
-    //debug
-    //for(let item of list) console.log(item.accountInfo.order,item.accountInfo.type, item.name)
-
-    const TEMPLATE = `
-    <div class="account-item" id="{name}">
-      <div class="accountlistitem">
-        <div class="accountlistname">{name}</div>
-        <div class="accountlistbalance balance">{total}</div>
-        <div class="accountlistcomment">{accountInfo.note}</div>
-      </div>
-    </div>
-    `;
-    d.clearContainer(ACCOUNTS_LIST);
-    d.populateUL(ACCOUNTS_LIST, TEMPLATE, list);
-
-    let total = 0;
-    //connect all item to accountItemClicked
-    document
-      .querySelectorAll("#accounts-list .account-item")
-      .forEach((item) => {
-        item.addEventListener("click", accountItemClicked);
-        //item.addEventListener("dragstart", accountItem_dragStart)
-        item.addEventListener("drag", accountItem_drag);
-        //item.addEventListener("dragenter", accountItem_dragEnter)
-        item.addEventListener("dragover", accountItem_dragOver);
-        //item.addEventListener("dragleave", accountItem_dragLeave)
-        item.addEventListener("drop", accountItem_drop);
-        item.addEventListener("dragend", accountItem_dragend);
-        //@ts-ignore
-        item.draggable = true;
-        let balanceNum = 0;
-        try {
-          balanceNum = c.toNum(d.getChildText(item, ".balance"));
-        } catch {
-          balanceNum = 0;
+    /*
+        //get accounts, sort by accountInfo.order and show as LI
+        const accountsRecord = await askBackgroundAllNetworkAccounts();
+    
+        const list: ExtendedAccountData[] = [];
+        let needRefresh = false;
+        for (let key in accountsRecord) {
+          const e = new ExtendedAccountData(key, accountsRecord[key])
+          list.push(e);
+          if (e.total == undefined) { needRefresh = true }
         }
-        if (isNaN(balanceNum)) balanceNum = 0;
-        total += balanceNum;
-      });
-
-    //show total
-    const totalEl = new d.El("#account-list-main .balance.total");
-    totalEl.innerText = c.toStringDec(total);
-    d.qs("#account-list-main .total-row").el.addEventListener(
-      "dragover",
-      total_dragOver
-    );
-
-    d.onClickId(ADD_ACCOUNT, addAccountClicked);
-
-    //const disconnectButton = d.qs("#disconnect-from-web-page");
-    //disconnectButton.onClick(disconnectFromWepPageClicked);
-
-    d.showPage(ACCOUNT_LIST_MAIN);
-
-    //d.qs("#disconnect-line").hide();
-    const isConnected = await askBackground({ code: "isConnected" });
-    d.onClickId("back-to-account", backToAccountsClicked);
-
-    //d.qs("#disconnect-line").showIf(isConnected);
-
+        list.sort(sortByOrder);
+        //debug
+        //for(let item of list) console.log(item.accountInfo.order,item.accountInfo.type, item.name)
+    
+        const TEMPLATE = `
+        <div class="account-item" id="{name}">
+          <div class="accountlistitem">
+            <div class="accountlistname">{name}</div>
+            <div class="accountlistbalance balance">{total}</div>
+            <div class="accountlistcomment">{accountInfo.note}</div>
+          </div>
+        </div>
+        `;
+        d.clearContainer(ACCOUNTS_LIST);
+        d.populateUL(ACCOUNTS_LIST, TEMPLATE, list);
+    
+        let total = 0;
+        //connect all item to accountItemClicked
+        document
+          .querySelectorAll("#accounts-list .account-item")
+          .forEach((item) => {
+            item.addEventListener("click", accountItemClicked);
+            //item.addEventListener("dragstart", accountItem_dragStart)
+            item.addEventListener("drag", accountItem_drag);
+            //item.addEventListener("dragenter", accountItem_dragEnter)
+            item.addEventListener("dragover", accountItem_dragOver);
+            //item.addEventListener("dragleave", accountItem_dragLeave)
+            item.addEventListener("drop", accountItem_drop);
+            item.addEventListener("dragend", accountItem_dragend);
+            //@ts-ignore
+            item.draggable = true;
+            let balanceNum = 0;
+            try {
+              balanceNum = c.toNum(d.getChildText(item, ".balance"));
+            } catch {
+              balanceNum = 0;
+            }
+            if (isNaN(balanceNum)) balanceNum = 0;
+            total += balanceNum;
+          });
+    
+        //show total
+        const totalEl = new d.El("#account-list-main .balance.total");
+        totalEl.innerText = c.toStringDec(total);
+        d.qs("#account-list-main .total-row").el.addEventListener(
+          "dragover",
+          total_dragOver
+        );
+    
+        d.onClickId(ADD_ACCOUNT, addAccountClicked);
+    
+        //const disconnectButton = d.qs("#disconnect-from-web-page");
+        //disconnectButton.onClick(disconnectFromWepPageClicked);
+    
+        d.showPage(ACCOUNT_LIST_MAIN);
+    
+        //d.qs("#disconnect-line").hide();
+        const isConnected = await askBackground({ code: "isConnected" });
+        d.onClickId("back-to-account", backToAccountsClicked);
+    
+    */
     await tryReposition();
     // start refreshing account list (unless reposition)
-    refreshAccountListBalances()
+    // refreshAccountListBalances()
 
   } catch (ex) {
     await UnlockPage_show(); //show the unlock-page
@@ -263,9 +263,9 @@ export async function show() {
   }
 }
 
-export function backToAccountsClicked() {
+export function backToMainPageClicked() {
   d.clearContainer("assets-list");
-  d.showPage("account-list-main");
+  show()
   hideOkCancel()
 }
 
@@ -291,21 +291,32 @@ async function tryReposition() {
         }
       }
     }
+      break;
+    default: {
+      const accname = await localStorageGet("currentAccountId")
+      if (accname && accname.endsWith("."+activeNetworkInfo.rootAccount)) {
+        AccountSelectedPage_show(accname)
+      }
+      else {
+        selectAccountPopupList()
+      }
+    }
+
   }
 }
 
-export async function backToAccountsList() {
+export async function backToMainPage() {
   //remove selected account auto-click
   localStorageRemove("account");
   selectedAccountData.name = ""; // mark as no account selected
   await show();
-  autoRefresh();
+  //autoRefresh();
 }
 
 //---------------------------------------------------
 //-- account item clicked => account selected Page --
 //---------------------------------------------------
-export async function accountItemClicked(ev: Event) {
+/*export async function accountItemClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
@@ -316,7 +327,7 @@ export async function accountItemClicked(ev: Event) {
     }
   }
 }
-
+*/
 
 export function updateScreen(selector: string, value: string) {
   try {
@@ -332,11 +343,11 @@ export function updateScreen(selector: string, value: string) {
   }
 }
 export function updateScreenNum(selector: string, amount: number | undefined) {
-  updateScreen(selector,c.toStringDec(amount))
+  updateScreen(selector, c.toStringDec(amount))
 }
 
 
-let refreshingAccountListBalances = false;
+/*let refreshingAccountListBalances = false;
 export async function refreshAccountListBalances() {
   if (d.activePage !== "account-list-main") {
     // user changed page / reposition
@@ -377,5 +388,5 @@ export async function refreshAccountListBalances() {
   } finally {
     refreshingAccountListBalances = false;
   }
-
 }
+*/

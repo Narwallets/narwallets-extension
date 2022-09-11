@@ -4,15 +4,14 @@
 
 @import url('https://rsms.me/inter/inter.css');
 
-body {
-	font-family: 'Inter', sans-serif;
-	 !important
+body, button {
+	font-family: 'Inter', sans-serif !important;
+	font-size: 11pt;
 }
 
 @supports (font-variation-settings: normal) {
-	body {
-		font-family: 'Inter var', sans-serif;
-		 !important
+	body, button {
+		font-family: 'Inter var', sans-serif !important;
 	}
 }
 

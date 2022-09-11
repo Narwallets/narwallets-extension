@@ -107,7 +107,7 @@ aside>nav>li {
   padding     : 5px 10px;
   margin-left : 10px;
   line-height : 2.2em;
-  font-size   : 1.7em;
+  font-size: 1.5em;
   font-weight : 250;
   z-index     : 93;
   margin-right: 10px;
@@ -147,11 +147,11 @@ NETWORK selection drop-down
 */
 
 .network-component.pointer {
-  border       : 1px solid var(--ControlAccent);
+  /* border       : 1px solid var(--ControlAccent); */
   border-radius: 24px;
-  margin-left  : 108px;
-  padding      : 3px;
-  width        : 149px;
+  margin-left: 116px;
+  padding: 2px;
+  width: 157px;
   flex         : 0 0 auto;
   display      : flex;
   z-index      : 99;
@@ -160,12 +160,12 @@ NETWORK selection drop-down
 
 .network-indicator {
   display    : flex;
-  width      : 211px;
+  width: 146px;
   align-items: center;
-  font-size  : 13px;
   color      : var(--Block);
   font-weight: 400;
   flex-flow  : row nowrap;
+  height: 22px;
 }
 
 li {
@@ -177,9 +177,10 @@ li {
 
 li#current-network-display-name {
   max-height: 20px;
-  width     : 118px;
+  width: 125px;
   color     : var(--TextGeneric);
   cursor    : pointer;
+  font-size: 98%;
 }
 
 .circle:before {
@@ -255,6 +256,12 @@ li#current-network-display-name {
   border          : 1px solid var(--HighLight);
   text-align      : center;
   box-shadow      : 0px 0px 7px var(--HighLight);
+  margin-top: 0px;
+}
+
+.combo-list-title {
+  text-align      : left;
+  color: var(--TextGeneric);
 }
 
 .combo-list-filter{
@@ -284,6 +291,7 @@ li#current-network-display-name {
 .combo-list-box.open {
   color: var(--ControlText);
   top             : auto;
+  margin-top: 22px;
   bottom          : 20px;
   max-height      : 520px;
   overflow-y      : scroll;
@@ -331,25 +339,37 @@ option.selected {
 .network-box-header .title {
   color         : var(--ControlAccent) smoke;
   color         : white;
-  font-size     : 14pt;
-  padding-bottom: 5px;
+  /* font-size     : 14pt; */
+  padding-bottom: 1px;
+  padding-left: 4px;
+  padding-top: 0px;
 }
 
 .down-arrow {
-  background-image   : url(../icons/down-chevron.svg);
-  background-repeat  : no-repeat;
-  background-size    : contain;
-  background-position: right;
-  font-size          : 0.6em;
+  /* background-image   : url(../icons/down-chevron.svg); */
+  /* background-repeat  : no-repeat; */
+  /* background-size    : contain; */
+  /* background-position: right; */
+  /*font-size          : 0.6em;
   min-width          : 10px;
   min-height         : 10px;
   margin             : 0 8px;
   min-width          : 10px;
   min-height         : 10px;
   color              : white;
+  */
   cursor             : pointer;
+  padding-left: 3px;
+  padding-top: 2px;
+  font-size: 0.85em;
 }
-
+.down-arrow:after {
+  content: "▽";
+  font-size:0.8em;
+  color: var(--BlockText);
+  opacity: 0.7;
+}
+  
 .network-box-header hr {
   border-color: #7090ab;
   width       : 90%;

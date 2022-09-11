@@ -15,7 +15,7 @@
 
 	<div class="topbar">
 		<div class="topbarleft"></div>
-		<div class="topbarcaption" id="topbar"></div>
+		<div class="topbarcaption"><button class="text-button-dropdown" id="topbar-left-button">Accounts</button></div>
 		<div class="topbarpulldown">
 			<div class="app-header-network-component-wrapper">
 				<div id="select-network" class="network-component pointer" title="Active Network">
@@ -30,7 +30,7 @@
 		<!--<div class="topbarhamburguer"></div>-->
 
 		<div class="hamb" id="hamb-button">
-			<svg width=24 height=28>
+			<svg viewBox="-4 -4 34 34" width=24 height=28>
 				<line id="top" x1=0 y1=2 x2=24 y2=2 />
 				<line id="middle" x1=0 y1=12 x2=24 y2=12 />
 				<line id="bottom" x1=0 y1=22 x2=24 y2=22 />
@@ -78,19 +78,19 @@
 			<hr>
 			<li id="lock">Lock</li>
 			<hr>
-			<li id="accounts">Accounts</li>
+			<li id="accounts" hidden>Accounts</li>
 			<hr>
 			<li id="add-account-side">Add Account</li>
 			<hr>
 			<li id="address-book-side">Address Book</li>
 			<hr>
+			<li id="options">Options</li>
+			<hr>
 			<li id="change-password">Change Password</li>
 			<hr>
 			<!--<li id="create-user">Create a new User</li>
 			<hr>-->
-			<li id="darkmode">Switch Dark/Light Mode</li>
-			<hr>
-			<li id="options">Options</li>
+			<li id="darkmode" hidden>Switch Dark/Light Mode</li>
 			<hr>
 			<li id="contact">Contact</li>
 			<hr>
@@ -267,8 +267,6 @@
 	<!--#region Account details -->
 
 	<div class="appface slide-hide" id="account-selected">
-
-		<button class="button back" id="back-to-account"></button>
 
 		<div class="accountdetstopcenter" id="selected-account">
 		</div>
@@ -641,14 +639,15 @@
 							<h2>
 								Updates account balance and assets balances from the blockchain.
 							</h2>
-						</button> -->
+						</button>
 
 						<button class="button morepage" id="address-book-button">
-							<h1>Account Address Book</h1>
+							<h1>Address Book</h1>
 							<h2>
 								Manage addresses to operate in a simpler way
 							</h2>
 						</button>
+						 -->
 
 						<button class="button morepage" id="search-pools">
 							<h1>Search More Assets</h1>
@@ -1212,7 +1211,7 @@
 		<input id="autolock-seconds-input" type="text" />
 
 		<div class="button-group">
-			<button class="ok" id="save-settings">Save Settings</button>
+			<button class="ok" id="save-settings">OK</button>
 			<button class="cancel" id="cancel-security-settings">Cancel</button>
 		</div>
 	</div>
@@ -1253,9 +1252,11 @@
 
 	<!--#region Overlay combo popup-->
 	<div id="popup-list-appface" class="combo-list-appface">
-		<div id="list-filter" class="combo-list-filter hidden">
+		<div id="popup-list-title" class="combo-list-title">Select an account...
 		</div>
 		<div id="popup-list" class="combo-list-box">
+		</div>
+		<div id="list-filter" class="combo-list-filter hidden">
 		</div>
 	</div>
 

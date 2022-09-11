@@ -52,7 +52,7 @@ import {
 import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { ASSET_HISTORY_TEMPLATE, nearDollarPrice } from "../data/global.js";
-import { backToAccountsList, setLastSelectedAsset } from "./main.js";
+import { backToMainPage, setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
 import { activeNetworkInfo } from "../index.js";
 import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
@@ -107,8 +107,6 @@ export async function show(
 
   d.showSubPage("asset-history");
   d.onClickId("asset-history-details", historyLineClicked);
-
-  d.byId("topbar").innerText = "Assets";
 
   renderAssetPage();
 
@@ -758,7 +756,7 @@ async function showAssetSendClicked() {
     });
 
     popupComboConfigure("send-to-asset-account", "send-to-asset-account-select", selectAddressClicked)
-    d.onEnterAndAmount("send-to-asset-amount", sendOKClicked )
+    d.onEnterAndAmount("send-to-asset-amount", sendOKClicked)
 
     showOKCancel(sendOKClicked, showInitialSubPage, false);
   } catch (ex) {

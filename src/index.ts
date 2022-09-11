@@ -2,7 +2,7 @@ import * as d from "./util/document.js";
 import * as Pages from "./pages/main.js";
 import { NetworkList } from "./lib/near-api-lite/network.js";
 
-import { refreshAccountListBalances } from "./pages/main.js";
+//import { refreshAccountListBalances } from "./pages/main.js";
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ChangePass_addListeners } from "./pages/change-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
@@ -281,6 +281,11 @@ async function initPopup() {
   chrome.alarms.clear("unlock-expired");
   //console.log(new Date().toISOString(), "enter initPopup()")
 
+  //update network indicator visual state
+  activeNetworkInfo = await askBackgroundGetNetworkInfo();
+  updateNetworkIndicatorVisualState(activeNetworkInfo);
+  Import_onNetworkChanged(activeNetworkInfo);
+
   hamb = new d.El(".hamb");
   aside = new d.El("aside");
   hamb.onClick(hambClicked);
@@ -321,10 +326,6 @@ async function initPopup() {
 
   Import_addListeners();
 
-  //update network indicator visual state
-  activeNetworkInfo = await askBackgroundGetNetworkInfo();
-  updateNetworkIndicatorVisualState(activeNetworkInfo);
-  Import_onNetworkChanged(activeNetworkInfo);
   // Account_onNetworkChanged(activeNetworkInfo);
 
   calculateDollarValue();
@@ -350,10 +351,11 @@ export async function autoRefresh() {
   try {
     refreshing = true
     //console.log(`Calling auto-refresh, selectedAccountData ${selectedAccountData} d.activePage ${d.activePage}`);
-    if (d.activePage == "account-list-main") {
-      await refreshAccountListBalances();
-    }
-    else if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
+    // if (d.activePage == "account-list-main") {
+    //   await refreshAccountListBalances();
+    // }
+    // else 
+    if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
       await refreshSelectedAccountAndAssets();
     }
   }

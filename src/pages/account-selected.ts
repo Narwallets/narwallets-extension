@@ -62,7 +62,8 @@ import {
   initAddressArr,
   saveContactOnBook,
   show as AddressBook_show,
-  getAddressesForPopupList
+  getAddressesForPopupList,
+  getAccountsForPopupList
 } from "./address-book.js";
 
 import type { AnyElement, ClickHandler } from "../util/document.js";
@@ -94,7 +95,7 @@ import { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { activeNetworkInfo, autoRefresh } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 
-const THIS_PAGE = "account-selected";
+const ACCOUNT_SELECTED = "account-selected";
 
 export let selectedAccountData: ExtendedAccountData;
 
@@ -116,11 +117,10 @@ export async function show(
   reposition?: string,
   assetIndex?: number
 ) {
-  d.byId("topbar").innerText = "Accounts";
 
   initPage();
   await selectAndShowAccount(accName);
-  d.showPage(THIS_PAGE);
+  d.showPage(ACCOUNT_SELECTED);
   if (reposition) {
     switch (reposition) {
       case "stake": {
@@ -171,10 +171,10 @@ function initPage() {
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
   d.onClickId("search-pools", searchMoreAssetsButtonClicked);
-  d.onClickId("address-book-button", showAddressBook);
+  //d.onClickId("address-book-button", showAddressBook);
 
   //d.onClickId("refresh-button", refreshSelectedAcc);
-  d.onClickId("back-to-account", backLinkClicked);
+  d.onClickId("topbar-left-button", selectAccountPopupList);
   d.onClickId("delete-account", DeleteAccount);
 
   // liquid/delayed stake
@@ -190,8 +190,20 @@ function initPage() {
   target?.addEventListener("usdPriceReady", usdPriceReady);
 }
 
+// shows drop-down with wallet accounts
+export async function selectAccountPopupList() {
+  const items = await getAccountsForPopupList()
+  //show and what to do when clicked
+  popupListOpen(items, popupListAddressClicked)
+}
+async function popupListAddressClicked(text: string, value: string) {
+  if (!value) return;
+  await show(value, undefined);
+  autoRefresh()
+}
+
 function backLinkClicked() {
-  Pages.backToAccountsList();
+  Pages.backToMainPage();
   hideOkCancel();
 }
 
@@ -1610,11 +1622,11 @@ function addNoteClicked() {
   showOKCancel(addNoteOKClicked, switchToAssetsSupbage);
 }
 
-function showAddressBook() {
-  isMoreOptionsOpen = false;
-  d.hideErr();
-  AddressBook_show();
-}
+// function showAddressBook() {
+//   isMoreOptionsOpen = false;
+//   d.hideErr();
+//   AddressBook_show();
+// }
 
 async function addNoteOKClicked() {
   d.hideErr();

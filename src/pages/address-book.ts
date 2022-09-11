@@ -26,6 +26,19 @@ import type { PopupItem } from "../util/popup-list.js";
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
+export async function getAccountsForPopupList(except?: string, added?:Record<string, boolean>): Promise<PopupItem[]> {
+  // add all wallet accounts
+  const walletAccounts = await askBackgroundAllNetworkAccounts();
+  let items = []
+  for (let key in walletAccounts) {
+    if ((added && added[key]) || (except && key == except)) continue;
+    let title = key
+    if (walletAccounts[key].note) title += " (" + walletAccounts[key].note + ")"
+    items.push({ text: title, value: key })
+  }
+  return items
+}
+
 export async function getAddressesForPopupList(except?: string): Promise<PopupItem[]> {
   if (addressContacts.length == 0) await initAddressArr();
   let items = []
@@ -37,16 +50,8 @@ export async function getAddressesForPopupList(except?: string): Promise<PopupIt
     }
   }
   // add also all wallet accounts
-  const walletAccounts = await askBackgroundAllNetworkAccounts();
-  for (let key in walletAccounts) {
-    if (!added[key] && (!except || key != except)) {
-      let title = key
-      if (walletAccounts[key].note) title += " (" + walletAccounts[key].note + ")"
-      items.push({ text: title, value: key })
-    }
-  }
-
-  return items
+  const walletAccounts = await getAccountsForPopupList(except, added);
+  return items.concat(walletAccounts)
 }
 
 export async function show() {

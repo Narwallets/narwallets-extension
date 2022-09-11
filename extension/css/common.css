@@ -104,7 +104,6 @@ h5 {
   position   : absolute;
   color      : var(--TextGeneric);
   font-weight: lighter;
-  font-size  : 12px;
   width      : 100%;
   height     : 39px;
   display    : inline-block;
@@ -137,13 +136,13 @@ h5 {
   color      : var(--TextGeneric);
   font-weight: 300;
   width      : 150px;
-  height     : 16px;
+  height: 22px;
   display    : inline-flex;
   top: 11px;
   left: 49px;
   margin-left: 0px;
   padding    : 0px;
-  font-size  : 16px;
+  /*font-size  : 16px;*/
   font-weight: 200;
 }
 
@@ -151,12 +150,11 @@ h5 {
   position   : absolute;
   color      : var(--TextGeneric);
   font-weight: lighter;
-  font-size  : 12px;
   width      : 148px;
   height     : 40px;
   display    : inline-block;
   top        : 5px;
-  left       : 170px;
+  left: 168px;
   margin     : 0px;
   padding    : 0px;
   font-weight: 200;
@@ -489,3 +487,18 @@ h5 {
 .text-strike-through {
   text-decoration-line: line-through;
 }
+
+.text-button-dropdown {
+  background: transparent;
+  color: var(--TextGeneri);
+}
+.text-button-dropdown:after {
+  content: "▽";
+  font-size: 0.7em;
+  color: var(--BlockText);
+  position: relative;
+  opacity: 0.7;
+  left: 5px;
+  top: -1px;
+}
+  

@@ -250,7 +250,7 @@ span#icon img {
   width        : 260px;
   background   : transparent;
   color        : var(--TextGeneric);
-  /* font-size    : 15px; */
+  font-size: 90%;
   font-weight  : 400;
 }
 

@@ -7,7 +7,7 @@ import { Account, newAccount } from "../data/account.js";
 
 import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import type { SeedPhraseResult } from "../lib/near-api-lite/utils/seed-phrase.js";
-import { backToAccountsList, backToAccountsClicked } from "./main.js";
+import { backToMainPage, backToMainPageClicked } from "./main.js";
 import { encodeHex } from "../lib/crypto-lite/encode.js";
 import { activeNetworkInfo } from "../index.js";
 
@@ -23,7 +23,7 @@ async function createAccountClicked(ev: Event) {
 
 function importAccountClicked(ev: Event) {
   d.showPage(IMPORT_ACCOUNT);
-  d.onClickId("import-existing-account-back-to-account", backToAccountsClicked);
+  d.onClickId("import-existing-account-back-to-account", backToMainPageClicked);
 }
 
 let seedResult: SeedPhraseResult;
@@ -42,10 +42,10 @@ async function createImplicitAccountClicked(ev: Event) {
 async function createImplicitAccount_Step1() {
   try {
     d.showPage("display-seed-phrase");
-    d.onClickId("create-implicit-account-back-to-account", backToAccountsClicked);
+    d.onClickId("create-implicit-account-back-to-account", backToMainPageClicked);
     d.byId("seed-phrase-show-box").innerText = seedResult.seedPhrase.join(" ");
     d.onClickId("seed-phrase-continue", createImplicitAccount_Step2);
-    d.onClickId("seed-phrase-cancel", backToAccountsList);
+    d.onClickId("seed-phrase-cancel", backToMainPage);
   }
   catch (ex) {
     d.showErr(ex.message)
