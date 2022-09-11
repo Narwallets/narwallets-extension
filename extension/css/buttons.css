@@ -45,36 +45,36 @@
 
 .morepage {
   position     : relative;
-  width: 456px;
-  height: 66px;
+  width        : 456px;
+  height       : 66px;
   color        : white;
-  padding: 0px;
+  padding      : 0px;
   margin       : 0px;
   border-radius: 0px;
   background   : var(--Background);
   border-style : none;
-  left: 6px;
+  left         : 6px;
 }
 
 .morepage:hover {
-  background: var(--HoverColor);
+  background   : var(--HoverColor);
   border-radius: 8px;
 }
 
 .morepage h1 {
-  position   : absolute;
-  display    : block;
-  padding: 3px 9px;
-  margin: 1px;
-  left: 7px;
-  top: 3px;
-  width: 402px;
-  height: 15px;
-  font-weight: 200;
-  font-size  : 14px;
-  background : var(--Block);
-  color      : var(--BlockText);
-  text-align : left;
+  position     : absolute;
+  display      : block;
+  padding      : 3px 9px;
+  margin       : 1px;
+  left         : 7px;
+  top          : 3px;
+  width        : 402px;
+  height       : 15px;
+  font-weight  : 200;
+  font-size    : 14px;
+  background   : var(--Block);
+  color        : var(--BlockText);
+  text-align   : left;
   border-radius: 8px;
 }
 
@@ -82,9 +82,9 @@
   position     : absolute;
   padding      : 0px;
   margin       : 0px;
-  left: 17px;
-  top: 28px;
-  width: 434px;
+  left         : 17px;
+  top          : 28px;
+  width        : 434px;
   text-align   : left;
   font-weight  : 100;
   font-size    : 12px;
@@ -166,10 +166,20 @@
   position        : absolute;
   left            : 10px;
   top             : 10px;
-  width           : 18px;
+  width           : 16px;
   padding         : 0px;
   background-image: url("../icons/SVG/back_dark.svg");
-  background-size : 16px;
+  background-size : 14px;
+}
+
+.back-button-asset {
+  position        : absolute;
+  left            : 11px;
+  top             : 102px;
+  width           : 16px;
+  padding         : 0px;
+  background-image: url("../icons/SVG/back_dark.svg");
+  background-size : 14px;
 }
 
 /*buttons that appear in dark background*/

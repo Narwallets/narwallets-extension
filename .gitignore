@@ -1,6 +1,7 @@
 node_modules
 out
 extension/dist/
+test-new-install-ln
 z-attic-gitignore
 
 extension/dist

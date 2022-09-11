@@ -15,6 +15,7 @@ export function initPopupHandlers() {
 }
 
 let popupClickHandler: Function;
+let popupEscapeHandler: Function|undefined;
 
 export let popupOpened: boolean = false;
 
@@ -80,6 +81,7 @@ function onPopupKeyDown(event: KeyboardEvent) {
     //If ESC key, close the popup
     if (event.key === "Escape") {
         closePopupList();
+        popupEscapeHandler && popupEscapeHandler()
         return;
     }
 
@@ -144,10 +146,11 @@ function onPopupKeyDown(event: KeyboardEvent) {
 }
 
 export let popupSelectedIndex: number = 0;
-export function popupListOpen(items: PopupItem[], clickHandler: Function) {
+export function popupListOpen(items: PopupItem[], clickHandler: Function, escapeHandler?:Function) {
 
     // initial populate list
     popupClickHandler = clickHandler
+    popupEscapeHandler = escapeHandler
     populatePopupList(items);
     // open full body semi-transparent background
     const popupFace = d.byId(POPUP_LIST_APPFACE);

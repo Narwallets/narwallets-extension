@@ -1,5 +1,5 @@
 import * as d from "./util/document.js";
-import * as Pages from "./pages/main.js";
+import * as Main from "./pages/main.js";
 import { NetworkList } from "./lib/near-api-lite/network.js";
 
 //import { refreshAccountListBalances } from "./pages/main.js";
@@ -67,6 +67,9 @@ function updateNetworkIndicatorVisualState(info: NetworkInfo) {
   currentNetworkDisplayName.el.className = "circle " + info.color; //set indicator color
 }
 
+// function to check if the account matches active network
+export const accountMatchesNetwork = (accName:string) => accName && activeNetworkInfo && accName.endsWith( "." + activeNetworkInfo.rootAccount)
+
 export function setIsDark(d: boolean) {
   isDark = d
 }
@@ -94,7 +97,7 @@ async function networkItemClicked(e: Event) {
     // Account_onNetworkChanged(activeNetworkInfo);
     //on network-change restart the page-flow
     localStorageRemove("reposition");
-    Pages.show(); //refresh account list
+    Main.show(); // restart page-flow
   } catch (ex) {
     d.showErr(ex.message);
   }
@@ -115,7 +118,7 @@ function selectNetworkClicked(ev: Event) {
 }
 
 function welcomeCreatePassClicked() {
-  d.showPage(Pages.CREATE_USER);
+  d.showPage(Main.CREATE_USER);
 }
 
 function hambClicked() {
@@ -177,7 +180,7 @@ async function saveSecurityOptions(ev: Event) {
       autoUnlockSeconds: aulSecs,
     });
 
-    Pages.show();
+    Main.show();
     d.showSuccess("Options saved");
   } catch (ex) {
     d.showErr(ex.message);
@@ -207,19 +210,19 @@ async function asideOptions() {
 async function changePassword() {
   if (await asideIsUnlocked()) {
     hideOkCancel();
-    d.showPage(Pages.CHANGE_PASSWORD);
+    d.showPage(Main.CHANGE_PASSWORD);
     ChangePass_addListeners();
   }
 }
 
 function asideCreateUserClicked() {
   hambClicked();
-  d.showPage(Pages.WELCOME_NEW_USER_PAGE);
+  d.showPage(Main.WELCOME_NEW_USER_PAGE);
 }
 async function asideAddAccount() {
   if (await asideIsUnlocked()) {
     hideOkCancel();
-    Pages.addAccountClicked();
+    Main.addAccountClicked();
   }
 }
 
@@ -341,7 +344,7 @@ async function initPopup() {
   }, 10000);
 
   //show main page
-  return Pages.show();
+  return Main.show();
 }
 
 let refreshing: boolean = false;

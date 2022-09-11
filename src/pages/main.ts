@@ -20,7 +20,7 @@ import {
 import { D } from "../lib/tweetnacl/core/core.js";
 import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { activeNetworkInfo, asideSwitchMode, autoRefresh, setIsDark } from "../index.js";
+import { accountMatchesNetwork, activeNetworkInfo, asideSwitchMode, autoRefresh, setIsDark } from "../index.js";
 import { hideOkCancel } from "../util/okCancel.js";
 
 //--- content sections at MAIN popup.html
@@ -149,16 +149,17 @@ export async function show() {
   try {
     d.hideErr();
 
+    const selectAccountButton = new d.El("#topbar-left-button")
+    selectAccountButton.hide()
+
     //is locked?
     const locked = await askBackgroundIsLocked();
     if (locked) {
       //do a user exists?
       const state = await askBackgroundGetState();
-
       if (state.usersList.length == 0) {
         //no users => welcome new User
         d.showPage(WELCOME_NEW_USER_PAGE);
-        await tryReposition();
         return; //*****
       }
       //user & locked => unlock
@@ -285,21 +286,16 @@ async function tryReposition() {
       const assetIndex = await localStorageGetAndRemove("assetIndex");
       const isLocked = await askBackgroundIsLocked();
       if (!isLocked) {
-        if (account) {
-          //console.log("reposition ", account, reposition, assetIndex)
-          AccountSelectedPage_show(account, reposition, assetIndex);
-        }
+        //console.log("reposition ", account, reposition, assetIndex)
+        AccountSelectedPage_show(account, reposition, assetIndex);
       }
     }
       break;
     default: {
-      const accname = await localStorageGet("currentAccountId")
-      if (accname && accname.endsWith("."+activeNetworkInfo.rootAccount)) {
-        AccountSelectedPage_show(accname)
-      }
-      else {
-        selectAccountPopupList()
-      }
+      let account:string|undefined = await localStorageGet("lastSelectedAccountByNetwork_"+activeNetworkInfo.name)
+      if (!account) account = await localStorageGet("currentAccountId")
+      // in ALL cases we have to call AccountSelectedPage_show (it will show a select account popup if the account is not valid)
+      AccountSelectedPage_show(account||"")
     }
 
   }

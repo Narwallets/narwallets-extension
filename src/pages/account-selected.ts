@@ -2,7 +2,7 @@ import * as c from "../util/conversions.js";
 import * as d from "../util/document.js";
 
 import * as searchAccounts from "../util/search-accounts.js";
-import * as Pages from "../pages/main.js";
+import * as Main from "../pages/main.js";
 
 import * as StakingPool from "../contracts/staking-pool.js";
 import {
@@ -92,7 +92,7 @@ import {
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { activeNetworkInfo, autoRefresh } from "../index.js";
+import { accountMatchesNetwork, activeNetworkInfo, autoRefresh } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 
 const ACCOUNT_SELECTED = "account-selected";
@@ -118,6 +118,12 @@ export async function show(
   assetIndex?: number
 ) {
 
+  // ask to select another if account does not matches network
+  if (!accountMatchesNetwork(accName)) {
+    selectAccountPopupList()
+    return;
+  }
+
   initPage();
   await selectAndShowAccount(accName);
   d.showPage(ACCOUNT_SELECTED);
@@ -140,8 +146,12 @@ export async function show(
       }
     }
   }
-  localStorageSet({ reposition: "account", account: accName });
-  localStorageSet({ currentAccountId: accName })
+  let payload:Record<string, any>={
+    reposition: "account", 
+    account: accName 
+  };
+  payload["lastSelectedAccountByNetwork_"+activeNetworkInfo.name] = accName 
+  localStorageSet(payload)
   //checkConnectOrDisconnect();
   autoRefresh()
 }
@@ -184,6 +194,9 @@ function initPage() {
 
   seedTextElem = new d.El("#seed-phrase");
 
+  // select account button
+  document.querySelector("#topbar-left-button")?.classList.remove("hidden");
+
   OkCancelInit();
 
   var target = document.querySelector("#usd-price-link");
@@ -194,16 +207,18 @@ function initPage() {
 export async function selectAccountPopupList() {
   const items = await getAccountsForPopupList()
   //show and what to do when clicked
-  popupListOpen(items, popupListAddressClicked)
+  popupListOpen(items, popupListAddressClicked, popupListAddressEscaped)
 }
 async function popupListAddressClicked(text: string, value: string) {
   if (!value) return;
   await show(value, undefined);
-  autoRefresh()
+}
+async function popupListAddressEscaped() {
+  Main.show();
 }
 
 function backLinkClicked() {
-  Pages.backToMainPage();
+  Main.backToMainPage();
   hideOkCancel();
 }
 
@@ -241,9 +256,9 @@ export async function refreshSelectedAccountAndAssets() {
     await assetUpdateBalance(asset, accName)
     // update balance on-screen
     const assetId = assetDivId(asset)
-    Pages.updateScreenNum(`#assets-list [id='${assetId}'] .accountassetbalance`, asset.balance)
-    Pages.updateScreen(`#assets-list [id='${assetId}'] .accountassetfiat`, getUsdValue(asset))
-    if (Pages.lastSelectedAsset && asset.contractId == Pages.lastSelectedAsset.contractId && asset.symbol == Pages.lastSelectedAsset.symbol) {
+    Main.updateScreenNum(`#assets-list [id='${assetId}'] .accountassetbalance`, asset.balance)
+    Main.updateScreen(`#assets-list [id='${assetId}'] .accountassetfiat`, getUsdValue(asset))
+    if (Main.lastSelectedAsset && asset.contractId == Main.lastSelectedAsset.contractId && asset.symbol == Main.lastSelectedAsset.symbol) {
       // only update amount
       const el = document.querySelector("#selected-asset #balance") as HTMLElement;
       if (el) {
@@ -271,8 +286,8 @@ export async function usdPriceReady() {
   const elems = d.all(".accountdetsfiat")
   elems.innerText = c.toStringDec(selectedAccountData.totalUSD, 2);
   elems.show()
-  if (Pages.lastSelectedAsset) {
-    let assetUsdValue = getUsdValue(Pages.lastSelectedAsset)
+  if (Main.lastSelectedAsset) {
+    let assetUsdValue = getUsdValue(Main.lastSelectedAsset)
     // if (Pages.lastSelectedAsset.balance != undefined) {
     //   if (Pages.lastSelectedAsset.symbol == "STNEAR") {
     //     await getNarwalletsMetrics()
@@ -437,7 +452,7 @@ async function selectAndShowAccount(accName: string) {
 
   // get balance from chain (launch async)
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
-  Pages.setLastSelectedAccount(selectedAccountData);
+  Main.setLastSelectedAccount(selectedAccountData);
 
   showSelectedAccount();
 }

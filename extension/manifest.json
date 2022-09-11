@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Narwallets V4",
   "description": "NEAR protocol wallet",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "browser_action": {
     "default_popup": "index.html"
   },
@@ -22,16 +22,22 @@
   },
   "content_scripts": [
     {
-        "matches": ["https://*/*"],
-        "js": ["dist/content-script.js"],
-        "run_at": "document_start"
-    },
-    {
-      "matches": ["<all_urls>"],
+      "matches": [
+        "https://*/*"
+      ],
       "js": [
         "dist/content-script.js"
       ],
       "run_at": "document_start"
-  }
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "dist/content-script.js"
+      ],
+      "run_at": "document_start"
+    }
   ]
 }
