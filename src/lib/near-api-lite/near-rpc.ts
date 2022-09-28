@@ -150,6 +150,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
         actions,
         recentBlockHash
     )
+    console.log("Transaction", transaction)
 
     const serializedTx = serialize(TX.SCHEMA, transaction);
     const serializedTxHash = new Uint8Array( await sha256Async(serializedTx));
@@ -162,6 +163,8 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
             data: signature.signature
         })
     });
+    console.log("signedTransaction", signedTransaction)
+
 
     const result = await broadcast_tx_commit_signed(signedTransaction)
 

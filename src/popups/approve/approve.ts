@@ -2,6 +2,7 @@ import * as d from "../../util/document.js"
 import * as c from "../../util/conversions.js"
 import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../lib/near-api-lite/batch-transaction.js"
 import { askBackground } from "../../background/askBackground.js"
+import { globalSendResponse } from "../../background/background.js"
 
 type TxInfo = {
   action: string;
@@ -14,7 +15,8 @@ type TxMsg = {
   url: string;
   network: string | undefined;
   signerId: string;
-  tx: BatchTransaction;
+  tx?: BatchTransaction;
+  txs?: BatchTransaction[];
 }
 type ResolvedMsg = {
   dest: "page";
@@ -34,9 +36,11 @@ async function approveOkClicked() {
   d.showWait()
   try {
     //ask background to apply transaction
-    resolvedMsg.data = await askBackground(initialMsg)
+    // resolvedMsg.data = await askBackground(initialMsg)
     //response goes to initiating tab/page, another 5-min waiting spinner is there
-    chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //send resolution to original asking tab/page
+    // chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //send resolution to original asking tab/page
+    const wasCalled = await askBackground({code:"callGlobalSendResponse"})
+
     responseSent = true
     setTimeout(() => { window.close() }, 100);
   }
@@ -55,8 +59,10 @@ function respondRejected() {
   responseSent = true
 }
 
-function cancelOkClicked() {
-  respondRejected();
+async function cancelOkClicked() {
+  console.log("Cancel clicked")
+  // respondRejected();
+  const wasCalled = await askBackground({code:"callGlobalSendResponse", cancel: true})
   setTimeout(() => { window.close() }, 200);
 }
 
@@ -69,7 +75,7 @@ function humanReadableValue(value: Object): string {
   if (typeof value == "string") {
     if (/\d{20}/.test(value)) {
       //at least 20 digits. we assume YOCTOS
-      return c.toStringDecMin(c.yton(value)) + "N"
+      return c.toStringDecMin(c.yton(value))
     }
     else {
       return `"${value}"`;
@@ -107,50 +113,100 @@ function displayTx(msg: TxMsg) {
   resolvedMsg = { dest: "page", code: "request-resolved", tabId: initialMsg.tabId, requestId: initialMsg.requestId }
 
   try {
+    console.log("MSG", msg)
     d.byId("net-name").innerText = msg.network || ""
     d.byId("signer-id").innerText = msg.signerId || ""
     d.byId("web-page").innerText = msg.url.split(/[?#]/)[0]; // remove querystring and/or hash
-    d.byId("receiver").innerText = msg.tx.receiver
+    d.byId("receiver").innerText = msg.tx ? msg.tx.receiver : ""
 
     d.clearContainer("list")
 
-    for (let item of msg.tx.items) {
-      let toAdd: TxInfo = {
-        action: item.action,
-        attached: (item.attached != "0" && item.attached != "1") ?
-          `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
-      }
-      //explain action
-      switch (item.action) {
-        case "call":
-          const f = item as FunctionCall;
-          toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
-          break;
-
-        case "transfer":
-          toAdd.action = ""
-          toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
-          break;
-
-        default:
-          toAdd.action = JSON.stringify(item);
-      }
-      const TEMPLATE = `
-      <li id="{name}">
-        <div class="action">{action}</div>
-        <div class="attached-near">{attached}</div>
-      </li>
-      `;
-      d.appendTemplateLI("list", TEMPLATE, toAdd)
+    if(msg.tx) {
+      displaySingleTransactionParams(msg)
+    } else if(msg.txs) {
+      displayMultipleTransactionParams(msg)
     }
 
     //only if it displayed ok, enable ok action
     d.onClickId("approve-ok", approveOkClicked)
-
+    d.onClickId("approve-cancel", cancelOkClicked)
+    // Add cancel on click
   }
   catch (ex) {
     d.showErr(ex.message)
     d.qs("#approve-ok").hide() //hide ok button
+    console.error(ex)
+  }
+}
+
+function displaySingleTransactionParams(msg: TxMsg) {
+  for (let item of msg.tx!.items) {
+    let toAdd: TxInfo = {
+      action: item.action,
+      attached: (item.attached != "0" && item.attached != "1") ?
+        `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
+    }
+    //explain action
+    switch (item.action) {
+      case "call":
+        const f = item as FunctionCall;
+        toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
+        break;
+
+      case "transfer":
+        toAdd.action = ""
+        toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
+        break;
+
+      default:
+        toAdd.action = JSON.stringify(item);
+    }
+    const TEMPLATE = `
+    <li id="{name}">
+      <div class="action">{action}</div>
+      <div class="attached-near">{attached}</div>
+    </li>
+    `;
+    d.appendTemplateLI("list", TEMPLATE, toAdd)
+  }
+}
+
+function displayMultipleTransactionParams(msg: TxMsg) {
+  for (let tx of msg.txs!) {
+    // let toAdd: TxInfo = {
+    //   action: item.action,
+    //   attached: (item.attached != "0" && item.attached != "1") ?
+    //     `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
+    // }
+    // //explain action
+    // switch (item.action) {
+    //   case "call":
+    //     const f = item as FunctionCall;
+    //     toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
+    //     break;
+
+    //   case "transfer":
+    //     toAdd.action = ""
+    //     toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
+    //     break;
+
+    //   default:
+    //     toAdd.action = JSON.stringify(item);
+    // }
+    for(let item of tx.items) {
+      const f = item as FunctionCall;
+      let toAdd = {receiver: tx.receiver, action: `${f.method}(${JSON.stringify(f.args)})`}
+      const TEMPLATE = `
+      <li id="{name}">
+        <div class="receiver">{receiver}</div>
+        <div class="actions">{action}</div>
+      </li>
+      `;
+      // 
+      d.appendTemplateLI("list", TEMPLATE, toAdd)
+    }
+    
+    console.log("tx", tx)
   }
 }
 
