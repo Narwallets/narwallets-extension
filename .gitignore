@@ -4,5 +4,6 @@ extension/dist/
 z-attic-gitignore
 
 extension/dist
+test-new-install-ln
 
 .vscode/launch.json
