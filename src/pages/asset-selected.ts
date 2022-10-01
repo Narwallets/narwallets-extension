@@ -103,12 +103,15 @@ export async function show(
     asset_selected.icon = "STAKE";
   }
   d.showPage(THIS_PAGE);
-  d.onClickId("back-to-selected", backToSelectClicked);
-
+  
   d.showSubPage("asset-history");
   d.onClickId("asset-history-details", historyLineClicked);
 
   renderAssetPage();
+
+  d.onClickId("back-to-selected", backToSelectClicked);
+  // click on top account name, also goes back to asset list
+  d.qs("#selected-asset * .accountdetscuenta").onClick(backToSelectClicked)
 
   d.byId("asset-remove").classList.remove("hidden"); // shown in all cases
 

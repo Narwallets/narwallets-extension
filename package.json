@@ -1,6 +1,6 @@
 {
   "name": "narwallet-extension",
-  "version": "0.1.0",
+  "version": "4.0.0",
   "description": "Narwallet chrome-extension wallet for NEAR protocol",
   "author": "Lucio Tato <luciotato@gmail.com>",
   "homepage": "www.narwallets.com",

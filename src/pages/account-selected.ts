@@ -447,6 +447,14 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
 }
 
 async function selectAndShowAccount(accName: string) {
+  
+  // set as MRU
+  askBackground({
+    code: "set-account-order",
+    accountId: accName,
+    order: Date.now(),
+  }).catch(); //ignore if error
+  
   const accInfo = await askBackgroundGetAccountRecordCopy(accName);
   if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
 

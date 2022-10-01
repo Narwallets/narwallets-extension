@@ -34,7 +34,7 @@ export async function getAccountsForPopupList(except?: string, added?:Record<str
     if ((added && added[key]) || (except && key == except)) continue;
     let title = key
     if (walletAccounts[key].note) title += " (" + walletAccounts[key].note + ")"
-    items.push({ text: title, value: key })
+    items.push({ text: title, value: key, order:walletAccounts[key].order })
   }
   return items
 }

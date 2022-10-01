@@ -164,22 +164,24 @@
 
 .back {
   position        : absolute;
-  left            : 10px;
-  top             : 10px;
+  left: 14px;
+  top: 14px;
   width           : 16px;
   padding         : 0px;
   background-image: url("../icons/SVG/back_dark.svg");
-  background-size : 14px;
+  background-size: 9px;
+  opacity: 0.7;
 }
 
 .back-button-asset {
   position        : absolute;
   left            : 11px;
-  top             : 102px;
-  width           : 16px;
+  top: 83px;
+  width: 18px;
   padding         : 0px;
   background-image: url("../icons/SVG/back_dark.svg");
-  background-size : 14px;
+  background-size: 10px;
+  opacity: 0.85;
 }
 
 /*buttons that appear in dark background*/

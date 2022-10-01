@@ -4,19 +4,19 @@
 
 svg {
   min-height: 20px;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 }
 
 svg line {
   stroke      : currentColor;
   stroke-width: 3;
-  transition  : transform 0.3s ease-in-out;
+  transition  : transform 0.2s ease-in-out;
 }
 
 .hamb {
   position      : absolute;
   top           : 4px;
-  right: 4px;
+  left: 5px;
   border-radius : 6px;
   max-width     : 40px;
   padding       : 5px;
@@ -55,18 +55,19 @@ aside {
   position        : absolute;
   line-height     : 2;
   top             : 0;
-  left            : 493px;
-  transition      : transform 0.3s ease-in-out;
+  left: -493px;
+  transition: transform 0.2s ease-in-out;
   background-color: var(--Background);
   z-index         : 99;
   opacity         : 1;
   width           : 100%;
   height          : 100%;
-  padding-top     : 59px;
+  padding-top: 45px;
+  font-size: 7pt;
 }
 
 aside.open {
-  transform: translate(-492px, 0);
+  transform: translate(492px, 0);
 }
 
 .backblur {
@@ -84,29 +85,29 @@ aside.open {
 
 aside>nav>hr {
   border: 0;
-  width : 82%;
+  width: 90%;
   height: 1px;
   background-image: linear-gradient(to left,
-      rgba(0, 0, 0, 0.15),
-      rgba(0, 0, 0, 0.1),
-      rgba(0, 0, 0, 0));
-  opacity: 0.2;
-  margin : -1px 0px;
+      rgb(39 98 252 / 2%),
+      rgb(1 157 177),
+      rgb(1 157 177));
+  opacity: 0.7;
+  /* margin: 3px 0px; */
 }
 
 aside>nav {
   flex-flow  : column nowrap;
-  align-items: flex-end;
+  align-items: flex-start;
   display    : flex;
 }
 
 aside>nav>li {
   flex        : 1 1;
-  width       : 361px;
-  text-align  : right;
-  padding     : 5px 10px;
-  margin-left : 10px;
-  line-height : 2.2em;
+  width: 419px;
+  text-align: left;
+  padding: 4px 10px;
+  margin-left: 18px;
+  line-height: 1.5em;
   font-size: 1.5em;
   font-weight : 250;
   z-index     : 93;
@@ -135,8 +136,8 @@ aside>nav>li:hover {
 aside .logo-128 {
   opacity : 0.88;
   position: absolute;
-  top     : 5px;
-  left    : 20px;
+  bottom: 64px;
+  right: 20px;
   z-index : 94;
 }
 
@@ -149,7 +150,7 @@ NETWORK selection drop-down
 .network-component.pointer {
   /* border       : 1px solid var(--ControlAccent); */
   border-radius: 24px;
-  margin-left: 116px;
+  margin-left: 149px;
   padding: 2px;
   width: 157px;
   flex         : 0 0 auto;

@@ -74,15 +74,16 @@
 .accountdetsassets {
   font-size : 1;
   position  : relative;
-  width     : 468px;
+  width     : 449px;
   height    : 68px;
   display   : block;
   background: var(--Background);
+  left      : 16px;
 }
 
 .accountdetsassets:hover {
   background-color: var(--HoverColor);
-  border-radius: 6px;
+  border-radius   : 6px;
 }
 
 .accountassetcoin {
@@ -102,35 +103,22 @@
 }
 
 .accountassettoken {
-  position: absolute;
-
-  display: block;
-
-  font-size: 12px;
-
-  top: 0px;
-
-  left: 0px;
-
-  width: 464px;
-
-  height: 16px;
-
-  padding-top: 5px;
-
-  padding-right: 5px;
-
-  border-style: none;
-
-  border-radius: 0px;
-
+  position        : absolute;
+  display         : block;
+  font-size       : 12px;
+  top             : 2px;
+  left            : 0px;
+  width           : 436px;
+  height          : 16px;
+  padding-top     : 5px;
+  padding-right   : 5px;
+  border-style    : none;
+  border-radius   : 0px;
   background-color: var(--Block);
-
-  text-align: right;
-
-  font-weight: 250;
-
-  color: var(--BlockText);
+  text-align      : right;
+  font-weight     : 250;
+  color           : var(--BlockText);
+  opacity         : 0.9;
 }
 
 .accountasseticon svg {
@@ -159,7 +147,7 @@
   border-style: none;
   font-weight : 200;
   font-size   : 24px;
-  top: 25px;
+  top         : 25px;
   right       : 15px;
   width       : 415px;
   text-align  : right;
@@ -173,11 +161,11 @@
   color       : var(--BlockText);
   font-size   : 10px;
   font-weight : 500;
-  top: 52px;
-  right: 16px;
+  top         : 52px;
+  right       : 16px;
   width       : 200px;
   text-align  : right;
-  opacity: 0.7;
+  opacity     : 0.7;
 }
 
 /*#endregion*/

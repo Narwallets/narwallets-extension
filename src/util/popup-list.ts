@@ -8,7 +8,7 @@ let originalList: PopupItem[];
 
 let searchString = "";
 
-export type PopupItem = { text: string, value: string }
+export type PopupItem = { text: string, value: string, order?:number }
 
 export function initPopupHandlers() {
     d.onClickId(POPUP_LIST_APPFACE, closePopupList)

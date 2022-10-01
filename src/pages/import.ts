@@ -22,6 +22,7 @@ import {
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { activeNetworkInfo } from "../index.js";
+import { timeStamp } from "node:console";
 
 const NET_NAME = "net-name";
 const NET_ROOT = "net-root";
@@ -174,7 +175,7 @@ async function searchTheAccountName(accName: string) {
     );
     //Note: the lockupContract knows how much it has staked, no need to search the pools to get total balance
 
-    } catch (ex) {
+  } catch (ex) {
     d.showErr(ex.message);
     accountGetMessage.innerText = ex.message;
     accountGetMessage.show();
@@ -188,8 +189,7 @@ async function searchTheAccountName(accName: string) {
 async function importIfNew(
   accType: string,
   accName: string,
-  accountInfo: Account,
-  order: number
+  accountInfo: Account
 ): Promise<boolean> {
   const networkAccounts = await askBackgroundAllNetworkAccounts();
 
@@ -207,7 +207,7 @@ async function importIfNew(
     return false;
   } else {
     //d.showSuccess("Account added: " + accName); //new account
-    accountInfo.order = order;
+    accountInfo.order = Date.now();
     //console.log("added ",order,accName)
     await askBackgroundSetAccount(accName, accountInfo);
     return true;
@@ -220,17 +220,13 @@ async function importClicked(ev: Event) {
     return;
 
   const networkAccounts = await askBackgroundAllNetworkAccounts();
-  let accountOrder = networkAccounts
-    ? Object.keys(networkAccounts).length + 1
-    : 0;
 
   let couldNotImport = false;
 
   const importedMain = await importIfNew(
     "Account",
     lastSearchResult.mainAccountName,
-    lastSearchResult.mainAccount,
-    accountOrder
+    lastSearchResult.mainAccount
   );
 
   if (!importedMain) couldNotImport = true;
@@ -240,8 +236,7 @@ async function importClicked(ev: Event) {
     const importedLc = await importIfNew(
       "Lockup Contract",
       lastSearchResult.lockupContract.contractAccount,
-      lastSearchResult.lockupContract.accountInfo,
-      accountOrder + 1
+      lastSearchResult.lockupContract.accountInfo
     );
     if (!importedLc) {
       // commented, importIfNew already shows err msg

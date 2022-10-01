@@ -11,9 +11,9 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { refreshSelectedAccountAndAssets, selectedAccountData } from "./pages/account-selected.js";
+import { refreshSelectedAccountAndAssets, selectAccountPopupList, selectedAccountData, show } from "./pages/account-selected.js";
 import { show as UnlockPage_show } from "./pages/unlock.js";
-import { show as AddressBook_show } from "./pages/address-book.js";
+import { getAccountsForPopupList, show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
 
 import { recoverState, State } from "./data/global.js";
@@ -30,7 +30,7 @@ import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
 
 import type { NetworkInfo } from "./lib/near-api-lite/network.js";
 import { calculateDollarValue } from "./data/global.js";
-import { D } from "./lib/tweetnacl/core/core.js";
+import { D, _0 } from "./lib/tweetnacl/core/core.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 import { initPopupHandlers } from "./util/popup-list.js";
 
@@ -68,7 +68,7 @@ function updateNetworkIndicatorVisualState(info: NetworkInfo) {
 }
 
 // function to check if the account matches active network
-export const accountMatchesNetwork = (accName:string) => accName && activeNetworkInfo && accName.endsWith( "." + activeNetworkInfo.rootAccount)
+export const accountMatchesNetwork = (accName: string) => accName && activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)
 
 export function setIsDark(d: boolean) {
   isDark = d
@@ -121,10 +121,34 @@ function welcomeCreatePassClicked() {
   d.showPage(Main.CREATE_USER);
 }
 
+function hambClose() {
+  if (hambIsOpen) hambClicked()
+}
+
+function buildMRU() {
+  // show MRUs
+  getAccountsForPopupList().then((list) => {
+    list.sort((a, b) => (b.order || 0) - (a.order || 0));
+    for (let i = 1; i <= 3; i++) {
+      const elem = d.qs("aside #mru-" + i)
+      if (list.length >= i) {
+        elem.innerText = list[i - 1].text
+        elem.show()
+      }
+      else {
+        elem.hide()
+      }
+    }
+  }
+  );
+}
+
+// TODO: Remove account-list-main
 function hambClicked() {
   hamb.toggleClass("open");
   aside.toggleClass("open");
   if (!hambIsOpen) {
+    buildMRU();
     d.byId("account-list-main").classList.add("hidden");
     hambIsOpen = true;
   } else {
@@ -145,12 +169,6 @@ function asideExpand() {
     url: chrome.runtime.getURL("index.html"),
     state: "maximized",
   });
-}
-
-function asideAccounts() {
-  hambClicked();
-  hideOkCancel();
-  d.showPage("account-list-main");
 }
 
 async function asideIsUnlocked() {
@@ -273,6 +291,20 @@ export function switchDarkLight(): string {
   return colorMode;
 }
 
+function selectAccountMru(event: Event) {
+  try {
+    // TODO: remember & select MRU accounts per network
+    const accName = (event.target as HTMLElement).innerText.split("(")[0]
+    if (accName) {
+      hambClose()
+      show(accName)
+    }
+  }
+  catch (err) {
+    console.error(err)
+  }
+}
+
 //-----------------------
 //executed after the background-page is available
 let initPopupTimestamp: number = 0;
@@ -301,15 +333,18 @@ async function initPopup() {
   d.onClickId(SELECT_NETWORK, selectNetworkClicked);
 
   //aside
-  d.qs("aside #lock").onClick(asideLock);
-  d.qs("aside #accounts").onClick(asideAccounts);
   //d.qs("aside #create-user").onClick(asideCreateUserClicked);
+  d.qs("aside #mru-1").onClick(selectAccountMru);
+  d.qs("aside #mru-2").onClick(selectAccountMru);
+  d.qs("aside #mru-3").onClick(selectAccountMru);
+  d.qs("aside #other-accounts").onClick(() => { hambClose(); selectAccountPopupList() });
   d.qs("aside #add-account-side").onClick(asideAddAccount);
+  d.qs("aside #address-book-side").onClick(asideAddressBook);
+  d.qs("aside #lock").onClick(asideLock);
   d.qs("aside #options").onClick(asideOptions);
   d.qs("aside #contact").onClick(asideContact);
   d.qs("aside #change-password").onClick(changePassword);
   d.qs("aside #about").onClick(asideAbout);
-  d.qs("aside #address-book-side").onClick(asideAddressBook);
   d.qs("aside #darkmode").onClick(asideSwitchMode);
 
   {

@@ -119,7 +119,7 @@ h5 {
   position           : absolute;
   width              : 40px;
   height             : 40px;
-  display            : inline-block;
+  display: none;
   top: 2px;
   left: 6px;
   margin-left        : 0px;
@@ -414,15 +414,21 @@ h5 {
   position: absolute;
   left    : 10px;
   right   : 10px;
-  bottom  : 80px;
+  top: 52px;
   z-index : 999;
+  display: flex;
+  flex-flow: column;
+  align-items: flex-end;
 }
 
 #err-div>div {
   color           : darkred;
   text-align      : center;
-  margin          : 1px;
-  padding         : 15px;
+  margin: 3;
+  padding-top: 4px;
+  padding-bottom: 5px;
+  padding-right: 14px;
+  padding-left: 10px;
   background-color: #981313;
   color           : wheat;
   border          : 1px solid wheat;
@@ -433,11 +439,12 @@ h5 {
   font-weight     : 200;
   max-height      : 0px;
   transition      : opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+  text-align: right;
 }
 
 #err-div>div.show {
   opacity   : 1;
-  max-height: 400px;
+  max-height: 394px;
   word-break: break-word;
 }
 
@@ -455,9 +462,9 @@ h5 {
 }
 
 #err-div>div.warning {
-  background-color: #d9df6d;
+  background-color: #dce269;
   border-width    : 1px;
-  color           : #3b3b3b;
+  color: #000000;
 }
 
 #import-or-create h3 {
@@ -501,4 +508,3 @@ h5 {
   left: 5px;
   top: -1px;
 }
-  

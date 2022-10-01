@@ -15,7 +15,8 @@
 
 	<div class="topbar" id="topbar">
 		<div class="topbarleft"></div>
-		<div class="topbarcaption"><button class="text-button-dropdown" id="topbar-left-button">Accounts</button></div>
+		<div class="topbarcaption hidden"><button class="text-button-dropdown" id="topbar-left-button">Accounts</button>
+		</div>
 		<div class="topbarpulldown">
 			<div class="app-header-network-component-wrapper">
 				<div id="select-network" class="network-component pointer" title="Active Network">
@@ -30,7 +31,7 @@
 		<!--<div class="topbarhamburguer"></div>-->
 
 		<div class="hamb" id="hamb-button">
-			<svg viewBox="-4 -4 34 34" width=24 height=28>
+			<svg viewBox="-4 -4 34 34" width=24 height=32>
 				<line id="top" x1=0 y1=2 x2=24 y2=2 />
 				<line id="middle" x1=0 y1=12 x2=24 y2=12 />
 				<line id="bottom" x1=0 y1=22 x2=24 y2=22 />
@@ -75,27 +76,21 @@
 	<aside>
 		<div class="logo-128"></div>
 		<nav>
+			<li id="mru-1">mru-1</li>
+			<li id="mru-2">mru-2</li>
+			<li id="mru-3">mru-3</li>
 			<hr>
-			<li id="lock">Lock</li>
-			<hr>
-			<li id="accounts" hidden>Accounts</li>
-			<hr>
+			<li id="other-accounts">Other accounts...</li>
 			<li id="add-account-side">Add Account</li>
 			<hr>
-			<li id="address-book-side">Address Book</li>
-			<hr>
+			<li id="lock">Lock</li>
 			<li id="options">Options</li>
-			<hr>
+			<li id="address-book-side">Address Book</li>
 			<li id="change-password">Change Password</li>
-			<hr>
-			<!--<li id="create-user">Create a new User</li>
-			<hr>-->
+			<!--<li id="create-user">Create a new User</li>-->
 			<li id="darkmode" hidden>Switch Dark/Light Mode</li>
-			<hr>
 			<li id="contact">Contact</li>
-			<hr>
 			<li id="about">About</li>
-			<hr>
 		</nav>
 	</aside>
 
@@ -1227,7 +1222,14 @@
 
 	<!--#region Error and wait div -->
 
-	<div id="err-div"></div>
+	<div id="err-div">
+		<!--
+		<div class="show success">a success message</div>
+		<div class="show warning">some large warning text</div>
+		<div class="show error">some errror aksj laksj dlasj dlaks dlaksjd alsd laksjd laks jdalkjd laskj with maybe
+			more text with some extra data</div>
+		-->
+	</div>
 
 	<a class="hidden" id="usd-price-link"></a>
 
@@ -1252,7 +1254,7 @@
 
 	<!--#region Overlay combo popup-->
 	<div id="popup-list-appface" class="combo-list-appface">
-		<div id="popup-list-title" class="combo-list-title">Select an account...
+		<div id="popup-list-title" class="combo-list-title">Select account...
 		</div>
 		<div id="popup-list" class="combo-list-box">
 		</div>
