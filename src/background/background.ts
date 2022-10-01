@@ -17,6 +17,7 @@ import {
   DeleteAccountToBeneficiary,
   Transfer,
   BatchAction,
+  BatchTransaction,
 } from "../lib/near-api-lite/batch-transaction.js";
 import type { ResolvedMessage } from "../data/state-type.js";
 import { Asset, assetAddHistory, assetAmount, setAssetBalanceYoctos, findAsset, History, Account } from "../data/account.js";
@@ -57,12 +58,11 @@ function runtimeMessageHandler(
   const fromWs = msg.src? msg.src == "ws" : false
 
   //console.log("runtimeMessage received ",sender, url)
-  log(
-    "runtimeMessage received " +
-    (fromPage ? "FROM PAGE " : "from popup ") +
-    JSON.stringify(msg)
-  );
-  console.log("Message received")
+  // log(
+  //   "runtimeMessage received " +
+  //   (fromPage ? "FROM PAGE " : "from popup ") +
+  //   JSON.stringify(msg)
+  // );
   if (msg.dest != "ext") {
     sendResponse({ err: "msg.dest must be 'ext'" });
   } else if(fromWs) {
@@ -97,6 +97,13 @@ async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse:
   let signerId = await localStorageGet("currentAccountId")
   let accInfo: Account
   let actions: TX.Action[] = []
+  let resolvedMsg: ResolvedMessage = {
+    dest: "page",
+    code: "request-resolved",
+    tabId: msg.tabId,
+    requestId: msg.requestId,
+  };
+  console.log(`Message received with code ${msg.code}`)
   switch(msg.code) {
     case "is-installed":
       sendResponse({id: msg.id, code: msg.code, data: true})
@@ -114,7 +121,7 @@ async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse:
       if(global.isLocked()) {
         const width = 500;
         const height = 540;
-        const tabId = 
+        
         chrome.windows.create({
           url: "index.html",
           type: "popup",
@@ -135,48 +142,118 @@ async function resolveFromWalletSelector(msg: Record<string, any>, sendResponse:
         //   globalSendResponse = undefined
         // }, 5000)
       } else {
-        localStorageGet("currentAccountId").then(accName => sendResponse({id: msg.id, code: msg.code, data: accName}))
+        
+        localStorageGet("currentAccountId").then(accName => {
+          console.log(`Getting account ID ${accName}`)
+          sendResponse({id: msg.id, code: msg.code, data: accName})
+        })
       }
       break
       case "sign-and-send-transaction":
-      
-        console.log("Received signAndSendTransaction", msg.params)
-        // actions = msg.params.actions.map((action: any) => {
-        //   const a = createCorrespondingAction(action)
-        //   return a
-        // })
-        // near.broadcast_tx_commit_actions(
-        //   actions,
-        //   signerId,
-        //   msg.params.receiverId,
-        //   accInfo.privateKey || ""
-        // )
-        accInfo = global.getAccount(signerId);
-        mapAndCommitActions(msg.params, signerId, accInfo).then(res => {
-          console.log(res)
-          sendResponse({id: msg.id, code: msg.code, data: res})
-        })
-
-        break
       case "sign-and-send-transactions":
-        console.log("Received signAndSendTransactions", msg.params)
-        accInfo = global.getAccount(signerId);
-        let responses: any[] = []
-        for(let i = 0; i < msg.params.length; i++) {
-          responses.push(await mapAndCommitActions(msg.params[i], signerId, accInfo))
+        try {
+          prepareAndOpenApprovePopup(msg, signerId)
+
+          globalSendResponse = async function(cancel?: boolean) {
+            try {
+              if(cancel) {
+                sendResponse({id: msg.id, code: msg.code, error: "Rejected by user"})
+                return
+              }
+              if(msg.code == "sign-and-send-transaction") {
+                let accInfo = global.getAccount(signerId);
+                mapAndCommitActions(msg.params, signerId, accInfo).then(res => {
+                  console.log("Res: ", res)
+                  sendResponse({id: msg.id, code: msg.code, data: res})
+                })
+              } else if(msg.code == "sign-and-send-transactions") {
+                let responses: Promise<any>[] = []
+                for(let i = 0; i < msg.params.length; i++) {
+                  responses.push(mapAndCommitActions(msg.params[i], signerId, accInfo))
+                }
+                sendResponse({id: msg.id, code: msg.code, data: await Promise.all(responses)})
+              }
+            } catch(err) {
+              console.error(err)
+            } finally {
+              globalSendResponse = undefined
+            }            
+          }
+        } catch (ex) {
+          console.log("Error signing transaction", ex)
+          //@ts-ignore
+          window.pendingApprovalMsg = undefined;
+          resolvedMsg.err = ex.message; //if error, also send msg to content-script->tab
+          sendResponse({id: msg.id, code: msg.code, error: `Error signing transaction`})
         }
-        sendResponse({id: msg.id, code: msg.code, data: responses})
-        break
+        break;
       default:
         sendResponse({id: msg.id, code: msg.code, error: `Code ${msg.code} not found`})
   }
 }
 
+function prepareAndOpenApprovePopup(msg: Record<string, any>, signerId: string) {
+  const accInfo = global.getAccount(signerId);
+    if (!accInfo.privateKey) {
+      throw Error(`Narwallets: account ${signerId} is read-only`);
+    }
+
+    msg.dest = "approve"; //send msg to the approval popup
+    msg.signerId = signerId
+    msg.network = Network.current;
+    chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    }, function(tabs) {
+      msg.url = tabs[0].url;
+    });
+    console.log("Message", msg)
+    if(msg.code == "sign-and-send-transaction") {
+      let batchTransaction: BatchTransaction = new BatchTransaction(msg.params.receiverId) 
+      msg.params.actions.forEach((action: any) => {
+        const functioncall: FunctionCall = new FunctionCall(action.methodName, action.args)
+        batchTransaction.addItem(functioncall)
+      });
+      msg.tx = batchTransaction
+    } else if(msg.code == "sign-and-send-transactions") {
+      msg.txs = []
+      msg.params.forEach((transaction: any) => {
+        let batchTransaction: BatchTransaction = new BatchTransaction(transaction.receiverId) 
+        transaction.actions.forEach((action: any) => {
+          const functioncall: FunctionCall = new FunctionCall(action.methodName, action.args)
+          batchTransaction.addItem(functioncall)
+        });
+        msg.txs.push(batchTransaction)
+      });
+      
+    } else {
+      throw new Error(`Approve popup shouldn't be open with code ${msg.code}`)
+    }
+
+
+    //pass message via chrome.extension.getBackgroundPage() common window
+    //@ts-ignore
+    window.pendingApprovalMsg = msg;
+    console.log("Opening approve popup")
+    //load popup window for the user to approve
+    const width = 500;
+    const height = 540;
+    chrome.windows.create({
+      url: "popups/approve/approve.html",
+      type: "popup",
+      left: screen.width / 2 - width / 2,
+      top: screen.height / 2 - height / 2,
+      width: width,
+      height: height,
+      focused: true,
+    });
+}
+
 async function mapAndCommitActions(params: any, signerId: string, accInfo: Account): Promise<any> {
-  const actions = params.actions.map((action: any) => {
-    const a = createCorrespondingAction(action)
-    return a
+  const actions: TX.Action[] = params.actions.map((action: any) => {
+    return createCorrespondingAction(action)
   })
+  console.log("Gas", actions[0].functionCall.gas)
   return await near.broadcast_tx_commit_actions(
     actions,
     signerId,
@@ -186,13 +263,14 @@ async function mapAndCommitActions(params: any, signerId: string, accInfo: Accou
 }
 
 function createCorrespondingAction(action: any): TX.Action {
+  console.log("Action", action)
   if(action.methodName) {
-    action.gas = "1000000000000"
-    return TX.functionCall(action.methodName, action.args, action.gas, action.deposit)
+    // action.gas = "1000000000"
+    return TX.functionCall(action.methodName, action.args, BigInt(action.gas), BigInt(action.deposit))
   } else if(action.beneficiaryAccountId) {
     return TX.deleteAccount(action.beneficiaryAccountId)
   } else if(action.attached) {
-    return TX.transfer(action.attached)
+    return TX.transfer(BigInt(action.attached))
   }
   throw new Error(`There is no action that matches input: ${action}`)
 }
@@ -316,7 +394,7 @@ function getActionPromise(msg: Record<string, any>): Promise<any> {
         if(!globalSendResponse) {
           return Promise.resolve(false)
         }
-        globalSendResponse()
+        globalSendResponse(msg.cancel)
         return Promise.resolve(true)
       case "get-account-id": {
         return Promise.resolve(selectedAccountData.name)
