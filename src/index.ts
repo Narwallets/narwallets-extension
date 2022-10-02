@@ -381,6 +381,9 @@ async function initPopup() {
 
 let refreshing: boolean = false;
 export async function autoRefresh() {
+  
+  return; // WHILE DEBUGGING
+
   //console.log(refreshing ? "SKIP" : "DO", "autoRefresh enter", d.activePage, "already refreshing?", refreshing)
   if (refreshing) return;
   try {

@@ -11,7 +11,7 @@ import { log } from "./lib/log.js";
 import { GContact } from "./data/contact.js";
 import { Account } from "./structs/account-info.js";
 
-//ask background, wait for response, return a Promise
+// ask background, wait for response, return a Promise
 export function askBackground(requestPayload: any): Promise<any> {
   requestPayload.dest = "ext";
   return new Promise((resolve, reject) => {
@@ -33,6 +33,11 @@ export function askBackground(requestPayload: any): Promise<any> {
       return resolve(response.data);
     });
   });
+}
+
+// send direct msg to background
+export function passMsgToBackground(msg:any, sendResponse:Function ){
+  chrome.runtime.sendMessage(msg, sendResponse);
 }
 
 export function askBackgroundGetAccountRecordCopy(accName: string): Promise<Account> {

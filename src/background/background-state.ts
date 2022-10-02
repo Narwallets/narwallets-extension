@@ -34,7 +34,7 @@ const DATA_VERSION = "0.1";
 const INVALID_USER_OR_PASS = "Invalid Password";
 
 
-//---- GLOBAL STATE ----
+//---- BASE STATE ----
 
 export const EmptyState: StateStruct = {
     dataVersion: DATA_VERSION,
@@ -43,6 +43,12 @@ export const EmptyState: StateStruct = {
 };
 
 export var state = Object.assign({}, EmptyState);
+
+export function stateIsEmpty():boolean {
+    return state.currentUser===""
+};
+
+//---- SECURE STATE ----
 
 type NetworkNameType = string;
 type AccountIdType = string;
@@ -86,7 +92,7 @@ type callbackERR = (err: string) => void;
 
 export async function recoverState(): Promise<void> {
     state = await recoverFromLocalStorage("State", "S", EmptyState);
-    //console.log("Recover state", State)
+    log("RECOVER STATE" + JSON.stringify(state));
 }
 
 export async function sha256PwdBase64Async(password: string): Promise<string> {
@@ -105,17 +111,24 @@ export function clearUnlockSHA() {
     localStorageRemove("_us");
 }
 
+export function secureStateOpened() {
+    return secureState && secureState.hashedPass;
+}
 export function isLocked() {
     //DEBUG
     // if (!SecureState) log("isLocked()? yes, !SecureState");
     // else if (!SecureState.hashedPass)
     //   log("isLocked()? yes, !SecureState.hashedPass");
-    return !secureState || !secureState.hashedPass;
+    return !secureStateOpened();
 }
-export function lock(source: string) {
+export function closeSecureState() {
     clearUnlockSHA()
     // clear SecureState && SecureState.hashedPass
     secureState = Object.assign({}, EmptySecureState);
+}
+
+export function lock(source: string) {
+    closeSecureState()
     log("LOCKED from:" + source);
     // log("LOCKED call stack:" + JSON.stringify(new Error().stack));
 }
@@ -159,6 +172,7 @@ export async function createSecureStateAsync(password: string) {
     secureState.hashedPass = await sha256PwdBase64Async(password);
     secureState.accounts = {};
     saveSecureState();
+    log("Secure state created and opened!")
     saveUnlockSHA(secureState.hashedPass)
 }
 
@@ -244,6 +258,7 @@ export async function unlockSecureStateSHA(
     secureState = decrypted;
     saveUnlockSHA(hashedPassBase64)
     setCurrentUser(email); // set & save State.currentUser
+    log("Secure state opened! "+email)
 }
 
 //------------------

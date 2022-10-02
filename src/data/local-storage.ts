@@ -52,6 +52,7 @@ export async function recoverFromLocalStorage(
   return new Promise((resolve, reject) => {
     try {
       chrome.storage.local.get(code, (keys) => {
+        console.error("chrome.storage.local.get",code,keys)
         if (chrome.runtime.lastError) {
           console.log(JSON.stringify(chrome.runtime.lastError));
         }

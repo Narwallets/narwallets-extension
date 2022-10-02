@@ -20,16 +20,10 @@ import {
 import { changePasswordAsync, clearState, createUserAsync, getAccount, getNetworkAccountsCount, 
     getUnlockSHA, 
     isLocked, lock, recoverState, saveSecureState, secureState, 
-    state, unlockSecureStateAsync, unlockSecureStateSHA } from "./background-state.js";
+    secureStateOpened, 
+    state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA } from "./background-state.js";
 import { Account, Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 
-
-declare global {
-  interface Window {
-    msg: String;
-    sendResponse: Function;
-  }
-}
 
 
 //export let globalSendResponse: Function | undefined = undefined
@@ -39,10 +33,6 @@ function semver(major: number, minor: number, version: number): number {
   return major * 1e6 + minor * 1e3 + version;
 }
 const WALLET_VERSION = semver(2, 0, 0);
-
-//---------- working data
-// let _connectedTabs: Record<number, ConnectedTabInfo> = {};
-let bgDataExists: boolean;
 
 //----------------------------------------
 //-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
@@ -1020,13 +1010,36 @@ var unlockExpire: any;
 // TODO: consider the possibility the user added accounts to the wallet on another tab
 async function retrieveBgInfoFromStorage(): Promise<void> {
 
+  // Always recover first the base unencrypted state
+  if (stateIsEmpty()) {
+    await recoverState();
+  }
+  log(`dataVersion ${state.dataVersion} || user ${state.currentUser}`);
+  // validate dataVersion
+  if (!state.dataVersion) {
+    clearState();
+  }
+  
+  // ----------------------------
+  // here we have a base state
+  // ----------------------------
+
+  // recover last set network
+  const nw = (await localStorageGet("selectedNetwork")) as string;
+  if (nw) Network.setCurrent(nw);
+
+  // default is secure state not opened
   if (unlockExpire && Date.now() > unlockExpire) {
-    bgDataExists = false;
-    lock("retrieveBgInfoFromStorage");
+    lock("unlock-expired");
     return;
   }
+  // if no current user, lock
+  if (!state.currentUser) {
+    lock("no current user");
+    return;
+  }
+
   if (isLocked()) {
-    bgDataExists = false;
     return;
   }
 
@@ -1034,8 +1047,9 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
   if (lockTimeout) {
     clearTimeout(lockTimeout);
   }
-  if (bgDataExists) {
-    log("BK bgDataExists" + bgDataExists + ", State" + JSON.stringify(state))
+
+  if (secureStateOpened()) {
+    log("BK-init secureState was opened, has ", secureState.accounts.length, "accounts")
     // cached
     return
   }
@@ -1046,18 +1060,10 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
   //_connectedTabs = await localStorageGet("_ct");
 
   const unlockSHA = await getUnlockSHA()
-  log("RECOVERED SHA", unlockSHA);
+  log("RECOVERED UNLOACK SHA", unlockSHA);
 
-  //To manage the possibility that the user has added/removed accounts ON ANOTHER TAB
-  //we reload state & secureState from storage when the popup opens
-  await recoverState();
-  lock(`!dataVersion ${state.dataVersion} || !user ${state.currentUser}`);
-  // validate dataVersion
-  if (!state.dataVersion) {
-    clearState();
-  }
-  // if no current user, or no auto-unlock-SHA, lock
-  if (!state.dataVersion || !state.currentUser || !unlockSHA) {
+  // if no auto-unlock-SHA
+  if (!unlockSHA) {
     return;
   }
 
@@ -1070,14 +1076,9 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
     );
   } catch (ex) {
     log("recovering secure state on retrieveBgInfoFromStorage", ex.message);
-    lock("err calling unlockSecureStateSHA");
     return;
   }
 
-  bgDataExists = true;
-  const nw = (await localStorageGet("selectedNetwork")) as string;
-  if (nw) Network.setCurrent(nw);
-  log("bgDataExists = true, NETWORK=", nw);
   return;
 }
 

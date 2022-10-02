@@ -1,9 +1,16 @@
 import * as d from "../util/document.js"
-import { askBackground, askBackgroundGetAccessKey, askBackgroundGetState } from "../askBackground.js"
+import { askBackground, askBackgroundGetAccessKey, askBackgroundGetState, passMsgToBackground } from "../askBackground.js"
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js"
 import { show as MainPage_show } from "./main.js"
 import { SINGLE_USER_EMAIL } from "../index.js"
 import { showPassword } from "../data/local-storage.js"
+
+declare global {
+  interface Window {
+    msg: String;
+    sendResponse: Function;
+  }
+}
 
 async function unlockClicked(ev: Event) {
   console.log("Unlock clicked")
@@ -24,13 +31,15 @@ async function unlockClicked(ev: Event) {
     const numAccounts = await askBackground({ code: "getNetworkAccountsCount" })
     console.log("Accounts: ", numAccounts)
     if (numAccounts == 0) {
-      d.showPage("import-or-create"); //auto-add account after unlock      
+      d.showPage("import-or-create"); // auto-add account after unlock      
     } else {
-      const wasCalled = await askBackground({ code: "callGlobalSendResponse" })
-      if (!wasCalled) {
-        await MainPage_show()
-      } else {
+      if (window.msg && window.sendResponse) {
+        // this unlock is to execute a transaction
+        passMsgToBackground(window.msg, window.sendResponse)
         window.close()
+      }
+      else {
+        return MainPage_show()
       }
     }
   }
