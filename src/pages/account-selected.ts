@@ -21,24 +21,17 @@ import { show as UnlockPage_show } from "./unlock.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
 import {
-  Account,
-  Asset,
-  History,
-  Contact,
   newTokenFromMetadata,
-  setAssetBalanceYoctos,
   assetUpdateBalance,
-  findAsset,
-  assetDivId,
-} from "../data/account.js";
-import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/util.js";
+} from "../data/asset-update.js";
+
+import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/local-storage.js";
 import {
-  accountMatchesNetwork, activeNetworkInfo, 
+  accountMatchesNetwork, activeNetworkInfo,
   askBackground,
   askBackgroundApplyTxAction,
   askBackgroundApplyBatchTx,
   askBackgroundCallMethod,
-  askBackgroundGetNetworkInfo,
   askBackgroundGetOptions,
   askBackgroundGetValidators,
   askBackgroundTransferNear,
@@ -48,7 +41,7 @@ import {
   askBackgroundViewMethod,
   askBackgroundGetState,
   askBackgroundGetAccountRecordCopy,
-} from "../background/askBackground.js";
+} from "../askBackground.js";
 import {
   BatchTransaction,
   DeleteAccountToBeneficiary,
@@ -76,7 +69,7 @@ import {
   showOKCancel,
   hideOkCancel,
 } from "../util/okCancel.js";
-import { ASSET_HISTORY_TEMPLATE, getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/global.js";
+
 import { addressContacts } from "./address-book.js";
 import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/contact.js";
@@ -94,6 +87,8 @@ import { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { autoRefresh } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 import { asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
+import { getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/price-data.js";
+import { Asset, assetDivId, ASSET_HISTORY_TEMPLATE, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 
 const ACCOUNT_SELECTED = "account-selected";
 
@@ -146,11 +141,11 @@ export async function show(
       }
     }
   }
-  let payload:Record<string, any>={
-    reposition: "account", 
-    account: accName 
+  let payload: Record<string, any> = {
+    reposition: "account",
+    account: accName
   };
-  payload["lastSelectedAccountByNetwork_"+activeNetworkInfo.name] = accName 
+  payload["lastSelectedAccountByNetwork_" + activeNetworkInfo.name] = accName
   localStorageSet(payload)
   //checkConnectOrDisconnect();
   autoRefresh()
@@ -447,14 +442,14 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
 }
 
 async function selectAndShowAccount(accName: string) {
-  
+
   // set as MRU
   askBackground({
     code: "set-account-order",
     accountId: accName,
     order: Date.now(),
   }).catch(); //ignore if error
-  
+
   const accInfo = await askBackgroundGetAccountRecordCopy(accName);
   if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
 

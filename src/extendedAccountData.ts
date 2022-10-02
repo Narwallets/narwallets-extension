@@ -1,9 +1,10 @@
 import { LockupContract } from "./contracts/LockupContract.js";
 import { getLockupContract } from "./util/search-accounts.js";
-import { Account } from "./data/account.js";
-import { nearDollarPrice } from "./data/global.js";
-import { activeNetworkInfo, askBackground, askBackgroundSetAccount, askBackgroundViewMethod } from "./background/askBackground.js";
+
+import { activeNetworkInfo, askBackground, askBackgroundSetAccount, askBackgroundViewMethod } from "./askBackground.js";
 import { yton } from "./util/conversions.js";
+import { nearDollarPrice } from "./data/price-data.js";
+import { Account } from "./structs/account-info.js";
 
 
 export class ExtendedAccountData {
@@ -129,6 +130,5 @@ export async function asyncRefreshAccountInfoLastBalance(accName: string, info: 
   if (save) {
     askBackgroundSetAccount(accName, info);
   }
-
 
 }

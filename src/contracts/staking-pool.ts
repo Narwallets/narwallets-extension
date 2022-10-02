@@ -1,4 +1,4 @@
-import { askBackground } from "../background/askBackground.js";
+import { askBackground } from "../askBackground.js";
 
 export type StakingPoolAccountInfoResult = {
     account_id: string; // '90027aec7944e8e70cf1f86fa255ac18866bb043.lockup.guildnet',

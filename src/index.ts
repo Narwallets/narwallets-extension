@@ -16,24 +16,23 @@ import { show as UnlockPage_show } from "./pages/unlock.js";
 import { getAccountsForPopupList, show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
 
-import { recoverState, State } from "./data/global.js";
-import { localStorageRemove, localStorageSet } from "./data/util.js";
+import { localStorageRemove, localStorageSet } from "./data/local-storage.js";
 import {
   askBackground,
   askBackgroundGetNetworkInfo,
   askBackgroundGetState,
   askBackgroundIsLocked,
   askBackgroundSetNetwork,
-} from "./background/askBackground.js";
+} from "./askBackground.js";
 import { functionCall } from "./lib/near-api-lite/transaction.js";
 import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
 
 import type { NetworkInfo } from "./lib/near-api-lite/network.js";
-import { calculateDollarValue } from "./data/global.js";
-import { D, _0 } from "./lib/tweetnacl/core/core.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 import { initPopupHandlers } from "./util/popup-list.js";
 import { logEnabled } from "./lib/log.js";
+import { fetchNearDollarPrice } from "./data/price-data.js";
+import { activeNetworkInfo } from "./askBackground.js";
 
 export const SINGLE_USER_EMAIL = "unique-user@narwallets.com"
 
@@ -60,10 +59,10 @@ let aside: d.El;
 
 let hambIsOpen = false;
 
-function updateNetworkIndicatorVisualState(info: NetworkInfo) {
+function updateNetworkIndicatorVisualState() {
   const currentNetworkDisplayName = new d.El("#current-network-display-name");
-  currentNetworkDisplayName.innerText = info.displayName; //set name
-  currentNetworkDisplayName.el.className = "circle " + info.color; //set indicator color
+  currentNetworkDisplayName.innerText = activeNetworkInfo.displayName; //set name
+  currentNetworkDisplayName.el.className = "circle " + activeNetworkInfo.color; //set indicator color
 }
 
 export function setIsDark(d: boolean) {
@@ -85,10 +84,10 @@ async function networkItemClicked(e: Event) {
     d.byId(NETWORKS_LIST).classList.remove(d.OPEN); //hides
 
     //update global state (background)
-    const ni = await askBackgroundSetNetwork(networkName);
+    await askBackgroundSetNetwork(networkName);
     //update indicator visual state
-    updateNetworkIndicatorVisualState(ni);
-    Import_onNetworkChanged(ni);
+    updateNetworkIndicatorVisualState();
+    Import_onNetworkChanged();
 
     // Account_onNetworkChanged(activeNetworkInfo);
     //on network-change restart the page-flow
@@ -315,10 +314,9 @@ async function initPopup() {
   //console.log(new Date().toISOString(), "enter initPopup()")
 
   //update network indicator visual state
-  const ni = await askBackgroundGetNetworkInfo();
-  console.log(ni)
-  updateNetworkIndicatorVisualState(ni);
-  Import_onNetworkChanged(ni);
+  await askBackgroundGetNetworkInfo();
+  updateNetworkIndicatorVisualState();
+  Import_onNetworkChanged();
 
   hamb = new d.El(".hamb");
   aside = new d.El("aside");
@@ -365,7 +363,7 @@ async function initPopup() {
 
   // Account_onNetworkChanged(activeNetworkInfo);
 
-  calculateDollarValue();
+  fetchNearDollarPrice();
 
   initPopupHandlers()
 

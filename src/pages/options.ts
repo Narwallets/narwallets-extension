@@ -1,7 +1,7 @@
 const OPTIONS = "options";
 import {
   askBackground,
-} from "../background/askBackground.js";
+} from "../askBackground.js";
 import * as Pages from "./main.js";
 import { GContact } from "../data/contact.js";
 import * as d from "../util/document.js";

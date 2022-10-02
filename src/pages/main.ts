@@ -1,7 +1,7 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
-import { Account, Asset, setAssetBalanceYoctos} from "../data/account.js";
+import { Account, Asset, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 import { selectAccountPopupList, selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
@@ -11,16 +11,15 @@ import {
   localStorageGetAndRemove,
   localStorageRemove,
   localStorageSet,
-} from "../data/util.js";
+} from "../data/local-storage.js";
 import {
   accountMatchesNetwork, activeNetworkInfo,
   askBackground,
   askBackgroundAllNetworkAccounts,
   askBackgroundGetState,
   askBackgroundIsLocked,
-} from "../background/askBackground.js";
+} from "../askBackground.js";
 import { D } from "../lib/tweetnacl/core/core.js";
-import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { asideSwitchMode, autoRefresh, setIsDark } from "../index.js";
 import { hideOkCancel } from "../util/okCancel.js";
@@ -294,10 +293,10 @@ async function tryReposition() {
     }
       break;
     default: {
-      let account:string|undefined = await localStorageGet("lastSelectedAccountByNetwork_"+activeNetworkInfo.name)
+      let account: string | undefined = await localStorageGet("lastSelectedAccountByNetwork_" + activeNetworkInfo.name)
       if (!account) account = await localStorageGet("currentAccountId")
       // in ALL cases we have to call AccountSelectedPage_show (it will show a select account popup if the account is not valid)
-      AccountSelectedPage_show(account||"")
+      AccountSelectedPage_show(account || "")
     }
 
   }

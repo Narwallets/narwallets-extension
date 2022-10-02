@@ -2,7 +2,8 @@ import * as d from "../util/document.js"
 import * as c from "../util/conversions.js"
 import * as StakingPool from "../contracts/staking-pool.js"
 
-import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../background/askBackground.js"
+import { askBackgroundGetValidators } from "../askBackground.js"
+import { activeNetworkInfo } from "../askBackground.js"
 
 
 
@@ -36,8 +37,7 @@ async function displayStakingPools() {
 
     const data = await askBackgroundGetValidators()
 
-    const networkInfo = await askBackgroundGetNetworkInfo()
-    d.byId("net-name").innerText = networkInfo.displayName;
+    d.byId("net-name").innerText = activeNetworkInfo.displayName;
 
     const list: PoolInfo[] = []
     for (let item of data.current_validators) {

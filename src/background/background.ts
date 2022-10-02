@@ -1,5 +1,4 @@
 import * as c from "../util/conversions.js";
-import * as global from "../data/global.js";
 import { log, logEnabled } from "../lib/log.js";
 
 import * as Network from "../lib/near-api-lite/network.js";
@@ -7,10 +6,8 @@ import * as Network from "../lib/near-api-lite/network.js";
 
 import * as near from "../lib/near-api-lite/near-rpc.js";
 import { jsonRpc, setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js";
-import { localStorageSet, localStorageGet } from "../data/util.js";
+import { localStorageSet, localStorageGet } from "../data/local-storage.js";
 import * as TX from "../lib/near-api-lite/transaction.js";
-
-import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 
 import {
   FunctionCall,
@@ -19,10 +16,12 @@ import {
   BatchAction,
   BatchTransaction,
 } from "../lib/near-api-lite/batch-transaction.js";
-import type { ResolvedMessage } from "../data/state-type.js";
-import { Asset, assetAddHistory, assetAmount, setAssetBalanceYoctos, findAsset, History, Account } from "../data/account.js";
-import { box_nonceLength } from "../lib/naclfast-secret-box/nacl-fast.js";
-import { META_SVG } from "../util/svg_const.js";
+
+import { changePasswordAsync, clearState, createUserAsync, getAccount, getNetworkAccountsCount, 
+    getUnlockSHA, 
+    isLocked, lock, recoverState, saveSecureState, secureState, 
+    state, unlockSecureStateAsync, unlockSecureStateSHA } from "./background-state.js";
+import { Account, Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 
 
 declare global {
@@ -43,7 +42,7 @@ const WALLET_VERSION = semver(2, 0, 0);
 
 //---------- working data
 // let _connectedTabs: Record<number, ConnectedTabInfo> = {};
-let _bgDataRecovered: boolean;
+let bgDataExists: boolean;
 
 //----------------------------------------
 //-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
@@ -65,13 +64,18 @@ function runtimeMessageHandler(
     return false;
   }
 
+  //-- DEBUG
   logEnabled(2)
   //console.log("runtimeMessage received ",sender, msg)
+  const fromExtension = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  const fromPage = !fromExtension
+  const fromWs = fromPage && msg.src == "ws"
+  const jmsg = JSON.stringify(msg)
   log(
-    "chrome.runtime.message received from " +
-    JSON.stringify(sender) + " " +
-    JSON.stringify(msg)
+    "BKG: msg from " + (fromWs ? "WS" : fromExtension ? "POPUP-EXT" : "PAGE") + " " +
+    jmsg.substring(0, Math.min(120, jmsg.length))
   );
+  //-- END DEBUG
 
   // launch recover data
   retrieveBgInfoFromStorage().
@@ -90,31 +94,17 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
   sendResponse: Function
 ) {
   //check if it comes from the web-page or from this extension
-  const url = sender.url ? sender.url : "";
-  const fromExtension = url.startsWith(
-    "chrome-extension://" + chrome.runtime.id + "/"
-  );
-  const fromPage = !fromExtension
-  const fromWs = fromPage && msg.src == "ws"
-
-  if (fromPage) {
-    // from web-app/tab -> content-script, or wallet-selector
-    // process separated from internal requests for security
-    if (msg.src == "ws") {
-      resolveFromWalletSelector(msg, sendResponse)
-    }
-    else {
-      sendResponse({ err: "invalid msg src:" + msg.src })
-    }
-    // msg.url = url; //add source
-    // msg.tabId = sender.tab ? sender.tab.id : -1; //add tab.id
-    // setTimeout(() => {
-    //   processMessageFromWebPage(msg);
-    // }, 100); //execute async
+  const fromExtension = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  if (!fromExtension) {
+    // from web-app/tab or wallet-selector -> content-script -> here
+    // process separated from internal requests for security. 
+    // We don't trust the page, 
+    // Actions require user approval
+    resolveUntrustedFromPage(msg, sendResponse)
   }
   else {
-    // from internal pages like popup
-    // other codes resolved by promises
+    // from internal trusted pages like extension-popup
+    // use promises to resolve
     getPromiseMsgFromPopup(msg)
       .then((data: any) => {
         //promise resolved OK
@@ -128,7 +118,7 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
   }
 }
 
-function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Function) {
+function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: Function) {
 
   switch (msg.code) {
 
@@ -137,19 +127,19 @@ function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Funct
       return;
 
     case "is-signed-in":
-      sendResponse({ data: !global.isLocked() })
+      sendResponse({ data: !isLocked() })
       return;
 
     case "sign-out":
       // await disconnectFromWebPage()
-      global.lock("sign-out")
+      lock("sign-out")
       sendResponse({ data: true })
       // ctinfo.acceptedConnection = false;
       return;
 
     case "sign-in":
     case "get-account-id":
-      if (global.isLocked()) {
+      if (isLocked()) {
         const width = 500;
         const height = 540;
         chrome.windows.create({
@@ -161,7 +151,7 @@ function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Funct
           height: height,
           focused: true,
         }, (window) => {
-          // pass msg and send-response to the popup for unlock
+          // pass msg and send-response to the popup to respond after unlock
           // @ts-ignore
           window.msg = msg;
           // @ts-ignore
@@ -179,7 +169,7 @@ function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Funct
 
     case "sign-and-send-transaction":
     case "sign-and-send-transactions":
-      if (global.isLocked()) {
+      if (isLocked()) {
         sendResponse({ err: "Wallet is locked" })
         return;
       }
@@ -193,7 +183,7 @@ function resolveFromWalletSelector(msg: Record<string, any>, sendResponse: Funct
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Function) {
 
-  // const accInfo = global.getAccount(signerId);
+  // const accInfo = getAccount(signerId);
   // if (!accInfo.privateKey) {
   //   return sendResponse({ err: `Narwallets: account ${signerId} is read-only` });
   // }
@@ -207,7 +197,6 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Func
   // }, function (tabs) {
   //   msg.url = tabs[0].url;
   // });
-  console.log("Message", msg)
 
   console.log("Opening approve popup")
   //load popup window for the user to approve
@@ -222,7 +211,7 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Func
     height: height,
     focused: true,
   }, (window) => {
-    //pass message via popup window
+    // pass msg and send-response to the popup to re-send as internal, after user approval
     //@ts-ignore
     window.msg = msg;
     //@ts-ignore
@@ -258,7 +247,7 @@ function createCorrespondingAction(action: any): TX.Action {
 }
 
 function reflectReception(receiver: string, amount: number, sender: string) {
-  const accounts = global.SecureState.accounts[Network.current];
+  const accounts = secureState.accounts[Network.current];
   // is the dest-account also in this wallet?
   const destAccount = accounts[receiver];
   if (destAccount == undefined) return;
@@ -276,7 +265,7 @@ function reflectTransfer(msg: any) {
         // apply transaction request from popup
         // {code:"apply", signerId:<account>, tx:BatchTransaction}
         // when resolved, send msg to content-script->page
-        const accounts = global.SecureState.accounts[Network.current];
+        const accounts = secureState.accounts[Network.current];
         if (accounts == undefined) return;
         const signerId = msg.signerId || "...";
         for (let item of msg.tx.items) {
@@ -364,22 +353,13 @@ function reflectTransfer(msg: any) {
     console.error(ex);
   }
   if (modified) {
-    global.saveSecureState();
+    saveSecureState();
   }
 }
 
 // create a promise to resolve the action requested by the popup
 async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
   switch (msg.code) {
-    // case "callGlobalSendResponse":
-    //   if (!globalSendResponse) {
-    //     return false
-    //   }
-    //   globalSendResponse(msg.cancel)
-    //   return true
-    // case "get-account-id": {
-    //   return Promise.resolve(selectedAccountData.name)
-    // }
     case "set-network": {
       Network.setCurrent(msg.network);
       localStorageSet({ selectedNetwork: Network.current });
@@ -389,40 +369,40 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       return Network.currentInfo()
     }
     case "get-state": {
-      return global.State
+      return state
     }
     case "lock": {
-      return global.lock(JSON.stringify(msg))
+      return lock(JSON.stringify(msg))
     }
     case "is-locked": {
-      return global.isLocked()
+      return isLocked()
     }
     case "unlockSecureState": {
-      return global.unlockSecureStateAsync(msg.email, msg.password);
+      return unlockSecureStateAsync(msg.email, msg.password);
     }
     case "create-user": {
-      return global.createUserAsync(msg.email, msg.password);
+      return createUserAsync(msg.email, msg.password);
     }
     case "change-password": {
-      return global.changePasswordAsync(msg.email, msg.password)
+      return changePasswordAsync(msg.email, msg.password)
     }
     case "set-options": {
-      global.SecureState.advancedMode = msg.advancedMode;
-      global.SecureState.autoUnlockSeconds = msg.autoUnlockSeconds;
-      global.saveSecureState();
+      secureState.advancedMode = msg.advancedMode;
+      secureState.autoUnlockSeconds = msg.autoUnlockSeconds;
+      saveSecureState();
       return
     }
     case "get-options": {
       return {
-        advancedMode: global.SecureState.advancedMode,
-        autoUnlockSeconds: global.SecureState.autoUnlockSeconds,
+        advancedMode: secureState.advancedMode,
+        autoUnlockSeconds: secureState.autoUnlockSeconds,
       }
     }
     case "get-account": {
-      if (!global.SecureState.accounts[Network.current]) {
+      if (!secureState.accounts[Network.current]) {
         return undefined;
       }
-      return global.SecureState.accounts[Network.current][msg.accountId]
+      return secureState.accounts[Network.current][msg.accountId]
     }
     case "set-account": {
       if (!msg.accountId) throw Error("!msg.accountId");
@@ -430,50 +410,50 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       if (!msg.accInfo.network) {
         console.log("Account without network. ", JSON.stringify(msg.accInfo))
       } else {
-        if (!global.SecureState.accounts[msg.accInfo.network]) {
-          global.SecureState.accounts[msg.accInfo.network] = {};
+        if (!secureState.accounts[msg.accInfo.network]) {
+          secureState.accounts[msg.accInfo.network] = {};
         }
-        global.SecureState.accounts[msg.accInfo.network][msg.accountId] = msg.accInfo;
-        global.saveSecureState();
+        secureState.accounts[msg.accInfo.network][msg.accountId] = msg.accInfo;
+        saveSecureState();
       }
       return
     }
     case "add-contact": {
       if (!msg.name) throw Error("!msg.name");
-      if (!global.SecureState.contacts) global.SecureState.contacts = {};
-      if (!global.SecureState.contacts[Network.current]) {
-        global.SecureState.contacts[Network.current] = {};
+      if (!secureState.contacts) secureState.contacts = {};
+      if (!secureState.contacts[Network.current]) {
+        secureState.contacts[Network.current] = {};
       }
-      global.SecureState.contacts[Network.current][msg.name] = msg.contact;
-      global.saveSecureState();
+      secureState.contacts[Network.current][msg.name] = msg.contact;
+      saveSecureState();
       return
     }
     case "set-account-order": {
-      let accInfo = global.getAccount(msg.accountId);
+      let accInfo = getAccount(msg.accountId);
       accInfo.order = msg.order;
-      global.saveSecureState();
+      saveSecureState();
       return
     }
     case "remove-account": {
       if (msg.accountId) {
-        delete global.SecureState.accounts[Network.current][msg.accountId];
+        delete secureState.accounts[Network.current][msg.accountId];
       }
       //persist
-      global.saveSecureState();
+      saveSecureState();
       return
     }
     case "getNetworkAccountsCount": {
-      return global.getNetworkAccountsCount()
+      return getNetworkAccountsCount()
     }
     case "all-address-contacts": {
-      if (!global.SecureState.contacts) {
+      if (!secureState.contacts) {
         return {};
       } else {
-        return global.SecureState.contacts[Network.current];
+        return secureState.contacts[Network.current];
       }
     }
     case "all-network-accounts": {
-      return global.SecureState.accounts[Network.current] || {}
+      return secureState.accounts[Network.current] || {}
     }
     // case "connect": {
     //   if (!msg.network) msg.network = Network.current;
@@ -505,24 +485,25 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     }
     case "set-address-book": {
       if (!msg.accountId) throw Error("!msg.accountId");
-      if (!global.SecureState.contacts[Network.current]) global.SecureState.contacts[Network.current] = {};
-      global.SecureState.contacts[Network.current][msg.accountId] = msg.contact;
-      global.saveSecureState();
+      if (!secureState.contacts[Network.current]) secureState.contacts[Network.current] = {};
+      secureState.contacts[Network.current][msg.accountId] = msg.contact;
+      saveSecureState();
       return
     }
     case "remove-address": {
-      delete global.SecureState.contacts[Network.current][msg.accountId];
+      delete secureState.contacts[Network.current][msg.accountId];
       //persist
-      global.saveSecureState();
+      saveSecureState();
       return
     }
 
+    // old v3 - not originated in wallet-connect
     case "apply": {
       //apply transaction request from popup
       //{code:"apply", signerId:<account>, tx:BatchTransaction}
       //when resolved, send msg to content-script->page
       const signerId = msg.signerId || "...";
-      const accInfo = global.getAccount(signerId);
+      const accInfo = getAccount(signerId);
       if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);
       //convert wallet-api actions to near.TX.Action
       const actions: TX.Action[] = [];
@@ -561,15 +542,16 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     }
       break
 
+    // new v4 - wallet-connect mode
     case "sign-and-send-transaction": {
-      const signerId = global.State.currentUser
-      const accInfo = global.getAccount(signerId);
+      const signerId = msg.signerId || "...";
+      const accInfo = getAccount(signerId);
       return mapAndCommitActions(msg.params, signerId, accInfo)
     }
 
     case "sign-and-send-transactions": {
-      const signerId = global.State.currentUser
-      const accInfo = global.getAccount(signerId);
+      const signerId = msg.signerId || "...";
+      const accInfo = getAccount(signerId);
       let promises: Promise<any>[] = []
       for (let i = 0; i < msg.params.length; i++) {
         promises.push(mapAndCommitActions(msg.params[i], signerId, accInfo))
@@ -582,13 +564,6 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     }
   }
 }
-
-/*
-    selectedAccountData.accountInfo.history.unshift(
-  new History("send", amountToSend, toAccName)
-);
- 
-*/
 
 
 // //---------------------------------------------------
@@ -643,7 +618,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
 //       //   height: height,
 //       //   focused: true,
 //       // });
-//       // if(global.isLocked()) {
+//       // if(isLocked()) {
 //       //   const width = 500;
 //       //   const height = 540;
 //       //   chrome.windows.create({
@@ -718,7 +693,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
 
 //         //verify account exists and is full-access
 //         const signerId = ctinfo.connectedAccountId;
-//         const accInfo = global.getAccount(signerId);
+//         const accInfo = getAccount(signerId);
 //         if (!accInfo.privateKey) {
 //           throw Error(`Narwallets: account ${signerId} is read-only`);
 //         }
@@ -788,15 +763,15 @@ chrome.runtime.onInstalled.addListener(function (details) {
  */
 
 //Continuation-Passing style data
-type CPSDATA = {
-  accountId: string;
-  network: string;
-  activeTabId: number;
-  url: string | undefined;
-  ctinfo: ConnectedTabInfo;
-  resolve: Function;
-  reject: Function;
-};
+// type CPSDATA = {
+//   accountId: string;
+//   network: string;
+//   activeTabId: number;
+//   url: string | undefined;
+//   ctinfo: ConnectedTabInfo;
+//   resolve: Function;
+//   reject: Function;
+// };
 
 // chrome.tabs.onCreated.addListener(function(tabId) {
 //   connectToWebPage("silkking.testnet", "testnet")
@@ -933,12 +908,12 @@ type CPSDATA = {
 //   }, 250);
 // }
 
-type ConnectedTabInfo = {
-  injected?: boolean;
-  acceptedConnection?: boolean;
-  connectedAccountId?: string;
-  connectedResponse?: any;
-};
+// type ConnectedTabInfo = {
+//   injected?: boolean;
+//   acceptedConnection?: boolean;
+//   connectedAccountId?: string;
+//   connectedResponse?: any;
+// };
 
 // function disconnectFromWebPage(): Promise<void> {
 //   return new Promise((resolve, reject) => {
@@ -1006,7 +981,7 @@ chrome.alarms.onAlarm.addListener(function (alarm: any) {
   //log("chrome.alarms.onAlarm fired ", alarm);
   if (alarm.name == UNLOCK_EXPIRED) {
     chrome.alarms.clearAll();
-    global.lock("chrome.alarms.onAlarm " + JSON.stringify(alarm));
+    lock("chrome.alarms.onAlarm " + JSON.stringify(alarm));
     //window.close()//unload this background page
     //chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
   }
@@ -1020,15 +995,15 @@ var unlockExpire: any;
 //   "message",
 //   async function (event) {
 //     if (event.data.code == "popupUnloading") {
-//       if (!global.isLocked()) {
-//         const autoUnlockSeconds = global.getAutoUnlockSeconds();
+//       if (!isLocked()) {
+//         const autoUnlockSeconds = getAutoUnlockSeconds();
 //         unlockExpire = Date.now() + autoUnlockSeconds * 1000;
 //         chrome.alarms.create(UNLOCK_EXPIRED, { when: unlockExpire });
 //         log(UNLOCK_EXPIRED, autoUnlockSeconds);
 //         if (autoUnlockSeconds < 60 * 5) {
 //           //also setTimeout to Lock, because alarms fire only once per minute
 //           if (lockTimeout) clearTimeout(lockTimeout);
-//           lockTimeout = setTimeout(global.lock, autoUnlockSeconds * 1000);
+//           lockTimeout = setTimeout(lock, autoUnlockSeconds * 1000);
 //         }
 //       }
 //       return;
@@ -1046,12 +1021,12 @@ var unlockExpire: any;
 async function retrieveBgInfoFromStorage(): Promise<void> {
 
   if (unlockExpire && Date.now() > unlockExpire) {
-    _bgDataRecovered = false;
-    global.lock("retrieveBgInfoFromStorage");
+    bgDataExists = false;
+    lock("retrieveBgInfoFromStorage");
     return;
   }
-  if (global.isLocked()) {
-    _bgDataRecovered = false;
+  if (isLocked()) {
+    bgDataExists = false;
     return;
   }
 
@@ -1059,7 +1034,8 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
   if (lockTimeout) {
     clearTimeout(lockTimeout);
   }
-  if (_bgDataRecovered) {
+  if (bgDataExists) {
+    log("BK bgDataExists" + bgDataExists + ", State" + JSON.stringify(state))
     // cached
     return
   }
@@ -1069,39 +1045,39 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
   //@ts-ignore
   //_connectedTabs = await localStorageGet("_ct");
 
-  const unlockSHA = await global.getUnlockSHA()
+  const unlockSHA = await getUnlockSHA()
   log("RECOVERED SHA", unlockSHA);
 
   //To manage the possibility that the user has added/removed accounts ON ANOTHER TAB
   //we reload state & secureState from storage when the popup opens
-  await global.recoverState();
+  await recoverState();
+  lock(`!dataVersion ${state.dataVersion} || !user ${state.currentUser}`);
   // validate dataVersion
-  if (!global.State.dataVersion) {
-    global.clearState();
+  if (!state.dataVersion) {
+    clearState();
   }
   // if no current user, or no auto-unlock-SHA, lock
-  if (!global.State.dataVersion || !global.State.currentUser || !unlockSHA) {
-    global.lock(`!dataVersion ${global.State.dataVersion} || !user ${global.State.currentUser} || !unlockSHA ${!unlockSHA}`);
+  if (!state.dataVersion || !state.currentUser || !unlockSHA) {
     return;
   }
 
   // try auto-unlock
   //try to recover secure state
   try {
-    await global.unlockSecureStateSHA(
-      global.State.currentUser,
-      unlockSHA 
+    await unlockSecureStateSHA(
+      state.currentUser,
+      unlockSHA
     );
   } catch (ex) {
     log("recovering secure state on retrieveBgInfoFromStorage", ex.message);
-    global.lock("err calling unlockSecureStateSHA");
+    lock("err calling unlockSecureStateSHA");
     return;
   }
 
-  _bgDataRecovered = true;
+  bgDataExists = true;
   const nw = (await localStorageGet("selectedNetwork")) as string;
   if (nw) Network.setCurrent(nw);
-  log("NETWORK=", nw);
+  log("bgDataExists = true, NETWORK=", nw);
   return;
 }
 

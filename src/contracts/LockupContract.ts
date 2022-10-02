@@ -6,14 +6,14 @@ import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js"
 //import * as near from "../api/near-rpc.js";
 import * as StakingPool from "./staking-pool.js";
 //import * as TX from "../api/transaction.js";
-import { Account, removeAsset } from "../data/account.js"
 import { isValidAccountID, CheckValidAmount } from "../lib/near-api-lite/utils/valid.js";
-import { activeNetworkInfo, askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundGetNetworkInfo, askBackgroundViewMethod } from "../background/askBackground.js";
+import { activeNetworkInfo, askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundViewMethod } from "../askBackground.js";
 import { FunctionCall } from "../lib/near-api-lite/batch-transaction.js";
 
 import type { StakingPoolAccountInfoResult } from "./staking-pool.js";
 import { encodeHex, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
+import { Account, removeAsset } from "../structs/account-info.js";
 
 
 const BASE_GAS = 25;

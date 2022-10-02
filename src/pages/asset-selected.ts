@@ -5,12 +5,13 @@ import {
   askBackgroundAllNetworkAccounts,
   askBackgroundCallMethod,
   askBackgroundGetAccountRecordCopy,
-  askBackgroundGetNetworkInfo,
   askBackgroundSetAccount,
   askBackgroundViewMethod,
-} from "../background/askBackground.js";
-import { Asset, assetAddHistory, assetUpdateBalance, assetUpdateMetadata, findAsset, findAssetIndex, History
-  ,newTokenFromMetadata, setAssetBalanceYoctos, updateTokenAssetFromMetadata } from "../data/account.js";
+} from "../askBackground.js";
+import {
+  assetUpdateBalance, assetUpdateMetadata,
+  newTokenFromMetadata, updateTokenAssetFromMetadata
+} from "../data/asset-update";
 import {
   isValidAccountID,
   CheckValidAmount,
@@ -40,7 +41,7 @@ import {
 import * as StakingPool from "../contracts/staking-pool.js";
 import { addressContacts, getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
 import { GContact } from "../data/contact.js";
-import { localStorageSet } from "../data/util.js";
+import { localStorageSet } from "../data/local-storage.js";
 import { contactExists } from '../pages/address-book.js'
 import {
   META_SVG,
@@ -53,11 +54,13 @@ import {
 } from "../util/svg_const.js";
 import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
-import { ASSET_HISTORY_TEMPLATE, nearDollarPrice } from "../data/global.js";
+
 import { backToMainPage, setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
 import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
 import { LockupContract } from "../contracts/LockupContract.js";
+import { nearDollarPrice } from "../data/price-data.js";
+import { Asset, assetAddHistory, ASSET_HISTORY_TEMPLATE, findAsset, findAssetIndex, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 
 const THIS_PAGE = "AccountAssetDetail";
 
@@ -104,7 +107,7 @@ export async function show(
     asset_selected.icon = "STAKE";
   }
   d.showPage(THIS_PAGE);
-  
+
   d.showSubPage("asset-history");
   d.onClickId("asset-history-details", historyLineClicked);
 

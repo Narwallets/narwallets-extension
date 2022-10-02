@@ -1,9 +1,9 @@
 import * as d from "../util/document.js"
-import { activeNetworkInfo, askBackgroundGetNetworkInfo, askBackgroundSetAccount } from "../background/askBackground.js";
+import { activeNetworkInfo, askBackgroundSetAccount } from "../askBackground.js";
 import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
 import * as bs58 from '../lib/crypto-lite/bs58.js';
 import { show as AccountPage_show, showPrivateKeyClicked } from "./account-selected.js";
-import { Account, newAccount } from "../data/account.js";
+import { Account, newAccount } from "../structs/account-info.js";
 
 import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import type { SeedPhraseResult } from "../lib/near-api-lite/utils/seed-phrase.js";

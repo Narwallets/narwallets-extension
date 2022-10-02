@@ -5,7 +5,7 @@ import * as searchAccounts from "../util/search-accounts.js";
 import { isValidAccountID } from "../lib/near-api-lite/utils/valid.js";
 import * as Pages from "../pages/main.js";
 
-import { Account, newAccount } from "../data/account.js";
+import { Account, newAccount } from "../structs/account-info.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import {
   askPrivateKey,
@@ -16,10 +16,9 @@ import {
   activeNetworkInfo,
   askBackground,
   askBackgroundAllNetworkAccounts,
-  askBackgroundGetNetworkInfo,
   askBackgroundGetValidators,
   askBackgroundSetAccount,
-} from "../background/askBackground.js";
+} from "../askBackground.js";
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { timeStamp } from "node:console";
@@ -312,14 +311,10 @@ async function searchClicked(ev: Event) {
 //   messageLine.hide()
 // }
 
-export async function onNetworkChanged(info: NetworkInfo) {
-  if (!info) {
-    //console.log("!info")
-    return;
-  }
+export async function onNetworkChanged() {
   //update .root-account
-  d.byId(NET_NAME).innerText = info.name; //search button
-  d.byId(NET_ROOT).innerText = "." + info.rootAccount; //account name label
+  d.byId(NET_NAME).innerText = activeNetworkInfo.name; //search button
+  d.byId(NET_ROOT).innerText = "." + activeNetworkInfo.rootAccount; //account name label
 }
 
 function createAccountClicked(ev: Event) {
@@ -348,12 +343,12 @@ export async function addListeners() {
   searchButton.onClick(searchClicked);
   importButton.onClick(importClicked);
 
-  onNetworkChanged(await askBackgroundGetNetworkInfo());
+  onNetworkChanged();
 }
 
 //listen to extension messages
 chrome.runtime.onMessage.addListener(function (msg) {
   if (msg.code == "network-changed") {
-    onNetworkChanged(msg.networkInfo);
+    onNetworkChanged();
   }
 });

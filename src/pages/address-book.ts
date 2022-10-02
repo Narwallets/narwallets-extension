@@ -4,9 +4,9 @@ import {
   askBackgroundAddContact,
   askBackgroundAllAddressContact,
   askBackgroundAllNetworkAccounts,
-} from "../background/askBackground.js";
+} from "../askBackground.js";
 import { contactPlusNote, GContact } from "../data/contact.js";
-import { saveSecureState } from "../data/global.js";
+
 import { D } from "../lib/tweetnacl/core/core.js";
 import * as d from "../util/document.js";
 import {
@@ -26,7 +26,7 @@ import type { PopupItem } from "../util/popup-list.js";
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
-export async function getAccountsForPopupList(except?: string, added?:Record<string, boolean>): Promise<PopupItem[]> {
+export async function getAccountsForPopupList(except?: string, added?: Record<string, boolean>): Promise<PopupItem[]> {
   // add all wallet accounts
   const walletAccounts = await askBackgroundAllNetworkAccounts();
   let items = []
@@ -34,7 +34,7 @@ export async function getAccountsForPopupList(except?: string, added?:Record<str
     if ((added && added[key]) || (except && key == except)) continue;
     let title = key
     if (walletAccounts[key].note) title += " (" + walletAccounts[key].note + ")"
-    items.push({ text: title, value: key, order:walletAccounts[key].order })
+    items.push({ text: title, value: key, order: walletAccounts[key].order })
   }
   return items
 }
@@ -86,7 +86,7 @@ function showAddContactPage() {
 
 function showInitial() {
   d.clearContainer("address-list");
-  const TEMPLATE=`
+  const TEMPLATE = `
     <div class="address-item" id="{key}">
     <div class="accountlistitem">
       <div class="addresslistname">{accountId}</div>

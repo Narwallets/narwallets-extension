@@ -1,8 +1,8 @@
 import * as c from "./conversions.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
-import { Account, newAccount } from "../data/account.js";
-import { activeNetworkInfo, askBackground, askBackgroundGetNetworkInfo } from "../background/askBackground.js";
+import { Account, newAccount } from "../structs/account-info.js";
+import { activeNetworkInfo, askBackground, askBackgroundGetNetworkInfo } from "../askBackground.js";
 import { asyncRefreshAccountInfoLastBalance } from "../extendedAccountData.js";
 
 function checkNotLockup(accName: string) {

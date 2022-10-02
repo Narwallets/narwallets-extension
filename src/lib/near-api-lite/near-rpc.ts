@@ -6,10 +6,10 @@ import { serialize } from "./utils/serialize.js"
 import * as TX from "./transaction.js"
 
 import * as bs58 from "../crypto-lite/bs58.js";
-import {sha256Async} from '../crypto-lite/crypto-primitives-browser.js';
+import { sha256Async } from '../crypto-lite/crypto-primitives-browser.js';
 
-import{log} from "../log.js"
-import { decodeBase64, stringFromArray, stringFromUint8Array, Uint8ArrayFromString } from "../crypto-lite/encode.js";
+import { log } from "../log.js"
+import { decodeBase64, encodeBase64, stringFromArray, stringFromUint8Array, Uint8ArrayFromString } from "../crypto-lite/encode.js";
 
 
 //---------------------------
@@ -102,7 +102,7 @@ export function access_key(accountId: string, publicKey: string): Promise<any> {
 export function viewRaw(contractId: string, method: string, params?: any): Promise<any> {
     let encodedParams = undefined;
     if (params) {
-        const asArr=Uint8ArrayFromString(JSON.stringify(params))
+        const asArr = Uint8ArrayFromString(JSON.stringify(params))
         encodedParams = bs58.encode(asArr);
     }
     return jsonRpcQuery("call/" + contractId + "/" + method, encodedParams);
@@ -123,8 +123,8 @@ export function getValidators(): Promise<any> {
 //-------------------------------
 export function broadcast_tx_commit_signed(signedTransaction: TX.SignedTransaction): Promise<any> {
     const borshEncoded = signedTransaction.encode();
-    const b64Encoded = Buffer.from(borshEncoded).toString('base64')
-    return jsonRpc('broadcast_tx_commit', [b64Encoded]) as Promise<any>
+    const b64EncodedString = encodeBase64(borshEncoded)
+    return jsonRpc('broadcast_tx_commit', [b64EncodedString]) as Promise<any>
 };
 
 //-------------------------------
@@ -144,7 +144,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
     // each transaction requires a unique number or nonce
     // this is created by taking the current nonce and incrementing it
     const nonce = ++accessKey.nonce;
-    
+
     const transaction = TX.createTransaction(
         signerId,
         publicKey,
@@ -156,7 +156,7 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
     console.log("Transaction", transaction)
 
     const serializedTx = serialize(TX.SCHEMA, transaction);
-    const serializedTxHash = new Uint8Array( await sha256Async(serializedTx));
+    const serializedTxHash = new Uint8Array(await sha256Async(serializedTx));
     const signature = keyPair.sign(serializedTxHash)
 
     const signedTransaction = new TX.SignedTransaction({

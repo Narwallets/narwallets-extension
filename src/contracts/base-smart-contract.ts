@@ -1,4 +1,4 @@
-import { askBackground, askBackgroundCallMethod } from "../background/askBackground.js";
+import { askBackground, askBackgroundCallMethod } from "../askBackground.js";
 
 export const DEFAULT_GAS="200"+"0".repeat(12);
 

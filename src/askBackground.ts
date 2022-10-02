@@ -1,26 +1,30 @@
-import type { StateStruct, SecureOptions } from "../data/state-type.js";
-import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { Account } from "../data/account.js";
+import type { StateStruct, SecureOptions } from "./structs/state-structs.js";
+import { NetworkInfo } from "./lib/near-api-lite/network.js";
+
 import {
   BatchAction,
   BatchTransaction,
   FunctionCall,
   Transfer,
-} from "../lib/near-api-lite/batch-transaction.js";
-import { log } from "../lib/log.js";
-import { GContact } from "../data/contact.js";
+} from "./lib/near-api-lite/batch-transaction.js";
+import { log } from "./lib/log.js";
+import { GContact } from "./data/contact.js";
+import { Account } from "./structs/account-info.js";
 
 //ask background, wait for response, return a Promise
 export function askBackground(requestPayload: any): Promise<any> {
-requestPayload.dest = "ext";
-return new Promise((resolve, reject) => {
-    log("askBackground chrome.runtime.sendMessage", JSON.stringify(requestPayload));
+  requestPayload.dest = "ext";
+  return new Promise((resolve, reject) => {
+    log("askBackground ", requestPayload.code);
     const timeout = setTimeout(() => {
       return reject(Error("timeout"));
     }, 30000);
     chrome.runtime.sendMessage(requestPayload, function (response) {
       clearTimeout(timeout);
-      log("response", JSON.stringify(response));
+      //-- DEBUG
+      const jres = JSON.stringify(response)
+      log("response to ", requestPayload.code, jres.substring(0, Math.min(120, jres.length)));
+      //----
       if (!response) {
         return reject(Error("response is empty"));
       } else if (response.err) {
@@ -76,11 +80,11 @@ export async function askBackgroundSetNetwork(
 ): Promise<NetworkInfo> {
   // save active NetworkInfo 
   activeNetworkInfo = await askBackground({ code: "set-network", network: networkName })
-  return activeNetworkInfo 
+  return activeNetworkInfo
 }
 export async function askBackgroundGetNetworkInfo(): Promise<NetworkInfo> {
   activeNetworkInfo = await askBackground({ code: "get-network-info" });
-  return activeNetworkInfo 
+  return activeNetworkInfo
 }
 export function askBackgroundGetOptions(): Promise<SecureOptions> {
   return askBackground({ code: "get-options" }) as Promise<SecureOptions>;

@@ -1,7 +1,7 @@
 import * as d from "../../util/document.js"
 import * as c from "../../util/conversions.js"
 import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../lib/near-api-lite/batch-transaction.js"
-import { askBackground } from "../../background/askBackground.js"
+import { askBackground } from "../../askBackground.js"
 //import { globalSendResponse } from "../../background/background.js"
 
 // props addded when this popup is created

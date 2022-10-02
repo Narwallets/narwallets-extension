@@ -1,5 +1,5 @@
-import { askBackground, askBackgroundGetState } from "../background/askBackground.js"
-import { showPassword } from "../data/util.js"
+import { askBackground, askBackgroundGetState } from "../askBackground.js"
+import { showPassword } from "../data/local-storage.js"
 import { SINGLE_USER_EMAIL } from "../index.js"
 import * as d from "../util/document.js"
 
@@ -8,8 +8,8 @@ const PASS_CONFIRM = "pass-confirm"
 const AGREE_CHECK = "agree-check"
 const CREATE_USER = "create-user"
 const IMPORT_OR_CREATE = "import-or-create"
-const SHOW_NEW_USER_PASS_CONFIRM="show-new-user-password-confirm"
-const SHOW_NEW_USER_PASS="show-new-user-password"
+const SHOW_NEW_USER_PASS_CONFIRM = "show-new-user-password-confirm"
+const SHOW_NEW_USER_PASS = "show-new-user-password"
 
 function agreeCheckboxClicked(ev: Event) {
   //enable create button when terms accepted
@@ -38,6 +38,7 @@ async function createClicked(ev: Event) {
     const state = await askBackgroundGetState()
     await askBackground({ code: "create-user", email: email, password: password })
 
+    d.hideErr()
     d.showPage(IMPORT_OR_CREATE);
 
   }
@@ -51,7 +52,7 @@ export function addListeners() {
 
   d.onClickId(AGREE_CHECK, agreeCheckboxClicked);
   d.onClickId(CREATE_USER, createClicked);
-  d.onClickId(SHOW_NEW_USER_PASS,showPassword);
-  d.onClickId(SHOW_NEW_USER_PASS_CONFIRM,showPassword);
+  d.onClickId(SHOW_NEW_USER_PASS, showPassword);
+  d.onClickId(SHOW_NEW_USER_PASS_CONFIRM, showPassword);
 
 }
