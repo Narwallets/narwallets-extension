@@ -9,7 +9,7 @@ import * as bs58 from "../crypto-lite/bs58.js";
 import {sha256Async} from '../crypto-lite/crypto-primitives-browser.js';
 
 import{log} from "../log.js"
-import { decodeBase64, stringFromArray, stringFromUint8Array } from "../crypto-lite/encode.js";
+import { decodeBase64, stringFromArray, stringFromUint8Array, Uint8ArrayFromString } from "../crypto-lite/encode.js";
 
 
 //---------------------------
@@ -101,7 +101,10 @@ export function access_key(accountId: string, publicKey: string): Promise<any> {
 //-------------------------------
 export function viewRaw(contractId: string, method: string, params?: any): Promise<any> {
     let encodedParams = undefined;
-    if (params) encodedParams = bs58.encode(Buffer.from(JSON.stringify(params)));
+    if (params) {
+        const asArr=Uint8ArrayFromString(JSON.stringify(params))
+        encodedParams = bs58.encode(asArr);
+    }
     return jsonRpcQuery("call/" + contractId + "/" + method, encodedParams);
 }
 export async function view(contractId: string, method: string, params?: any): Promise<any> {

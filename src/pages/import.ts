@@ -5,7 +5,7 @@ import * as searchAccounts from "../util/search-accounts.js";
 import { isValidAccountID } from "../lib/near-api-lite/utils/valid.js";
 import * as Pages from "../pages/main.js";
 
-import { Account, ExtendedAccountData, newAccount } from "../data/account.js";
+import { Account, newAccount } from "../data/account.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import {
   askPrivateKey,
@@ -13,6 +13,7 @@ import {
   show as AccountSelectedPage_show,
 } from "./account-selected.js";
 import {
+  activeNetworkInfo,
   askBackground,
   askBackgroundAllNetworkAccounts,
   askBackgroundGetNetworkInfo,
@@ -21,8 +22,8 @@ import {
 } from "../background/askBackground.js";
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { activeNetworkInfo } from "../index.js";
 import { timeStamp } from "node:console";
+import { ExtendedAccountData } from "../extendedAccountData.js";
 
 const NET_NAME = "net-name";
 const NET_ROOT = "net-root";

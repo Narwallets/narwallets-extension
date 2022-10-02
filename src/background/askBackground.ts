@@ -14,12 +14,13 @@ import { GContact } from "../data/contact.js";
 export function askBackground(requestPayload: any): Promise<any> {
 requestPayload.dest = "ext";
 return new Promise((resolve, reject) => {
-    log("sendMessage", JSON.stringify(requestPayload));
+    log("askBackground chrome.runtime.sendMessage", JSON.stringify(requestPayload));
     const timeout = setTimeout(() => {
       return reject(Error("timeout"));
     }, 30000);
     chrome.runtime.sendMessage(requestPayload, function (response) {
       clearTimeout(timeout);
+      log("response", JSON.stringify(response));
       if (!response) {
         return reject(Error("response is empty"));
       } else if (response.err) {
@@ -65,13 +66,21 @@ export function askBackgroundIsLocked(): Promise<boolean> {
 export function askBackgroundGetState(): Promise<StateStruct> {
   return askBackground({ code: "get-state" }) as Promise<StateStruct>;
 }
-export function askBackgroundSetNetwork(
+
+export var activeNetworkInfo: NetworkInfo;
+// function to check if the account matches active network
+export const accountMatchesNetwork = (accName: string) => accName && activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)
+
+export async function askBackgroundSetNetwork(
   networkName: string
 ): Promise<NetworkInfo> {
-  return askBackground({ code: "set-network", network: networkName });
+  // save active NetworkInfo 
+  activeNetworkInfo = await askBackground({ code: "set-network", network: networkName })
+  return activeNetworkInfo 
 }
-export function askBackgroundGetNetworkInfo(): Promise<NetworkInfo> {
-  return askBackground({ code: "get-network-info" });
+export async function askBackgroundGetNetworkInfo(): Promise<NetworkInfo> {
+  activeNetworkInfo = await askBackground({ code: "get-network-info" });
+  return activeNetworkInfo 
 }
 export function askBackgroundGetOptions(): Promise<SecureOptions> {
   return askBackground({ code: "get-options" }) as Promise<SecureOptions>;

@@ -1,9 +1,9 @@
 import * as c from "./conversions.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
-import { Account, asyncRefreshAccountInfoLastBalance, newAccount } from "../data/account.js";
-import { askBackground, askBackgroundGetNetworkInfo } from "../background/askBackground.js";
-import { activeNetworkInfo } from "../index.js";
+import { Account, newAccount } from "../data/account.js";
+import { activeNetworkInfo, askBackground, askBackgroundGetNetworkInfo } from "../background/askBackground.js";
+import { asyncRefreshAccountInfoLastBalance } from "../extendedAccountData.js";
 
 function checkNotLockup(accName: string) {
   const suffix = LockupContract.getLockupSuffix();

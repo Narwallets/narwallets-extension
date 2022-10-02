@@ -2,7 +2,16 @@ import * as d from "../../util/document.js"
 import * as c from "../../util/conversions.js"
 import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../lib/near-api-lite/batch-transaction.js"
 import { askBackground } from "../../background/askBackground.js"
-import { globalSendResponse } from "../../background/background.js"
+//import { globalSendResponse } from "../../background/background.js"
+
+// props addded when this popup is created
+interface Window {
+  msg: Record<string, any>
+}
+// interface Window {
+//   msg: Record<string, any>
+//   sendResponse: Function;
+// }
 
 type TxInfo = {
   action: string;
@@ -34,40 +43,23 @@ var resolvedMsg: ResolvedMsg;
 
 async function approveOkClicked() {
   d.showWait()
-  try {
-    //ask background to apply transaction
-    // resolvedMsg.data = await askBackground(initialMsg)
-    //response goes to initiating tab/page, another 5-min waiting spinner is there
-    // chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //send resolution to original asking tab/page
-    const wasCalled = await askBackground({code:"callGlobalSendResponse"})
-
-    responseSent = true
-    setTimeout(() => { window.close() }, 100);
-  }
-  catch (ex) {
-    d.showErr(ex.message) //some error
-    //the user can retry or cancel the approval
-  }
-  finally {
-    d.hideWait()
-  }
-}
-
-function respondRejected() {
-  resolvedMsg.err = "User rejected the transaction";
-  chrome.tabs.sendMessage(initialMsg.tabId, resolvedMsg) //resolve-reject request
-  responseSent = true
+  // ask background to process the message, this time origin is a popup from the extension
+  askBackground(window.msg)
+    .then((data) => { window.sendResponse({ data }) })
+    .catch((err) => { window.sendResponse({ err: err.message }) })
+    .finally(() => { window.close() })
 }
 
 async function cancelOkClicked() {
   console.log("Cancel clicked")
   // respondRejected();
-  const wasCalled = await askBackground({code:"callGlobalSendResponse", cancel: true})
+  window.sendResponse({ err: "Rejected by user" })
+  //const wasCalled = await askBackground({code:"callGlobalSendResponse", cancel: true})
   setTimeout(() => { window.close() }, 200);
 }
 
 window.addEventListener('beforeunload', function (event) {
-  if (!responseSent) respondRejected();
+  cancelOkClicked()
 });
 
 
@@ -110,7 +102,7 @@ function humanReadableCallArgs(args: Object): string {
 function displayTx(msg: TxMsg) {
 
   initialMsg = msg;
-  resolvedMsg = { dest: "page", code: "request-resolved", tabId: initialMsg.tabId, requestId: initialMsg.requestId }
+  //resolvedMsg = { dest: "page", code: "request-resolved", tabId: initialMsg.tabId, requestId: initialMsg.requestId }
 
   try {
     console.log("MSG", msg)
@@ -121,9 +113,9 @@ function displayTx(msg: TxMsg) {
 
     d.clearContainer("list")
 
-    if(msg.tx) {
+    if (msg.tx) {
       displaySingleTransactionParams(msg)
-    } else if(msg.txs) {
+    } else if (msg.txs) {
       displayMultipleTransactionParams(msg)
     }
 
@@ -193,9 +185,9 @@ function displayMultipleTransactionParams(msg: TxMsg) {
     //   default:
     //     toAdd.action = JSON.stringify(item);
     // }
-    for(let item of tx.items) {
+    for (let item of tx.items) {
       const f = item as FunctionCall;
-      let toAdd = {receiver: tx.receiver, action: `${f.method}(${JSON.stringify(f.args)})`}
+      let toAdd = { receiver: tx.receiver, action: `${f.method}(${JSON.stringify(f.args)})` }
       const TEMPLATE = `
       <li id="{name}">
         <div class="receiver">{receiver}</div>
@@ -205,28 +197,23 @@ function displayMultipleTransactionParams(msg: TxMsg) {
       // 
       d.appendTemplateLI("list", TEMPLATE, toAdd)
     }
-    
+
     console.log("tx", tx)
   }
 }
 
 let retries = 0;
 
-async function initFromBgPage() {
+async function initFromWindow() {
 
-  //Get transaction to approve from background page window
-  const bgpage: any = chrome.extension.getBackgroundPage() as any
-  if (!bgpage && retries < 4) {
-    retries++; //retry if we can't get bg page
-    setTimeout(initFromBgPage, 200);
-    return;
-  }
-  const msg: TxMsg = bgpage.pendingApprovalMsg
   //Display transaction for user approval
-  displayTx(msg);
+  displayTx(window.msg as unknown as TxMsg);
 
 }
 
 //--- INIT
 d.onClickId("approve-cancel", cancelOkClicked)
-initFromBgPage()
+
+window.onload = function() { 
+  setTimeout(initFromWindow, 200) 
+}

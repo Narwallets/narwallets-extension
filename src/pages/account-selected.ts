@@ -23,18 +23,17 @@ import { LockupContract } from "../contracts/LockupContract.js";
 import {
   Account,
   Asset,
-  ExtendedAccountData,
   History,
   Contact,
   newTokenFromMetadata,
   setAssetBalanceYoctos,
   assetUpdateBalance,
-  asyncRefreshAccountInfoLastBalance,
   findAsset,
   assetDivId,
 } from "../data/account.js";
 import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/util.js";
 import {
+  accountMatchesNetwork, activeNetworkInfo, 
   askBackground,
   askBackgroundApplyTxAction,
   askBackgroundApplyBatchTx,
@@ -92,8 +91,9 @@ import {
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { accountMatchesNetwork, activeNetworkInfo, autoRefresh } from "../index.js";
+import { autoRefresh } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
+import { asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 
 const ACCOUNT_SELECTED = "account-selected";
 

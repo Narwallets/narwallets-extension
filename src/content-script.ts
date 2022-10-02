@@ -8,15 +8,17 @@ window.addEventListener("message", (event) => {
   if (event.data.type && (event.data.type == "nw") && event.data.dest == "ext") {
     // Sending message to narwallets extension
     return chrome.runtime.sendMessage(event.data, function (response) {
-      console.log("Posting message for page with response ", response)
       // Send response to wallet-selector on callback
-      window.postMessage(
-        {
-          type: "nw",
-          dest: "page",
-          result: response
-        }
-      )
+      // copy id & other data from original msg
+      let postBack = Object.assign({}, event.data);
+      // add type:nw, dest:page & result:response
+      Object.assign(postBack, {
+        type: "nw",
+        dest: "page",
+        result: response
+      });
+      console.log("Posting message for page", postBack)
+      window.postMessage(postBack);
     });
   }
 }, true);

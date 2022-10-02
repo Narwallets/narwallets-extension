@@ -1,5 +1,5 @@
 // -------------------------------------------------------------
-// Crypto-primitives *BROWSER ONLY* .- uses window.crypto.subtle
+// Crypto-primitives *BROWSER ONLY* .- uses crypto.subtle
 // -------------------------------------------------------------
 // based on: https://gist.github.com/Allegan/97a7b002837e21fa37a3e929c546ca11
 // async functions returning ArrayBuffer (undelying buffer for UInt8Array & other views)
@@ -8,18 +8,18 @@
 
 //random
 export function getRandomValues(byteLength:number):Uint8Array { 
-  return window.crypto.getRandomValues(new Uint8Array(byteLength))
+  return crypto.getRandomValues(new Uint8Array(byteLength))
 }
 
 //sha256
 export async function sha256Async(byt:Uint8Array|ArrayBuffer) 
 : Promise<ArrayBuffer>  {
-  return window.crypto.subtle.digest("SHA-256", byt)
+  return crypto.subtle.digest("SHA-256", byt)
 }
 //sha512
 export async function sha512Async(byt:Uint8Array|ArrayBuffer) 
 : Promise<ArrayBuffer>  {
-  return window.crypto.subtle.digest("SHA-512", byt);
+  return crypto.subtle.digest("SHA-512", byt);
 }
 
 // export pbkdf2_sha256_Async
@@ -41,7 +41,7 @@ async function pbkdf2Async(key:string, salt:string, iterations:number, shaAlgo:s
   const te = new TextEncoder()
 
   // turn password into a key object
-  const bytKey = await window.crypto.subtle.importKey(
+  const bytKey = await crypto.subtle.importKey(
       "raw",
       te.encode(key),
       "PBKDF2",
@@ -49,7 +49,7 @@ async function pbkdf2Async(key:string, salt:string, iterations:number, shaAlgo:s
       ["deriveBits"]
   )
 
-  return window.crypto.subtle.deriveBits(
+  return crypto.subtle.deriveBits(
       {
           "name": "PBKDF2",
           hash: {name: shaAlgo}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"

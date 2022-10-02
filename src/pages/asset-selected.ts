@@ -1,5 +1,6 @@
 import * as c from "../util/conversions.js";
 import {
+  activeNetworkInfo,
   askBackground,
   askBackgroundAllNetworkAccounts,
   askBackgroundCallMethod,
@@ -8,7 +9,8 @@ import {
   askBackgroundSetAccount,
   askBackgroundViewMethod,
 } from "../background/askBackground.js";
-import { Asset, assetAddHistory, assetUpdateBalance, assetUpdateMetadata, asyncRefreshAccountInfoLastBalance, ExtendedAccountData, findAsset, findAssetIndex, History, newTokenFromMetadata, setAssetBalanceYoctos, updateTokenAssetFromMetadata } from "../data/account.js";
+import { Asset, assetAddHistory, assetUpdateBalance, assetUpdateMetadata, findAsset, findAssetIndex, History
+  ,newTokenFromMetadata, setAssetBalanceYoctos, updateTokenAssetFromMetadata } from "../data/account.js";
 import {
   isValidAccountID,
   CheckValidAmount,
@@ -54,7 +56,6 @@ import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { ASSET_HISTORY_TEMPLATE, nearDollarPrice } from "../data/global.js";
 import { backToMainPage, setLastSelectedAsset } from "./main.js";
 import { networkInterfaces } from "node:os";
-import { activeNetworkInfo } from "../index.js";
 import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 

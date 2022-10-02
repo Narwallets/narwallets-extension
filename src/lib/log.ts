@@ -1,9 +1,10 @@
-let _logEnabled = false
+let _logEnabled = 0
 
-export function logEnabled(onoff:boolean){
-    _logEnabled = onoff
+export function logEnabled(stream: number) {
+    _logEnabled = stream
 }
 
-export function log(...args:any){
-    if (_logEnabled) console.error(...args) //console.error so it gets on the extensions page error log
+export function log(...args: any) {
+    if (_logEnabled == 2) console.error(...args) // console.error so it gets on the extensions page error log
+    if (_logEnabled == 1) console.log(...args)
 }

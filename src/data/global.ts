@@ -8,9 +8,9 @@ import {
   localStorageSet,
   localStorageGet,
 } from "./util.js";
-import { showErr } from "../util/document.js";
+//import { showErr } from "../util/document.js";
 import { Account } from "./account.js"; //required for SecureState declaration
-import { askBackground, askBackgroundViewMethod } from "../background/askBackground.js";
+//import { askBackground, askBackgroundViewMethod } from "../background/askBackground.js";
 import { log } from "../lib/log.js";
 
 import * as clite from "../lib/crypto-lite/crypto-primitives-browser.js";
@@ -29,7 +29,7 @@ import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import type { StateStruct } from "./state-type.js";
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 import { GContact } from "./contact.js";
-import { activeNetworkInfo } from "../index.js";
+//import { activeNetworkInfo } from "../index.js";
 import { yton } from "../util/conversions.js";
 
 //---- GLOBAL STATE ----
@@ -42,7 +42,7 @@ export const EmptyState: StateStruct = {
 
 export var State = Object.assign({}, EmptyState);
 
-export var workingData = { unlockSHA: "" };
+//export var workingData = { unlockSHA: "" };
 
 type NetworkNameType = string;
 type AccountIdType = string;
@@ -94,8 +94,27 @@ export async function sha256PwdBase64Async(password: string): Promise<string> {
   return encodeBase64(new Uint8Array(hash));
 }
 
+
+export function saveUnlockSHA(unlockSHA:string) {
+  localStorageSet({ _us: unlockSHA });
+}
+export async function getUnlockSHA() {
+  return localStorageGet("_us")
+}
+export function clearUnlockSHA() {
+  localStorageRemove("_us");
+}
+
+export function isLocked() {
+  //DEBUG
+  // if (!SecureState) log("isLocked()? yes, !SecureState");
+  // else if (!SecureState.hashedPass)
+  //   log("isLocked()? yes, !SecureState.hashedPass");
+  return !SecureState || !SecureState.hashedPass;
+}
 export function lock(source: string) {
-  workingData.unlockSHA = "";
+  clearUnlockSHA()
+  // clear SecureState && SecureState.hashedPass
   SecureState = Object.assign({}, EmptySecureState);
   log("LOCKED from:" + source);
   log("LOCKED call stack:" + JSON.stringify(new Error().stack));
@@ -140,6 +159,7 @@ export async function createSecureStateAsync(password: string) {
   SecureState.hashedPass = await sha256PwdBase64Async(password);
   SecureState.accounts = {};
   saveSecureState();
+  saveUnlockSHA(SecureState.hashedPass)
 }
 
 export function saveSecureState() {
@@ -174,15 +194,6 @@ export function setCurrentUser(user: string) {
       saveState();
     } catch { }
   }
-}
-
-export function isLocked() {
-  //DEBUG
-  // if (!SecureState) log("isLocked()? yes, !SecureState");
-  // else if (!SecureState.hashedPass)
-  //   log("isLocked()? yes, !SecureState.hashedPass");
-
-  return !SecureState || !SecureState.hashedPass;
 }
 
 function decryptIntoJson(
@@ -231,7 +242,7 @@ export async function unlockSecureStateSHA(
   if (!encryptedState) throw Error(INVALID_USER_OR_PASS);
   const decrypted = decryptIntoJson(hashedPassBase64, encryptedState);
   SecureState = decrypted;
-  workingData.unlockSHA = hashedPassBase64; //auto-save on popup-unload (with expiry time)
+  saveUnlockSHA(hashedPassBase64)
   setCurrentUser(email); // set & save State.currentUser
 }
 
@@ -358,7 +369,7 @@ const RETRY_INTERVAL_MS = 10 * 1000; // 10 seconds in milliseconds
 let lastFetched = new Date().getTime() - FETCH_INTERVAL_MS;
 export async function getNarwalletsMetrics() {
   const elapsed = new Date().getTime() - lastFetched
-  if ( elapsed >= FETCH_INTERVAL_MS || (!narwalletsMetrics && elapsed >= RETRY_INTERVAL_MS)) {
+  if (elapsed >= FETCH_INTERVAL_MS || (!narwalletsMetrics && elapsed >= RETRY_INTERVAL_MS)) {
     try {
       let data = await fetch("https://validators.narwallets.com/metrics_json")
       narwalletsMetrics = await data.json()

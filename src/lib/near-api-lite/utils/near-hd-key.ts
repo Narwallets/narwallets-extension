@@ -25,7 +25,7 @@ async function hmac_sha512_Async(seed:ArrayBuffer, passwordSalt:ArrayBuffer) :Pr
     // console.log(JSON.stringify(Buffer.from(I)))
     // return I
 
-    const key = await window.crypto.subtle.importKey(
+    const key = await crypto.subtle.importKey(
         "raw", // raw format of the key - should be Uint8Array
         passwordSalt,
         { // algorithm details
@@ -36,7 +36,7 @@ async function hmac_sha512_Async(seed:ArrayBuffer, passwordSalt:ArrayBuffer) :Pr
         ["sign", "verify"] // what this key can do
     );
 
-    return window.crypto.subtle.sign(
+    return crypto.subtle.sign(
             "HMAC",
             key,
             seed

@@ -1,7 +1,8 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
-import { Account, Asset, setAssetBalanceYoctos, asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../data/account.js";
+import { Account, Asset, setAssetBalanceYoctos} from "../data/account.js";
+import { asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 import { selectAccountPopupList, selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 
@@ -12,6 +13,7 @@ import {
   localStorageSet,
 } from "../data/util.js";
 import {
+  accountMatchesNetwork, activeNetworkInfo,
   askBackground,
   askBackgroundAllNetworkAccounts,
   askBackgroundGetState,
@@ -20,7 +22,7 @@ import {
 import { D } from "../lib/tweetnacl/core/core.js";
 import { saveAccount } from "../data/global.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { accountMatchesNetwork, activeNetworkInfo, asideSwitchMode, autoRefresh, setIsDark } from "../index.js";
+import { asideSwitchMode, autoRefresh, setIsDark } from "../index.js";
 import { hideOkCancel } from "../util/okCancel.js";
 
 //--- content sections at MAIN popup.html
@@ -149,8 +151,8 @@ export async function show() {
   try {
     d.hideErr();
 
-    const selectAccountButton = new d.El("#topbar-left-button")
-    selectAccountButton.hide()
+    // const selectAccountButton = new d.El("#topbar-left-button")
+    // selectAccountButton.hide()
 
     //is locked?
     const locked = await askBackgroundIsLocked();

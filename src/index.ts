@@ -33,6 +33,7 @@ import { calculateDollarValue } from "./data/global.js";
 import { D, _0 } from "./lib/tweetnacl/core/core.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 import { initPopupHandlers } from "./util/popup-list.js";
+import { logEnabled } from "./lib/log.js";
 
 export const SINGLE_USER_EMAIL = "unique-user@narwallets.com"
 
@@ -59,16 +60,11 @@ let aside: d.El;
 
 let hambIsOpen = false;
 
-export var activeNetworkInfo: NetworkInfo;
-
 function updateNetworkIndicatorVisualState(info: NetworkInfo) {
   const currentNetworkDisplayName = new d.El("#current-network-display-name");
   currentNetworkDisplayName.innerText = info.displayName; //set name
   currentNetworkDisplayName.el.className = "circle " + info.color; //set indicator color
 }
-
-// function to check if the account matches active network
-export const accountMatchesNetwork = (accName: string) => accName && activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)
 
 export function setIsDark(d: boolean) {
   isDark = d
@@ -89,10 +85,10 @@ async function networkItemClicked(e: Event) {
     d.byId(NETWORKS_LIST).classList.remove(d.OPEN); //hides
 
     //update global state (background)
-    activeNetworkInfo = await askBackgroundSetNetwork(networkName);
+    const ni = await askBackgroundSetNetwork(networkName);
     //update indicator visual state
-    updateNetworkIndicatorVisualState(activeNetworkInfo);
-    Import_onNetworkChanged(activeNetworkInfo);
+    updateNetworkIndicatorVisualState(ni);
+    Import_onNetworkChanged(ni);
 
     // Account_onNetworkChanged(activeNetworkInfo);
     //on network-change restart the page-flow
@@ -313,13 +309,16 @@ async function initPopup() {
   if (Date.now() < initPopupTimestamp + 100) return;
   initPopupTimestamp = Date.now()
 
+  logEnabled(1);
+
   chrome.alarms.clear("unlock-expired");
   //console.log(new Date().toISOString(), "enter initPopup()")
 
   //update network indicator visual state
-  activeNetworkInfo = await askBackgroundGetNetworkInfo();
-  updateNetworkIndicatorVisualState(activeNetworkInfo);
-  Import_onNetworkChanged(activeNetworkInfo);
+  const ni = await askBackgroundGetNetworkInfo();
+  console.log(ni)
+  updateNetworkIndicatorVisualState(ni);
+  Import_onNetworkChanged(ni);
 
   hamb = new d.El(".hamb");
   aside = new d.El("aside");
@@ -414,54 +413,53 @@ function openTermsOfUseOnNewWindow() {
   return false;
 }
 
-//event to inform background.js we're unloading (starts auto-lock timer)
-addEventListener(
-  "unload",
-  function (event) {
-    //@ts-ignore
-    background.postMessage({ code: "popupUnloading" }, "*");
-  },
-  true
-);
+// //event to inform background.js we're unloading (starts auto-lock timer)
+// addEventListener(
+//   "unload",
+//   function (event) {
+//     //@ts-ignore
+//     background.postMessage({ code: "popupUnloading" }, "*");
+//   },
+//   true
+// );
 
-//listen to background messages
-chrome.runtime.onMessage.addListener(function (msg) {
-  if (msg.code == "can-init-popup") {
-    initPopup();
-  }
-});
+// //listen to background messages
+// chrome.runtime.onMessage.addListener(function (msg) {
+//   if (msg.code == "can-init-popup") {
+//     initPopup();
+//   }
+// });
 
 window.onload = function () {
+  initPopup();
   // dark light mode
   // default is dark
-  chrome.storage.local.get("popupConfig", (obj) => {
-    if (chrome.runtime.lastError) {
-      console.log(JSON.stringify(chrome.runtime.lastError));
-    }
-    else {
-      //console.log(obj);
-      if (obj?.popupConfig?.lightMode) {
-        switchDarkLight();
-      }
-    }
-  });
-
+  // chrome.storage.local.get("popupConfig", (obj) => {
+  //   if (chrome.runtime.lastError) {
+  //     console.log(JSON.stringify(chrome.runtime.lastError));
+  //   }
+  //   else {
+  //     //console.log(obj);
+  //     if (obj?.popupConfig?.lightMode) {
+  //       switchDarkLight();
+  //     }
+  //   }
+  // });
 };
 
-var background: Window | undefined;
-//wake-up background page
-//WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
-chrome.runtime.getBackgroundPage((bgpage) => {
-  if (chrome.runtime.lastError) {
-    console.error(JSON.stringify(chrome.runtime.lastError));
-    alert(chrome.runtime.lastError);
-  } else {
-    background = bgpage;
-
-    //@ts-ignore
-    background.postMessage({ code: "popupLoading" }, "*");
-    //will reply with "can-init-popup" after retrieving data from localStorage
-  }
-});
+// var background: Window | undefined;
+// //wake-up background page
+// //WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
+// chrome.runtime.getBackgroundPage((bgpage) => {
+//   if (chrome.runtime.lastError) {
+//     console.error(JSON.stringify(chrome.runtime.lastError));
+//     alert(chrome.runtime.lastError.message);
+//   } else {
+//     background = bgpage;
+//     //@ts-ignore
+//     background.postMessage({ code: "popupLoading" }, "*");
+//     //will reply with "can-init-popup" after retrieving data from localStorage
+//   }
+// });
 
 
