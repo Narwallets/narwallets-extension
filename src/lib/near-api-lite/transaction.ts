@@ -2,7 +2,7 @@ import { Enum, Assignable } from './utils/enums.js';
 import { serialize, deserialize } from './utils/serialize.js';
 import { KeyType, CurveAndArrayKey } from './utils/key-pair.js';
 import { KeyPair } from './utils/key-pair.js';
-import { stringFromArray } from '../crypto-lite/encode.js';
+import { stringFromArray, Uint8ArrayFromString } from '../crypto-lite/encode.js';
 
 export class FunctionCallPermission extends Assignable {
     allowance?: bigint;
@@ -103,7 +103,7 @@ export class Transaction extends Assignable {
         return serialize(SCHEMA, this);
     }
 
-    static decode(bytes: Buffer): Transaction {
+    static decode(bytes: Uint8Array): Transaction {
         return deserialize(SCHEMA, Transaction, bytes);
     }
 }
@@ -116,7 +116,7 @@ export class SignedTransaction extends Assignable {
         return serialize(SCHEMA, this);
     }
 
-    static decode(bytes: Buffer): SignedTransaction {
+    static decode(bytes: Uint8Array): SignedTransaction {
         return deserialize(SCHEMA, SignedTransaction, bytes);
     }
 }

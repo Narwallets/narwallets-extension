@@ -1,5 +1,6 @@
-import { fromBE, toBufferLE } from '../../crypto-lite/bigint-buffer.js';
+import { concatU8Arrays, fromBE, toBufferLE } from '../../crypto-lite/bigint-buffer.js';
 import * as bs58 from '../../crypto-lite/bs58.js';
+import { stringFromUint8Array, Uint8ArrayFromString } from '../../crypto-lite/encode.js';
 
 const INITIAL_LENGTH = 1024;
 
@@ -23,29 +24,37 @@ export class BorshError extends Error {
 
 /// Binary encoder.
 export class BinaryWriter {
-    buf: Buffer;
+    buf: Uint8Array;
     length: number;
 
     public constructor() {
-        this.buf = Buffer.alloc(INITIAL_LENGTH);
+        this.buf = new Uint8Array(INITIAL_LENGTH);
         this.length = 0;
     }
 
     maybe_resize() {
-        if (this.buf.length < 16 + this.length) {
-            this.buf = Buffer.concat([this.buf, Buffer.alloc(INITIAL_LENGTH)]);
+        if (this.buf.byteLength < this.length + 16) {
+            const newArray = new Uint8Array(this.buf.byteLength + INITIAL_LENGTH);
+            newArray.set(this.buf.slice(0,this.length))
+            this.buf = newArray
         }
     }
 
     public write_u8(value: number) {
+        if (value<0||value>0xff) throw Error("u8 out fo range")
         this.maybe_resize();
-        this.buf.writeUInt8(value, this.length);
+        this.buf[this.length]=value
         this.length += 1;
     }
 
     public write_u32(value: number) {
+        if (value<0||value>0xffffffff) throw Error("u32 out fo range")
         this.maybe_resize();
-        this.buf.writeUInt32LE(value, this.length);
+        // writeUInt32LE 
+        this.buf[this.length + 3] = (value >>> 24)
+        this.buf[this.length + 2] = (value >>> 16)
+        this.buf[this.length + 1] = (value >>> 8)
+        this.buf[this.length] = (value & 0xff)
         this.length += 4;
     }
 
@@ -59,21 +68,20 @@ export class BinaryWriter {
         this.write_buffer(toBufferLE(value,16));
     }
 
-    private write_buffer(buffer: Buffer) {
-        // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
-        this.buf = Buffer.concat([Buffer.from(this.buf.subarray(0, this.length)), buffer, Buffer.alloc(INITIAL_LENGTH)]);
-        this.length += buffer.length;
+    private write_buffer(toAppend: Uint8Array) {
+        this.buf = concatU8Arrays(this.buf.slice(0,this.length), toAppend ) 
+        this.length += toAppend.length;
     }
 
     public write_string(str: string) {
+        const b = Uint8ArrayFromString(str);
         this.maybe_resize();
-        const b = Buffer.from(str, 'utf8');
-        this.write_u32(b.length);
+        this.write_u32(b.byteLength);
         this.write_buffer(b);
     }
 
     public write_fixed_array(array: Uint8Array) {
-        this.write_buffer(Buffer.from(array));
+        this.write_buffer(array);
     }
 
     public write_array(array: any[], fn: any) {
@@ -86,7 +94,7 @@ export class BinaryWriter {
     }
 
     public toArray(): Uint8Array {
-        return this.buf.subarray(0, this.length);
+        return this.buf.slice(0, this.length);
     }
 }
 
@@ -99,7 +107,7 @@ function handlingRangeError(target: any, propertyKey: string, propertyDescriptor
             if (e instanceof RangeError ) {
                 const code = (e as any).code;
                 if (['ERR_BUFFER_OUT_OF_BOUNDS', 'ERR_OUT_OF_RANGE'].indexOf(code) >= 0) {
-                    throw new BorshError('Reached the end of buffer when deserializing');
+                    throw new BorshError('Reached the end of uint8array when deserializing');
                 }
             }
             throw e;
@@ -108,24 +116,28 @@ function handlingRangeError(target: any, propertyKey: string, propertyDescriptor
 }
 
 export class BinaryReader {
-    buf: Buffer;
+    buf: Uint8Array;
     offset: number;
 
-    public constructor(buf: Buffer) {
+    public constructor(buf: Uint8Array) {
         this.buf = buf;
         this.offset = 0;
     }
 
     @handlingRangeError
     read_u8(): number {
-        const value = this.buf.readUInt8(this.offset);
+        const value = this.buf[this.offset];
         this.offset += 1;
         return value;
     }
 
     @handlingRangeError
     read_u32(): number {
-        const value = this.buf.readUInt32LE(this.offset);
+        const value = (
+            (this.buf[this.offset]) |
+            (this.buf[this.offset + 1] << 8) |
+            (this.buf[this.offset + 2] << 16)) +
+            (this.buf[this.offset + 3] * 0x1000000)
         this.offset += 4;
         return value;
     }
@@ -142,9 +154,9 @@ export class BinaryReader {
         return fromBE(buf);
     }
 
-    private read_buffer(len: number): Buffer {
+    private read_buffer(len: number): Uint8Array {
         if ((this.offset + len) > this.buf.length) {
-            throw new BorshError(`Expected buffer length ${len} isn't within bounds`);
+            throw new BorshError(`Expected uint8array length ${len} isn't within bounds`);
         }
         const result = this.buf.slice(this.offset, this.offset + len);
         this.offset += len;
@@ -153,18 +165,18 @@ export class BinaryReader {
 
     @handlingRangeError
     read_string(): string {
-        const len = this.read_u32();
-        const buf = this.read_buffer(len);
+        const len = this.read_u32()
+        const buf = this.read_buffer(len)
         try {
-            return buf.toString("utf8");
+            return stringFromUint8Array(buf)
         } catch (e) {
-            throw new BorshError(`Error decoding UTF-8 string: ${e}`);
+            throw new BorshError(`Error decoding UTF-8 string: ${e}`)
         }
     }
 
     @handlingRangeError
     read_fixed_array(len: number): Uint8Array {
-        return new Uint8Array(this.read_buffer(len));
+        return this.read_buffer(len);
     }
 
     @handlingRangeError
@@ -304,11 +316,11 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
 }
 
 /// Deserializes object from bytes using schema.
-export function deserialize(schema: Schema, classType: any, buffer: Buffer): any {
-    const reader = new BinaryReader(buffer);
+export function deserialize(schema: Schema, classType: any, ui8arr: Uint8Array): any {
+    const reader = new BinaryReader(ui8arr);
     const result = deserializeStruct(schema, classType, reader);
-    if (reader.offset < buffer.length) {
-        throw new BorshError(`Unexpected ${buffer.length - reader.offset} bytes after deserialized data`);
+    if (reader.offset < ui8arr.length) {
+        throw new BorshError(`Unexpected ${ui8arr.length - reader.offset} bytes after deserialized data`);
     }
     return result;
 }
