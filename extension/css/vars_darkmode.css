@@ -10,7 +10,7 @@ body, button {
 }
 
 @supports (font-variation-settings: normal) {
-	body, button {
+	body, button, input {
 		font-family: 'Inter var', sans-serif !important;
 	}
 }

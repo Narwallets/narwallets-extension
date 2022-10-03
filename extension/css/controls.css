@@ -16,21 +16,24 @@
     position                  : absolute;
     border-style              : solid;
     border-width              : 1px;
-    border-radius             : 16px;
+    border-radius: 15px;
     border-top-right-radius   : 0px;
     border-bottom-right-radius: 0px;
     /* padding                   : 5px; */
-    /* padding-left              : 29px; */
-    text-align                : center;
-    width: 322px;
+    padding-top: 5px;
+    text-align: center;
+    width: 295px;
     height                    : 32px;
-    left: 68px;
+    left: 67px;
     /* top: 11px; */
     border-color              : var(--InputBorder);
     background-color          : var(--ControlBackground);
     color                     : var(--ControlAltText);
     margin: 0px 0px;
     /* align-self: end; */
+    padding-left: 29px;
+    font-size: 20px;
+    font-weight: 300;
 }
 
 /*.inputboxwithbutton input[type="text"] {
@@ -57,7 +60,7 @@
     text-align                : center;
     width                     : 54px;
     height                    : 32px;
-    left: 387px;
+    left: 359px;
     /* top                       : 11px; */
     border-top-right-radius   : 16px;
     border-bottom-right-radius: 16px;

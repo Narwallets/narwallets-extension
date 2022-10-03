@@ -414,7 +414,7 @@ h5 {
   position: absolute;
   left    : 10px;
   right   : 10px;
-  top: 52px;
+  bottom: 100px;
   z-index : 999;
   display: flex;
   flex-flow: column;
@@ -425,14 +425,14 @@ h5 {
   color           : darkred;
   text-align      : center;
   margin: 3;
-  padding-top: 4px;
-  padding-bottom: 5px;
-  padding-right: 14px;
-  padding-left: 10px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  padding-right: 17px;
+  padding-left: 13px;
   background-color: #981313;
-  color           : wheat;
-  border          : 1px solid wheat;
-  border-radius   : 12px;
+  color: #faf0de;
+  /* border          : 1px solid wheat; */
+  border-radius: 6px;
   box-shadow      : 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   opacity         : 0;
   font-size       : 15px;
