@@ -19,6 +19,7 @@ export function OkCancelInit() {
 //Aca no ocultamos automaticamente por si hay error.
 export function confirmClicked(ev: Event) {
   try {
+    d.hideErr()
     if (confirmFunction) confirmFunction(ev);
   } catch (ex) {
     d.showErr(ex.message);
@@ -28,6 +29,7 @@ export function confirmClicked(ev: Event) {
 
 export function cancelClicked(ev: Event) {
   try {
+    d.hideErr()
     hideOkCancel();
     if (cancelFunction) cancelFunction(ev);
   } catch (ex) {
