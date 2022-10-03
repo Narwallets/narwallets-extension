@@ -40,7 +40,7 @@
   left: 9px;
   width: 457px;
   padding        : 0px;
-  height: 64px;
+  height: 57px;
   margin         : 0px;
   padding-top    : 5px;
   display        : inline-flex;
@@ -128,18 +128,20 @@
   color           : var(--BlockText);
   background-color: var(--Block);
   height: 44px;
-  width           : 420px;
+  width: 405px;
   overflow-wrap   : break-word;
   word-break      : break-word;
   white-space     : initial;
   overflow        : hidden;
   font-size       : 22px;
   font-weight     : 200;
-  border-radius   : 5px 5px 0 0;
+  border-radius: 6px 6px 0 0;
   padding-left    : 35px;
   padding-right   : 30px;
   padding-top     : 7px;
   padding-bottom  : 7px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .accountdetscomment {
@@ -149,8 +151,9 @@
   align-items: center;
   color: var(--BlockText);
   background-color: var(--Block);
-  margin       : auto;
+  margin-left: 5px;
   margin-top: 0px;
+  margin-right: 5px;
   margin-bottom: 0px;
   max-height : 24px;
   height     : 15px;
@@ -160,6 +163,7 @@
   font-size  : 12px;
   font-weight: 200;
   padding-bottom: 5px;
+  border-radius: 0 0 6px 6px;
 }
 
 .accountdetssymbol {
@@ -241,8 +245,8 @@ span#icon img {
 .accountdetsfiat {
   display      : inline-block;
   margin-bottom: 0px;
-  max-height   : 24px;
-  height       : 28px;
+  /* max-height   : 24px; */
+  height: 29px;
   padding      : 0px;
   font-weight  : 400;
   text-align   : center;
@@ -252,6 +256,8 @@ span#icon img {
   color        : var(--TextGeneric);
   font-size: 90%;
   font-weight  : 400;
+  position: relative;
+  top: -4px;
 }
 
 .asset_in_usd {

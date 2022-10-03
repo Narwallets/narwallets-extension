@@ -8,8 +8,8 @@
 
 .tab {
   cursor: pointer;
-  padding-top: 0px;
-  padding-bottom: 10px;
+  padding-top: 2px;
+  padding-bottom: 8px;
   height: 10px;
   width: auto;
   margin: 0px;
@@ -18,9 +18,10 @@
   margin-bottom: 7px;
   background: transparent;
   display: inline-block;
-  color:var(--ControlAltText);
-  border-width: 2px;
-  border-style: none; 
+  color:
+  var(--ControlAltText);
+  border-width: 1px;
+  border-style: none;
 }
 
 .tab:hover {
@@ -72,8 +73,4 @@
 
 .radio.one:checked ~ .tabs .tab.one,
 .radio.two:checked ~ .tabs .tab.two,
-.radio.three:checked ~ .tabs .tab.three {
-
-  border-bottom-style: solid;
-  
-}
+.radio.three:checked ~ .tabs .tab.three {border-bottom-style: solid;}

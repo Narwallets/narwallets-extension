@@ -17,11 +17,13 @@ import {
   BatchTransaction,
 } from "../lib/near-api-lite/batch-transaction.js";
 
-import { changePasswordAsync, clearState, createUserAsync, getAccount, getNetworkAccountsCount, 
-    getUnlockSHA, 
-    isLocked, lock, recoverState, saveSecureState, secureState, 
-    secureStateOpened, 
-    state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA } from "./background-state.js";
+import {
+  changePasswordAsync, clearState, createUserAsync, getAccount, getNetworkAccountsCount,
+  getUnlockSHA,
+  isLocked, lock, recoverState, saveSecureState, secureState,
+  secureStateOpened,
+  state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA
+} from "./background-state.js";
 import { Account, Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 
 
@@ -977,7 +979,7 @@ chrome.alarms.onAlarm.addListener(function (alarm: any) {
   }
 });
 
-var lockTimeout: any;
+// var lockTimeout: any;
 var unlockExpire: any;
 
 // //only to receive "popupLoading"|"popupUnloading" events
@@ -1014,12 +1016,12 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
   if (stateIsEmpty()) {
     await recoverState();
   }
-  log(`dataVersion ${state.dataVersion} || user ${state.currentUser}`);
+  log(`isLocked ${isLocked()} dataVersion ${state.dataVersion} || user ${state.currentUser}`);
   // validate dataVersion
   if (!state.dataVersion) {
     clearState();
   }
-  
+
   // ----------------------------
   // here we have a base state
   // ----------------------------
@@ -1039,17 +1041,8 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
     return;
   }
 
-  if (isLocked()) {
-    return;
-  }
-
-  // not locked
-  if (lockTimeout) {
-    clearTimeout(lockTimeout);
-  }
-
   if (secureStateOpened()) {
-    log("BK-init secureState was opened, has ", secureState.accounts.length, "accounts")
+    log("BK-init secureState already opened, has ", getNetworkAccountsCount(), "accounts")
     // cached
     return
   }

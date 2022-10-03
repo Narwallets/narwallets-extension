@@ -29,8 +29,8 @@ import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
 
 import type { NetworkInfo } from "./lib/near-api-lite/network.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
-import { initPopupHandlers } from "./util/popup-list.js";
-import { logEnabled } from "./lib/log.js";
+import { closePopupList, initPopupHandlers } from "./util/popup-list.js";
+import { log, logEnabled } from "./lib/log.js";
 import { fetchNearDollarPrice } from "./data/price-data.js";
 import { activeNetworkInfo } from "./askBackground.js";
 
@@ -54,7 +54,7 @@ const NETWORKS_LIST = "networks-list";
 
 let isDark = true;
 
-let hamb: d.El;
+export let hamb: d.El;
 let aside: d.El;
 
 let hambIsOpen = false;
@@ -120,7 +120,7 @@ function hambClose() {
   if (hambIsOpen) hambClicked()
 }
 
-function buildMRU() {
+export function buildMRU() {
   // show MRUs
   getAccountsForPopupList().then((list) => {
     list.sort((a, b) => (b.order || 0) - (a.order || 0));
@@ -154,9 +154,10 @@ function hambClicked() {
 
 async function asideLock() {
   await askBackground({ code: "lock" });
-  hambClicked();
-  hideOkCancel();
-  await UnlockPage_show();
+  hambClicked()
+  hideOkCancel()
+  //await UnlockPage_show();
+  window.close()
 }
 
 function asideExpand() {
@@ -216,6 +217,7 @@ function asideAbout() {
 
 async function asideOptions() {
   if (await asideIsUnlocked()) {
+    closePopupList();
     securityOptions();
   }
 }
@@ -223,6 +225,7 @@ async function asideOptions() {
 async function changePassword() {
   if (await asideIsUnlocked()) {
     hideOkCancel();
+    closePopupList();
     d.showPage(Main.CHANGE_PASSWORD);
     ChangePass_addListeners();
   }
@@ -235,6 +238,7 @@ function asideCreateUserClicked() {
 async function asideAddAccount() {
   if (await asideIsUnlocked()) {
     hideOkCancel();
+    closePopupList();
     Main.addAccountClicked();
   }
 }
@@ -246,8 +250,9 @@ async function asideChangePassword() {
 }
 
 async function asideAddressBook() {
-  hideOkCancel();
   if (await asideIsUnlocked()) {
+    hideOkCancel();
+    closePopupList();
     AddressBook_show();
   }
 }
@@ -289,9 +294,11 @@ export function switchDarkLight(): string {
 function selectAccountMru(event: Event) {
   try {
     // TODO: remember & select MRU accounts per network
-    const accName = (event.target as HTMLElement).innerText.split("(")[0]
+    const accName = (event.target as HTMLElement).innerText.split("(")[0].trim()
+    // log("selectAccountMru |"+accName+"|")
     if (accName) {
       hambClose()
+      closePopupList()
       show(accName)
     }
   }
@@ -381,8 +388,8 @@ async function initPopup() {
 
 let refreshing: boolean = false;
 export async function autoRefresh() {
-  
-  return; // WHILE DEBUGGING
+
+  //return; // WHILE DEBUGGING
 
   //console.log(refreshing ? "SKIP" : "DO", "autoRefresh enter", d.activePage, "already refreshing?", refreshing)
   if (refreshing) return;

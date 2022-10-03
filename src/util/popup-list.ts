@@ -11,7 +11,7 @@ let searchString = "";
 export type PopupItem = { text: string, value: string, order?:number }
 
 export function initPopupHandlers() {
-    d.onClickId(POPUP_LIST_APPFACE, closePopupList)
+    d.onClickId(POPUP_LIST_APPFACE, escapePopup)
 }
 
 let popupClickHandler: Function;
@@ -71,6 +71,11 @@ function markItemAsSelected() {
     })
 }
 
+function escapePopup(){
+    closePopupList();
+    popupEscapeHandler && popupEscapeHandler()
+}
+
 function onPopupKeyDown(event: KeyboardEvent) {
 
     // console.log("onPopupKeyDown",popupOpened,JSON.stringify(event))
@@ -80,8 +85,7 @@ function onPopupKeyDown(event: KeyboardEvent) {
 
     //If ESC key, close the popup
     if (event.key === "Escape") {
-        closePopupList();
-        popupEscapeHandler && popupEscapeHandler()
+        escapePopup()
         return;
     }
 

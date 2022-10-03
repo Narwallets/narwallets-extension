@@ -7,7 +7,7 @@ import { Account, newAccount } from "../structs/account-info.js";
 
 import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import type { SeedPhraseResult } from "../lib/near-api-lite/utils/seed-phrase.js";
-import { backToMainPage, backToMainPageClicked } from "./main.js";
+import { backToSelectAccount, backToMainPageClicked } from "./main.js";
 import { encodeHex } from "../lib/crypto-lite/encode.js";
 
 
@@ -44,7 +44,7 @@ async function createImplicitAccount_Step1() {
     d.onClickId("create-implicit-account-back-to-account", backToMainPageClicked);
     d.byId("seed-phrase-show-box").innerText = seedResult.seedPhrase.join(" ");
     d.onClickId("seed-phrase-continue", createImplicitAccount_Step2);
-    d.onClickId("seed-phrase-cancel", backToMainPage);
+    d.onClickId("seed-phrase-cancel", backToSelectAccount);
   }
   catch (ex) {
     d.showErr(ex.message)

@@ -22,6 +22,7 @@ import {
 } from "./account-selected.js";
 import { checkIfAccountExists } from "../util/search-accounts.js";
 import type { PopupItem } from "../util/popup-list.js";
+import {show as Main_show} from "./main.js";
 
 export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
@@ -107,9 +108,8 @@ function backToAccountsClicked() {
   if (selectedAccountData && selectedAccountData.name != "") {
     AccountSelectedPage_show(selectedAccountData.name, undefined);
   } else {
-    d.clearContainer("address-list");
-    d.showPage("account-list-main");
     hideOkCancel();
+    Main_show();
   }
 }
 

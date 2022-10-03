@@ -84,7 +84,7 @@ import {
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { autoRefresh } from "../index.js";
+import { autoRefresh, buildMRU } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 import { asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 import { getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/price-data.js";
@@ -114,7 +114,8 @@ export async function show(
 ) {
 
   // ask to select another if account does not matches network
-  if (!accountMatchesNetwork(accName)) {
+  if (!accName || !accountMatchesNetwork(accName)) {
+    //loop exit if last account was removed, is empty or not valid
     selectAccountPopupList()
     return;
   }
@@ -213,7 +214,7 @@ async function popupListAddressEscaped() {
 }
 
 function backLinkClicked() {
-  Main.backToMainPage();
+  Main.backToSelectAccount();
   hideOkCancel();
 }
 
@@ -451,7 +452,9 @@ async function selectAndShowAccount(accName: string) {
   }).catch(); //ignore if error
 
   const accInfo = await askBackgroundGetAccountRecordCopy(accName);
-  if (!accInfo) throw new Error("Account is not in this wallet: " + accName);
+  if (!accInfo) {
+    throw new Error("Account is not in this wallet: " + accName);
+  }
 
   // get balance from chain (launch async)
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
@@ -1445,7 +1448,7 @@ export async function searchMoreAssets(exAccData: ExtendedAccountData, includePo
 
     for (let pool of allOfThem) {
       if (!checked[pool.account_id]) {
-        doingDiv.innerText = "Pool " + pool.account_id;
+        doingDiv.innerText = "Check pool " + pool.account_id;
         let isStakingPool = true;
         let poolAccInfo;
         try {
@@ -1886,10 +1889,9 @@ async function removeAccountRecord_and_go_to_account_pages() {
     code: "remove-account",
     accountId: selectedAccountData.name,
   });
-  // avoid reposition on removed account
-  await localStorageGetAndRemove("account");
-  //return to main page
-  await AccountPages_show();
+  buildMRU()
+  //return to main page (no account selected)
+  Main.backToSelectAccount()
 }
 
 //---------------------------------------

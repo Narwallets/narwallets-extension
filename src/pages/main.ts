@@ -21,7 +21,7 @@ import {
 } from "../askBackground.js";
 import { D } from "../lib/tweetnacl/core/core.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { asideSwitchMode, autoRefresh, setIsDark } from "../index.js";
+import { asideSwitchMode, autoRefresh, hamb, setIsDark } from "../index.js";
 import { hideOkCancel } from "../util/okCancel.js";
 
 //--- content sections at MAIN popup.html
@@ -156,6 +156,7 @@ export async function show() {
     //is locked?
     const locked = await askBackgroundIsLocked();
     if (locked) {
+      hamb.hide()
       //do a user exists?
       const state = await askBackgroundGetState();
       if (state.usersList.length == 0) {
@@ -167,6 +168,8 @@ export async function show() {
       await UnlockPage_show();
       return; //*****
     }
+
+    hamb.show()
 
     //logged-in and with no accounts? add an account
     const countAccounts = await askBackground({
@@ -259,6 +262,7 @@ export async function show() {
     // refreshAccountListBalances()
 
   } catch (ex) {
+    hamb.hide()
     await UnlockPage_show(); //show the unlock-page
     d.showErr(ex.message);
   } finally {
@@ -302,10 +306,12 @@ async function tryReposition() {
   }
 }
 
-export async function backToMainPage() {
+export async function backToSelectAccount() {
   //remove selected account auto-click
   localStorageRemove("account");
-  selectedAccountData.name = ""; // mark as no account selected
+  localStorageRemove("currentAccountId")
+  localStorageRemove("lastSelectedAccountByNetwork_" + activeNetworkInfo.name)
+  if (selectedAccountData) selectedAccountData.name = ""; // mark as no account selected
   await show();
   //autoRefresh();
 }

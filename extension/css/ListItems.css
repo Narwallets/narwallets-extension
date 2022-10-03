@@ -72,13 +72,14 @@
 /*#region asset*/
 
 .accountdetsassets {
-  font-size : 1;
+  /* font-size : 1; */
   position  : relative;
-  width     : 449px;
+  width: 449px;
   height    : 68px;
   display   : block;
   background: var(--Background);
-  left      : 16px;
+  left: 8px;
+  /* padding-left: 8px; */
 }
 
 .accountdetsassets:hover {
@@ -106,14 +107,14 @@
   position        : absolute;
   display         : block;
   font-size       : 12px;
-  top             : 2px;
-  left            : 0px;
-  width           : 436px;
+  top: 3px;
+  left: 5px;
+  width: 430px;
   height          : 16px;
   padding-top     : 5px;
   padding-right   : 5px;
   border-style    : none;
-  border-radius   : 0px;
+  border-radius: 5px;
   background-color: var(--Block);
   text-align      : right;
   font-weight     : 250;
@@ -124,7 +125,7 @@
 .accountasseticon svg {
   position: absolute;
   top     : 27px;
-  left    : 7px;
+  left    : 13px;
   width   : 26px;
   height  : 26px;
 
@@ -208,8 +209,8 @@
   display         : block;
   font-size       : 12px;
   top             : 0px;
-  left            : 0px;
-  width           : 464px;
+  left: 4px;
+  width: 449px;
   height          : 16px;
   padding-top     : 5px;
   padding-right   : 5px;

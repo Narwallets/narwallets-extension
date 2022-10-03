@@ -16,7 +16,7 @@ svg line {
 .hamb {
   position      : absolute;
   top           : 4px;
-  left: 5px;
+  left          : 5px;
   border-radius : 6px;
   max-width     : 40px;
   padding       : 5px;
@@ -25,11 +25,7 @@ svg line {
   color         : #a0aec0;
   color         : rgba(160, 174, 192, var(--text-opacity));
   border-style  : none;
-  z-index       : 99;
-}
-
-.hamb.open {
-  z-index: 100;
+  z-index       : 120;
 }
 
 .open svg {
@@ -55,15 +51,15 @@ aside {
   position        : absolute;
   line-height     : 2;
   top             : 0;
-  left: -493px;
-  transition: transform 0.2s ease-in-out;
+  left            : -493px;
+  transition      : transform 0.2s ease-in-out;
   background-color: var(--Background);
-  z-index         : 99;
+  z-index         : 101;
   opacity         : 1;
   width           : 100%;
   height          : 100%;
-  padding-top: 45px;
-  font-size: 7pt;
+  padding-top     : 45px;
+  font-size       : 7pt;
 }
 
 aside.open {
@@ -85,13 +81,13 @@ aside.open {
 
 aside>nav>hr {
   border: 0;
-  width: 90%;
+  width : 90%;
   height: 1px;
   background-image: linear-gradient(to left,
       rgb(39 98 252 / 2%),
       rgb(1 157 177),
       rgb(1 157 177));
-  opacity: 0.7;
+  opacity  : 0.7;
   /* margin: 3px 0px; */
 }
 
@@ -103,12 +99,12 @@ aside>nav {
 
 aside>nav>li {
   flex        : 1 1;
-  width: 419px;
-  text-align: left;
-  padding: 4px 10px;
-  margin-left: 18px;
-  line-height: 1.5em;
-  font-size: 1.5em;
+  width       : 419px;
+  text-align  : left;
+  padding     : 4px 10px;
+  margin-left : 18px;
+  line-height : 1.5em;
+  font-size   : 1.5em;
   font-weight : 250;
   z-index     : 93;
   margin-right: 10px;
@@ -117,6 +113,13 @@ aside>nav>li {
 aside>nav>li:hover {
   background-color: var(--HoverColor);
   cursor          : pointer;
+}
+
+aside>nav>li>svg {
+  position: relative;
+  top: 5px;
+  padding-right: 2px;
+  width: 14px;
 }
 
 /* more-than 640px 
@@ -136,8 +139,8 @@ aside>nav>li:hover {
 aside .logo-128 {
   opacity : 0.88;
   position: absolute;
-  bottom: 64px;
-  right: 20px;
+  bottom  : 64px;
+  right   : 20px;
   z-index : 94;
 }
 
@@ -150,23 +153,23 @@ NETWORK selection drop-down
 .network-component.pointer {
   /* border       : 1px solid var(--ControlAccent); */
   border-radius: 24px;
-  margin-left: 149px;
-  padding: 2px;
-  width: 157px;
+  margin-left  : 149px;
+  padding      : 2px;
+  width        : 157px;
   flex         : 0 0 auto;
   display      : flex;
   z-index      : 99;
-  margin-top: 4px;
+  margin-top   : 4px;
 }
 
 .network-indicator {
   display    : flex;
-  width: 146px;
+  width      : 146px;
   align-items: center;
   color      : var(--Block);
   font-weight: 400;
   flex-flow  : row nowrap;
-  height: 22px;
+  height     : 22px;
 }
 
 li {
@@ -178,23 +181,23 @@ li {
 
 li#current-network-display-name {
   max-height: 20px;
-  width: 125px;
+  width     : 125px;
   color     : var(--TextGeneric);
   cursor    : pointer;
-  font-size: 98%;
+  font-size : 98%;
 }
 
 .circle:before {
   display      : inline-block;
   content      : "";
   border       : 2px solid #7f8186bd;
-  margin: -2px 6px;
-  padding-top: 1px;
+  margin       : -2px 6px;
+  padding-top  : 1px;
   width        : 10px;
   height       : 10px;
   border-radius: 7px;
-  /* position: relative; */
-  top: 1px;
+  /* position  : relative; */
+  top          : 1px;
 }
 
 .circle.green:before {
@@ -251,25 +254,25 @@ li#current-network-display-name {
 }
 
 .combo-list-appface.open {
-  top             : 0px;
-  opacity: 0.96;
-  background-color: var(--Background);
-  border          : 1px solid var(--HighLight);
-  text-align      : center;
-  box-shadow      : 0px 0px 7px var(--HighLight);
-  margin-top: 0px;
+  top                : 48px;
+  opacity            : 0.96;
+  background-color   : var(--Background);
+  /* border          : 1px solid var(--HighLight); */
+  text-align         : center;
+  box-shadow         : 0px 0px 7px var(--HighLight);
+  margin-top         : 0px;
 }
 
 .combo-list-title {
-  text-align      : left;
-  color: var(--TextGeneric);
+  text-align: left;
+  color     : var(--TextGeneric);
 }
 
-.combo-list-filter{
-  top: 557px;
+.combo-list-filter {
+  top             : 51px;
   position        : absolute;
-  bottom           : 20px;
-  max-height: 15px;
+  right           : 20px;
+  max-height      : 15px;
   overflow-y      : scroll;
   opacity         : 1;
   transition      : opacity 0.25s ease-in-out;
@@ -290,13 +293,13 @@ li#current-network-display-name {
 }
 
 .combo-list-box.open {
-  color: var(--ControlText);
-  top             : auto;
-  margin-top: 22px;
+  color           : var(--ControlText);
+  top             : 29px;
+  margin-top      : 22px;
   bottom          : 20px;
   max-height      : 520px;
   overflow-y      : scroll;
-  opacity: 1;
+  opacity         : 1;
   transition      : opacity 0.25s ease-in-out;
   z-index         : 99;
   padding         : 2px;
@@ -304,7 +307,7 @@ li#current-network-display-name {
   border          : 1px solid var(--HighLight);
   text-align      : center;
   box-shadow      : 0px 0px 7px var(--HighLight);
-  border-radius: 6px;
+  border-radius   : 6px;
 }
 
 option {
@@ -338,12 +341,12 @@ option.selected {
 }
 
 .network-box-header .title {
-  color         : var(--ControlAccent) smoke;
-  color         : white;
+  color            : var(--ControlAccent) smoke;
+  color            : white;
   /* font-size     : 14pt; */
-  padding-bottom: 1px;
-  padding-left: 4px;
-  padding-top: 0px;
+  padding-bottom   : 1px;
+  padding-left     : 4px;
+  padding-top      : 0px;
 }
 
 .down-arrow {
@@ -359,18 +362,19 @@ option.selected {
   min-height         : 10px;
   color              : white;
   */
-  cursor             : pointer;
+  cursor      : pointer;
   padding-left: 3px;
-  padding-top: 2px;
-  font-size: 0.85em;
+  padding-top : 2px;
+  font-size   : 0.85em;
 }
+
 .down-arrow:after {
-  content: "▽";
-  font-size:0.8em;
-  color: var(--BlockText);
-  opacity: 0.7;
+  content  : "▽";
+  font-size: 0.8em;
+  color    : var(--BlockText);
+  opacity  : 0.7;
 }
-  
+
 .network-box-header hr {
   border-color: #7090ab;
   width       : 90%;
