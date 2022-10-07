@@ -74,7 +74,7 @@
 .accountdetsassets {
   /* font-size : 1; */
   position  : relative;
-  width: 449px;
+  width: 453px;
   height    : 68px;
   display   : block;
   background: var(--Background);
@@ -104,17 +104,17 @@
 }
 
 .accountassettoken {
-  position        : absolute;
-  display         : block;
+  /* position        : absolute; */
+  /* display         : block; */
   font-size       : 12px;
-  top: 3px;
-  left: 5px;
-  width: 430px;
+  /* top: 3px; */
+  /* left: 5px; */
+  width: 442px;
   height          : 16px;
   padding-top     : 5px;
-  padding-right   : 5px;
-  border-style    : none;
-  border-radius: 5px;
+  padding-right: 15px;
+  /* border-style    : none; */
+  /* border-radius: 5px; */
   background-color: var(--Block);
   text-align      : right;
   font-weight     : 250;

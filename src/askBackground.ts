@@ -23,7 +23,7 @@ export function askBackground(requestPayload: any): Promise<any> {
       clearTimeout(timeout);
       //-- DEBUG
       const jres = JSON.stringify(response)
-      log("response to ", requestPayload.code, jres.substring(0, Math.min(120, jres.length)));
+      log("response to ", requestPayload.code, jres?.substring(0, Math.min(120, jres.length)));
       //----
       if (!response) {
         return reject(Error("response is empty"));

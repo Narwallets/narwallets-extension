@@ -1,59 +1,99 @@
+// import * as c from "../../util/conversions.js"
 import * as d from "../../util/document.js"
-import * as c from "../../util/conversions.js"
-import { BatchTransaction, BatchAction, FunctionCall, Transfer } from "../../lib/near-api-lite/batch-transaction.js"
 import { askBackground } from "../../askBackground.js"
+import { removeDecZeroes, toStringDecMin, yton, ytonFull, ytonString } from "../../util/conversions.js";
 //import { globalSendResponse } from "../../background/background.js"
 
-// props addded when this popup is created
-interface Window {
-  msg: Record<string, any>
-}
-// interface Window {
-//   msg: Record<string, any>
-//   sendResponse: Function;
-// }
+type SendResponseFunction = (response: any) => void
+
+let ThisApprovalSendResponse: SendResponseFunction
+let ThisApprovalMsg: any
+
+// Received message from background service
+chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
+
+  console.log("approve.ts chrome.runtime.onMessage.addListener", msg, sender)
+  if (sender.id == chrome.runtime.id && msg.dest == "approve-popup") {
+    try {
+      ThisApprovalSendResponse = sendResponse
+      ThisApprovalMsg = msg
+      // show request origin
+      if (sender.url) d.byId("web-page").innerText = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
+      //d.byId("net-name").innerText = msg.network || ""
+      // display instructions
+      displayTx(msg)
+      return true; // ack, it's for me, sendResponse will be called later
+    }
+    catch (err) {
+      sendResponse({ err: err.message })
+    }
+
+  }
+  // // We only accept messages from ourselves
+  // if (event.source != window) {
+  //   return;
+  // }
+
+  // if (event.data && event.data.dest == "approve-popup") {
+  //   window.msg = event.data.msg
+  //   window.sendResponse = event.data.sendResponse
+  //   displayTx()
+  // }
+});
 
 type TxInfo = {
   action: string;
   attached: string;
 }
-
-type TxMsg = {
-  tabId: number;
-  requestId: number;
+/*
+{id: 7, src: 'ws', type: 'nw', code: 'sign-and-send-transaction', dest: 'page', …}
+code: "sign-and-send-transaction"
+dest: "page"
+id: 7
+src: "ws"
+type: "nw"
+params: 
+   receiverId: "token.meta.pool.testnet"
+   actions: Array(1) 0: 
+    {methodName: 'ft_transfer_call', args: {…}, gas: '200000000000000', deposit: '1'}
+*/
+type Msg = {
+  id: number;
   url: string;
   network: string | undefined;
   signerId: string;
-  tx?: BatchTransaction;
-  txs?: BatchTransaction[];
+  params: any,
+  // tx?: BatchTransaction;
+  // txs?: BatchTransaction[];
 }
-type ResolvedMsg = {
-  dest: "page";
-  code: "request-resolved";
-  tabId: number;
-  requestId: number;
-  err?: any;
-  data?: any
-}
+// type ResolvedMsg = {
+//   dest: "page";
+//   code: "request-resolved";
+//   tabId: number;
+//   requestId: number;
+//   err?: any;
+//   data?: any
+// }
 
 let responseSent = false;
 
-var initialMsg: TxMsg;
-var resolvedMsg: ResolvedMsg;
+//var initialMsg: TxMsg;
+//var resolvedMsg: ResolvedMsg;
 
 async function approveOkClicked() {
   d.showWait()
-  // ask background to process the message, this time origin is a popup from the extension
-  askBackground(window.msg)
-    .then((data) => { window.sendResponse({ data }) })
-    .catch((err) => { window.sendResponse({ err: err.message }) })
+  // ask background to process the message, this time the origin is a popup from the extension, so it is trusted
+  ThisApprovalMsg.dest = "ext"
+  askBackground(ThisApprovalMsg)
+    .then((data) => { ThisApprovalSendResponse({ data }) })
+    .catch((err) => { ThisApprovalSendResponse({ err: err.message }) })
     .finally(() => { window.close() })
 }
 
 async function cancelOkClicked() {
   console.log("Cancel clicked")
   // respondRejected();
-  window.sendResponse({ err: "Rejected by user" })
+  ThisApprovalSendResponse({ err: "Rejected by user" })
   //const wasCalled = await askBackground({code:"callGlobalSendResponse", cancel: true})
   setTimeout(() => { window.close() }, 200);
 }
@@ -67,7 +107,7 @@ function humanReadableValue(value: Object): string {
   if (typeof value == "string") {
     if (/\d{20}/.test(value)) {
       //at least 20 digits. we assume YOCTOS
-      return c.toStringDecMin(c.yton(value))
+      return toStringDecMin(yton(value))
     }
     else {
       return `"${value}"`;
@@ -99,24 +139,18 @@ function humanReadableCallArgs(args: Object): string {
 }
 
 // ---------------------
-function displayTx(msg: TxMsg) {
-
-  initialMsg = msg;
-  //resolvedMsg = { dest: "page", code: "request-resolved", tabId: initialMsg.tabId, requestId: initialMsg.requestId }
+function displayTx(msg: Msg) {
 
   try {
-    console.log("MSG", msg)
-    d.byId("net-name").innerText = msg.network || ""
-    d.byId("signer-id").innerText = msg.signerId || ""
-    d.byId("web-page").innerText = msg.url.split(/[?#]/)[0]; // remove querystring and/or hash
-    d.byId("receiver").innerText = msg.tx ? msg.tx.receiver : ""
 
-    d.clearContainer("list")
+    d.clearContainer("tx-list")
 
-    if (msg.tx) {
-      displaySingleTransactionParams(msg)
-    } else if (msg.txs) {
-      displayMultipleTransactionParams(msg)
+    if (msg.params.length) {
+      // tx array
+      displayMultipleTransactionParams(msg.params)
+    } else {
+      // single tx
+      displaySingleTransactionParams(0, msg.params)
     }
 
     //only if it displayed ok, enable ok action
@@ -129,91 +163,115 @@ function displayTx(msg: TxMsg) {
     d.qs("#approve-ok").hide() //hide ok button
     console.error(ex)
   }
+
+  //--- connect
+  d.onClickId("approve-cancel", cancelOkClicked)
+  // show face
+  d.byId("approve-face").classList.remove("hidden")
 }
 
-function displaySingleTransactionParams(msg: TxMsg) {
-  for (let item of msg.tx!.items) {
+function displaySingleTransactionParams(inx: number, params: any) {
+
+  // signer and receiver
+  const txContainerId = `tx_${inx}`
+  const TEMPLATE1 = `
+  <div class="tx" id="${txContainerId}">
+    <div class="signer"><b>{signerId}</b> to execute</div>
+    <div class="receiver">on <b>{receiverId}</b></div>
+    <ul id="${txContainerId}_actions" class="list">
+    </ul>
+  </div>
+  `;
+  d.appendTemplate("DIV", "tx-list", TEMPLATE1, params)
+
+  for (let action of params.actions) {
+
     let toAdd: TxInfo = {
-      action: item.action,
-      attached: (item.attached != "0" && item.attached != "1") ?
-        `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
+      action: `${action.methodName}(${JSON.stringify(action.args)})`,
+      attached: (action.params.deposit != "0" && action.params.deposit != "1") ?
+        `with <span class="near">${removeDecZeroes(ytonFull(action.params.deposit))}</span> attached NEAR` : ""
     }
-    //explain action
-    switch (item.action) {
-      case "call":
-        const f = item as FunctionCall;
-        toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
+
+    switch (action.type) {
+      case "FunctionCall":
+        toAdd.action = `call ${action.params.methodName}(${humanReadableCallArgs(action.params.args)})`;
         break;
 
-      case "transfer":
+      case "Transfer":
         toAdd.action = ""
-        toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
+        toAdd.attached = `transfer <span class="near">${ytonString(action.params.deposit)}</span> NEAR`
         break;
 
       default:
-        toAdd.action = JSON.stringify(item);
+        toAdd.action = JSON.stringify(action);
     }
+
+    // //explain action
     const TEMPLATE = `
     <li id="{name}">
       <div class="action">{action}</div>
       <div class="attached-near">{attached}</div>
     </li>
     `;
-    d.appendTemplateLI("list", TEMPLATE, toAdd)
+    d.appendTemplateLI(txContainerId + "_actions", TEMPLATE, toAdd)
   }
 }
 
-function displayMultipleTransactionParams(msg: TxMsg) {
-  for (let tx of msg.txs!) {
-    // let toAdd: TxInfo = {
-    //   action: item.action,
-    //   attached: (item.attached != "0" && item.attached != "1") ?
-    //     `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
-    // }
-    // //explain action
-    // switch (item.action) {
-    //   case "call":
-    //     const f = item as FunctionCall;
-    //     toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
-    //     break;
-
-    //   case "transfer":
-    //     toAdd.action = ""
-    //     toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
-    //     break;
-
-    //   default:
-    //     toAdd.action = JSON.stringify(item);
-    // }
-    for (let item of tx.items) {
-      const f = item as FunctionCall;
-      let toAdd = { receiver: tx.receiver, action: `${f.method}(${JSON.stringify(f.args)})` }
-      const TEMPLATE = `
-      <li id="{name}">
-        <div class="receiver">{receiver}</div>
-        <div class="actions">{action}</div>
-      </li>
-      `;
-      // 
-      d.appendTemplateLI("list", TEMPLATE, toAdd)
-    }
-
-    console.log("tx", tx)
+function displayMultipleTransactionParams(txArray: any[]) {
+  let inx = 0;
+  for (let tx of txArray) {
+    displaySingleTransactionParams(inx, tx)
+    inx++
   }
+  // let toAdd: TxInfo = {
+  //   action: item.action,
+  //   attached: (item.attached != "0" && item.attached != "1") ?
+  //     `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
+  // }
+  // //explain action
+  // switch (item.action) {
+  //   case "call":
+  //     const f = item as FunctionCall;
+  //     toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
+  //     break;
+
+  //   case "transfer":
+  //     toAdd.action = ""
+  //     toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
+  //     break;
+
+  //   default:
+  //     toAdd.action = JSON.stringify(item);
+  // }
+  // for (let item of tx.items) {
+  //   const f = item as FunctionCall;
+  //   let toAdd = { receiver: tx.receiver, action: `${f.method}(${JSON.stringify(f.args)})` }
+  //   const TEMPLATE = `
+  //   <li id="{name}">
+  //     <div class="receiver">{receiver}</div>
+  //     <div class="actions">{action}</div>
+  //   </li>
+  //   `;
+  //   // 
+  //   d.appendTemplateLI("list", TEMPLATE, toAdd)
+  // }
+
+  // console.log("tx", tx)
+  // }
 }
 
-let retries = 0;
+// // wait for window.msg to be set
+// let interval: NodeJS.Timeout
+// function waitForMsg(){
+//   console.log("waiting for window.msg",window.msg)
+//   if (window.msg) {
+//     clearInterval(interval)
+//     displayTx()
+//   }
+// }
+// window.onload = function () {
+//   console.log("setInterval(waitForMsg")
+//   interval = setInterval(waitForMsg,1000);
+// }
 
-async function initFromWindow() {
 
-  //Display transaction for user approval
-  displayTx(window.msg as unknown as TxMsg);
-
-}
-
-//--- INIT
-d.onClickId("approve-cancel", cancelOkClicked)
-
-window.onload = function() { 
-  setTimeout(initFromWindow, 200) 
-}

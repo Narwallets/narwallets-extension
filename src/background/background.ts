@@ -48,11 +48,11 @@ chrome.runtime.onMessage.addListener(runtimeMessageHandler);
 function runtimeMessageHandler(
   msg: any,
   sender: chrome.runtime.MessageSender,
-  sendResponse: Function
+  sendResponse: SendResponseFunction
 ) {
 
   if (msg.dest != "ext") {
-    sendResponse({ err: "msg.dest must be 'ext'" });
+    console.log("bkg handler, not for me:",msg)
     return false;
   }
 
@@ -65,7 +65,7 @@ function runtimeMessageHandler(
   const jmsg = JSON.stringify(msg)
   log(
     "BKG: msg from " + (fromWs ? "WS" : fromExtension ? "POPUP-EXT" : "PAGE") + " " +
-    jmsg.substring(0, Math.min(120, jmsg.length))
+    jmsg?.substring(0, Math.min(120, jmsg.length))
   );
   //-- END DEBUG
 
@@ -83,7 +83,7 @@ function runtimeMessageHandler(
 async function runtimeMessageHandlerAfterTryRetrieveData(
   msg: any,
   sender: chrome.runtime.MessageSender,
-  sendResponse: Function
+  sendResponse: SendResponseFunction
 ) {
   //check if it comes from the web-page or from this extension
   const fromExtension = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
@@ -110,7 +110,9 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
   }
 }
 
-function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: Function) {
+type SendResponseFunction = (response: any) => void;
+
+function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: SendResponseFunction) {
 
   switch (msg.code) {
 
@@ -137,8 +139,8 @@ function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: Functi
         chrome.windows.create({
           url: "index.html",
           type: "popup",
-          left: screen.width / 2 - width / 2,
-          top: screen.height / 2 - height / 2,
+          //left: 40,
+          top: 100,
           width: width,
           height: height,
           focused: true,
@@ -173,7 +175,7 @@ function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: Functi
   }
 }
 
-function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Function) {
+function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
 
   // const accInfo = getAccount(signerId);
   // if (!accInfo.privateKey) {
@@ -190,52 +192,50 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Func
   //   msg.url = tabs[0].url;
   // });
 
-  console.log("Opening approve popup")
+  console.log("Opening approve popup", msg)
   //load popup window for the user to approve
   const width = 500;
   const height = 540;
   chrome.windows.create({
     url: "popups/approve/approve.html",
     type: "popup",
-    left: screen.width / 2 - width / 2,
-    top: screen.height / 2 - height / 2,
+    //left: 40,
+    top: 100,
     width: width,
     height: height,
     focused: true,
-  }, (window) => {
-    // pass msg and send-response to the popup to re-send as internal, after user approval
-    //@ts-ignore
-    window.msg = msg;
-    //@ts-ignore
-    window.sendResponse = sendResponse
+  }, (chromePopupwindow) => {
+    // once opened, ask for a re-send so the approval-popup can process
+    console.log("chrome.runtime.sendMessage", { action: "resend", to: "approve-popup" })
+    sendResponse({ action: "resend", to: "approve-popup" })
   }
   );
 }
 
-async function mapAndCommitActions(params: any, signerId: string, accInfo: Account): Promise<any> {
-  const actions: TX.Action[] = params.actions.map((action: any) => {
-    return createCorrespondingAction(action)
-  })
-  console.log("Gas", actions[0].functionCall.gas)
+async function commitActions(params: any, privateKey:string ): Promise<any> {
+  // re-hydrate action POJO as class instances, for the borsh serializer
+  const rehydratedActions = params.actions.map((action:any) => createCorrespondingAction(action) )
   return near.broadcast_tx_commit_actions(
-    actions,
-    signerId,
+    rehydratedActions,
+    params.signerId,
     params.receiverId,
-    accInfo.privateKey || ""
+    privateKey
   )
 }
 
+// re-hydrate action POJO as class instance
 function createCorrespondingAction(action: any): TX.Action {
   console.log("Action", action)
-  if (action.methodName) {
-    // action.gas = "1000000000"
-    return TX.functionCall(action.methodName, action.args, BigInt(action.gas), BigInt(action.deposit))
-  } else if (action.beneficiaryAccountId) {
-    return TX.deleteAccount(action.beneficiaryAccountId)
-  } else if (action.attached) {
-    return TX.transfer(BigInt(action.attached))
+  switch(action.type){
+    case "FunctionCall":
+      return TX.functionCall(action.params.methodName, action.params.args, BigInt(action.params.gas), BigInt(action.params.deposit))
+    case "Transfer":
+      return TX.transfer(BigInt(action.attached))
+    case "DeleteAccount":
+      return TX.deleteAccount(action.beneficiaryAccountId)
+    default:
+      throw new Error(`action.type not contemplated: ${action.type}`)
   }
-  throw new Error(`There is no action that matches input: ${action}`)
 }
 
 function reflectReception(receiver: string, amount: number, sender: string) {
@@ -535,18 +535,23 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       break
 
     // new v4 - wallet-connect mode
+    // Note: sign-and-send-transaction should return a FinalExecutionOutcome struct
     case "sign-and-send-transaction": {
-      const signerId = msg.signerId || "...";
-      const accInfo = getAccount(signerId);
-      return mapAndCommitActions(msg.params, signerId, accInfo)
+      const accInfo = getAccount(msg.params.signerId);
+      if (!accInfo.privateKey) {
+        throw Error(`account ${msg.params.signerId} is read-only`)
+      }
+      return commitActions(msg.params, accInfo.privateKey)
     }
 
     case "sign-and-send-transactions": {
-      const signerId = msg.signerId || "...";
-      const accInfo = getAccount(signerId);
       let promises: Promise<any>[] = []
-      for (let i = 0; i < msg.params.length; i++) {
-        promises.push(mapAndCommitActions(msg.params[i], signerId, accInfo))
+      for (let tx of msg.params) {
+        const accInfo = getAccount(tx.signerId);
+        if (!accInfo.privateKey) {
+          throw Error(`account ${tx.signerId} is read-only`)
+        }
+        promises.push(commitActions(tx, accInfo.privateKey))
       }
       return Promise.all(promises)
     }

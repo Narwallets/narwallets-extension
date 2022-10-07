@@ -6,13 +6,11 @@
 
 body {
   font-family: 'Inter', sans-serif;
-   !important
 }
 
 @supports (font-variation-settings: normal) {
   body {
     font-family: 'Inter var', sans-serif;
-     !important
   }
 }
 
@@ -21,7 +19,9 @@ body {
   display: none;
 }
 
-
+.action {
+  word-break: break-all;
+}
 
 /*Colores */
 
@@ -66,6 +66,11 @@ body {
   color           : var(--TextColor);
 }
 
+
+.tx-list {
+  padding-top: 10px;
+}
+
 .appface {
   display   : block;
   text-align: center;
@@ -86,13 +91,13 @@ li {
   font-weight: 200;
 }
 
-ul {
+ul.list {
   border       : 1px solid white;
   border-radius: 8px;
   margin       : 20px;
   padding      : 10px;
-  margin-left  : 50px;
-  margin-right : 50px;
+  margin-left: 16px;
+  margin-right: 37px;
 }
 
 .sep30 {
@@ -120,19 +125,22 @@ h2 {
 
 }
 
-h3 {
+h3,.signer,.receiver {
   color      : var(--TextGeneric);
   font-size  : 18px;
   font-weight: 200;
   display    : block;
-  width      : 400px;
+  width: 422px;
   height     : auto;
   word-wrap  : break-word;
   margin     : auto;
-  padding    : 2px;
+  padding: 0px;
 }
 
-
+.signer,.receiver {
+  text-align: left;
+  padding-top: 8px;
+}
 .cancel {
   position        : absolute;
   top             : 0px;

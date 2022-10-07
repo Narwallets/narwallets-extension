@@ -2,12 +2,6 @@
 //--- DOM UTILITIES ---
 //---------------------
 import * as c from "./conversions.js";
-import {
-  LIQUID_STAKE_DEFAULT_SVG,
-  SEND_SVG,
-  STAKE_DEFAULT_SVG,
-  UNSTAKE_DEFAULT_SVG,
-} from "./svg_const.js";
 
 export type ClickHandler =
   | (() => void)
@@ -126,7 +120,7 @@ export function onEnterKey(textId: string, clickHandler: (ev: Event) => void) {
 }
 
 export function onEnterAndAmount(textId: string, clickHandler: (ev: Event) => void) {
-  onEnterKey(textId, (ev: Event)=>{ if (getNumber("#"+textId)) clickHandler(ev) } )
+  onEnterKey(textId, (ev: Event) => { if (getNumber("#" + textId)) clickHandler(ev) })
 }
 
 /**
@@ -421,7 +415,7 @@ export function appendTemplate(
   }
   //-- if id has replace-value, set it
   if (templateElem.id && templateElem.id.startsWith("{")) {
-    newLI.id = templateReplace(templateElem.id, data); 
+    newLI.id = templateReplace(templateElem.id, data);
   }
   //-- copy classes from template (except "hidden")
   //@ts-ignore
