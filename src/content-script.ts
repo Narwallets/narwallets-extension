@@ -12,24 +12,47 @@ window.addEventListener("message", (event) => {
       if (response && response.action === "resend") {
         // the background service worker opened a popup for approval, 
         // and now requires the message to be resent, so the approval popup can process it
-        setTimeout( () => {
-          const resendAs = Object.assign(msg,{dest:response.to})
-          console.log("content-script: re-send as ", resendAs)
-          // resend, now to approval popup
-          chrome.runtime.sendMessage(resendAs, function (response) {
-            // Send new response to wallet-selector on callback
-            postBack(msg, response);
-          })
-        },400)
+        const resendAs = Object.assign(msg,{dest:response.to})
+        console.log("content-script: re-send as ", resendAs)
+        // resend, now to approval popup
+        waitAndSendWithRetry(100,20,msg)
       }
       else {
         // immediate response:
-        // Send response to wallet-selector on callback
+        if (!response) {
+          // failed to send, probably runtime.lastError: The message port closed before a response was received
+          const response = chrome.runtime.lastError
+        }
+        // post response to wallet-selector 
         postBack(msg, response);
       }
     });
   }
 });
+
+function waitAndSendWithRetry(waitMs:number, retries:number, msg:Record<string,any>) {
+  return setTimeout(()=>{
+    chrome.runtime.sendMessage(msg, 
+      function (response) {
+        if (response) {
+          // Send new response to wallet-selector on callback
+          postBack(msg, response);
+        }
+        else {
+          // failed to send, probably runtime.lastError: The message port closed before a response was received
+          // meaning the popup is still opening, so we wait and retry
+          const lastErr = chrome.runtime.lastError
+          if (retries<=0) {
+            throw lastErr
+          }
+          // retry
+          waitAndSendWithRetry(waitMs, retries-1, msg)
+        }
+      }
+    )}
+  , waitMs)
+}
+
 
 function postBack(originalMsg: any, response: any) {
   // copy id & other data from original msg
