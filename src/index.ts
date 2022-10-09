@@ -308,19 +308,16 @@ function selectAccountMru(event: Event) {
 }
 
 //-----------------------
-//executed after the background-page is available
-let initPopupTimestamp: number = 0;
-async function initPopup() {
-  // debounce
-  if (Date.now() < initPopupTimestamp + 100) return;
-  initPopupTimestamp = Date.now()
+// initPopup
+//-----------------------
+document.addEventListener('DOMContentLoaded', initPopup);
+async function initPopup() { 
 
   logEnabled(1);
 
   chrome.alarms.clear("unlock-expired");
-  //console.log(new Date().toISOString(), "enter initPopup()")
 
-  //update network indicator visual state
+  // update network indicator visual state
   await askBackgroundGetNetworkInfo();
   updateNetworkIndicatorVisualState();
   Import_onNetworkChanged();
@@ -431,43 +428,4 @@ function openTermsOfUseOnNewWindow() {
 //   true
 // );
 
-// //listen to background messages
-// chrome.runtime.onMessage.addListener(function (msg) {
-//   if (msg.code == "can-init-popup") {
-//     initPopup();
-//   }
-// });
-
-window.onload = function () {
-  initPopup();
-  // dark light mode
-  // default is dark
-  // chrome.storage.local.get("popupConfig", (obj) => {
-  //   if (chrome.runtime.lastError) {
-  //     console.log(JSON.stringify(chrome.runtime.lastError));
-  //   }
-  //   else {
-  //     //console.log(obj);
-  //     if (obj?.popupConfig?.lightMode) {
-  //       switchDarkLight();
-  //     }
-  //   }
-  // });
-};
-
-// var background: Window | undefined;
-// //wake-up background page
-// //WARNING:  chrome.runtime.getBackgroundPage != chrome.extension.getBackgroundPage
-// chrome.runtime.getBackgroundPage((bgpage) => {
-//   if (chrome.runtime.lastError) {
-//     console.error(JSON.stringify(chrome.runtime.lastError));
-//     alert(chrome.runtime.lastError.message);
-//   } else {
-//     background = bgpage;
-//     //@ts-ignore
-//     background.postMessage({ code: "popupLoading" }, "*");
-//     //will reply with "can-init-popup" after retrieving data from localStorage
-//   }
-// });
-
-
+  
