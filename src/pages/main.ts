@@ -180,86 +180,10 @@ export async function show() {
       return;
     }
 
-    //here we have:
-    //a user, unlocked, with accounts.
-    //
-    //show the logged-in & unlocked user their accounts
-    //
-    /*
-        //get accounts, sort by accountInfo.order and show as LI
-        const accountsRecord = await askBackgroundAllNetworkAccounts();
+    // here we have:
+    // a user, unlocked, with accounts.
     
-        const list: ExtendedAccountData[] = [];
-        let needRefresh = false;
-        for (let key in accountsRecord) {
-          const e = new ExtendedAccountData(key, accountsRecord[key])
-          list.push(e);
-          if (e.total == undefined) { needRefresh = true }
-        }
-        list.sort(sortByOrder);
-        //debug
-        //for(let item of list) console.log(item.accountInfo.order,item.accountInfo.type, item.name)
-    
-        const TEMPLATE = `
-        <div class="account-item" id="{name}">
-          <div class="accountlistitem">
-            <div class="accountlistname">{name}</div>
-            <div class="accountlistbalance balance">{total}</div>
-            <div class="accountlistcomment">{accountInfo.note}</div>
-          </div>
-        </div>
-        `;
-        d.clearContainer(ACCOUNTS_LIST);
-        d.populateUL(ACCOUNTS_LIST, TEMPLATE, list);
-    
-        let total = 0;
-        //connect all item to accountItemClicked
-        document
-          .querySelectorAll("#accounts-list .account-item")
-          .forEach((item) => {
-            item.addEventListener("click", accountItemClicked);
-            //item.addEventListener("dragstart", accountItem_dragStart)
-            item.addEventListener("drag", accountItem_drag);
-            //item.addEventListener("dragenter", accountItem_dragEnter)
-            item.addEventListener("dragover", accountItem_dragOver);
-            //item.addEventListener("dragleave", accountItem_dragLeave)
-            item.addEventListener("drop", accountItem_drop);
-            item.addEventListener("dragend", accountItem_dragend);
-            //@ts-ignore
-            item.draggable = true;
-            let balanceNum = 0;
-            try {
-              balanceNum = c.toNum(d.getChildText(item, ".balance"));
-            } catch {
-              balanceNum = 0;
-            }
-            if (isNaN(balanceNum)) balanceNum = 0;
-            total += balanceNum;
-          });
-    
-        //show total
-        const totalEl = new d.El("#account-list-main .balance.total");
-        totalEl.innerText = c.toStringDec(total);
-        d.qs("#account-list-main .total-row").el.addEventListener(
-          "dragover",
-          total_dragOver
-        );
-    
-        d.onClickId(ADD_ACCOUNT, addAccountClicked);
-    
-        //const disconnectButton = d.qs("#disconnect-from-web-page");
-        //disconnectButton.onClick(disconnectFromWepPageClicked);
-    
-        d.showPage(ACCOUNT_LIST_MAIN);
-    
-        //d.qs("#disconnect-line").hide();
-        const isConnected = await askBackground({ code: "isConnected" });
-        d.onClickId("back-to-account", backToAccountsClicked);
-    
-    */
     await tryReposition();
-    // start refreshing account list (unless reposition)
-    // refreshAccountListBalances()
 
   } catch (ex) {
     hamb.hide()
@@ -348,48 +272,3 @@ export function updateScreen(selector: string, value: string) {
 export function updateScreenNum(selector: string, amount: number | undefined) {
   updateScreen(selector, c.toStringDec(amount))
 }
-
-
-/*let refreshingAccountListBalances = false;
-export async function refreshAccountListBalances() {
-  if (d.activePage !== "account-list-main") {
-    // user changed page / reposition
-    return;
-  }
-  if (refreshingAccountListBalances) return;
-  refreshingAccountListBalances = true
-  try {
-    const accountsRecord = await askBackgroundAllNetworkAccounts();
-    const list: ExtendedAccountData[] = [];
-    for (let key in accountsRecord) {
-      list.push(new ExtendedAccountData(key, accountsRecord[key]));
-    }
-    // refresh in user-defined order
-    list.sort(sortByOrder);
-
-    console.log("refreshAccountListBalances", list.length, d.activePage);
-    let grandTotal = 0;
-    for (let e of list) {
-      // refresh in memory
-      await asyncRefreshAccountInfoLastBalance(e.name, e.accountInfo);
-
-      if (d.activePage !== "account-list-main") {
-        // user changed page, no need to continue refreshing main list
-        return;
-      }
-
-      e.recomputeTotals()
-      grandTotal += (e.total || 0)
-
-      // update on screen
-      updateScreenNum(`#accounts-list [id='${e.name}'] .accountlistbalance`, e.total)
-
-    }
-
-    // update grandtotal on the screen
-    updateScreenNum(`#account-list-main .accountlistbalance.total`, grandTotal)
-  } finally {
-    refreshingAccountListBalances = false;
-  }
-}
-*/

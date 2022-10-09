@@ -2,7 +2,6 @@ import * as d from "./util/document.js";
 import * as Main from "./pages/main.js";
 import { NetworkList } from "./lib/near-api-lite/network.js";
 
-//import { refreshAccountListBalances } from "./pages/main.js";
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ChangePass_addListeners } from "./pages/change-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
@@ -392,11 +391,6 @@ export async function autoRefresh() {
   if (refreshing) return;
   try {
     refreshing = true
-    //console.log(`Calling auto-refresh, selectedAccountData ${selectedAccountData} d.activePage ${d.activePage}`);
-    // if (d.activePage == "account-list-main") {
-    //   await refreshAccountListBalances();
-    // }
-    // else 
     if (d.activePage == "account-selected" || d.activePage == "AccountAssetDetail") {
       await refreshSelectedAccountAndAssets();
     }

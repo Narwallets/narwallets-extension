@@ -8,12 +8,12 @@ window.addEventListener("message", (event) => {
   if (msg.type && (msg.type == "nw") && msg.dest == "ext") {
     // Sending message to narwallets extension background service worker 
     chrome.runtime.sendMessage(msg, function (response) {
-      console.log("content-script: response is ", response)
+      //console.log("content-script: response is ", response)
       if (response && response.action === "resend") {
         // the background service worker opened a popup for approval, 
         // and now requires the message to be resent, so the approval popup can process it
         const resendAs = Object.assign(msg,{dest:response.to})
-        console.log("content-script: re-send as ", resendAs)
+        //console.log("content-script: re-send as ", resendAs)
         // resend, now to approval popup
         waitAndSendWithRetry(100,20,msg)
       }
@@ -63,6 +63,6 @@ function postBack(originalMsg: any, response: any) {
     dest: "page",
     result: response
   });
-  console.log("Posting message for page", postBack)
+  //console.log("Posting message for page", postBack)
   window.postMessage(postBack);
 }

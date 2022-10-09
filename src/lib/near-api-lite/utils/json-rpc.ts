@@ -122,7 +122,7 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
     }
     catch (ex) {
         //add rpc url to err info
-        console.log(ex)
+        //console.log(ex)
         throw new Error(ex.message + " (" + rpcUrl + ")")
     }
 }

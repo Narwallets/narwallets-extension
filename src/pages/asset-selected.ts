@@ -468,8 +468,8 @@ async function confirmLiquidUnstake() {
 
     d.showSubPage("asset-selected-liquid-unstake-confirmation");
     await showOKCancel(LiquidUnstakeOk, showInitialSubPage);
-  } catch (error) {
-    console.log(error)
+  } catch (err) {
+    d.showErr(err.message)
   }
 
 }

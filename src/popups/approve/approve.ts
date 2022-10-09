@@ -12,7 +12,6 @@ let ThisApprovalMsg: any
 // Received message from background service
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
 
-  console.log("approve.ts chrome.runtime.onMessage.addListener", msg, sender)
   if (sender.id == chrome.runtime.id && msg.dest == "approve-popup") {
     try {
       ThisApprovalSendResponse = sendResponse
@@ -91,7 +90,6 @@ async function approveOkClicked() {
 }
 
 async function cancelOkClicked() {
-  console.log("Cancel clicked")
   // respondRejected();
   ThisApprovalSendResponse({ err: "Rejected by user" })
   //const wasCalled = await askBackground({code:"callGlobalSendResponse", cancel: true})

@@ -53,7 +53,7 @@ function runtimeMessageHandler(
 ) {
 
   if (msg.dest != "ext") {
-    console.log("bkg handler, not for me:",msg)
+    //console.log("bkg handler, not for me:",msg)
     return false;
   }
 
@@ -156,7 +156,7 @@ function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: SendRe
       else {
         // not locked
         localStorageGet("currentAccountId").then(accName => {
-          console.log(`Getting account ID ${accName}`)
+          //console.log(`Getting account ID ${accName}`)
           sendResponse({ data: accName })
         })
       }
@@ -193,7 +193,7 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
   //   msg.url = tabs[0].url;
   // });
 
-  console.log("Opening approve popup", msg)
+  //console.log("Opening approve popup", msg)
   //load popup window for the user to approve
   const width = 500;
   const height = 540;
@@ -207,7 +207,7 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
     focused: true,
   }, (chromePopupwindow) => {
     // once opened, ask for a re-send so the approval-popup can process
-    console.log("chrome.runtime.sendMessage", { action: "resend", to: "approve-popup" })
+    //console.log("chrome.runtime.sendMessage", { action: "resend", to: "approve-popup" })
     sendResponse({ action: "resend", to: "approve-popup" })
   }
   );
@@ -226,7 +226,7 @@ async function commitActions(params: any, privateKey:string ): Promise<FinalExec
 
 // re-hydrate action POJO as class instance
 function createCorrespondingAction(action: any): TX.Action {
-  console.log("Action", action)
+  //console.log("Action", action)
   switch(action.type){
     case "FunctionCall":
       return TX.functionCall(action.params.methodName, action.params.args, BigInt(action.params.gas), BigInt(action.params.deposit))
@@ -401,7 +401,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       if (!msg.accountId) throw Error("!msg.accountId");
       if (!msg.accInfo) throw Error("!msg.accInfo");
       if (!msg.accInfo.network) {
-        console.log("Account without network. ", JSON.stringify(msg.accInfo))
+        console.error("Account without network. ", JSON.stringify(msg.accInfo))
       } else {
         if (!secureState.accounts[msg.accInfo.network]) {
           secureState.accounts[msg.accInfo.network] = {};

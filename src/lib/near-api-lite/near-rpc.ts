@@ -155,7 +155,7 @@ export async function signTransaction(actions: TX.Action[], signerId: string, re
         actions,
         recentBlockHash
     )
-    console.log("Transaction", transaction)
+    //console.log("Transaction", transaction)
 
     const serializedTx = serialize(TX.SCHEMA, transaction);
     const serializedTxHash = new Uint8Array(await sha256Async(serializedTx));
@@ -168,7 +168,7 @@ export async function signTransaction(actions: TX.Action[], signerId: string, re
             data: signature.signature
         })
     });
-    console.log("signedTransaction", signedTransaction)
+    //console.log("signedTransaction", signedTransaction)
     return signedTransaction
 }
 

@@ -7,12 +7,12 @@ export async function localStorageGet(code: string): Promise<any> {
       chrome.storage.local.get(code, (obj) => {
         //console.log("localStorageGet",code,obj)
         if (chrome.runtime.lastError) {
-          console.log(JSON.stringify(chrome.runtime.lastError));
+          console.error(JSON.stringify(chrome.runtime.lastError));
         }
         return resolve(obj[code]);
       });
     } catch (err) {
-      console.log(
+      console.error(
         "CRITICAL. localStorageGet('" + code + "') failed",
         err.message
       );
@@ -33,7 +33,7 @@ export function localStorageSet(payload: any) {
   //console.log("localStorageSet",payload)
   chrome.storage.local.set(payload, () => {
     if (chrome.runtime.lastError)
-      console.log(
+      console.error(
         "ERR chrome.storage.local.set(...) " + chrome.runtime.lastError.message
       );
   });
@@ -54,7 +54,7 @@ export async function recoverFromLocalStorage(
       chrome.storage.local.get(code, (keys) => {
         console.error("chrome.storage.local.get",code,keys)
         if (chrome.runtime.lastError) {
-          console.log(JSON.stringify(chrome.runtime.lastError));
+          console.error(JSON.stringify(chrome.runtime.lastError));
         }
         let result = keys[code] || {};
         if (Object.keys(result).length == 0)
@@ -72,7 +72,7 @@ export async function recoverFromLocalStorage(
       //   finally { }
       // }
     } catch (err) {
-      console.log("CRITICAL. Can't recover " + title, err.message);
+      console.error("CRITICAL. Can't recover " + title, err.message);
       reject();
     } finally {
     }
