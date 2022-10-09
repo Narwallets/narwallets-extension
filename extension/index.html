@@ -294,14 +294,6 @@
 			<div class="contentarea">
 
 				<h2>Send</h2>
-				<h3>Send to Account Id</h3>
-
-				<div id="select-send-address-book" class="inputboxwithbutton" title="Send address book">
-					<div class="inputboxwithbutton">
-						<input id="send-to-account-name" type="text" />
-						<button id="send-to-account-name-dropdown">▽</button>
-					</div>
-				</div>
 
 				<h3>Amount in NEAR</h3>
 				<div class="inputboxwithbutton">
@@ -309,6 +301,13 @@
 					<button id="send-max">Max</button>
 				</div>
 
+				<h3>Send to Account Id</h3>
+				<div id="select-send-address-book" class="inputboxwithbutton" title="Send address book">
+					<div class="inputboxwithbutton">
+						<input id="send-to-account-name" type="text" />
+						<button id="send-to-account-name-dropdown">▽</button>
+					</div>
+				</div>
 
 			</div>
 
@@ -552,7 +551,7 @@
 					<b>It's extremely important that you preserve your seed phrase or your private key</b>
 				</h3>
 
-				<h3>Your PRIVATE key <b>DO NOT SHARE!</b></h3>
+				<h3><b>NEVER SHARE</b> your PRIVATE key!</h3>
 				<h5 id="account-selected-private-key"></h5>
 			</div>
 
@@ -815,7 +814,7 @@
 
 
 
-		<h3>This is your SEED PHRASE, <b>DO NOT SHARE!</b></h3>
+		<h3>This is your SEED PHRASE, <b>DO NOT SHARE IT!</b></h3>
 		<div class="boximportante" id="seed-phrase-show-box"></div>
 
 
@@ -1000,17 +999,18 @@
 			<div class="contentarea">
 				<h2>Send</h2>
 
+				<h3>Amount in <span id="asset-symbol"></h3>
+				<div class="inputboxwithbutton">
+					<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
+					<button id="asset-send-max">Max</button>
+				</div>
+
 				<h3>Send to Account Id</h3>
 				<div class="inputboxwithbutton">
 					<input id="send-to-asset-account" type="text" />
 					<button id="send-to-asset-account-select">▽</button>
 				</div>
 
-				<h3>Amount in <span id="asset-symbol"></h3>
-				<div class="inputboxwithbutton">
-					<input id="send-to-asset-amount" autocomplete="chrome-off" type="text" dir="auto" value="">
-					<button id="asset-send-max">Max</button>
-				</div>
 			</div>
 		</div>
 
