@@ -21,7 +21,6 @@ import {
 } from "../askBackground.js";
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { timeStamp } from "node:console";
 import { ExtendedAccountData } from "../extendedAccountData.js";
 
 const NET_NAME = "net-name";

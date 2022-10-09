@@ -2,7 +2,7 @@
 // Crypto-primitives *BROWSER ONLY* .- uses crypto.subtle
 // -------------------------------------------------------------
 // based on: https://gist.github.com/Allegan/97a7b002837e21fa37a3e929c546ca11
-// async functions returning ArrayBuffer (undelying buffer for UInt8Array & other views)
+// async functions returning ArrayBuffer (underlying buffer for UInt8Array & other views)
 // https://stackoverflow.com/questions/42416783/where-to-use-arraybuffer-vs-typed-array-in-javascript
 //
 

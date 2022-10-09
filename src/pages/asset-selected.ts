@@ -56,7 +56,6 @@ import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 
 import { backToSelectAccount, setLastSelectedAsset } from "./main.js";
-import { networkInterfaces } from "node:os";
 import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { nearDollarPrice } from "../data/price-data.js";

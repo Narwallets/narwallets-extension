@@ -1,4 +1,3 @@
-import { timeStamp } from "node:console";
 import { askBackground, askBackgroundSetAccount, askBackgroundViewMethod } from "../askBackground.js";
 import * as c from "../util/conversions.js";
 import { TOKEN_DEFAULT_SVG } from "../util/svg_const.js";
