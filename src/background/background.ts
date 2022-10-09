@@ -25,6 +25,7 @@ import {
   state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA
 } from "./background-state.js";
 import { Account, Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
 
 
 
@@ -212,10 +213,10 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
   );
 }
 
-async function commitActions(params: any, privateKey:string ): Promise<any> {
+async function commitActions(params: any, privateKey:string ): Promise<FinalExecutionOutcome> {
   // re-hydrate action POJO as class instances, for the borsh serializer
   const rehydratedActions = params.actions.map((action:any) => createCorrespondingAction(action) )
-  return near.broadcast_tx_commit_actions(
+  return near.sendTransaction(
     rehydratedActions,
     params.signerId,
     params.receiverId,
@@ -491,9 +492,10 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
 
     // old v3 - not originated in wallet-connect
     case "apply": {
-      //apply transaction request from popup
-      //{code:"apply", signerId:<account>, tx:BatchTransaction}
-      //when resolved, send msg to content-script->page
+      // apply transaction request from popup
+      // {code:"apply", signerId:<account>, tx:BatchTransaction}
+      // V3: when resolved, extract restult, send msg to content-script->page
+      // Note: V4 uses signAndSendTransaction and returns FinalExecutionOutcome (full return data, needs to be parsed to extract results)
       const signerId = msg.signerId || "...";
       const accInfo = getAccount(signerId);
       if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);
@@ -525,7 +527,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
         }
       }
       //returns the Promise required to complete this action
-      return near.broadcast_tx_commit_actions(
+      return near.sendTransactionAndParseResult(
         actions,
         signerId,
         msg.tx.receiver,

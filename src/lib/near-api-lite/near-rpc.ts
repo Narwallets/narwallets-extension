@@ -10,6 +10,7 @@ import { sha256Async } from '../crypto-lite/crypto-primitives-browser.js';
 
 import { log } from "../log.js"
 import { decodeBase64, encodeBase64, stringFromArray, stringFromUint8Array, Uint8ArrayFromString } from "../crypto-lite/encode.js";
+import { FinalExecutionOutcome, FinalExecutionStatus } from "./near-types.js";
 
 
 //---------------------------
@@ -119,16 +120,17 @@ export function getValidators(): Promise<any> {
     return jsonRpc('validators', [null]) as Promise<any>
 };
 
+//------------------
+// SIGN and SEND ---
+//------------------
+export async function signMessageGetSignature(buf: Uint8Array, privateKey: string): Promise<any> {
+    const keyPair = KeyPairEd25519.fromString(privateKey);
+    const hash256 = new Uint8Array(await sha256Async(buf));
+    return keyPair.sign(hash256)
+}
 
 //-------------------------------
-export function broadcast_tx_commit_signed(signedTransaction: TX.SignedTransaction): Promise<any> {
-    const borshEncoded = signedTransaction.encode();
-    const b64EncodedString = encodeBase64(borshEncoded)
-    return jsonRpc('broadcast_tx_commit', [b64EncodedString]) as Promise<any>
-};
-
-//-------------------------------
-export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId: string, receiver: string, privateKey: string): Promise<any> {
+export async function signTransaction(actions: TX.Action[], signerId: string, receiver: string, privateKey: string): Promise<TX.SignedTransaction> {
 
     const keyPair = KeyPairEd25519.fromString(privateKey);
     const publicKey = keyPair.getPublicKey();
@@ -167,37 +169,76 @@ export async function broadcast_tx_commit_actions(actions: TX.Action[], signerId
         })
     });
     console.log("signedTransaction", signedTransaction)
-
-
-    const result = await broadcast_tx_commit_signed(signedTransaction)
-
-    if (result.status && result.status.Failure) {
-        //log(JSON.stringify(result))
-        log(getLogsAndErrorsFromReceipts(result))
-        throw Error(formatJSONErr(result.status.Failure))
-    }
-
-    if (result.status && result.status.SuccessValue) {
-        const sv = stringFromUint8Array(decodeBase64(result.status.SuccessValue))
-        //console.log("result.status.SuccessValue:", sv)
-        if (sv == "false") {
-            //log(JSON.stringify(result))
-            throw Error(getLogsAndErrorsFromReceipts(result))
-        }
-        else if (sv == "null")
-            return ""; //I strongly prefer "" as alias to null (ORACLE style)
-        else {
-            try {
-                return JSON.parse(sv); //result from fn_call
-            }
-            catch (ex) {
-                throw Error("ERR at JSON.parse: " + sv);
-            }
-        }
-    }
-
-    return result
+    return signedTransaction
 }
+
+//-------------------------------
+export function sendSignedTransaction(signedTransaction: TX.SignedTransaction): Promise<FinalExecutionOutcome> {
+    const borshEncoded = signedTransaction.encode();
+    const b64EncodedString = encodeBase64(borshEncoded)
+    return jsonRpc('broadcast_tx_commit', [b64EncodedString]) as Promise<FinalExecutionOutcome>
+};
+
+
+//-------------------------------
+export async function sendTransaction(actions: TX.Action[], signerId: string, receiver: string, privateKey: string)
+    : Promise<FinalExecutionOutcome> {
+
+    const signedTransaction = await signTransaction(actions, signerId, receiver, privateKey)
+
+    return sendSignedTransaction(signedTransaction)
+}
+
+//-------------------------------
+export async function sendTransactionAndParseResult(actions: TX.Action[], signerId: string, receiver: string, privateKey: string)
+    : Promise<FinalExecutionOutcome> {
+
+    const signedTransaction = await signTransaction(actions, signerId, receiver, privateKey)
+
+    const executionOutcome = await sendSignedTransaction(signedTransaction)
+
+    return parseFinalExecutionOutcome(executionOutcome)
+}
+
+//-------------------------------
+export function parseFinalExecutionOutcome(executionOutcome: FinalExecutionOutcome): any {
+
+    if (executionOutcome.status) {
+        const status = executionOutcome.status as FinalExecutionStatus
+        if (status.Failure !== undefined) {
+            //log(JSON.stringify(executionOutcome))
+            log(getLogsAndErrorsFromReceipts(executionOutcome))
+            throw Error(formatJSONErr(status.Failure))
+        }
+        else if (status.SuccessValue !== undefined) {
+            if (status.SuccessValue === "") {
+                return "" // early exit para return void functions
+            }
+            // decode from base64 and into string
+            const sv = stringFromUint8Array(decodeBase64(status.SuccessValue))
+            //console.log("executionOutcome.status.SuccessValue:", sv)
+            if (sv == "false") {
+                //log(JSON.stringify(executionOutcome))
+                throw Error(getLogsAndErrorsFromReceipts(executionOutcome))
+            }
+            else if (sv == "null")
+                return ""; //I strongly prefer "" as alias to null (ORACLE style)
+            else {
+                try {
+                    return JSON.parse(sv); // result from smart contract
+                }
+                catch (ex) {
+                    throw Error("ERR at JSON.parse: " + sv);
+                }
+            }
+        }
+    }
+    // if we don't recognize the data
+    log(JSON.stringify(executionOutcome))
+    throw Error("not a valid execution outcome");
+    //return executionOutcome
+}
+
 
 //-------------------------------
 function getLogsAndErrorsFromReceipts(txResult: any) {
@@ -223,9 +264,9 @@ function getLogsAndErrorsFromReceipts(txResult: any) {
 }
 
 //-------------------------------
-export function send(sender: string, receiver: string, amountYoctos: string, privateKey: string): Promise<any> {
+export function sendYoctos(sender: string, receiver: string, amountYoctos: string, privateKey: string): Promise<any> {
     const actions = [TX.transfer(BigInt(amountYoctos))]
-    return broadcast_tx_commit_actions(actions, sender, receiver, privateKey)
+    return sendTransactionAndParseResult(actions, sender, receiver, privateKey)
 }
 
 
@@ -236,7 +277,7 @@ export function delete_account(accountToDelete: string, privateKey: string, bene
     if (!isValidAccountID(beneficiary)) throw Error("Delete account: invalid beneficiary account name")
 
     const actions = [TX.deleteAccount(beneficiary)]
-    return broadcast_tx_commit_actions(actions, accountToDelete, accountToDelete, privateKey)
+    return sendTransactionAndParseResult(actions, accountToDelete, accountToDelete, privateKey)
 
 }
 
