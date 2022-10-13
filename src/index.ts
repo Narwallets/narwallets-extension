@@ -10,18 +10,19 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { refreshSelectedAccountAndAssets, selectAccountPopupList, selectedAccountData, show } from "./pages/account-selected.js";
-import { show as UnlockPage_show } from "./pages/unlock.js";
+import { refreshSelectedAccountAndAssets, selectAccountPopupList, selectedAccountData, show as AccountSelected_show } from "./pages/account-selected.js";
 import { getAccountsForPopupList, show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
+import { show as MainPage_show } from "./pages/main.js";
 
-import { localStorageRemove, localStorageSet } from "./data/local-storage.js";
+import { localStorageRemove, localStorageSet, showPassword } from "./data/local-storage.js";
 import {
   askBackground,
   askBackgroundGetNetworkInfo,
   askBackgroundGetState,
   askBackgroundIsLocked,
   askBackgroundSetNetwork,
+  passMsgToBackground,
 } from "./askBackground.js";
 import { functionCall } from "./lib/near-api-lite/transaction.js";
 import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
@@ -155,7 +156,6 @@ async function asideLock() {
   await askBackground({ code: "lock" });
   hambClicked()
   hideOkCancel()
-  //await UnlockPage_show();
   window.close()
 }
 
@@ -170,7 +170,7 @@ async function asideIsUnlocked() {
   hambClicked();
   const isLocked = await askBackgroundIsLocked();
   if (isLocked) {
-    await UnlockPage_show();
+    await showUnlockPage();
     d.showErr("You need to unlock the wallet first");
     return false;
   }
@@ -279,7 +279,7 @@ function selectAccountMru(event: Event) {
     if (accName) {
       hambClose()
       closePopupList()
-      show(accName)
+      AccountSelected_show(accName)
     }
   }
   catch (err) {
@@ -391,13 +391,67 @@ function openTermsOfUseOnNewWindow() {
   return false;
 }
 
-// //event to inform background.js we're unloading (starts auto-lock timer)
-// addEventListener(
-//   "unload",
-//   function (event) {
-//     //@ts-ignore
-//     background.postMessage({ code: "popupUnloading" }, "*");
-//   },
-//   true
-// );
+type SendResponseFunction = (response: any) => void
+let thisUnlockSendResponse: SendResponseFunction
+let thisAfterUnlockMessage: any
+// Received message from content-script
+chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
 
+  console.error("INDEX POPUP ONMESSAGE "+JSON.stringify(msg))
+  if (sender.id == chrome.runtime.id && msg.dest == "unlock-popup") {
+    thisUnlockSendResponse = sendResponse
+    thisAfterUnlockMessage = msg
+    // show request origin
+    //if (sender.url) d.byId("web-page").innerText = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
+    // ack, it's for me, sendResponse will be called later
+    return true;
+  }
+});
+
+async function unlockClicked(ev: Event) {
+  console.log("Unlock clicked")
+  //const emailEl = d.inputById("unlock-email")
+  const passEl = d.inputById("unlock-pass")
+  const email = SINGLE_USER_EMAIL; //emailEl.value
+
+  const password = passEl.value.trim();
+  if (!password) return;
+  passEl.value = ""
+
+  try {
+    await askBackground({ code: "unlockSecureState", email: email, password: password })
+    const numAccounts = await askBackground({ code: "getNetworkAccountsCount" })
+    console.log("Accounts: ", numAccounts)
+    if (numAccounts == 0) {
+      d.showPage("import-or-create"); // auto-add account after unlock      
+    } else {
+      if (thisUnlockSendResponse) {
+        // this unlock is to execute a transaction or other page request
+        // send directly to background to process and respond
+        thisAfterUnlockMessage.src = "page"
+        thisAfterUnlockMessage.dest = "ext"
+        passMsgToBackground(thisAfterUnlockMessage, thisUnlockSendResponse)
+        window.close()
+      }
+      else {
+        return MainPage_show()
+      }
+    }
+  }
+  catch (ex) {
+    d.showErr(ex.message);
+  }
+
+}
+
+export async function showUnlockPage() {
+
+  d.onClickId("unlock", unlockClicked);
+
+  d.onEnterKey("unlock-pass", unlockClicked)
+
+  d.showPage("unlock"); //show & clear fields
+
+  d.onClickId("show-password-login", showPassword);
+
+}

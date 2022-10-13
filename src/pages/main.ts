@@ -4,7 +4,7 @@ import * as c from "../util/conversions.js";
 import { Account, Asset, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
 import { selectAccountPopupList, selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
-import { show as UnlockPage_show } from "./unlock.js";
+import { showUnlockPage } from "../index.js";
 
 import {
   localStorageGet,
@@ -165,7 +165,7 @@ export async function show() {
         return; //*****
       }
       //user & locked => unlock
-      await UnlockPage_show();
+      await showUnlockPage();
       return; //*****
     }
 
@@ -187,7 +187,7 @@ export async function show() {
 
   } catch (ex) {
     hamb.hide()
-    await UnlockPage_show(); //show the unlock-page
+    await showUnlockPage(); //show the unlock-page
     d.showErr(ex.message);
   } finally {
   }

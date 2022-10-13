@@ -1,7 +1,7 @@
 import { askBackground, askBackgroundGetState } from "../askBackground.js"
 import { showPassword } from "../data/local-storage.js";
 import * as d from "../util/document.js"
-import { show as UnlockPage_show } from "./unlock.js";
+import { showUnlockPage } from "../index.js";
 
 const CURRENT_PASS = "current-pass";
 const PASS = "new-pass"
@@ -39,8 +39,8 @@ async function changeClicked(ev: Event) {
 
     //validate email,pwd,duplicates & Create SecureState store hashedPass
     await askBackground({ code: "change-password", email: state.currentUser, password: password })
-    d.showSuccess("Password changed succesfully");
-    UnlockPage_show();
+    d.showSuccess("Password changed successfully");
+    showUnlockPage();
 
   }
   catch (ex) {

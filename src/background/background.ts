@@ -52,23 +52,21 @@ function runtimeMessageHandler(
   sendResponse: SendResponseFunction
 ) {
 
-  if (msg.dest != "ext") {
-    //console.log("bkg handler, not for me:",msg)
-    return false;
-  }
-
   //-- DEBUG
   logEnabled(1)
   //console.log("runtimeMessage received ",sender, msg)
-  const fromExtension = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  const fromPage = !fromExtension
-  const fromWs = fromPage && msg.src == "ws"
+  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  const fromPage = !senderIsExt
   const jmsg = JSON.stringify(msg)
   log(
-    "BKG: msg from " + (fromWs ? "WS" : fromExtension ? "POPUP-EXT" : "PAGE") + " " +
+    "BKG: msg from " + (senderIsExt ? "EXT" : "PAGE") + " " +
     jmsg?.substring(0, Math.min(120, jmsg.length))
   );
   //-- END DEBUG
+  if (!msg || msg.dest != "ext") {
+    log("bkg handler, not for me!")
+    return false;
+  }
 
   // launch recover data
   tryRetrieveBgInfoFromStorage().
@@ -86,14 +84,17 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
   sender: chrome.runtime.MessageSender,
   sendResponse: SendResponseFunction
 ) {
-  //check if it comes from the web-page or from this extension
-  const fromExtension = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  if (!fromExtension) {
+  // check if it comes from the web-page or from this extension
+  // TODO: CHECK: can still a malicious page make a postMessage and get here as "fromExtension"
+  // can the malicious page do it if the wallet is locked (will trigger unlock and send message from the unlock popup)
+  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  console.log("BK w/data sender is ext", senderIsExt, msg)
+  if (!senderIsExt) {
     // from web-app/tab or wallet-selector -> content-script -> here
     // process separated from internal requests for security. 
     // We don't trust the page, 
     // Actions require user approval
-    resolveUntrustedFromPage(msg, sendResponse)
+    resolveUntrustedFromPage(sender, msg, sendResponse)
   }
   else {
     // from internal trusted pages like extension-popup
@@ -113,7 +114,13 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
 
 type SendResponseFunction = (response: any) => void;
 
-function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: SendResponseFunction) {
+function resolveUntrustedFromPage(
+  sender: chrome.runtime.MessageSender,
+  msg: Record<string, any>,
+  sendResponse: SendResponseFunction) {
+
+  // set the source url of the sender
+  if (sender.url) msg.senderUrl = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
 
   switch (msg.code) {
 
@@ -136,7 +143,7 @@ function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: SendRe
     case "get-account-id":
       if (isLocked()) {
         const width = 500;
-        const height = 540;
+        const height = 600;
         chrome.windows.create({
           url: "index.html",
           type: "popup",
@@ -145,12 +152,10 @@ function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: SendRe
           width: width,
           height: height,
           focused: true,
-        }, (window) => {
-          // pass msg and send-response to the popup to respond after unlock
-          // @ts-ignore
-          window.msg = msg;
-          // @ts-ignore
-          window.sendResponse = sendResponse;
+        }, (windowChromeObject) => {
+          // once opened, send to the unlock-popup (resend)
+          msg.dest = "unlock-popup"
+          waitAndSendWithRetry(1000, 30, msg, sendResponse)
         });
       }
       else {
@@ -191,12 +196,40 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
     height: height,
     focused: true,
   }, (chromePopupwindow) => {
-    // once opened, ask for a re-send so the approval-popup can process
-    //console.log("chrome.runtime.sendMessage", { action: "resend", to: "approve-popup" })
-    sendResponse({ action: "resend", to: "approve-popup" })
-  }
-  );
+    // once opened, send msg to approval popup (resend)
+    msg.dest = "approve-popup"
+    waitAndSendWithRetry(100, 50, msg, sendResponse)
+  });
 }
+
+function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction) {
+  return setTimeout(() => {
+    chrome.runtime.sendMessage(msg,
+      function (response) {
+        if (response) {
+          // all ok, Send response to original requestor
+          originalSendResponse(response);
+        }
+        else {
+          // failed to send, probably runtime.lastError: The message port closed before a response was received | Could not establish connection. Receiving end does not exist
+          // meaning the popup is still opening, so we wait and retry
+          const lastErr = chrome.runtime.lastError || { message: "response is empty" }
+          if (retries <= 0) {
+            // timed out
+            console.error(`waitAndSendWithRetry timedout ${JSON.stringify(lastErr)} ${JSON.stringify(msg)}`)
+            originalSendResponse({ err: lastErr.message });
+          }
+          else {
+            // retry
+            waitAndSendWithRetry(waitMs, retries - 1, msg, originalSendResponse)
+          }
+        }
+      }
+    )
+  }
+    , waitMs)
+}
+
 
 async function commitActions(params: any, privateKey: string): Promise<FinalExecutionOutcome> {
   // re-hydrate action POJO as class instances, for the borsh serializer
@@ -973,15 +1006,20 @@ chrome.alarms.onAlarm.addListener(function (alarm: any) {
 
 // called before processing messages to recover data if this is a new instance
 // this call does not recover SecureState if no sha, lockTimeout, or not unlocked already,
-// the caller MUST check isLocked()? after this call
 // TODO: consider the possibility the user added accounts to the wallet on another tab
 async function tryRetrieveBgInfoFromStorage(): Promise<void> {
 
   // Always recover first the base unencrypted state, if needed
   if (stateIsEmpty()) {
+    // recover base state
     await recoverState();
+    // recover last set network
+    const nw = (await localStorageGet("selectedNetwork")) as string;
+    if (nw) Network.setCurrent(nw);
   }
-  log(`isLocked ${isLocked()} dataVersion ${state.dataVersion} || user ${state.currentUser}`);
+
+  const locked = isLocked()
+  log(`locked ${locked} dataVersion ${state.dataVersion} || user ${state.currentUser}`);
   // validate dataVersion
   if (!state.dataVersion) {
     clearState();
@@ -990,10 +1028,6 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
   // ----------------------------
   // here we have a base state
   // ----------------------------
-
-  // recover last set network
-  const nw = (await localStorageGet("selectedNetwork")) as string;
-  if (nw) Network.setCurrent(nw);
 
   // if no current user, lock
   if (!state.currentUser) {

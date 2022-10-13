@@ -17,7 +17,6 @@ import {
   CurveAndArrayKey,
   KeyPairEd25519,
 } from "../lib/near-api-lite/utils/key-pair.js";
-import { show as UnlockPage_show } from "./unlock.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
 import {
@@ -279,7 +278,9 @@ export async function refreshSelectedAccountAndAssets() {
 export async function usdPriceReady() {
   if (selectedAccountData == undefined) return;
   if (selectedAccountData.total) selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
-  const elems = d.all(".accountdetsfiat")
+  const selector = ".accountdetsfiat"
+  if (document.querySelectorAll(selector).length==0) return;
+  const elems = d.all(selector)
   elems.innerText = c.toStringDec(selectedAccountData.totalUSD, 2);
   elems.show()
   if (Main.lastSelectedAsset) {
@@ -460,6 +461,7 @@ async function selectAndShowAccount(accName: string) {
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Main.setLastSelectedAccount(selectedAccountData);
 
+  localStorageSet({currentAccountId:accName})
   showSelectedAccount();
 }
 

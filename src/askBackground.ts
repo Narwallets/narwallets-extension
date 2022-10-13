@@ -15,7 +15,7 @@ import { Account } from "./structs/account-info.js";
 export function askBackground(requestPayload: any): Promise<any> {
   requestPayload.dest = "ext";
   return new Promise((resolve, reject) => {
-    log("askBackground ", requestPayload.code);
+    log("askBackground ", JSON.stringify(requestPayload));
     const timeout = setTimeout(() => {
       return reject(Error("askBackground timeout"));
     }, 30000);

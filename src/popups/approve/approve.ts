@@ -9,15 +9,15 @@ type SendResponseFunction = (response: any) => void
 let ThisApprovalSendResponse: SendResponseFunction
 let ThisApprovalMsg: any
 
-// Received message from background service
-chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
+// Received message from bg
+chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
 
+  console.log("ONMESSAGE APPROVEPOPUP",msg)
   if (sender.id == chrome.runtime.id && msg.dest == "approve-popup") {
     try {
       ThisApprovalSendResponse = sendResponse
       ThisApprovalMsg = msg
       // show request origin
-      if (sender.url) d.byId("web-page").innerText = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
       //d.byId("net-name").innerText = msg.network || ""
       // display instructions
       displayTx(msg)
@@ -58,9 +58,10 @@ params:
 */
 type Msg = {
   id: number;
-  url: string;
+  senderUrl: string;
   network: string | undefined;
-  signerId: string;
+  signerId: string; // account
+  receiverId: string; // contract
   params: any,
   // tx?: BatchTransaction;
   // txs?: BatchTransaction[];
@@ -140,6 +141,8 @@ function humanReadableCallArgs(args: Object): string {
 function displayTx(msg: Msg) {
 
   try {
+
+    d.byId("web-page").innerText = msg.senderUrl
 
     d.clearContainer("tx-list")
 
