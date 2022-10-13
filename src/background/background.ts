@@ -18,9 +18,9 @@ import {
 } from "../lib/near-api-lite/batch-transaction.js";
 
 import {
-  changePasswordAsync, clearState, createUserAsync, getAccount, getNetworkAccountsCount,
+  changePasswordAsync, clearState, createUserAsync, getAccount, getAutoUnlockSeconds, getNetworkAccountsCount,
   getUnlockSHA,
-  isLocked, lock, recoverState, saveSecureState, secureState,
+  isLocked, lockWallet, recoverState, saveSecureState, secureState,
   secureStateOpened,
   state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA
 } from "./background-state.js";
@@ -43,7 +43,7 @@ const WALLET_VERSION = semver(2, 0, 0);
 //-- msg path is tab->cs->here->action
 //----------------------------------------
 //https://developer.chrome.com/extensions/background_pages
-console.error("BG chrome.runtime.onMessage.addListener")
+//console.error("BG chrome.runtime.onMessage.addListener")
 chrome.runtime.onMessage.addListener(runtimeMessageHandler);
 
 function runtimeMessageHandler(
@@ -58,7 +58,7 @@ function runtimeMessageHandler(
   }
 
   //-- DEBUG
-  logEnabled(2)
+  logEnabled(1)
   //console.log("runtimeMessage received ",sender, msg)
   const fromExtension = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   const fromPage = !fromExtension
@@ -71,7 +71,7 @@ function runtimeMessageHandler(
   //-- END DEBUG
 
   // launch recover data
-  retrieveBgInfoFromStorage().
+  tryRetrieveBgInfoFromStorage().
     then(() => { // launch async processing
       runtimeMessageHandlerAfterTryRetrieveData(msg, sender, sendResponse)
     });
@@ -127,7 +127,7 @@ function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: SendRe
 
     case "sign-out":
       // await disconnectFromWebPage()
-      lock("sign-out")
+      lockWallet("sign-out")
       sendResponse({ data: true })
       // ctinfo.acceptedConnection = false;
       return;
@@ -178,21 +178,6 @@ function resolveUntrustedFromPage(msg: Record<string, any>, sendResponse: SendRe
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
 
-  // const accInfo = getAccount(signerId);
-  // if (!accInfo.privateKey) {
-  //   return sendResponse({ err: `Narwallets: account ${signerId} is read-only` });
-  // }
-
-  // msg.dest = "approve"; //send msg to the approval popup
-  // msg.signerId = signerId
-  // msg.network = Network.current;
-  // chrome.tabs.query({
-  //   active: true,
-  //   currentWindow: true
-  // }, function (tabs) {
-  //   msg.url = tabs[0].url;
-  // });
-
   //console.log("Opening approve popup", msg)
   //load popup window for the user to approve
   const width = 500;
@@ -213,9 +198,9 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
   );
 }
 
-async function commitActions(params: any, privateKey:string ): Promise<FinalExecutionOutcome> {
+async function commitActions(params: any, privateKey: string): Promise<FinalExecutionOutcome> {
   // re-hydrate action POJO as class instances, for the borsh serializer
-  const rehydratedActions = params.actions.map((action:any) => createCorrespondingAction(action) )
+  const rehydratedActions = params.actions.map((action: any) => createCorrespondingAction(action))
   return near.sendTransaction(
     rehydratedActions,
     params.signerId,
@@ -227,7 +212,7 @@ async function commitActions(params: any, privateKey:string ): Promise<FinalExec
 // re-hydrate action POJO as class instance
 function createCorrespondingAction(action: any): TX.Action {
   //console.log("Action", action)
-  switch(action.type){
+  switch (action.type) {
     case "FunctionCall":
       return TX.functionCall(action.params.methodName, action.params.args, BigInt(action.params.gas), BigInt(action.params.deposit))
     case "Transfer":
@@ -365,7 +350,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       return state
     }
     case "lock": {
-      return lock(JSON.stringify(msg))
+      return lockWallet(JSON.stringify(msg))
     }
     case "is-locked": {
       return isLocked()
@@ -980,46 +965,19 @@ chrome.alarms.onAlarm.addListener(function (alarm: any) {
   //log("chrome.alarms.onAlarm fired ", alarm);
   if (alarm.name == UNLOCK_EXPIRED) {
     chrome.alarms.clearAll();
-    lock("chrome.alarms.onAlarm " + JSON.stringify(alarm));
+    lockWallet("chrome.alarms.onAlarm " + JSON.stringify(alarm));
     //window.close()//unload this background page
     //chrome.storage.local.remove(["uk", "exp"]) //clear unlock sha
   }
 });
 
-// var lockTimeout: any;
-var unlockExpire: any;
-
-// //only to receive "popupLoading"|"popupUnloading" events
-// window.addEventListener(
-//   "message",
-//   async function (event) {
-//     if (event.data.code == "popupUnloading") {
-//       if (!isLocked()) {
-//         const autoUnlockSeconds = getAutoUnlockSeconds();
-//         unlockExpire = Date.now() + autoUnlockSeconds * 1000;
-//         chrome.alarms.create(UNLOCK_EXPIRED, { when: unlockExpire });
-//         log(UNLOCK_EXPIRED, autoUnlockSeconds);
-//         if (autoUnlockSeconds < 60 * 5) {
-//           //also setTimeout to Lock, because alarms fire only once per minute
-//           if (lockTimeout) clearTimeout(lockTimeout);
-//           lockTimeout = setTimeout(lock, autoUnlockSeconds * 1000);
-//         }
-//       }
-//       return;
-//     } else if (event.data.code == "popupLoading") {
-//       log("popupLoading");
-//       await retrieveBgInfoFromStorage();
-//       chrome.runtime.sendMessage({ dest: "popup", code: "can-init-popup" });
-//     }
-//   },
-//   false
-// );
-
 // called before processing messages to recover data if this is a new instance
+// this call does not recover SecureState if no sha, lockTimeout, or not unlocked already,
+// the caller MUST check isLocked()? after this call
 // TODO: consider the possibility the user added accounts to the wallet on another tab
-async function retrieveBgInfoFromStorage(): Promise<void> {
+async function tryRetrieveBgInfoFromStorage(): Promise<void> {
 
-  // Always recover first the base unencrypted state
+  // Always recover first the base unencrypted state, if needed
   if (stateIsEmpty()) {
     await recoverState();
   }
@@ -1037,20 +995,17 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
   const nw = (await localStorageGet("selectedNetwork")) as string;
   if (nw) Network.setCurrent(nw);
 
-  // default is secure state not opened
-  if (unlockExpire && Date.now() > unlockExpire) {
-    lock("unlock-expired");
-    return;
-  }
   // if no current user, lock
   if (!state.currentUser) {
-    lock("no current user");
+    lockWallet("no current user");
     return;
   }
 
   if (secureStateOpened()) {
+    // it was cached, the serviceworker is still acttive
     log("BK-init secureState already opened, has ", getNetworkAccountsCount(), "accounts")
-    // cached
+    // set alarm to lock after x minutes
+    setAutoLockAlarm()
     return
   }
 
@@ -1060,10 +1015,11 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
   //_connectedTabs = await localStorageGet("_ct");
 
   const unlockSHA = await getUnlockSHA()
-  log("RECOVERED UNLOACK SHA", unlockSHA);
+  log("RECOVERED UNLOCK SHA", unlockSHA);
 
   // if no auto-unlock-SHA
   if (!unlockSHA) {
+    lockWallet("no unlock sha");
     return;
   }
 
@@ -1076,11 +1032,23 @@ async function retrieveBgInfoFromStorage(): Promise<void> {
     );
   } catch (ex) {
     log("recovering secure state on retrieveBgInfoFromStorage", ex.message);
+    lockWallet("error decoding secure state");
     return;
   }
 
+  // set alarm to lock after x minutes
+  setAutoLockAlarm()
   return;
 }
+
+function setAutoLockAlarm() {
+  if (secureStateOpened()) {
+    const autoUnlockSeconds = getAutoUnlockSeconds()
+    const unlockExpireTimeStamp = Date.now() + autoUnlockSeconds * 1000;
+    chrome.alarms.create(UNLOCK_EXPIRED, { when: unlockExpireTimeStamp });
+  }
+}
+
 
 // returns true if loaded-unpacked, developer mode
 // false if installed from the chrome store

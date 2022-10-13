@@ -11,8 +11,6 @@
     "type": "module"
   },
   "permissions": [
-    "activeTab",
-    "tabs",
     "storage",
     "alarms"
   ],

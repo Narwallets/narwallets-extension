@@ -82,7 +82,7 @@ export class ExtendedAccountData {
   }
 
   async refreshLastBalance() {
-    await asyncRefreshAccountInfoLastBalance(
+    await tryAsyncRefreshAccountInfoLastBalance(
       this.name,
       this.accountInfo
     );
@@ -109,6 +109,17 @@ export class ExtendedAccountData {
 
 }
 
+/// try AsyncRefreshAccountInfoLastBalance and just log error if failure (network timeout, bad account, etc)
+export async function tryAsyncRefreshAccountInfoLastBalance(accName: string, info: Account, save: boolean = true) {
+  try {
+    await asyncRefreshAccountInfoLastBalance(accName,info,save)
+  }
+  catch(ex){
+    console.error(JSON.stringify(ex))
+  }
+}
+
+/// AsyncRefreshAccountInfoLastBalance and throw if error 
 export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account, save: boolean = true) {
 
   let stateResultYoctos;
@@ -118,6 +129,7 @@ export async function asyncRefreshAccountInfoLastBalance(accName: string, info: 
       accountId: accName,
     });
   } catch (ex) {
+    console.error(ex)
     const err = ex as Error
     let reason = (err.message && err.message.includes("name:UNKNOWN_ACCOUNT")) ? `not found in ${activeNetworkInfo.name}` : err.message;
     throw Error(`account:"${accName}", Error:${reason}`);

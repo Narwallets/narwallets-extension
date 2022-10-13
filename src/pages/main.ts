@@ -2,7 +2,7 @@ import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
 import { Account, Asset, setAssetBalanceYoctos } from "../structs/account-info.js";
-import { asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
+import { ExtendedAccountData } from "../extendedAccountData.js";
 import { selectAccountPopupList, selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
 import { show as UnlockPage_show } from "./unlock.js";
 

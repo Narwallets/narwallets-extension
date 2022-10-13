@@ -86,7 +86,7 @@ import {
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { autoRefresh, buildMRU } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
-import { asyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
+import { tryAsyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 import { getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/price-data.js";
 import { Asset, assetDivId, ASSET_HISTORY_TEMPLATE, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 
@@ -878,7 +878,7 @@ async function performSend() {
     const destAccInfo = await askBackgroundGetAccountRecordCopy(toAccName);
     if (destAccInfo) {
       // refresh dest account balance from chain - do not await for it
-      asyncRefreshAccountInfoLastBalance(toAccName, destAccInfo);
+      tryAsyncRefreshAccountInfoLastBalance(toAccName, destAccInfo);
     }
 
     d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
@@ -1932,13 +1932,11 @@ export async function refreshSaveSelectedAccount(fromTimer?: boolean) {
     //network changed
     return;
   }
-
-  await asyncRefreshAccountInfoLastBalance(
+  await tryAsyncRefreshAccountInfoLastBalance(
     selectedAccountData.name,
-    selectedAccountData.accountInfo
+    selectedAccountData.accountInfo,
+    true
   );
-  await saveSelectedAccount(); //save
-
   showSelectedAccount();
 }
 

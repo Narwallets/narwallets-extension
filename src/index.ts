@@ -181,25 +181,6 @@ async function securityOptions() {
   Options_show();
 }
 
-async function saveSecurityOptions(ev: Event) {
-  try {
-    ev.preventDefault();
-
-    const aulSecs = Number(d.inputById("autolock-seconds-input").value);
-    if (isNaN(aulSecs)) throw Error("Invalid auto unlock seconds");
-
-    await askBackground({
-      code: "set-options",
-      autoUnlockSeconds: aulSecs,
-    });
-
-    Main.show();
-    d.showSuccess("Options saved");
-  } catch (ex) {
-    d.showErr(ex.message);
-  }
-}
-
 function asideContact() {
   chrome.windows.create({
     url: "https://narwallets.com/contact.html",
@@ -310,11 +291,9 @@ function selectAccountMru(event: Event) {
 // initPopup
 //-----------------------
 document.addEventListener('DOMContentLoaded', initPopup);
-async function initPopup() { 
+async function initPopup() {
 
   logEnabled(1);
-
-  chrome.alarms.clear("unlock-expired");
 
   // update network indicator visual state
   await askBackgroundGetNetworkInfo();
@@ -422,4 +401,3 @@ function openTermsOfUseOnNewWindow() {
 //   true
 // );
 
-  

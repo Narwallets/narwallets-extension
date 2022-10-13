@@ -83,8 +83,19 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
         let accountDoesNotExistsRetries = 0;
         while (true) {
             let fetchResult = await fetch(rpcUrl, rpcOptions);
-            let response = await fetchResult.json()
-            if (!fetchResult.ok) throw new Error(rpcUrl + " " + fetchResult.status + " " + fetchResult.statusText)
+            if (fetchResult.status!==200) {
+                throw new Error(rpcUrl + " " + fetchResult.status + " " + fetchResult.statusText)
+            }
+            let response 
+            try {
+                response = await fetchResult.json()
+            }
+            catch(ex){
+                throw new Error(rpcUrl + " no a valid json response " + ex.message)
+            }
+            if (!fetchResult.ok) {
+                throw new Error(rpcUrl + " " + fetchResult.status + " " + fetchResult.statusText)
+            }
 
             let error = response.error
             if (!error && response.result && response.result.error) {

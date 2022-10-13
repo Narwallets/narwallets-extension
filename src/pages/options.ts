@@ -10,29 +10,30 @@ export let addressContacts: GContact[] = [];
 let selectedContactIndex: number = NaN;
 
 export async function show() {
-  
+
   d.onClickId("save-settings", saveSecurityOptions);
-  d.onClickId("cancel-security-settings", Pages.show);  
+  d.onClickId("cancel-security-settings", Pages.show);
 
   await showInitial();
 }
 async function saveSecurityOptions(ev: Event) {
-    try {
-      ev.preventDefault();
-      const aulSecs = Number(d.inputById("autolock-seconds-input").value);
-      if (isNaN(aulSecs)) throw Error("Invalid auto unlock seconds");
-  
-      await askBackground({
-        code: "set-options",
-        autoUnlockSeconds: aulSecs,
-      });
-  
-      Pages.show();
-      d.showSuccess("Options saved");
-    } catch (ex) {
-      d.showErr(ex.message);
-    }
+  try {
+    ev.preventDefault();
+    const aulSecs = Number(d.inputById("autolock-seconds-input").value);
+    if (isNaN(aulSecs)) throw Error("Invalid autolock seconds");
+    if (aulSecs < 60) throw Error("Autolock minimun is 60 seconds");
+
+    await askBackground({
+      code: "set-options",
+      autoUnlockSeconds: aulSecs,
+    });
+
+    Pages.show();
+    d.showSuccess("Options saved");
+  } catch (ex) {
+    d.showErr(ex.message);
   }
+}
 
 
 async function showInitial() {

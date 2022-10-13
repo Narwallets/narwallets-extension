@@ -44,8 +44,8 @@ export const EmptyState: StateStruct = {
 
 export var state = Object.assign({}, EmptyState);
 
-export function stateIsEmpty():boolean {
-    return state.currentUser===""
+export function stateIsEmpty(): boolean {
+    return state.currentUser === ""
 };
 
 //---- SECURE STATE ----
@@ -68,7 +68,7 @@ type NarwalletSecureData = {
 const EmptySecureState: NarwalletSecureData = {
     dataVersion: DATA_VERSION,
     hashedPass: undefined,
-    autoUnlockSeconds: 1800,
+    autoUnlockSeconds: 600, // 10 minutes
     advancedMode: false,
     accounts: {},
     contacts: {},
@@ -127,7 +127,7 @@ export function closeSecureState() {
     secureState = Object.assign({}, EmptySecureState);
 }
 
-export function lock(source: string) {
+export function lockWallet(source: string) {
     closeSecureState()
     log("LOCKED from:" + source);
     // log("LOCKED call stack:" + JSON.stringify(new Error().stack));
@@ -145,7 +145,7 @@ export async function changePasswordAsync(
     secureState.hashedPass = await sha256PwdBase64Async(password);
     saveSecureState();
 
-    lock("changePasswordAsync"); //log out current user
+    lockWallet("changePasswordAsync"); //log out current user
 }
 
 export async function createUserAsync(
@@ -159,7 +159,7 @@ export async function createUserAsync(
     } else if (!password || password.length < 8) {
         throw Error("password must be at least 8 characters long");
     }
-    lock("createUserAsync"); //log out current user
+    lockWallet("createUserAsync"); //log out current user
 
     state.currentUser = email;
     await createSecureStateAsync(password);
@@ -258,7 +258,7 @@ export async function unlockSecureStateSHA(
     secureState = decrypted;
     saveUnlockSHA(hashedPassBase64)
     setCurrentUser(email); // set & save State.currentUser
-    log("Secure state opened! "+email)
+    log("Secure state opened! " + email)
 }
 
 //------------------
@@ -306,7 +306,8 @@ export function getNetworkAccountsCount() {
 
 export function getAutoUnlockSeconds() {
     let aul = secureState.autoUnlockSeconds;
-    if (aul == undefined) aul = 30;
+    // min for chrome.alarm is 1 minute
+    if (!aul || aul < 60) aul = 60;
     return aul;
 }
 

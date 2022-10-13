@@ -917,20 +917,6 @@ function showInitialSubPage() {
   d.showSubPage("asset-history");
 }
 
-// async function refreshSaveSelectedAccount() {
-//   await asyncRefreshAccountInfoLastBalance(
-//     selectedAccountData.name,
-//     selectedAccountData.accountInfo
-//   );
-
-//   await saveSelectedAccount();
-
-//   selectedAccountData.available =
-//     selectedAccountData.accountInfo.lastBalance -
-//     selectedAccountData.accountInfo.lockedOther;
-//   selectedAccountData.total = selectedAccountData.available;
-// }
-
 async function assetCheckContactList(address: string) {
   if (await contactExists(address)) {
     showInitialSubPage();
