@@ -199,6 +199,13 @@ export function backToMainPageClicked() {
   hideOkCancel()
 }
 
+export async function asyncGetLastAccountName() {
+  let account: string | undefined = await localStorageGet("lastSelectedAccountByNetwork_" + activeNetworkInfo.name)
+  if (!account) account = await localStorageGet("currentAccountId")
+  if (account && !accountMatchesNetwork(account)) account = undefined
+  return account
+}
+
 async function tryReposition() {
   const reposition = await localStorageGetAndRemove("reposition");
   switch (reposition) {
@@ -221,9 +228,8 @@ async function tryReposition() {
     }
       break;
     default: {
-      let account: string | undefined = await localStorageGet("lastSelectedAccountByNetwork_" + activeNetworkInfo.name)
-      if (!account) account = await localStorageGet("currentAccountId")
       // in ALL cases we have to call AccountSelectedPage_show (it will show a select account popup if the account is not valid)
+      const account = await asyncGetLastAccountName()
       AccountSelectedPage_show(account || "")
     }
 

@@ -392,15 +392,14 @@ function openTermsOfUseOnNewWindow() {
 }
 
 type SendResponseFunction = (response: any) => void
-let thisUnlockSendResponse: SendResponseFunction
-let thisAfterUnlockMessage: any
-// Received message from content-script
+let thisUnlockSendResponse: SendResponseFunction | undefined
+let thisUnlockReceivedMessage: any
+// Received message from background
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
-
-  console.error("INDEX POPUP ONMESSAGE "+JSON.stringify(msg))
+  //debug("INDEX POPUP ONMESSAGE "+chrome.runtime.id+JSON.stringify(msg))
   if (sender.id == chrome.runtime.id && msg.dest == "unlock-popup") {
     thisUnlockSendResponse = sendResponse
-    thisAfterUnlockMessage = msg
+    thisUnlockReceivedMessage = msg
     // show request origin
     //if (sender.url) d.byId("web-page").innerText = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
     // ack, it's for me, sendResponse will be called later
@@ -409,7 +408,6 @@ chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSe
 });
 
 async function unlockClicked(ev: Event) {
-  console.log("Unlock clicked")
   //const emailEl = d.inputById("unlock-email")
   const passEl = d.inputById("unlock-pass")
   const email = SINGLE_USER_EMAIL; //emailEl.value
@@ -421,17 +419,29 @@ async function unlockClicked(ev: Event) {
   try {
     await askBackground({ code: "unlockSecureState", email: email, password: password })
     const numAccounts = await askBackground({ code: "getNetworkAccountsCount" })
-    console.log("Accounts: ", numAccounts)
+    //console.error("Accounts: ", numAccounts)
+    //console.error("thisUnlockSendResponse?", thisUnlockSendResponse?"YES":"NO")
     if (numAccounts == 0) {
       d.showPage("import-or-create"); // auto-add account after unlock      
     } else {
       if (thisUnlockSendResponse) {
         // this unlock is to execute a transaction or other page request
         // send directly to background to process and respond
-        thisAfterUnlockMessage.src = "page"
-        thisAfterUnlockMessage.dest = "ext"
-        passMsgToBackground(thisAfterUnlockMessage, thisUnlockSendResponse)
-        window.close()
+        let passMsg = Object.assign({}, thisUnlockReceivedMessage)
+        passMsg.src = "page"
+        passMsg.dest = "ext"
+        // for sign-in & get-account-id respond here
+        if (passMsg.code == "sign-in" || passMsg.code == "get-account-id") {
+          let account = await Main.asyncGetLastAccountName()
+          //console.error("thisUnlockSendResponse", account)
+          thisUnlockSendResponse({ data: account })
+        }
+        else {
+          //console.error("passMsgToBackground", JSON.stringify(passMsg))
+          // other codes, pass to background
+          passMsgToBackground(passMsg, thisUnlockSendResponse)
+        }
+        setTimeout(window.close, 200);
       }
       else {
         return MainPage_show()
