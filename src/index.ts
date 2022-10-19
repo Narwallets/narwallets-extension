@@ -394,12 +394,12 @@ function openTermsOfUseOnNewWindow() {
 type SendResponseFunction = (response: any) => void
 let thisUnlockSendResponse: SendResponseFunction | undefined
 let thisUnlockReceivedMessage: any
-// Received message from background
+// Received message from background (when acting as unlock-popup)
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
   //debug("INDEX POPUP ONMESSAGE "+chrome.runtime.id+JSON.stringify(msg))
-  console.log("INDEX POPUP ONMESSAGE ", chrome.runtime.id, JSON.stringify(msg))
-  if (sender.id == chrome.runtime.id && msg.dest == "unlock-popup") {
-    
+  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  console.log("INDEX POPUP ONMESSAGE, senderIsExt:", chrome.runtime.id, msg)
+  if (senderIsExt && msg.dest == "unlock-popup") {
     thisUnlockSendResponse = sendResponse
     thisUnlockReceivedMessage = msg
     // show request origin
@@ -408,6 +408,8 @@ chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSe
     return true;
   }
 });
+// let everyone interested know that this popup is opened and ready to process messages
+chrome.runtime.sendMessage({code:"popup-is-ready", src:"index"})
 
 async function unlockClicked(ev: Event) {
   //const emailEl = d.inputById("unlock-email")

@@ -13,7 +13,8 @@ let ThisApprovalMsg: any
 chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
 
   console.log("ONMESSAGE APPROVEPOPUP",msg)
-  if (sender.id == chrome.runtime.id && msg.dest == "approve-popup") {
+  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  if (senderIsExt && msg.dest == "approve-popup") {
     try {
       ThisApprovalSendResponse = sendResponse
       ThisApprovalMsg = msg
@@ -29,6 +30,8 @@ chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageS
 
   }
 });
+// let everyone interested know that this popup is opened and ready to process messages
+chrome.runtime.sendMessage({code:"popup-is-ready", src:"approve"})
 
 type TxInfo = {
   action: string;
@@ -52,7 +55,7 @@ async function approveOkClicked() {
   ThisApprovalMsg.dest = "ext"
   ThisApprovalMsg.src = "approve-popup"
   askBackground(ThisApprovalMsg)
-    .then((data) => { console.log("data", ThisApprovalSendResponse); ThisApprovalSendResponse({ data }) })
+    .then((data) => { console.log("approve ok clicked .then() after askbkg, data", data); ThisApprovalSendResponse({ data }) })
     .catch((err) => { ThisApprovalSendResponse({ err: err.message }) })
     // .finally(() => { window.close() })
 }

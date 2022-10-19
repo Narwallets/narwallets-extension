@@ -56,13 +56,19 @@ function runtimeMessageHandler(
   logEnabled(1)
   //console.log("runtimeMessage received ",sender, msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  const fromPage = !senderIsExt
-  const jmsg = JSON.stringify(msg)
-  log(
-    "BKG: msg from " + (senderIsExt ? "EXT" : "PAGE") + " " +
-    jmsg?.substring(0, Math.min(120, jmsg.length))
-  );
+  console.log("BKG: msg, senderIsExt", senderIsExt, msg);
+  // const jmsg = JSON.stringify(msg)
+  // log(
+  //   "BKG: msg senderIsExt:" + senderIsExt + " " +
+  //   jmsg?.substring(0, Math.min(120, jmsg.length))
+  // );
   //-- END DEBUG
+
+  // information messages to set global flags and finish waiting
+  if (msg && msg.code === "popup-is-ready") {
+    globalFlagPopupIsReadyMsgReceived = true
+    return false // done, internal message no callback required
+  }
   if (!msg || msg.dest != "ext") {
     log("bkg handler, not for me!")
     return false;
@@ -97,12 +103,12 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
     resolveUntrustedFromPage(sender, msg, sendResponse)
   }
   else {
-    // from internal trusted pages like extension-popup
+    // from internal trusted sources like extension-popup
     // use promises to resolve
     getPromiseMsgFromPopup(msg)
       .then((data: any) => {
         //promise resolved OK
-        log(data)
+        log("trusted msg", msg.code, "promise resolved OK", data)
         reflectTransfer(msg); // add history entries, move amounts if accounts are in the wallet
         sendResponse({ data: data });
       })
@@ -125,14 +131,12 @@ function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFuncti
     width: width,
     height: height,
     focused: true,
-  }, (_windowChromeObject) => {
-    // once opened, send to the unlock-popup (resend)
-    
-    msg.dest = "unlock-popup"
-    waitAndSendWithRetry(1000, 120, msg, sendResponse, "open-unlock")
-  });
+  })
+  msg.dest = "unlock-popup"
+  waitForPopupToOpen(200, 25, msg, sendResponse, "open-unlock")
 }
 
+/// this function should call sendResponse now, or else return true and call sendResponse later
 function resolveUntrustedFromPage(
   sender: chrome.runtime.MessageSender,
   msg: Record<string, any>,
@@ -161,16 +165,16 @@ function resolveUntrustedFromPage(
 
     case "sign-in":
     case "get-account-id":
-      if(isLocked()) {
+      if (isLocked()) {
         handleUnlock(msg, sendResponse)
-      } else { 
+      } else {
         // not locked
         localStorageGet("currentAccountId").then(accName => {
           //console.log(`Getting account ID ${accName}`)
           sendResponse({ data: accName })
         })
       }
-      
+
       break
 
     case "sign-and-send-transaction":
@@ -179,6 +183,7 @@ function resolveUntrustedFromPage(
         handleUnlock(msg, sendResponse)
       } else {
         prepareAndOpenApprovePopup(msg, sendResponse)
+        return true; // the approve popup will call sendResponse later
       }
       break
 
@@ -201,15 +206,9 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
     width: width,
     height: height,
     focused: true,
-  }, (chromePopupwindow) => {
-    console.log("Created")
-    // once opened, send msg to approval popup (resend)
-    console.log("Msg before", msg)
-    msg.dest = "approve-popup"
-    console.log("Msg after", msg)
-    // User will have 2000*30ms=1 minute to complete the action or an error will be thrown
-    waitAndSendWithRetry(200, 300, msg, sendResponse, "open_approve")
   });
+  msg.dest = "approve-popup"
+  waitForPopupToOpen(200, 25, msg, sendResponse, "open_approve")
 }
 
 // async function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction) {
@@ -224,8 +223,8 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
 //               retries--;
 //               console.log("Retries left", retries)
 //             }, waitMs);
-            
-            
+
+
 //           }
 //           if(!response && retries < 0) throw new Error("Response is empty")
 //           originalSendResponse(response);
@@ -242,34 +241,59 @@ async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
-function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction, loopTitle: string) {
-  return setTimeout(() => {
-    console.log("Loop:", loopTitle, retries, msg)
-    chrome.runtime.sendMessage(msg,
-      function (response) {
-        if (response) {
-          // all ok, Send response to original requestor
-          console.log("Response received. Sending to original send response", originalSendResponse)
-          originalSendResponse(response);
-        } else {
-          // failed to send, probably runtime.lastError: The message port closed before a response was received | Could not establish connection. Receiving end does not exist
-          // meaning the popup is still opening, so we wait and retry
-          const lastErr = chrome.runtime.lastError || { message: "response is empty" }
-          if (retries <= 0) {
-            // timed out
-            console.error(`waitAndSendWithRetry timed out ${JSON.stringify(lastErr)} ${JSON.stringify(msg)}`)
-            originalSendResponse({ err: lastErr.message });
-          }
-          else {
-            // retry
-            waitAndSendWithRetry(waitMs, retries - 1, msg, originalSendResponse, `${loopTitle}`)
-          }
-        }
-      }
-    )
-  }, waitMs)
+let globalFlagPopupIsReadyMsgReceived: boolean;
+async function waitForPopupToOpen(
+  waitMs: number,
+  retries: number,
+  msg: Record<string, any>,
+  originalSendResponse: SendResponseFunction,
+  loopTitle: string) {
+  globalFlagPopupIsReadyMsgReceived = false
+  while (retries >= 0) {
+    await sleep(waitMs)
+    // the popup, when ready will briadcast a message code="popup-is-ready" to signal that it is ready, 
+    // when received by runtime.onMessage here, the flag will be set to true
+    if (globalFlagPopupIsReadyMsgReceived) {  // the popup is active
+      // pass to the popup the responsibility to respond the original message
+      // we assume they're ready to process the message so no error possible in the next instruction
+      chrome.runtime.sendMessage(msg, originalSendResponse)
+      return
+    }
+    retries--;
+  }
+  // the popup never opened
+  console.error(`waitForPopupToOpen timed out ${loopTitle} ${JSON.stringify(msg)}`)
+  // we respond here to the original requester
+  originalSendResponse({ err: loopTitle + "popup never opened" });
 }
+
+// function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction, loopTitle: string) {
+//   return setTimeout(() => {
+//     console.log("Loop:", loopTitle, retries, msg)
+//     chrome.runtime.sendMessage(msg,
+//       function (response) {
+//         if (response) {
+//           // all ok, Send response to original requestor
+//           console.log("Response received. Sending to original send response", originalSendResponse)
+//           originalSendResponse(response);
+//         } else {
+//           // failed to send, probably runtime.lastError: The message port closed before a response was received | Could not establish connection. Receiving end does not exist
+//           // meaning the popup is still opening, so we wait and retry
+//           const lastErr = chrome.runtime.lastError || { message: "response is empty" }
+//           if (retries <= 0) {
+//             // timed out
+//             console.error(`waitAndSendWithRetry timed out ${JSON.stringify(lastErr)} ${JSON.stringify(msg)}`)
+//             originalSendResponse({ err: lastErr.message });
+//           }
+//           else {
+//             // retry
+//             waitAndSendWithRetry(waitMs, retries - 1, msg, originalSendResponse, `${loopTitle}`)
+//           }
+//         }
+//       }
+//     )
+//   }, waitMs)
+// }
 
 
 async function commitActions(params: any, privateKey: string): Promise<FinalExecutionOutcome> {
@@ -1060,7 +1084,7 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
   }
 
   const locked = isLocked()
-  log(`locked ${locked} dataVersion ${state.dataVersion} || user ${state.currentUser}`);
+  //log(`locked ${locked} dataVersion ${state.dataVersion} || user ${state.currentUser}`);
   // validate dataVersion
   if (!state.dataVersion) {
     clearState();
@@ -1090,11 +1114,11 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
   //_connectedTabs = await localStorageGet("_ct");
 
   const unlockSHA = await getUnlockSHA()
-  log("RECOVERED UNLOCK SHA", unlockSHA);
+  //log("RECOVERED UNLOCK SHA", unlockSHA);
 
   // if no auto-unlock-SHA
   if (!unlockSHA) {
-    lockWallet("no unlock sha");
+    if (!locked) lockWallet("no unlock sha");
     return;
   }
 
