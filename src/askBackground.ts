@@ -37,6 +37,7 @@ export function askBackground(requestPayload: any): Promise<any> {
 
 // send direct msg to background
 export function passMsgToBackground(msg:any, sendResponse:Function ){
+  console.log("Pass msg to background", msg)
   chrome.runtime.sendMessage(msg, sendResponse);
 }
 

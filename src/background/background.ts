@@ -89,7 +89,7 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
   // can the malicious page do it if the wallet is locked (will trigger unlock and send message from the unlock popup)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   console.log("BK w/data sender is ext", senderIsExt, msg)
-  if (!senderIsExt) {
+  if (!senderIsExt || msg.src === "page") {
     // from web-app/tab or wallet-selector -> content-script -> here
     // process separated from internal requests for security. 
     // We don't trust the page, 
@@ -114,13 +114,33 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
 
 type SendResponseFunction = (response: any) => void;
 
+function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFunction) {
+  const width = 500;
+  const height = 600;
+  chrome.windows.create({
+    url: "index.html",
+    type: "popup",
+    //left: 40,
+    top: 100,
+    width: width,
+    height: height,
+    focused: true,
+  }, (_windowChromeObject) => {
+    // once opened, send to the unlock-popup (resend)
+    
+    msg.dest = "unlock-popup"
+    waitAndSendWithRetry(1000, 120, msg, sendResponse, "open-unlock")
+  });
+}
+
 function resolveUntrustedFromPage(
   sender: chrome.runtime.MessageSender,
   msg: Record<string, any>,
   sendResponse: SendResponseFunction) {
 
-  // set the source url of the sender
-  if (sender.url) msg.senderUrl = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
+  // If the message comes from the extension, we trust the value from msg.senderUrl
+  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  if (sender.url && !senderIsExt) msg.senderUrl = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
 
   switch (msg.code) {
 
@@ -141,39 +161,25 @@ function resolveUntrustedFromPage(
 
     case "sign-in":
     case "get-account-id":
-      if (isLocked()) {
-        const width = 500;
-        const height = 600;
-        chrome.windows.create({
-          url: "index.html",
-          type: "popup",
-          //left: 40,
-          top: 100,
-          width: width,
-          height: height,
-          focused: true,
-        }, (windowChromeObject) => {
-          // once opened, send to the unlock-popup (resend)
-          msg.dest = "unlock-popup"
-          waitAndSendWithRetry(1000, 30, msg, sendResponse)
-        });
-      }
-      else {
+      if(isLocked()) {
+        handleUnlock(msg, sendResponse)
+      } else { 
         // not locked
         localStorageGet("currentAccountId").then(accName => {
           //console.log(`Getting account ID ${accName}`)
           sendResponse({ data: accName })
         })
       }
+      
       break
 
     case "sign-and-send-transaction":
     case "sign-and-send-transactions":
       if (isLocked()) {
-        sendResponse({ err: "Wallet is locked" })
-        return;
+        handleUnlock(msg, sendResponse)
+      } else {
+        prepareAndOpenApprovePopup(msg, sendResponse)
       }
-      prepareAndOpenApprovePopup(msg, sendResponse)
       break
 
     default:
@@ -196,38 +202,73 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
     height: height,
     focused: true,
   }, (chromePopupwindow) => {
+    console.log("Created")
     // once opened, send msg to approval popup (resend)
+    console.log("Msg before", msg)
     msg.dest = "approve-popup"
-    waitAndSendWithRetry(100, 50, msg, sendResponse)
+    console.log("Msg after", msg)
+    // User will have 2000*30ms=1 minute to complete the action or an error will be thrown
+    waitAndSendWithRetry(200, 300, msg, sendResponse, "open_approve")
   });
 }
 
-function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction) {
+// async function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction) {
+//     chrome.runtime.sendMessage(msg,
+//       function (response) {
+//         try {
+//           console.log("Checking response")
+//           while(!response && retries >= 0) {
+//             // Wait 200ms before rechecking for a response
+//             await sleep()
+//             setTimeout(() => {
+//               retries--;
+//               console.log("Retries left", retries)
+//             }, waitMs);
+            
+            
+//           }
+//           if(!response && retries < 0) throw new Error("Response is empty")
+//           originalSendResponse(response);
+//         } catch(err) {
+//           console.log("Throwing error")
+//           const lastErr = chrome.runtime.lastError || { message: "response is empty" }
+//           originalSendResponse({ err: lastErr.message });
+//         }
+//       }
+//     )
+// }
+
+async function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction, loopTitle: string) {
   return setTimeout(() => {
+    console.log("Loop:", loopTitle, retries, msg)
     chrome.runtime.sendMessage(msg,
       function (response) {
         if (response) {
           // all ok, Send response to original requestor
+          console.log("Response received. Sending to original send response", originalSendResponse)
           originalSendResponse(response);
-        }
-        else {
+        } else {
           // failed to send, probably runtime.lastError: The message port closed before a response was received | Could not establish connection. Receiving end does not exist
           // meaning the popup is still opening, so we wait and retry
           const lastErr = chrome.runtime.lastError || { message: "response is empty" }
           if (retries <= 0) {
             // timed out
-            console.error(`waitAndSendWithRetry timedout ${JSON.stringify(lastErr)} ${JSON.stringify(msg)}`)
+            console.error(`waitAndSendWithRetry timed out ${JSON.stringify(lastErr)} ${JSON.stringify(msg)}`)
             originalSendResponse({ err: lastErr.message });
           }
           else {
             // retry
-            waitAndSendWithRetry(waitMs, retries - 1, msg, originalSendResponse)
+            waitAndSendWithRetry(waitMs, retries - 1, msg, originalSendResponse, `${loopTitle}`)
           }
         }
       }
     )
-  }
-    , waitMs)
+  }, waitMs)
 }
 
 

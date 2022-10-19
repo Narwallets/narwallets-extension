@@ -5,7 +5,7 @@ window.addEventListener("message", (event) => {
     return;
   }
   const msg = event.data
-  if (msg.type && (msg.type == "nw") && msg.dest == "ext") {
+  if (msg && msg.type && (msg.type == "nw") && msg.dest == "ext") {
     // Sending message to narwallets extension background service worker 
     chrome.runtime.sendMessage(msg, function (response) {
       if (!response) {

@@ -397,7 +397,9 @@ let thisUnlockReceivedMessage: any
 // Received message from background
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
   //debug("INDEX POPUP ONMESSAGE "+chrome.runtime.id+JSON.stringify(msg))
+  console.log("INDEX POPUP ONMESSAGE ", chrome.runtime.id, JSON.stringify(msg))
   if (sender.id == chrome.runtime.id && msg.dest == "unlock-popup") {
+    
     thisUnlockSendResponse = sendResponse
     thisUnlockReceivedMessage = msg
     // show request origin

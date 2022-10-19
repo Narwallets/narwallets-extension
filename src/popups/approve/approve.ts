@@ -28,34 +28,13 @@ chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageS
     }
 
   }
-  // // We only accept messages from ourselves
-  // if (event.source != window) {
-  //   return;
-  // }
-
-  // if (event.data && event.data.dest == "approve-popup") {
-  //   window.msg = event.data.msg
-  //   window.sendResponse = event.data.sendResponse
-  //   displayTx()
-  // }
 });
 
 type TxInfo = {
   action: string;
   attached: string;
 }
-/*
-{id: 7, src: 'ws', type: 'nw', code: 'sign-and-send-transaction', dest: 'page', …}
-code: "sign-and-send-transaction"
-dest: "page"
-id: 7
-src: "ws"
-type: "nw"
-params: 
-   receiverId: "token.meta.pool.testnet"
-   actions: Array(1) 0: 
-    {methodName: 'ft_transfer_call', args: {…}, gas: '200000000000000', deposit: '1'}
-*/
+
 type Msg = {
   id: number;
   senderUrl: string;
@@ -63,31 +42,19 @@ type Msg = {
   signerId: string; // account
   receiverId: string; // contract
   params: any,
-  // tx?: BatchTransaction;
-  // txs?: BatchTransaction[];
 }
-// type ResolvedMsg = {
-//   dest: "page";
-//   code: "request-resolved";
-//   tabId: number;
-//   requestId: number;
-//   err?: any;
-//   data?: any
-// }
 
 let responseSent = false;
-
-//var initialMsg: TxMsg;
-//var resolvedMsg: ResolvedMsg;
 
 async function approveOkClicked() {
   d.showWait()
   // ask background to process the message, this time the origin is a popup from the extension, so it is trusted
   ThisApprovalMsg.dest = "ext"
+  ThisApprovalMsg.src = "approve-popup"
   askBackground(ThisApprovalMsg)
-    .then((data) => { ThisApprovalSendResponse({ data }) })
+    .then((data) => { console.log("data", ThisApprovalSendResponse); ThisApprovalSendResponse({ data }) })
     .catch((err) => { ThisApprovalSendResponse({ err: err.message }) })
-    .finally(() => { window.close() })
+    // .finally(() => { window.close() })
 }
 
 async function cancelOkClicked() {
@@ -224,55 +191,4 @@ function displayMultipleTransactionParams(txArray: any[]) {
     displaySingleTransactionParams(inx, tx)
     inx++
   }
-  // let toAdd: TxInfo = {
-  //   action: item.action,
-  //   attached: (item.attached != "0" && item.attached != "1") ?
-  //     `with <span class="near">${c.removeDecZeroes(c.ytonFull(item.attached))}</span> attached NEAR` : ""
-  // }
-  // //explain action
-  // switch (item.action) {
-  //   case "call":
-  //     const f = item as FunctionCall;
-  //     toAdd.action = `call ${f.method}(${humanReadableCallArgs(f.args)})`;
-  //     break;
-
-  //   case "transfer":
-  //     toAdd.action = ""
-  //     toAdd.attached = `transfer <span class="near">${c.ytonString(item.attached)}</span> NEAR`
-  //     break;
-
-  //   default:
-  //     toAdd.action = JSON.stringify(item);
-  // }
-  // for (let item of tx.items) {
-  //   const f = item as FunctionCall;
-  //   let toAdd = { receiver: tx.receiver, action: `${f.method}(${JSON.stringify(f.args)})` }
-  //   const TEMPLATE = `
-  //   <li id="{name}">
-  //     <div class="receiver">{receiver}</div>
-  //     <div class="actions">{action}</div>
-  //   </li>
-  //   `;
-  //   // 
-  //   d.appendTemplateLI("list", TEMPLATE, toAdd)
-  // }
-
-  // console.log("tx", tx)
-  // }
 }
-
-// // wait for window.msg to be set
-// let interval: NodeJS.Timeout
-// function waitForMsg(){
-//   console.log("waiting for window.msg",window.msg)
-//   if (window.msg) {
-//     clearInterval(interval)
-//     displayTx()
-//   }
-// }
-// window.onload = function () {
-//   console.log("setInterval(waitForMsg")
-//   interval = setInterval(waitForMsg,1000);
-// }
-
-
