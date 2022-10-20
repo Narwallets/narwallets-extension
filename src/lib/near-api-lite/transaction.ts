@@ -19,8 +19,9 @@ export class AccessKeyPermission extends Enum {
 
 export class AccessKey extends Assignable {
     nonce!: number
-    permission!: AccessKeyPermission
-
+    permission!: string
+    block_height!: number
+    block_hash!: string
 }
 
 export function fullAccessKey(): AccessKey {

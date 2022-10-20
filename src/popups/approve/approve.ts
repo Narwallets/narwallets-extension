@@ -2,36 +2,8 @@
 import * as d from "../../util/document.js"
 import { askBackground } from "../../askBackground.js"
 import { removeDecZeroes, toStringDecMin, yton, ytonFull, ytonString } from "../../util/conversions.js";
-//import { globalSendResponse } from "../../background/background.js"
 
 type SendResponseFunction = (response: any) => void
-
-let ThisApprovalSendResponse: SendResponseFunction
-let ThisApprovalMsg: any
-
-// Received message from bg
-chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
-
-  console.log("ONMESSAGE APPROVEPOPUP",msg)
-  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  if (senderIsExt && msg.dest == "approve-popup") {
-    try {
-      ThisApprovalSendResponse = sendResponse
-      ThisApprovalMsg = msg
-      // show request origin
-      //d.byId("net-name").innerText = msg.network || ""
-      // display instructions
-      displayTx(msg)
-      return true; // ack, it's for me, sendResponse will be called later
-    }
-    catch (err) {
-      sendResponse({ err: err.message })
-    }
-
-  }
-});
-// let everyone interested know that this popup is opened and ready to process messages
-chrome.runtime.sendMessage({code:"popup-is-ready", src:"approve"})
 
 type TxInfo = {
   action: string;
@@ -47,17 +19,15 @@ type Msg = {
   params: any,
 }
 
-let responseSent = false;
-
 async function approveOkClicked() {
   d.showWait()
   // ask background to process the message, this time the origin is a popup from the extension, so it is trusted
   ThisApprovalMsg.dest = "ext"
   ThisApprovalMsg.src = "approve-popup"
   askBackground(ThisApprovalMsg)
-    .then((data) => { console.log("approve ok clicked .then() after askbkg, data", data); ThisApprovalSendResponse({ data }) })
-    .catch((err) => { ThisApprovalSendResponse({ err: err.message }) })
-    // .finally(() => { window.close() })
+    .then((data) => { ThisApprovalSendResponse({ data, code: ThisApprovalMsg.code }) })
+    .catch((err) => { ThisApprovalSendResponse({ err: err.message, code: ThisApprovalMsg.code }) })
+    .finally(() => { window.close() })
 }
 
 async function cancelOkClicked() {
@@ -67,9 +37,7 @@ async function cancelOkClicked() {
   setTimeout(() => { window.close() }, 200);
 }
 
-window.addEventListener('beforeunload', function (event) {
-  cancelOkClicked()
-});
+
 
 
 function humanReadableValue(value: Object): string {
@@ -195,3 +163,33 @@ function displayMultipleTransactionParams(txArray: any[]) {
     inx++
   }
 }
+
+let ThisApprovalSendResponse: SendResponseFunction
+let ThisApprovalMsg: any
+
+window.addEventListener('beforeunload', function (event) {
+  cancelOkClicked()
+});
+
+// Received message from bg
+chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
+
+  console.log("ONMESSAGE APPROVEPOPUP",msg)
+  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  if (senderIsExt && msg.dest == "approve-popup") {
+    try {
+      ThisApprovalSendResponse = sendResponse
+      ThisApprovalMsg = msg
+      // show request origin
+      //d.byId("net-name").innerText = msg.network || ""
+      // display instructions
+      displayTx(msg)
+      return true; // ack, it's for me, sendResponse will be called later
+    }
+    catch (err) {
+      sendResponse({ err: err.message })
+    }
+  }
+});
+// let everyone interested know that this popup is opened and ready to process messages
+setTimeout(() => { chrome.runtime.sendMessage({code:"popup-is-ready", src:"approve"}) }, 1000)

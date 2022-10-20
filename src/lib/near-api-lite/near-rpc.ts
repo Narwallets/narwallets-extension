@@ -95,7 +95,7 @@ export async function queryAccount(accountId: string): Promise<StateResult> {
 };
 
 //-------------------------------
-export function access_key(accountId: string, publicKey: string): Promise<any> {
+export function access_key(accountId: string, publicKey: string): Promise<TX.AccessKey> {
     return jsonRpcQuery(`access_key/${accountId}/${publicKey}`) as Promise<any>
 };
 
@@ -136,7 +136,60 @@ export async function signTransaction(actions: TX.Action[], signerId: string, re
     const publicKey = keyPair.getPublicKey();
 
     const accessKey = await access_key(signerId, publicKey.toString());
-    if (accessKey.permission !== 'FullAccess') throw Error(`The key is not full access for account '${signerId}'`)
+    if (accessKey.permission !== "FullAccess") throw Error(`The key is not full access for account '${signerId}'`)
+
+    // converts a recent block hash into an array of bytes 
+    // this hash was retrieved earlier when creating the accessKey (Line 26)
+    // this is required to prove the tx was recently constructed (within 24hrs)
+    recentBlockHash = bs58.decode(accessKey.block_hash);
+
+    // each transaction requires a unique number or nonce
+    // this is created by taking the current nonce and incrementing it
+    const nonce = ++accessKey.nonce;
+
+    const transaction = TX.createTransaction(
+        signerId,
+        publicKey,
+        receiver,
+        nonce,
+        actions,
+        recentBlockHash
+    )
+    //console.log("Transaction", transaction)
+
+    const serializedTx = serialize(TX.SCHEMA, transaction);
+    const serializedTxHash = new Uint8Array(await sha256Async(serializedTx));
+    const signature = keyPair.sign(serializedTxHash)
+
+    const signedTransaction = new TX.SignedTransaction({
+        transaction: transaction,
+        signature: new TX.Signature({
+            keyType: transaction.publicKey.keyType,
+            data: signature.signature
+        })
+    });
+    //console.log("signedTransaction", signedTransaction)
+    return signedTransaction
+}
+
+export async function getAccessKey(signerId: string, privateKey: string): Promise<any> {
+    const keyPair = KeyPairEd25519.fromString(privateKey);
+    const publicKey = keyPair.getPublicKey();
+
+    const accessKey = await access_key(signerId, publicKey.toString());
+    console.log("Access Key", accessKey)
+    if (accessKey.permission != "FullAccess") throw Error(`The key is not full access for account '${signerId}'`)
+    return accessKey
+}
+
+//-------------------------------
+export async function signTransaction2(accessKey: any, actions: TX.Action[], signerId: string, receiver: string, privateKey: string): Promise<TX.SignedTransaction> {
+
+    const keyPair = KeyPairEd25519.fromString(privateKey);
+    const publicKey = keyPair.getPublicKey();
+
+    // const accessKey = await access_key(signerId, publicKey.toString());
+    // if (accessKey.permission !== 'FullAccess') throw Error(`The key is not full access for account '${signerId}'`)
 
     // converts a recent block hash into an array of bytes 
     // this hash was retrieved earlier when creating the accessKey (Line 26)
@@ -185,6 +238,15 @@ export async function sendTransaction(actions: TX.Action[], signerId: string, re
     : Promise<FinalExecutionOutcome> {
 
     const signedTransaction = await signTransaction(actions, signerId, receiver, privateKey)
+
+    return sendSignedTransaction(signedTransaction)
+}
+
+//-------------------------------
+export async function sendTransaction2(accessKey: any, actions: TX.Action[], signerId: string, receiver: string, privateKey: string)
+    : Promise<FinalExecutionOutcome> {
+
+    const signedTransaction = await signTransaction2(accessKey, actions, signerId, receiver, privateKey)
 
     return sendSignedTransaction(signedTransaction)
 }

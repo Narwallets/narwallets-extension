@@ -26,6 +26,7 @@ import {
 } from "./background-state.js";
 import { Account, Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
+import { S } from "../lib/tweetnacl/core/core.js";
 
 
 
@@ -67,7 +68,7 @@ function runtimeMessageHandler(
   // information messages to set global flags and finish waiting
   if (msg && msg.code === "popup-is-ready") {
     globalFlagPopupIsReadyMsgReceived = true
-    return false // done, internal message no callback required
+    return true // done, internal message no callback required
   }
   if (!msg || msg.dest != "ext") {
     log("bkg handler, not for me!")
@@ -120,7 +121,18 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
 
 type SendResponseFunction = (response: any) => void;
 
-function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFunction) {
+export const WALLET_SELECTOR_CODES = {
+  IS_INSTALLED: "is-installed",
+  IS_SIGNED_IN: "is-signed-in",
+  SIGN_OUT: "sign-out",
+  SIGN_IN: "sign-in",
+  GET_ACCOUNT_ID: "get-account-id",
+  SIGN_AND_SEND_TRANSACTION: "sign-and-send-transaction",
+  SIGN_AND_SEND_TRANSACTIONS: "sign-and-send-transactions",
+}
+
+async function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFunction) {
+  globalFlagPopupIsReadyMsgReceived = false
   const width = 500;
   const height = 600;
   chrome.windows.create({
@@ -132,8 +144,12 @@ function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFuncti
     height: height,
     focused: true,
   })
-  msg.dest = "unlock-popup"
-  waitForPopupToOpen(200, 25, msg, sendResponse, "open-unlock")
+  waitForPopupToOpen("unlock-popup", msg, sendResponse)
+
+  // msg.dest = "unlock-popup"
+  // await sleep(1000)
+  // chrome.runtime.sendMessage(msg, sendResponse)
+  // waitForPopupToOpen(200, 25, msg, sendResponse, "open-unlock")
 }
 
 /// this function should call sendResponse now, or else return true and call sendResponse later
@@ -148,37 +164,36 @@ function resolveUntrustedFromPage(
 
   switch (msg.code) {
 
-    case "is-installed":
-      sendResponse({ data: true })
+    case WALLET_SELECTOR_CODES.IS_INSTALLED:
+      sendResponse({ data: true, code: msg.code })
       return;
 
-    case "is-signed-in":
-      sendResponse({ data: !isLocked() })
+    case WALLET_SELECTOR_CODES.IS_SIGNED_IN:
+      sendResponse({ data: !isLocked(), code: msg.code })
       return;
 
-    case "sign-out":
+    case WALLET_SELECTOR_CODES.SIGN_OUT:
       // await disconnectFromWebPage()
       lockWallet("sign-out")
-      sendResponse({ data: true })
+      sendResponse({ data: true, code: msg.code })
       // ctinfo.acceptedConnection = false;
       return;
 
-    case "sign-in":
-    case "get-account-id":
+    case WALLET_SELECTOR_CODES.SIGN_IN:
+    case WALLET_SELECTOR_CODES.GET_ACCOUNT_ID:
       if (isLocked()) {
         handleUnlock(msg, sendResponse)
       } else {
         // not locked
         localStorageGet("currentAccountId").then(accName => {
-          //console.log(`Getting account ID ${accName}`)
-          sendResponse({ data: accName })
+          sendResponse({ data: accName, code: msg.code })
         })
       }
 
       break
 
-    case "sign-and-send-transaction":
-    case "sign-and-send-transactions":
+    case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTION:
+    case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTIONS:
       if (isLocked()) {
         handleUnlock(msg, sendResponse)
       } else {
@@ -193,8 +208,9 @@ function resolveUntrustedFromPage(
 }
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
-
-  //console.log("Opening approve popup", msg)
+  
+  console.log("Opening approve popup", msg)
+  globalFlagPopupIsReadyMsgReceived = false
   //load popup window for the user to approve
   const width = 500;
   const height = 540;
@@ -207,65 +223,51 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
     height: height,
     focused: true,
   });
-  msg.dest = "approve-popup"
-  waitForPopupToOpen(200, 25, msg, sendResponse, "open_approve")
+  
+  waitForPopupToOpen("approve-popup", msg, sendResponse)
 }
-
-// async function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction) {
-//     chrome.runtime.sendMessage(msg,
-//       function (response) {
-//         try {
-//           console.log("Checking response")
-//           while(!response && retries >= 0) {
-//             // Wait 200ms before rechecking for a response
-//             await sleep()
-//             setTimeout(() => {
-//               retries--;
-//               console.log("Retries left", retries)
-//             }, waitMs);
-
-
-//           }
-//           if(!response && retries < 0) throw new Error("Response is empty")
-//           originalSendResponse(response);
-//         } catch(err) {
-//           console.log("Throwing error")
-//           const lastErr = chrome.runtime.lastError || { message: "response is empty" }
-//           originalSendResponse({ err: lastErr.message });
-//         }
-//       }
-//     )
-// }
 
 async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 let globalFlagPopupIsReadyMsgReceived: boolean;
+
 async function waitForPopupToOpen(
-  waitMs: number,
-  retries: number,
+  dest: string,
   msg: Record<string, any>,
-  originalSendResponse: SendResponseFunction,
-  loopTitle: string) {
-  globalFlagPopupIsReadyMsgReceived = false
-  while (retries >= 0) {
-    await sleep(waitMs)
-    // the popup, when ready will briadcast a message code="popup-is-ready" to signal that it is ready, 
-    // when received by runtime.onMessage here, the flag will be set to true
-    if (globalFlagPopupIsReadyMsgReceived) {  // the popup is active
-      // pass to the popup the responsibility to respond the original message
-      // we assume they're ready to process the message so no error possible in the next instruction
-      chrome.runtime.sendMessage(msg, originalSendResponse)
-      return
+  sendResponse: SendResponseFunction) {
+    msg.dest = dest
+    while(!globalFlagPopupIsReadyMsgReceived) {
+      await sleep(100)
     }
-    retries--;
-  }
-  // the popup never opened
-  console.error(`waitForPopupToOpen timed out ${loopTitle} ${JSON.stringify(msg)}`)
-  // we respond here to the original requester
-  originalSendResponse({ err: loopTitle + "popup never opened" });
+    chrome.runtime.sendMessage(msg, sendResponse)
+    // await sleep(1000)
 }
+// async function waitForPopupToOpen(
+//   waitMs: number,
+//   retries: number,
+//   msg: Record<string, any>,
+//   sendResponse: SendResponseFunction,
+//   loopTitle: string) {
+//   globalFlagPopupIsReadyMsgReceived = false
+//   while (retries >= 0) {
+//     await sleep(waitMs)
+//     // the popup, when ready will briadcast a message code="popup-is-ready" to signal that it is ready, 
+//     // when received by runtime.onMessage here, the flag will be set to true
+//     if (globalFlagPopupIsReadyMsgReceived) {  // the popup is active
+//       // pass to the popup the responsibility to respond the original message
+//       // we assume they're ready to process the message so no error possible in the next instruction
+//       chrome.runtime.sendMessage(msg, sendResponse)
+//       return
+//     }
+//     retries--;
+//   }
+//   // the popup never opened
+//   console.error(`waitForPopupToOpen timed out ${loopTitle} ${JSON.stringify(msg)}`)
+//   // we respond here to the original requester
+//   sendResponse({ err: loopTitle + "popup never opened" });
+// }
 
 // function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction, loopTitle: string) {
 //   return setTimeout(() => {
@@ -296,10 +298,11 @@ async function waitForPopupToOpen(
 // }
 
 
-async function commitActions(params: any, privateKey: string): Promise<FinalExecutionOutcome> {
+async function commitActions(accessKey: any, params: any, privateKey: string): Promise<FinalExecutionOutcome> {
   // re-hydrate action POJO as class instances, for the borsh serializer
   const rehydratedActions = params.actions.map((action: any) => createCorrespondingAction(action))
-  return near.sendTransaction(
+  return near.sendTransaction2(
+    accessKey,
     rehydratedActions,
     params.signerId,
     params.receiverId,
@@ -626,17 +629,24 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       if (!accInfo.privateKey) {
         throw Error(`account ${msg.params.signerId} is read-only`)
       }
-      return commitActions(msg.params, accInfo.privateKey)
+      const accessKey = await near.getAccessKey(msg.params.signerId, accInfo.privateKey)
+      return commitActions(accessKey, msg.params, accInfo.privateKey)
     }
 
     case "sign-and-send-transactions": {
+      if(!msg.params || msg.params.length == 0) throw new Error("Sign and Send Transactions without any message")
       let promises: Promise<any>[] = []
+      const signerId = msg.params[0].signerId
       for (let tx of msg.params) {
-        const accInfo = getAccount(tx.signerId);
-        if (!accInfo.privateKey) {
-          throw Error(`account ${tx.signerId} is read-only`)
-        }
-        promises.push(commitActions(tx, accInfo.privateKey))
+        if(tx.signerId != signerId) throw new Error("Sign and Send Transactions with many signerIds")
+      }
+      const accInfo = getAccount(signerId);
+      if (!accInfo.privateKey) {
+        throw Error(`account ${signerId} is read-only`)
+      }
+      const accessKey = await near.getAccessKey(signerId, accInfo.privateKey)
+      for (let tx of msg.params) {
+        promises.push(commitActions(accessKey, tx, accInfo.privateKey))
       }
       return Promise.all(promises)
     }

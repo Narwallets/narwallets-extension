@@ -33,6 +33,7 @@ import { closePopupList, initPopupHandlers } from "./util/popup-list.js";
 import { log, logEnabled } from "./lib/log.js";
 import { fetchNearDollarPrice } from "./data/price-data.js";
 import { activeNetworkInfo } from "./askBackground.js";
+import { WALLET_SELECTOR_CODES } from "./background/background.js";
 
 export const SINGLE_USER_EMAIL = "unique-user@narwallets.com"
 
@@ -435,16 +436,17 @@ async function unlockClicked(ev: Event) {
         passMsg.src = "page"
         passMsg.dest = "ext"
         // for sign-in & get-account-id respond here
-        if (passMsg.code == "sign-in" || passMsg.code == "get-account-id") {
-          let account = await Main.asyncGetLastAccountName()
-          //console.error("thisUnlockSendResponse", account)
-          thisUnlockSendResponse({ data: account })
-        }
-        else {
-          //console.error("passMsgToBackground", JSON.stringify(passMsg))
-          // other codes, pass to background
-          passMsgToBackground(passMsg, thisUnlockSendResponse)
-        }
+        let account = await Main.asyncGetLastAccountName()
+        //console.error("thisUnlockSendResponse", account)
+        thisUnlockSendResponse({ data: account, code: WALLET_SELECTOR_CODES.SIGN_IN })
+        
+        // if (passMsg.code == "sign-in" || passMsg.code == "get-account-id") {
+        // }
+        // else {
+        //   //console.error("passMsgToBackground", JSON.stringify(passMsg))
+        //   // other codes, pass to background
+        //   passMsgToBackground(passMsg, thisUnlockSendResponse)
+        // }
         setTimeout(window.close, 200);
       }
       else {
