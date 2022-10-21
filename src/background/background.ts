@@ -145,11 +145,6 @@ async function handleUnlock(msg: Record<string, any>, sendResponse: SendResponse
     focused: true,
   })
   waitForPopupToOpen("unlock-popup", msg, sendResponse)
-
-  // msg.dest = "unlock-popup"
-  // await sleep(1000)
-  // chrome.runtime.sendMessage(msg, sendResponse)
-  // waitForPopupToOpen(200, 25, msg, sendResponse, "open-unlock")
 }
 
 /// this function should call sendResponse now, or else return true and call sendResponse later
@@ -244,59 +239,6 @@ async function waitForPopupToOpen(
     chrome.runtime.sendMessage(msg, sendResponse)
     // await sleep(1000)
 }
-// async function waitForPopupToOpen(
-//   waitMs: number,
-//   retries: number,
-//   msg: Record<string, any>,
-//   sendResponse: SendResponseFunction,
-//   loopTitle: string) {
-//   globalFlagPopupIsReadyMsgReceived = false
-//   while (retries >= 0) {
-//     await sleep(waitMs)
-//     // the popup, when ready will briadcast a message code="popup-is-ready" to signal that it is ready, 
-//     // when received by runtime.onMessage here, the flag will be set to true
-//     if (globalFlagPopupIsReadyMsgReceived) {  // the popup is active
-//       // pass to the popup the responsibility to respond the original message
-//       // we assume they're ready to process the message so no error possible in the next instruction
-//       chrome.runtime.sendMessage(msg, sendResponse)
-//       return
-//     }
-//     retries--;
-//   }
-//   // the popup never opened
-//   console.error(`waitForPopupToOpen timed out ${loopTitle} ${JSON.stringify(msg)}`)
-//   // we respond here to the original requester
-//   sendResponse({ err: loopTitle + "popup never opened" });
-// }
-
-// function waitAndSendWithRetry(waitMs: number, retries: number, msg: Record<string, any>, originalSendResponse: SendResponseFunction, loopTitle: string) {
-//   return setTimeout(() => {
-//     console.log("Loop:", loopTitle, retries, msg)
-//     chrome.runtime.sendMessage(msg,
-//       function (response) {
-//         if (response) {
-//           // all ok, Send response to original requestor
-//           console.log("Response received. Sending to original send response", originalSendResponse)
-//           originalSendResponse(response);
-//         } else {
-//           // failed to send, probably runtime.lastError: The message port closed before a response was received | Could not establish connection. Receiving end does not exist
-//           // meaning the popup is still opening, so we wait and retry
-//           const lastErr = chrome.runtime.lastError || { message: "response is empty" }
-//           if (retries <= 0) {
-//             // timed out
-//             console.error(`waitAndSendWithRetry timed out ${JSON.stringify(lastErr)} ${JSON.stringify(msg)}`)
-//             originalSendResponse({ err: lastErr.message });
-//           }
-//           else {
-//             // retry
-//             waitAndSendWithRetry(waitMs, retries - 1, msg, originalSendResponse, `${loopTitle}`)
-//           }
-//         }
-//       }
-//     )
-//   }, waitMs)
-// }
-
 
 async function commitActions(accessKey: any, params: any, privateKey: string): Promise<FinalExecutionOutcome> {
   // re-hydrate action POJO as class instances, for the borsh serializer
@@ -312,7 +254,6 @@ async function commitActions(accessKey: any, params: any, privateKey: string): P
 
 // re-hydrate action POJO as class instance
 function createCorrespondingAction(action: any): TX.Action {
-  //console.log("Action", action)
   switch (action.type) {
     case "FunctionCall":
       return TX.functionCall(action.params.methodName, action.params.args, BigInt(action.params.gas), BigInt(action.params.deposit))

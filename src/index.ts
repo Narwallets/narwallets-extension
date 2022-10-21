@@ -437,16 +437,8 @@ async function unlockClicked(ev: Event) {
         passMsg.dest = "ext"
         // for sign-in & get-account-id respond here
         let account = await Main.asyncGetLastAccountName()
-        //console.error("thisUnlockSendResponse", account)
         thisUnlockSendResponse({ data: account, code: WALLET_SELECTOR_CODES.SIGN_IN })
         
-        // if (passMsg.code == "sign-in" || passMsg.code == "get-account-id") {
-        // }
-        // else {
-        //   //console.error("passMsgToBackground", JSON.stringify(passMsg))
-        //   // other codes, pass to background
-        //   passMsgToBackground(passMsg, thisUnlockSendResponse)
-        // }
         setTimeout(window.close, 200);
       }
       else {

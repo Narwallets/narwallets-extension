@@ -25,14 +25,14 @@ async function approveOkClicked() {
   ThisApprovalMsg.dest = "ext"
   ThisApprovalMsg.src = "approve-popup"
   askBackground(ThisApprovalMsg)
-    .then((data) => { ThisApprovalSendResponse({ data, code: ThisApprovalMsg.code }) })
-    .catch((err) => { ThisApprovalSendResponse({ err: err.message, code: ThisApprovalMsg.code }) })
+    .then((data) => { approvalSendResponse({ data, code: ThisApprovalMsg.code }) })
+    .catch((err) => { approvalSendResponse({ err: err.message, code: ThisApprovalMsg.code }) })
     .finally(() => { window.close() })
 }
 
 async function cancelOkClicked() {
   // respondRejected();
-  ThisApprovalSendResponse({ err: "Rejected by user" })
+  approvalSendResponse({ err: "Rejected by user" })
   //const wasCalled = await askBackground({code:"callGlobalSendResponse", cancel: true})
   setTimeout(() => { window.close() }, 200);
 }
@@ -164,7 +164,7 @@ function displayMultipleTransactionParams(txArray: any[]) {
   }
 }
 
-let ThisApprovalSendResponse: SendResponseFunction
+let approvalSendResponse: SendResponseFunction
 let ThisApprovalMsg: any
 
 window.addEventListener('beforeunload', function (event) {
@@ -178,7 +178,7 @@ chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageS
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   if (senderIsExt && msg.dest == "approve-popup") {
     try {
-      ThisApprovalSendResponse = sendResponse
+      approvalSendResponse = sendResponse
       ThisApprovalMsg = msg
       // show request origin
       //d.byId("net-name").innerText = msg.network || ""
