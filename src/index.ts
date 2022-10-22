@@ -294,7 +294,7 @@ function selectAccountMru(event: Event) {
 document.addEventListener('DOMContentLoaded', initPopup);
 async function initPopup() {
 
-  logEnabled(1);
+  //logEnabled(1);
 
   // update network indicator visual state
   await askBackgroundGetNetworkInfo();
@@ -399,7 +399,7 @@ let thisUnlockReceivedMessage: any
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
   //debug("INDEX POPUP ONMESSAGE "+chrome.runtime.id+JSON.stringify(msg))
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  console.log("INDEX POPUP ONMESSAGE, senderIsExt:", chrome.runtime.id, msg)
+  //console.log("INDEX POPUP ONMESSAGE, senderIsExt:", chrome.runtime.id, msg)
   if (senderIsExt && msg.dest == "unlock-popup") {
     thisUnlockSendResponse = sendResponse
     thisUnlockReceivedMessage = msg
@@ -410,7 +410,7 @@ chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSe
   }
 });
 // let everyone interested know that this popup is opened and ready to process messages
-chrome.runtime.sendMessage({code:"popup-is-ready", src:"index"})
+chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" })
 
 async function unlockClicked(ev: Event) {
   //const emailEl = d.inputById("unlock-email")
@@ -438,7 +438,7 @@ async function unlockClicked(ev: Event) {
         // for sign-in & get-account-id respond here
         let account = await Main.asyncGetLastAccountName()
         thisUnlockSendResponse({ data: account, code: WALLET_SELECTOR_CODES.SIGN_IN })
-        
+
         setTimeout(window.close, 200);
       }
       else {

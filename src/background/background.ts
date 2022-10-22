@@ -54,10 +54,10 @@ function runtimeMessageHandler(
 ) {
 
   //-- DEBUG
-  logEnabled(1)
+  //logEnabled(1)
   //console.log("runtimeMessage received ",sender, msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  console.log("BKG: msg, senderIsExt", senderIsExt, msg);
+  //console.log("BKG: msg, senderIsExt", senderIsExt, msg);
   // const jmsg = JSON.stringify(msg)
   // log(
   //   "BKG: msg senderIsExt:" + senderIsExt + " " +
@@ -95,7 +95,7 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
   // TODO: CHECK: can still a malicious page make a postMessage and get here as "fromExtension"
   // can the malicious page do it if the wallet is locked (will trigger unlock and send message from the unlock popup)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  console.log("BK w/data sender is ext", senderIsExt, msg)
+  //console.log("BK w/data sender is ext", senderIsExt, msg)
   if (!senderIsExt || msg.src === "page") {
     // from web-app/tab or wallet-selector -> content-script -> here
     // process separated from internal requests for security. 
@@ -203,8 +203,8 @@ function resolveUntrustedFromPage(
 }
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
-  
-  console.log("Opening approve popup", msg)
+
+  //console.log("Opening approve popup", msg)
   globalFlagPopupIsReadyMsgReceived = false
   //load popup window for the user to approve
   const width = 500;
@@ -218,7 +218,7 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
     height: height,
     focused: true,
   });
-  
+
   waitForPopupToOpen("approve-popup", msg, sendResponse)
 }
 
@@ -232,12 +232,12 @@ async function waitForPopupToOpen(
   dest: string,
   msg: Record<string, any>,
   sendResponse: SendResponseFunction) {
-    msg.dest = dest
-    while(!globalFlagPopupIsReadyMsgReceived) {
-      await sleep(100)
-    }
-    chrome.runtime.sendMessage(msg, sendResponse)
-    // await sleep(1000)
+  msg.dest = dest
+  while (!globalFlagPopupIsReadyMsgReceived) {
+    await sleep(100)
+  }
+  chrome.runtime.sendMessage(msg, sendResponse)
+  // await sleep(1000)
 }
 
 async function commitActions(accessKey: any, params: any, privateKey: string): Promise<FinalExecutionOutcome> {
@@ -575,11 +575,11 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     }
 
     case "sign-and-send-transactions": {
-      if(!msg.params || msg.params.length == 0) throw new Error("Sign and Send Transactions without any message")
+      if (!msg.params || msg.params.length == 0) throw new Error("Sign and Send Transactions without any message")
       let promises: Promise<any>[] = []
       const signerId = msg.params[0].signerId
       for (let tx of msg.params) {
-        if(tx.signerId != signerId) throw new Error("Sign and Send Transactions with many signerIds")
+        if (tx.signerId != signerId) throw new Error("Sign and Send Transactions with many signerIds")
       }
       const accInfo = getAccount(signerId);
       if (!accInfo.privateKey) {

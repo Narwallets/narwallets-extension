@@ -172,9 +172,9 @@ window.addEventListener('beforeunload', function (event) {
 });
 
 // Received message from bg
-chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
+chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
 
-  console.log("ONMESSAGE APPROVEPOPUP",msg)
+  //console.log("ONMESSAGE APPROVEPOPUP",msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   if (senderIsExt && msg.dest == "approve-popup") {
     try {
@@ -192,4 +192,4 @@ chrome.runtime.onMessage.addListener( (msg: any, sender: chrome.runtime.MessageS
   }
 });
 // let everyone interested know that this popup is opened and ready to process messages
-setTimeout(() => { chrome.runtime.sendMessage({code:"popup-is-ready", src:"approve"}) }, 1000)
+setTimeout(() => { chrome.runtime.sendMessage({ code: "popup-is-ready", src: "approve" }) }, 1000)
