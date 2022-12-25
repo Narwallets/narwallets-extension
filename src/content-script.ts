@@ -59,14 +59,14 @@ async function handleResponse(response: any, msg: any): Promise<void> {
     // communicationsLeft avoids infinite calls
     let communicationsLeft = MAX_COMMUNICATIONS
     let waitingForInnerResponse = false
-    while(response && response.code != msg.code && communicationsLeft > 0) {
-      if(waitingForInnerResponse) {
+    while (response && response.code != msg.code && communicationsLeft > 0) {
+      if (waitingForInnerResponse) {
         await sleep(200)
       } else {
-        if(response.err) break
+        if (response.err) break
         waitingForInnerResponse = true
         communicationsLeft--;
-        console.log("Response received from second message", response , communicationsLeft)
+        console.log("Response received from second message", response, communicationsLeft)
         console.log("Resending message", msg)
         // Without the following setTimeout it opens two popups. DON'T YOU DARE REMOVE IT.
         setTimeout(() => {
@@ -75,24 +75,24 @@ async function handleResponse(response: any, msg: any): Promise<void> {
             waitingForInnerResponse = false
           })
         }, 500)
-        
-      } 
+
+      }
     }
-    if(!response) {
+    if (!response) {
       throw new Error("Empty response")
     }
-    if(response.err) {
+    if (response.err) {
       throw new Error(response.err)
     }
-    if(response.code != msg.code) {
+    if (response.code != msg.code) {
       throw new Error(`Unable to complete process in ${MAX_COMMUNICATIONS} calls. Consider setting 'code' property on response using WALLET_SELECTOR_CODES`)
     }
-    
+
     postBackMsg.result = response
-    
+
   } catch (err) {
     const lastErrMessage = chrome.runtime.lastError?.message || err.message
-    postBackMsg.result = { err: lastErrMessage } 
+    postBackMsg.result = { err: lastErrMessage }
   } finally {
     postBackMsg.dest = "page"
     window.postMessage(postBackMsg);

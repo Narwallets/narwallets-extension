@@ -203,7 +203,7 @@ function resolveUntrustedFromPage(
 }
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
-  
+
   console.log("Opening approve popup", msg)
   globalFlagPopupIsReadyMsgReceived = false
   //load popup window for the user to approve
@@ -218,7 +218,7 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
     height: height,
     focused: true,
   });
-  
+
   waitForPopupToOpen("approve-popup", msg, sendResponse)
 }
 
@@ -232,12 +232,12 @@ async function waitForPopupToOpen(
   dest: string,
   msg: Record<string, any>,
   sendResponse: SendResponseFunction) {
-    msg.dest = dest
-    while(!globalFlagPopupIsReadyMsgReceived) {
-      await sleep(100)
-    }
-    chrome.runtime.sendMessage(msg, sendResponse)
-    // await sleep(1000)
+  msg.dest = dest
+  while (!globalFlagPopupIsReadyMsgReceived) {
+    await sleep(100)
+  }
+  chrome.runtime.sendMessage(msg, sendResponse)
+  // await sleep(1000)
 }
 
 async function commitActions(accessKey: any, params: any, privateKey: string): Promise<FinalExecutionOutcome> {
@@ -575,11 +575,11 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     }
 
     case "sign-and-send-transactions": {
-      if(!msg.params || msg.params.length == 0) throw new Error("Sign and Send Transactions without any message")
+      if (!msg.params || msg.params.length == 0) throw new Error("Sign and Send Transactions without any message")
       let promises: Promise<any>[] = []
       const signerId = msg.params[0].signerId
       for (let tx of msg.params) {
-        if(tx.signerId != signerId) throw new Error("Sign and Send Transactions with many signerIds")
+        if (tx.signerId != signerId) throw new Error("Sign and Send Transactions with many signerIds")
       }
       const accInfo = getAccount(signerId);
       if (!accInfo.privateKey) {
