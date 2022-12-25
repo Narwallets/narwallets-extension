@@ -1,6 +1,6 @@
 rem 
 echo Remember: REMOVE LOG DEBUG
-echo Remember: REMOVE logEnabled(1|2)
+echo Remember: REMOVE logEnabled(1,2)
 echo Remember: BUMP VERSION
 pause
 @echo on

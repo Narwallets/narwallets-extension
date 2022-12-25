@@ -26,7 +26,7 @@ window.addEventListener("message", (event) => {
     return;
   }
   const msg = event.data
-  console.log("Message received: ", msg)
+  //console.log("Message received: ", msg)
   if (msg && msg.type && (msg.type == "nw") && msg.dest == "ext") {
     // Sending message to narwallets extension background service worker 
     chrome.runtime.sendMessage(msg, function (response) {
@@ -51,7 +51,7 @@ async function handleResponse(response: any, msg: any): Promise<void> {
   // post response to wallet-selector 
   let postBackMsg = Object.assign({}, msg)
   try {
-    console.log("Response received", response)
+    //console.log("Response received", response)
     if (!response) {
       // failed to send, probably runtime.lastError: The message port closed before a response was received
       throw new Error("Response is empty")
@@ -66,8 +66,6 @@ async function handleResponse(response: any, msg: any): Promise<void> {
         if (response.err) break
         waitingForInnerResponse = true
         communicationsLeft--;
-        console.log("Response received from second message", response, communicationsLeft)
-        console.log("Resending message", msg)
         // Without the following setTimeout it opens two popups. DON'T YOU DARE REMOVE IT.
         setTimeout(() => {
           chrome.runtime.sendMessage(msg, function (innerResponse) {

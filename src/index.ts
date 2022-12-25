@@ -294,7 +294,7 @@ function selectAccountMru(event: Event) {
 document.addEventListener('DOMContentLoaded', initPopup);
 async function initPopup() {
 
-  logEnabled(1);
+  //logEnabled(1);
 
   // update network indicator visual state
   await askBackgroundGetNetworkInfo();
@@ -399,7 +399,7 @@ let thisUnlockReceivedMessage: any
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
   //debug("INDEX POPUP ONMESSAGE "+chrome.runtime.id+JSON.stringify(msg))
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  console.log("INDEX POPUP ONMESSAGE, senderIsExt:", chrome.runtime.id, msg)
+  //console.log("INDEX POPUP ONMESSAGE, senderIsExt:", chrome.runtime.id, msg)
   if (senderIsExt && msg.dest == "unlock-popup") {
     thisUnlockSendResponse = sendResponse
     thisUnlockReceivedMessage = msg
