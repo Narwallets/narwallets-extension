@@ -79,7 +79,12 @@ export function askBackgroundGetState(): Promise<StateStruct> {
 
 export var activeNetworkInfo: NetworkInfo;
 // function to check if the account matches active network
-export const accountMatchesNetwork = (accName: string) => accName && activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)
+export function accountMatchesNetwork(accName: string) : boolean {
+  if (!accName) return false;
+  if (activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)) return true;
+  if (accName.length > 32) return true; // assume implicit account, e.g. 
+  return false;
+}
 
 export async function askBackgroundSetNetwork(
   networkName: string

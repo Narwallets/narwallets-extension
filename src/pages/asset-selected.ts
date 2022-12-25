@@ -36,7 +36,8 @@ import {
   historyLineClicked,
   refreshSaveSelectedAccount,
   usdPriceReady,
-  saveSelectedAccount
+  saveSelectedAccount,
+  selectAccountPopupList
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
 import { addressContacts, getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
@@ -113,8 +114,8 @@ export async function show(
   renderAssetPage();
 
   d.onClickId("back-to-selected", backToSelectClicked);
-  // click on top account name, also goes back to asset list
-  d.qs("#selected-asset * .accountdetscuenta").onClick(backToSelectClicked)
+  // click on top account name, jumps to select account
+  d.qs("#selected-asset * .accountdetscuenta").onClick(selectAccountPopupList)
 
   d.byId("asset-remove").classList.remove("hidden"); // shown in all cases
 

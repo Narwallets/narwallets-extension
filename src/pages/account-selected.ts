@@ -279,7 +279,7 @@ export async function usdPriceReady() {
   if (selectedAccountData == undefined) return;
   if (selectedAccountData.total) selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
   const selector = ".accountdetsfiat"
-  if (document.querySelectorAll(selector).length==0) return;
+  if (document.querySelectorAll(selector).length == 0) return;
   const elems = d.all(selector)
   elems.innerText = c.toStringDec(selectedAccountData.totalUSD, 2);
   elems.show()
@@ -461,7 +461,7 @@ async function selectAndShowAccount(accName: string) {
   selectedAccountData = new ExtendedAccountData(accName, accInfo);
   Main.setLastSelectedAccount(selectedAccountData);
 
-  localStorageSet({currentAccountId:accName})
+  localStorageSet({ currentAccountId: accName })
   showSelectedAccount();
 }
 
@@ -558,6 +558,10 @@ function updateAccountHeaderDOM() {
       el.classList.remove("small")
     }
   }
+
+  // click on account name jumps to select account
+  const accountNameDiv = document.querySelector("#selected-account .accountdetscuenta") as HTMLElement;
+  if (accountNameDiv) accountNameDiv.addEventListener(d.CLICK,selectAccountPopupList)
 
   if (nearDollarPrice) {
     usdPriceReady();
