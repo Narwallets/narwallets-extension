@@ -93,6 +93,22 @@ async function handleResponse(response: any, msg: any): Promise<void> {
     postBackMsg.result = { err: lastErrMessage }
   } finally {
     postBackMsg.dest = "page"
+    console.log("Sending message", postBackMsg)
     window.postMessage(postBackMsg);
   }
 }
+
+; (function () {
+
+  console.log("Executing")
+
+  function inject() {
+    const script = document.createElement('script')
+    script.src = chrome.runtime.getURL("dist/injected-script.js")
+    script.type = "module"
+    const g = (document.head || document.documentElement)
+    g.appendChild(script);
+  }
+
+  inject()
+})()

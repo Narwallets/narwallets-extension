@@ -5,16 +5,12 @@ import * as Network from "../lib/near-api-lite/network.js";
 //import * as nearAccounts from "../util/search-accounts.js";
 
 import * as near from "../lib/near-api-lite/near-rpc.js";
-import { jsonRpc, setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js";
 import { localStorageSet, localStorageGet } from "../data/local-storage.js";
 import * as TX from "../lib/near-api-lite/transaction.js";
 
 import {
   FunctionCall,
   DeleteAccountToBeneficiary,
-  Transfer,
-  BatchAction,
-  BatchTransaction,
 } from "../lib/near-api-lite/batch-transaction.js";
 
 import {
@@ -24,9 +20,9 @@ import {
   secureStateOpened,
   state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA
 } from "./background-state.js";
-import { Account, Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
-import { S } from "../lib/tweetnacl/core/core.js";
+import { askBackgroundGetNetworkInfo } from "../askBackground.js";
 
 
 
@@ -55,7 +51,7 @@ function runtimeMessageHandler(
 
   //-- DEBUG
   //logEnabled(1)
-  //console.log("runtimeMessage received ",sender, msg)
+  console.log("runtimeMessage received ", sender, msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   //console.log("BKG: msg, senderIsExt", senderIsExt, msg);
   // const jmsg = JSON.stringify(msg)
@@ -129,6 +125,7 @@ export const WALLET_SELECTOR_CODES = {
   GET_ACCOUNT_ID: "get-account-id",
   SIGN_AND_SEND_TRANSACTION: "sign-and-send-transaction",
   SIGN_AND_SEND_TRANSACTIONS: "sign-and-send-transactions",
+  GET_NETWORK: "get-network",
 }
 
 async function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFunction) {
@@ -196,8 +193,14 @@ function resolveUntrustedFromPage(
         return true; // the approve popup will call sendResponse later
       }
       break
+    case WALLET_SELECTOR_CODES.GET_NETWORK:
+      const networkInfo: Network.NetworkInfo = Network.currentInfo()
+      console.log(1, networkInfo)
+      sendResponse({ code: msg.code, data: { networkId: networkInfo.name, nodeUrl: networkInfo.rpc } })
+      break
 
     default:
+      console.log("Error")
       sendResponse({ err: "invalid code " + msg.code })
   }
 }
@@ -1116,3 +1119,4 @@ function setAutoLockAlarm() {
 //   await recoverWorkingData();
 //   if (!_bgDataRecovered) await retrieveBgInfoFromStorage();
 // }
+

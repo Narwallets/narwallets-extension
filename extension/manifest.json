@@ -33,9 +33,28 @@
         "<all_urls>"
       ],
       "js": [
-        "dist/content-script.js"
+        "dist/content-script.js",
+        "dist/injected-script.js"
       ],
       "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content.styles.css",
+        "icon-128.png",
+        "icon-38.png",
+        "script.bundle.js",
+        "popup.html",
+        "injected-script.js",
+        "dist/injected-script.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*",
+        "<all_urls>"
+      ]
     }
   ]
 }
