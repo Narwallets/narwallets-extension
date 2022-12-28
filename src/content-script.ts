@@ -66,8 +66,6 @@ async function handleResponse(response: any, msg: any): Promise<void> {
         if (response.err) break
         waitingForInnerResponse = true
         communicationsLeft--;
-        //console.log("Response received from second message", response , communicationsLeft)
-        //console.log("Resending message", msg)
         // Without the following setTimeout it opens two popups. DON'T YOU DARE REMOVE IT.
         setTimeout(() => {
           chrome.runtime.sendMessage(msg, function (innerResponse) {

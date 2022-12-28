@@ -204,7 +204,6 @@ function resolveUntrustedFromPage(
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
 
-  //console.log("Opening approve popup", msg)
   globalFlagPopupIsReadyMsgReceived = false
   //load popup window for the user to approve
   const width = 500;
