@@ -22,12 +22,14 @@ export function askBackground(requestPayload: any): Promise<any> {
     chrome.runtime.sendMessage(requestPayload, function (response) {
       clearTimeout(timeout);
       //-- DEBUG
-      const jres = JSON.stringify(response)
-      log("response to ", requestPayload.code, jres?.substring(0, Math.min(120, jres.length)));
+      const jsonAsText = JSON.stringify(response)
+      log("response to ", requestPayload.code, jsonAsText?.substring(0, Math.min(120, jsonAsText.length)));
       //----
       if (!response) {
+        log("for ", requestPayload.code, "response is empty")
         return reject(Error("response is empty"));
       } else if (response.err) {
+        log("for ", requestPayload.code, "response is err", response.err)
         return reject(Error(response.err));
       }
       return resolve(response.data);
