@@ -1,52 +1,264 @@
+// From https://github.com/near/NEPs/blob/master/specs/Standards/Wallets/InjectedWallets.md
+
 import { FinalExecutionOutcome } from "./lib/near-api-lite/near-types";
-import { Action } from "./lib/near-api-lite/transaction";
-import { Account } from "./structs/account-info";
 
 
-interface NarwalletsWallet {
-    id: string
-    initialized: boolean
-    connected: Function
-    network: Network
-    accounts: Account[]
-    accountsWithPlainPK: Account[]
-    signIn: Function
-    signOut: Function
-    getAccountId: Function
-    callSignAndSendTransaction: Function
-    callSignAndSendTransactions: Function
+/************* Start extracted from near-api-js **************/
+
+declare class FunctionCallPermission {
+    allowance?: BigInt;
+    receiverId: string;
+    methodNames: string[];
+}
+declare abstract class Enum {
+    enum: string;
+    constructor(properties: any);
+}
+
+declare class FunctionCall {
+    methodName: string;
+    args: Uint8Array;
+    gas: BigInt;
+    deposit: BigInt;
+}
+declare class Action extends Enum {
+    // createAccount: CreateAccount;
+    // deployContract: DeployContract;
+    functionCall: FunctionCall;
+    // transfer: Transfer;
+    // stake: Stake;
+    // addKey: AddKey;
+    // deleteKey: DeleteKey;
+    // deleteAccount: DeleteAccount;
+}
+
+declare class SignedTransaction {
+    transaction: Transaction;
+    signature: Signature;
+    encode(): Uint8Array;
+    static decode(bytes: any): SignedTransaction; // Bytes is supposed to be Buffer
+}
+
+declare class Transaction {
+    signerId: string;
+    publicKey: PublicKey;
+    nonce: BigInt;
+    receiverId: string;
+    actions: Action[];
+    blockHash: Uint8Array;
+    encode(): Uint8Array;
+    static decode(bytes: any): Transaction; // Bytes is supposed to be Buffer
+}
+
+declare class Signature {
+    keyType: KeyType;
+    data: Uint8Array;
+}
+
+declare class PublicKey {
+    keyType: KeyType;
+    data: Uint8Array;
+    static from(value: string | PublicKey): PublicKey;
+    static fromString(encodedKey: string): PublicKey;
+    toString(): string;
+    verify(message: Uint8Array, signature: Uint8Array): boolean;
+}
+
+/************* Finish extracted from near-api-js **************/
+interface Account {
+    accountId: string;
+    publicKey: PublicKey;
 }
 
 interface Network {
-    networkId: string
-    nodeUrl: string
+    networkId: string;
+    nodeUrl: string;
+}
+
+// Extracted from near-api-js
+
+
+interface SignInParams {
+    permission: FunctionCallPermission;
+    accounts: Array<Account>;
+}
+
+interface SignOutParams {
+    accounts: Array<Account>;
+}
+
+interface TransactionOptions {
+    receiverId: string;
+    actions: Array<Action>;
+    signerId?: string;
+}
+
+interface SignTransactionParams {
+    transaction: TransactionOptions;
+}
+
+interface SignTransactionsParams {
+    transactions: Array<TransactionOptions>;
+}
+
+interface Events {
+    accountsChanged: { accounts: Array<Account> };
+}
+
+interface ConnectParams {
+    networkId: string;
+}
+
+type Unsubscribe = () => void;
+
+const UNINITIALIZED_NETWORK = {
+    networkId: "uninitialized",
+    nodeUrl: ""
+}
+
+interface Wallet {
+    id: string;
+    connected: boolean;
+    network: Network;
+    accounts: Array<Account>;
+
+    supportsNetwork(networkId: string): Promise<boolean>;
+    connect(params: ConnectParams): Promise<Array<Account>>;
+    signIn(params: SignInParams): Promise<void>;
+    signOut(params: SignOutParams): Promise<void>;
+    signTransaction(params: SignTransactionParams): Promise<SignedTransaction>;
+    signTransactions(params: SignTransactionsParams): Promise<Array<SignedTransaction>>;
+    disconnect(): Promise<void>;
+    on<EventName extends keyof Events>(
+        event: EventName,
+        callback: (params: Events[EventName]) => void
+    ): Unsubscribe;
+    off<EventName extends keyof Events>(
+        event: EventName,
+        callback?: () => void
+    ): void;
 }
 
 declare global {
     interface Window {
-        narwallets: NarwalletsWallet;
+        narwallets: Wallet;
     }
 }
 
 async function script() {
     window.narwallets = {
         id: "Narwallets",
-        initialized: false,
-        connected: isSignedIn,
-        network: {
-            networkId: "uninitialized",
-            nodeUrl: ""
-        },
+        connected: false,
+        network: UNINITIALIZED_NETWORK,
         accounts: [],
-        accountsWithPlainPK: [],
+        supportsNetwork,
+        connect,
         signIn,
         signOut,
-        getAccountId,
-        callSignAndSendTransaction,
-        callSignAndSendTransactions
+        signTransaction,
+        signTransactions,
+        disconnect,
+        on,
+        off
     }
 
     await initialize()
+}
+
+async function supportsNetwork(networkId: string): Promise<boolean> {
+    return [
+        "mainnet",
+        "guildnet",
+        "testnet",
+        "betanet",
+        "local"
+    ].includes(networkId)
+}
+
+/**
+ * Request visibility for one or more accounts from the wallet. This should explicitly prompt the user to select from their list of imported accounts. dApps can use the accounts property once connected to retrieve the list of visible accounts.
+ * Note: Calling this method when already connected will allow users to modify their selection, triggering the 'accountsChanged' event.
+ * @param params 
+ * @returns An array with the selected account id (on wallet-selector they want an array in case someone wants to have more accounts to decide)
+ */
+async function connect(params: ConnectParams): Promise<Array<Account>> {
+    const accountResponse: Account = (await sendToNarwallets(NARWALLETS_CODES.CONNECT, false, params)) as Account;
+    window.narwallets.accounts.push(accountResponse)
+    window.narwallets.connected = true
+    return [accountResponse];
+}
+
+/**
+ * Add FunctionCall access key(s) for one or more accounts. This request should require explicit approval from the user.
+ * https://docs.near.org/concepts/basics/accounts/access-keys
+ * @param params 
+ * @returns 
+ */
+async function signIn(params: SignInParams): Promise<void> {
+    connect({ networkId: window.narwallets.network.networkId })
+}
+
+/**
+ * Not documented. Setting to lock the wallet.
+ * @param param 
+ * @returns 
+ */
+async function signOut(param: SignOutParams): Promise<void> {
+    if (!(await isSignedIn())) {
+        return;
+    }
+
+    const res: Resolve = await sendToNarwallets("sign-out");
+    // const res = await _state.wallet.signOut();
+    if (res === true) {
+        return;
+    }
+
+    const errorObject: NarwalletsError = res as NarwalletsError;
+
+    const error = new Error(
+        typeof errorObject.error === "string"
+            ? errorObject.error
+            : errorObject.error.type
+    );
+
+    // Prevent signing out by throwing.
+    if (error.message === "User reject") {
+        throw error;
+    }
+
+}
+
+/**
+ * Requests explicit approval from user to transaction
+ * @param params 
+ * @returns Type SignedTransaction is not properly defined yet, so FinalExecutionOutcome will be returned
+ */
+async function signTransaction(params: SignTransactionParams): Promise<SignedTransaction> {
+    return sendToNarwallets(
+        NARWALLETS_CODES.SIGN_AND_SEND_TRANSACTION,
+        false,
+        params
+    ).then((response: Resolve) => response as SignedTransaction);
+}
+
+async function signTransactions(params: SignTransactionsParams): Promise<Array<SignedTransaction>> {
+    return sendToNarwallets(
+        NARWALLETS_CODES.SIGN_AND_SEND_TRANSACTIONS,
+        false,
+        params
+    ).then((response: Resolve) => response as SignedTransaction[]);
+}
+
+async function disconnect(): Promise<void> {
+
+}
+
+function on<EventName extends keyof Events>(event: EventName, callback: (params: Events[EventName]) => void): Unsubscribe {
+    return () => { console.log("Not implemented") }
+}
+function off<EventName extends keyof Events>(event: EventName, callback?: () => void): void {
+
 }
 
 type Resolve =
@@ -55,12 +267,18 @@ type Resolve =
     | FinalExecutionOutcome
     | Array<FinalExecutionOutcome>
     | NarwalletsError
-    | Network;
+    | Network
+    | Account
+    | SignedTransaction
+    | SignedTransaction[];
 type NarwalletsFunctionParams =
     | undefined
     | boolean
+    | SignTransactionParams
+    | SignTransactionsParams
     | SignAndSendTransactionParams
-    | Array<SignAndSendTransactionParams>;
+    | Array<SignAndSendTransactionParams>
+    | ConnectParams;
 
 interface SignAndSendTransactionParams {
     signerId?: string;
@@ -82,10 +300,11 @@ interface PendingPromises {
     code: string;
     resolve: (value: Resolve) => void;
     reject: (reason?: string) => void;
-    timeout?: NodeJS.Timeout;
+    timeout?: number;
 }
 
 const NARWALLETS_CODES = {
+    CONNECT: "connect",
     SIGN_IN: "sign-in",
     IS_INSTALLED: "is-installed",
     IS_SIGNED_IN: "is-signed-in",
@@ -141,48 +360,38 @@ async function setNetwork(): Promise<void> {
         NARWALLETS_CODES.GET_NETWORK,
         false
     ) as Network;
-    window.narwallets.network = network
+    // window.narwallets.network = network
 }
 
-async function signIn() {
-    const isUserSignedIn = await isSignedIn();
-    console.log("Is signed in", isUserSignedIn)
-    let code;
-    if (!isUserSignedIn) {
-        code = NARWALLETS_CODES.SIGN_IN;
-    } else {
-        code = NARWALLETS_CODES.GET_ACCOUNT_ID;
-    }
-    const response = (await sendToNarwallets(code)) as string;
-    return [{ accountId: response }];
-}
+
 
 const isSignedIn = (): Promise<Resolve> => {
     return sendToNarwallets(NARWALLETS_CODES.IS_SIGNED_IN, true);
 };
 
-const getAccountId = (): Promise<Resolve> => {
-    return sendToNarwallets(NARWALLETS_CODES.GET_ACCOUNT_ID, false);
+const getAccountId = async (): Promise<Account[]> => {
+    const response = (await sendToNarwallets(NARWALLETS_CODES.GET_ACCOUNT_ID, false)) as string
+    return [{ accountId: response, publicKey: PublicKey.from("Add public key") }];
 };
 
 const callSignAndSendTransaction = (
     params: SignAndSendTransactionParams
-): Promise<Resolve> => {
+): Promise<FinalExecutionOutcome> => {
     return sendToNarwallets(
         NARWALLETS_CODES.SIGN_AND_SEND_TRANSACTION,
         false,
         params
-    );
+    ).then((response: Resolve) => response as FinalExecutionOutcome);
 };
 
 const callSignAndSendTransactions = (
     params: Array<SignAndSendTransactionParams>
-): Promise<Resolve> => {
+): Promise<FinalExecutionOutcome[]> => {
     return sendToNarwallets(
         NARWALLETS_CODES.SIGN_AND_SEND_TRANSACTIONS,
         false,
         params
-    );
+    ).then((response: Resolve) => response as FinalExecutionOutcome[]);
 };
 
 const findPendingPromiseById = (
@@ -197,32 +406,6 @@ const removePendingPromise = (callback: PendingPromises) => {
         // only splice array when item is found
         pendingPromises.splice(index, 1); // 2nd parameter means remove one item only
     }
-};
-
-const signOut = async () => {
-    if (!(await isSignedIn())) {
-        return;
-    }
-
-    const res: Resolve = await sendToNarwallets("sign-out");
-    // const res = await _state.wallet.signOut();
-    if (res === true) {
-        return;
-    }
-
-    const errorObject: NarwalletsError = res as NarwalletsError;
-
-    const error = new Error(
-        typeof errorObject.error === "string"
-            ? errorObject.error
-            : errorObject.error.type
-    );
-
-    // Prevent signing out by throwing.
-    if (error.message === "User reject") {
-        throw error;
-    }
-
 };
 
 window.addEventListener("message", (event) => {
@@ -255,8 +438,6 @@ window.addEventListener("message", (event) => {
 
 async function initialize() {
     await setNetwork()
-    window.narwallets.initialized = true
-
 }
 
 console.log("Inj");

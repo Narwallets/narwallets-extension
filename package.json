@@ -22,5 +22,8 @@
   ],
   "devDependencies": {
     "@types/chrome": "^0.0.197"
+  },
+  "dependencies": {
+    "near-api-js": "^1.1.0"
   }
 }

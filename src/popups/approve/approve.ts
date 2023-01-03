@@ -173,7 +173,7 @@ window.addEventListener('beforeunload', function (event) {
 
 // Received message from bg
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
-
+  console.log("Msg", msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   if (senderIsExt && msg.dest == "approve-popup") {
     try {

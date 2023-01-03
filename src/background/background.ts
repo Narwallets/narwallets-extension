@@ -118,6 +118,7 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
 type SendResponseFunction = (response: any) => void;
 
 export const WALLET_SELECTOR_CODES = {
+  CONNECT: "connect",
   IS_INSTALLED: "is-installed",
   IS_SIGNED_IN: "is-signed-in",
   SIGN_OUT: "sign-out",
@@ -156,6 +157,17 @@ function resolveUntrustedFromPage(
 
   switch (msg.code) {
 
+    case WALLET_SELECTOR_CODES.CONNECT:
+      if (isLocked()) {
+        handleUnlock(msg, sendResponse)
+      } else {
+        // not locked
+        localStorageGet("currentAccountId").then(accName => {
+          const accInfo = getAccount(accName);
+          sendResponse({ data: accInfo, code: msg.code })
+        })
+      }
+      break
     case WALLET_SELECTOR_CODES.IS_INSTALLED:
       sendResponse({ data: true, code: msg.code })
       return;
@@ -189,6 +201,16 @@ function resolveUntrustedFromPage(
       if (isLocked()) {
         handleUnlock(msg, sendResponse)
       } else {
+        // The standard sends the transaction information inside a transaction object, but it wasn't previously done like this.
+        // Consider changing the way narwallets builds this object.
+        if (msg.params.transaction) {
+          msg.params = msg.params.transaction
+          msg.params.actions = msg.params.actions.map((action: any) => {
+            return {
+              params: action
+            }
+          })
+        }
         prepareAndOpenApprovePopup(msg, sendResponse)
         return true; // the approve popup will call sendResponse later
       }
