@@ -462,4 +462,8 @@ export async function showUnlockPage() {
 
   d.onClickId("show-password-login", showPassword);
 
+  try {
+    d.inputById("unlock-pass").focus();
+  }
+  catch { }
 }

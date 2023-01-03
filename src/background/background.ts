@@ -54,10 +54,10 @@ function runtimeMessageHandler(
   console.log("runtimeMessage received ", sender, msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   //console.log("BKG: msg, senderIsExt", senderIsExt, msg);
-  // const jmsg = JSON.stringify(msg)
+  // const jsonMsg = JSON.stringify(msg)
   // log(
   //   "BKG: msg senderIsExt:" + senderIsExt + " " +
-  //   jmsg?.substring(0, Math.min(120, jmsg.length))
+  //   jsonMsg?.substring(0, Math.min(120, jsonMsg.length))
   // );
   //-- END DEBUG
 
@@ -545,7 +545,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     case "apply": {
       // apply transaction request from popup
       // {code:"apply", signerId:<account>, tx:BatchTransaction}
-      // V3: when resolved, extract restult, send msg to content-script->page
+      // V3: when resolved, extract result, send msg to content-script->page
       // Note: V4 uses signAndSendTransaction and returns FinalExecutionOutcome (full return data, needs to be parsed to extract results)
       const signerId = msg.signerId || "...";
       const accInfo = getAccount(signerId);
@@ -835,7 +835,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
 // })
 
 // chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
-//   console.log("pepe")
 //   if (changeInfo.status == 'complete') {
 //     connectToWebPage("silkking.testnet", "testnet")
 //   }
@@ -1076,7 +1075,7 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
   }
 
   if (secureStateOpened()) {
-    // it was cached, the serviceworker is still acttive
+    // it was cached, the service worker is still active
     log("BK-init secureState already opened, has ", getNetworkAccountsCount(), "accounts")
     // set alarm to lock after x minutes
     setAutoLockAlarm()

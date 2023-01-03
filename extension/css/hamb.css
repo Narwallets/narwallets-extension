@@ -153,7 +153,7 @@ NETWORK selection drop-down
 .network-component.pointer {
   /* border       : 1px solid var(--ControlAccent); */
   border-radius: 24px;
-  margin-left  : 149px;
+  margin-left  : 167px;
   padding      : 2px;
   width        : 157px;
   flex         : 0 0 auto;

@@ -258,10 +258,12 @@
   border-radius: 8px;
   background   : var(--Block);
   align-content: center;
+  border-color: var(--SelectedColor);
 }
 
 .generic:hover {
   cursor: hand;
+  border-color: var(--ControlAccent);
 }
 
 .huge {

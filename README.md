@@ -2,7 +2,7 @@
 
 ## Installation
 
-Install [Narwallets from the Chrome Web Store](https://chrome.google.com/webstore/detail/narwallets/bnbmlmjhaohpobnjfifeghjmamjfolnb)
+Install [Narwallets v4 from the Chrome Web Store](https://chrome.google.com/webstore/detail/narwallets-v4/lkpeokpdkmcdaiadpmnnpimlgmdobkdj)
 
 ## Objectives
 * Be the deafult chrome-extension wallet for NEAR DApps
