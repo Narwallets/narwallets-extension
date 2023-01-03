@@ -199,11 +199,12 @@ async function signIn(params: SignInParams): Promise<void> {
 }
 
 /**
- * Not documented. Setting to lock the wallet.
+ * Delete FunctionCall access key(s) for one or more accounts. This request should require explicit approval from the user.
+ * Since on Narwallets there will only be one user in accounts, it isn't needed the SignOutParams
  * @param param 
  * @returns 
  */
-async function signOut(param: SignOutParams): Promise<void> {
+async function signOut(param?: SignOutParams): Promise<void> {
     if (!(await isSignedIn())) {
         return;
     }
@@ -211,6 +212,8 @@ async function signOut(param: SignOutParams): Promise<void> {
     const res: Resolve = await sendToNarwallets("sign-out");
     // const res = await _state.wallet.signOut();
     if (res === true) {
+        window.narwallets.accounts = []
+        window.narwallets.connected = false
         return;
     }
 
@@ -251,7 +254,7 @@ async function signTransactions(params: SignTransactionsParams): Promise<Array<S
 }
 
 async function disconnect(): Promise<void> {
-
+    signOut()
 }
 
 function on<EventName extends keyof Events>(event: EventName, callback: (params: Events[EventName]) => void): Unsubscribe {
@@ -313,6 +316,7 @@ const NARWALLETS_CODES = {
     SIGN_AND_SEND_TRANSACTION: "sign-and-send-transaction",
     SIGN_AND_SEND_TRANSACTIONS: "sign-and-send-transactions",
     GET_NETWORK: "get-network",
+    DISCONNECT: "disconnect",
 };
 
 let id = 0;

@@ -127,6 +127,7 @@ export const WALLET_SELECTOR_CODES = {
   SIGN_AND_SEND_TRANSACTION: "sign-and-send-transaction",
   SIGN_AND_SEND_TRANSACTIONS: "sign-and-send-transactions",
   GET_NETWORK: "get-network",
+  DISCONNECT: "disconnect",
 }
 
 async function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFunction) {
@@ -176,6 +177,7 @@ function resolveUntrustedFromPage(
       sendResponse({ data: !isLocked(), code: msg.code })
       return;
 
+    case WALLET_SELECTOR_CODES.DISCONNECT:
     case WALLET_SELECTOR_CODES.SIGN_OUT:
       // await disconnectFromWebPage()
       lockWallet("sign-out")
