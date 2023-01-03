@@ -110,7 +110,7 @@ function displayTx(msg: Msg) {
 }
 
 function displaySingleTransactionParams(inx: number, params: any) {
-
+  console.log("Params", params)
   // signer and receiver
   const txContainerId = `tx_${inx}`
   const TEMPLATE1 = `

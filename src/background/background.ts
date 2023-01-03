@@ -197,7 +197,6 @@ function resolveUntrustedFromPage(
       break
 
     case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTION:
-    case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTIONS:
       if (isLocked()) {
         handleUnlock(msg, sendResponse)
       } else {
@@ -215,9 +214,29 @@ function resolveUntrustedFromPage(
         return true; // the approve popup will call sendResponse later
       }
       break
+    case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTIONS:
+      if (isLocked()) {
+        handleUnlock(msg, sendResponse)
+      } else {
+        // The standard sends the transaction information inside a transaction object, but it wasn't previously done like this.
+        // Consider changing the way narwallets builds this object.
+        if (msg.params.length > 0 && msg.params[0].transaction) {
+          msg.params = msg.params.map((p: any) => {
+            p = p.transaction
+            p.actions = p.actions.map((action: any) => {
+              return {
+                params: action
+              }
+            })
+            return p
+          })
+        }
+        prepareAndOpenApprovePopup(msg, sendResponse)
+        return true; // the approve popup will call sendResponse later
+      }
+      break
     case WALLET_SELECTOR_CODES.GET_NETWORK:
       const networkInfo: Network.NetworkInfo = Network.currentInfo()
-      console.log(1, networkInfo)
       sendResponse({ code: msg.code, data: { networkId: networkInfo.name, nodeUrl: networkInfo.rpc } })
       break
 
