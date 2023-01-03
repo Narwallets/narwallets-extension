@@ -111,9 +111,9 @@ interface ConnectParams {
 
 type Unsubscribe = () => void;
 
-const UNINITIALIZED_NETWORK = {
-    networkId: "uninitialized",
-    nodeUrl: ""
+const DEFAULT_NETWORK = {
+    networkId: "mainnet",
+    nodeUrl: "https://rpc.mainnet.near.org"
 }
 
 interface Wallet {
@@ -149,7 +149,7 @@ async function script() {
     window.narwallets = {
         id: "Narwallets",
         connected: false,
-        network: UNINITIALIZED_NETWORK,
+        network: DEFAULT_NETWORK,
         accounts: [],
         supportsNetwork,
         connect,
@@ -257,9 +257,28 @@ async function disconnect(): Promise<void> {
     signOut()
 }
 
+/**
+ * Triggered whenever accounts are updated (e.g. calling connect or disconnect).
+ * Documentation only explicitly says to have an `accountsChanged` event, but it doesn't tell what it has to do
+ * @param event 
+ * @param callback 
+ * @returns 
+ */
 function on<EventName extends keyof Events>(event: EventName, callback: (params: Events[EventName]) => void): Unsubscribe {
-    return () => { console.log("Not implemented") }
+    switch (event) {
+        case "accountsChanged":
+            return () => { console.log("Not implemented") }
+        default:
+            return () => { console.log("Not implemented") }
+    }
+
 }
+
+/**
+ * Not documented at all
+ * @param event 
+ * @param callback 
+ */
 function off<EventName extends keyof Events>(event: EventName, callback?: () => void): void {
 
 }
@@ -444,7 +463,6 @@ async function initialize() {
     await setNetwork()
 }
 
-console.log("Inj");
 script();
 
 
