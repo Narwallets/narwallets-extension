@@ -143,6 +143,15 @@
   margin-left: 5px;
   margin-right: 5px;
 }
+.accountdetscuenta:hover {
+  cursor: hand;
+}
+.accountdetscuenta:hover:after {
+  content: "▽";
+  font-size: 9pt;
+  position: absolute;
+  right: 20px;
+}
 
 .accountdetscomment {
   /* display      : block; */
