@@ -110,7 +110,7 @@ function displayTx(msg: Msg) {
 }
 
 function displaySingleTransactionParams(inx: number, params: any) {
-
+  console.log("Params", params)
   // signer and receiver
   const txContainerId = `tx_${inx}`
   const TEMPLATE1 = `
@@ -173,7 +173,7 @@ window.addEventListener('beforeunload', function (event) {
 
 // Received message from bg
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
-
+  console.log("Msg", msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   if (senderIsExt && msg.dest == "approve-popup") {
     try {

@@ -5,16 +5,12 @@ import * as Network from "../lib/near-api-lite/network.js";
 //import * as nearAccounts from "../util/search-accounts.js";
 
 import * as near from "../lib/near-api-lite/near-rpc.js";
-import { jsonRpc, setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js";
 import { localStorageSet, localStorageGet } from "../data/local-storage.js";
 import * as TX from "../lib/near-api-lite/transaction.js";
 
 import {
   FunctionCall,
   DeleteAccountToBeneficiary,
-  Transfer,
-  BatchAction,
-  BatchTransaction,
 } from "../lib/near-api-lite/batch-transaction.js";
 
 import {
@@ -24,9 +20,9 @@ import {
   secureStateOpened,
   state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA
 } from "./background-state.js";
-import { Account, Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
-import { S } from "../lib/tweetnacl/core/core.js";
+import { askBackgroundGetNetworkInfo } from "../askBackground.js";
 
 
 
@@ -55,7 +51,7 @@ function runtimeMessageHandler(
 
   //-- DEBUG
   //logEnabled(1)
-  //console.log("runtimeMessage received ",sender, msg)
+  console.log("runtimeMessage received ", sender, msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   //console.log("BKG: msg, senderIsExt", senderIsExt, msg);
   // const jsonMsg = JSON.stringify(msg)
@@ -122,6 +118,7 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
 type SendResponseFunction = (response: any) => void;
 
 export const WALLET_SELECTOR_CODES = {
+  CONNECT: "connect",
   IS_INSTALLED: "is-installed",
   IS_SIGNED_IN: "is-signed-in",
   SIGN_OUT: "sign-out",
@@ -129,6 +126,8 @@ export const WALLET_SELECTOR_CODES = {
   GET_ACCOUNT_ID: "get-account-id",
   SIGN_AND_SEND_TRANSACTION: "sign-and-send-transaction",
   SIGN_AND_SEND_TRANSACTIONS: "sign-and-send-transactions",
+  GET_NETWORK: "get-network",
+  DISCONNECT: "disconnect",
 }
 
 async function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFunction) {
@@ -159,6 +158,17 @@ function resolveUntrustedFromPage(
 
   switch (msg.code) {
 
+    case WALLET_SELECTOR_CODES.CONNECT:
+      if (isLocked()) {
+        handleUnlock(msg, sendResponse)
+      } else {
+        // not locked
+        localStorageGet("currentAccountId").then(accName => {
+          const accInfo = getAccount(accName);
+          sendResponse({ data: accInfo, code: msg.code })
+        })
+      }
+      break
     case WALLET_SELECTOR_CODES.IS_INSTALLED:
       sendResponse({ data: true, code: msg.code })
       return;
@@ -167,6 +177,7 @@ function resolveUntrustedFromPage(
       sendResponse({ data: !isLocked(), code: msg.code })
       return;
 
+    case WALLET_SELECTOR_CODES.DISCONNECT:
     case WALLET_SELECTOR_CODES.SIGN_OUT:
       // await disconnectFromWebPage()
       lockWallet("sign-out")
@@ -188,16 +199,51 @@ function resolveUntrustedFromPage(
       break
 
     case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTION:
-    case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTIONS:
       if (isLocked()) {
         handleUnlock(msg, sendResponse)
       } else {
+        // The standard sends the transaction information inside a transaction object, but it wasn't previously done like this.
+        // Consider changing the way narwallets builds this object.
+        if (msg.params.transaction) {
+          msg.params = msg.params.transaction
+          msg.params.actions = msg.params.actions.map((action: any) => {
+            return {
+              params: action
+            }
+          })
+        }
         prepareAndOpenApprovePopup(msg, sendResponse)
         return true; // the approve popup will call sendResponse later
       }
       break
+    case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTIONS:
+      if (isLocked()) {
+        handleUnlock(msg, sendResponse)
+      } else {
+        // The standard sends the transaction information inside a transaction object, but it wasn't previously done like this.
+        // Consider changing the way narwallets builds this object.
+        if (msg.params.length > 0 && msg.params[0].transaction) {
+          msg.params = msg.params.map((p: any) => {
+            p = p.transaction
+            p.actions = p.actions.map((action: any) => {
+              return {
+                params: action
+              }
+            })
+            return p
+          })
+        }
+        prepareAndOpenApprovePopup(msg, sendResponse)
+        return true; // the approve popup will call sendResponse later
+      }
+      break
+    case WALLET_SELECTOR_CODES.GET_NETWORK:
+      const networkInfo: Network.NetworkInfo = Network.currentInfo()
+      sendResponse({ code: msg.code, data: { networkId: networkInfo.name, nodeUrl: networkInfo.rpc } })
+      break
 
     default:
+      console.log("Error")
       sendResponse({ err: "invalid code " + msg.code })
   }
 }
@@ -1115,3 +1161,4 @@ function setAutoLockAlarm() {
 //   await recoverWorkingData();
 //   if (!_bgDataRecovered) await retrieveBgInfoFromStorage();
 // }
+
