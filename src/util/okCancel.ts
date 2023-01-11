@@ -8,9 +8,9 @@ let confirmBtn: d.El;
 let cancelBtn: d.El;
 
 export function OkCancelInit() {
-  confirmBtn = new d.El("#account-selected-action-confirm");
-  cancelBtn = new d.El("#account-selected-action-cancel");
-  okCancelRow = new d.El("#ok-cancel-row");
+  if (!confirmBtn) confirmBtn = new d.El("#account-selected-action-confirm");
+  if (!cancelBtn) cancelBtn = new d.El("#account-selected-action-cancel");
+  if (!okCancelRow) okCancelRow = new d.El("#ok-cancel-row");
 
   confirmBtn.onClick(confirmClicked);
   cancelBtn.onClick(cancelClicked);

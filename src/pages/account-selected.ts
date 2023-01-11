@@ -201,7 +201,9 @@ function initPage() {
 // shows drop-down with wallet accounts
 export async function selectAccountPopupList() {
   const items = await getAccountsForPopupList()
-  //show and what to do when clicked
+  // this can be invoked anytime
+  hideOkCancel()
+  // show and what to do when clicked
   popupListOpen(items, popupListAddressClicked, popupListAddressEscaped)
 }
 async function popupListAddressClicked(text: string, value: string) {
@@ -561,7 +563,7 @@ function updateAccountHeaderDOM() {
 
   // click on account name jumps to select account
   const accountNameDiv = document.querySelector("#selected-account .accountdetscuenta") as HTMLElement;
-  if (accountNameDiv) accountNameDiv.addEventListener(d.CLICK,selectAccountPopupList)
+  if (accountNameDiv) accountNameDiv.addEventListener(d.CLICK, selectAccountPopupList)
 
   if (nearDollarPrice) {
     usdPriceReady();

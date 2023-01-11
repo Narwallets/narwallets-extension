@@ -51,7 +51,7 @@ function runtimeMessageHandler(
 
   //-- DEBUG
   //logEnabled(1)
-  console.log("runtimeMessage received ", sender, msg)
+  //console.log("runtimeMessage received ", sender, msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   //console.log("BKG: msg, senderIsExt", senderIsExt, msg);
   // const jsonMsg = JSON.stringify(msg)

@@ -93,7 +93,7 @@ async function handleResponse(response: any, msg: any): Promise<void> {
     postBackMsg.result = { err: lastErrMessage }
   } finally {
     postBackMsg.dest = "page"
-    console.log("Sending message", postBackMsg)
+    //console.log("Sending message", postBackMsg)
     window.postMessage(postBackMsg);
   }
 }
