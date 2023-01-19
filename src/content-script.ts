@@ -100,8 +100,6 @@ async function handleResponse(response: any, msg: any): Promise<void> {
 
 ; (function () {
 
-  console.log("Executing")
-
   function inject() {
     const script = document.createElement('script')
     script.src = chrome.runtime.getURL("dist/injected-script.js")

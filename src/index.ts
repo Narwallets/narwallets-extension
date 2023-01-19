@@ -35,6 +35,13 @@ import { fetchNearDollarPrice } from "./data/price-data.js";
 import { activeNetworkInfo } from "./askBackground.js";
 import { WALLET_SELECTOR_CODES } from "./background/background.js";
 
+// used in injected-script.ts
+declare global {
+  interface Window {
+    narwallets: Wallet;
+  }
+}
+
 export const SINGLE_USER_EMAIL = "unique-user@narwallets.com"
 
 const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr

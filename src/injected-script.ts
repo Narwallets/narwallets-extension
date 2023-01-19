@@ -1,8 +1,55 @@
+declare type BlockHash = string;
+declare type BlockHeight = number;
+declare type BlockId = BlockHash | BlockHeight;
+declare type Finality = 'optimistic' | 'near-final' | 'final';
+declare type BlockReference = {
+    blockId: BlockId;
+} | {
+    finality: Finality;
+} | {
+    sync_checkpoint: 'genesis' | 'earliest_available';
+};
+declare enum ExecutionStatusBasic {
+    Unknown = "Unknown",
+    Pending = "Pending",
+    Failure = "Failure"
+}
+interface ExecutionStatus {
+    SuccessValue?: string;
+    SuccessReceiptId?: string;
+    Failure?: ExecutionError;
+}
+declare enum FinalExecutionStatusBasic {
+    NotStarted = "NotStarted",
+    Started = "Started",
+    Failure = "Failure"
+}
+interface ExecutionError {
+    error_message: string;
+    error_type: string;
+}
+interface FinalExecutionStatus {
+    SuccessValue?: string;
+    Failure?: ExecutionError;
+}
+interface ExecutionOutcomeWithId {
+    id: string;
+    outcome: ExecutionOutcome;
+}
+interface ExecutionOutcome {
+    logs: string[];
+    receipt_ids: string[];
+    gas_burnt: number;
+    status: ExecutionStatus | ExecutionStatusBasic;
+}
+interface FinalExecutionOutcome {
+    status: FinalExecutionStatus | FinalExecutionStatusBasic;
+    transaction: any;
+    transaction_outcome: ExecutionOutcomeWithId;
+    receipts_outcome: ExecutionOutcomeWithId[];
+}
+
 // From https://github.com/near/NEPs/blob/master/specs/Standards/Wallets/InjectedWallets.md
-
-import { FinalExecutionOutcome } from "./lib/near-api-lite/near-types";
-
-
 /************* Start extracted from near-api-js **************/
 
 declare class FunctionCallPermission {
@@ -137,12 +184,6 @@ interface Wallet {
         event: EventName,
         callback?: () => void
     ): void;
-}
-
-declare global {
-    interface Window {
-        narwallets: Wallet;
-    }
 }
 
 async function script() {
@@ -373,10 +414,6 @@ const sendToNarwallets = (
     });
     return promise;
 };
-
-async function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 async function setNetwork(): Promise<void> {
     let network: Network = await sendToNarwallets(
