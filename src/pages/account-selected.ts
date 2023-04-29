@@ -83,7 +83,7 @@ import {
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { autoRefresh, buildMRU } from "../index.js";
+import { autoRefresh} from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 import { tryAsyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 import { getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/price-data.js";
@@ -1897,7 +1897,7 @@ async function removeAccountRecord_and_go_to_account_pages() {
     code: "remove-account",
     accountId: selectedAccountData.name,
   });
-  buildMRU()
+  //buildMRU()
   //return to main page (no account selected)
   Main.backToSelectAccount()
 }

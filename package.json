@@ -1,8 +1,8 @@
 {
   "name": "narwallet-extension",
-  "version": "4.0.0",
+  "version": "4.0.7",
   "description": "Narwallet chrome-extension wallet for NEAR protocol",
-  "author": "Lucio Tato <luciotato@gmail.com>",
+  "author": "Lucio Tato <lucio@metapool.app>",
   "homepage": "www.narwallets.com",
   "type": "module",
   "private": true,
@@ -12,7 +12,6 @@
   },
   "scripts": {
     "build": "tsc -b -verbose tsconfig-sourcemap.json && rm -rf test-new-install-ln && ln -sTf extension test-new-install-ln",
-    "buildw": "tsc -b -verbose -w tsconfig-sourcemap.json",
     "start": "git pull && npm run build && echo done. open the extension form the browser",
     "test": "chrome chrome://extensions/"
   },

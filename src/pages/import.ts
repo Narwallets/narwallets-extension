@@ -22,6 +22,7 @@ import {
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
+import { hamb } from "../index.js";
 
 const NET_NAME = "net-name";
 const NET_ROOT = "net-root";
@@ -251,6 +252,7 @@ async function importClicked(ev: Event) {
       lastSearchResult.mainAccountName,
       "ask_private_key"
     );
+    hamb.show()
   }
 }
 

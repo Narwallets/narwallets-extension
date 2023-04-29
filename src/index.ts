@@ -128,30 +128,30 @@ function hambClose() {
   if (hambIsOpen) hambClicked()
 }
 
-export function buildMRU() {
-  // show MRUs
-  getAccountsForPopupList().then((list) => {
-    list.sort((a, b) => (b.order || 0) - (a.order || 0));
-    for (let i = 1; i <= 3; i++) {
-      const elem = d.qs("aside #mru-" + i)
-      if (list.length >= i) {
-        elem.innerText = list[i - 1].text
-        elem.show()
-      }
-      else {
-        elem.hide()
-      }
-    }
-  }
-  );
-}
+// export function buildMRU() {
+//   // show MRUs
+//   getAccountsForPopupList().then((list) => {
+//     list.sort((a, b) => (b.order || 0) - (a.order || 0));
+//     for (let i = 1; i <= 3; i++) {
+//       const elem = d.qs("aside #mru-" + i)
+//       if (list.length >= i) {
+//         elem.innerText = list[i - 1].text
+//         elem.show()
+//       }
+//       else {
+//         elem.hide()
+//       }
+//     }
+//   }
+//   );
+// }
 
 // TODO: Remove account-list-main
 function hambClicked() {
   hamb.toggleClass("open");
   aside.toggleClass("open");
   if (!hambIsOpen) {
-    buildMRU();
+    //buildMRU();
     d.byId("account-list-main").classList.add("hidden");
     hambIsOpen = true;
   } else {
@@ -321,9 +321,6 @@ async function initPopup() {
 
   //aside
   //d.qs("aside #create-user").onClick(asideCreateUserClicked);
-  d.qs("aside #mru-1").onClick(selectAccountMru);
-  d.qs("aside #mru-2").onClick(selectAccountMru);
-  d.qs("aside #mru-3").onClick(selectAccountMru);
   d.qs("aside #other-accounts").onClick(() => { hambClose(); selectAccountPopupList() });
   d.qs("aside #add-account-side").onClick(asideAddAccount);
   d.qs("aside #address-book-side").onClick(asideAddressBook);
