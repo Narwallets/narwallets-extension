@@ -1,6 +1,6 @@
 // import * as c from "../../util/conversions.js"
 import * as d from "../../util/document.js"
-import { askBackground } from "../../askBackground.js"
+import { askBackground, askBackgroundGetAccountRecordCopy } from "../../askBackground.js"
 import { removeDecZeroes, toStringDecMin, yton, ytonFull, ytonString } from "../../util/conversions.js";
 
 type SendResponseFunction = (response: any) => void
@@ -19,15 +19,24 @@ type Msg = {
   params: any,
 }
 
+let lastSignerId: string;
+
 async function approveOkClicked() {
-  d.showWait()
   // ask background to process the message, this time the origin is a popup from the extension, so it is trusted
   ThisApprovalMsg.dest = "ext"
   ThisApprovalMsg.src = "approve-popup"
-  askBackground(ThisApprovalMsg)
-    .then((data) => { approvalSendResponse({ data, code: ThisApprovalMsg.code }) })
-    .catch((err) => { approvalSendResponse({ err: err.message, code: ThisApprovalMsg.code }) })
-    .finally(() => { window.close() })
+  let acc = await askBackgroundGetAccountRecordCopy(lastSignerId)
+  if (!acc || !acc.privateKey) {
+    console.log("this account is read-only")
+    d.showErr(`You can not sign. This account: ${lastSignerId}, is read-only`)
+  }
+  else {
+    d.showWait()
+    askBackground(ThisApprovalMsg)
+      .then((data) => { approvalSendResponse({ data, code: ThisApprovalMsg.code }) })
+      .catch((err) => { approvalSendResponse({ err: err.message, code: ThisApprovalMsg.code }) })
+      .finally(() => { window.close() })
+  }
 }
 
 async function cancelOkClicked() {
@@ -111,6 +120,7 @@ function displayTx(msg: Msg) {
 
 function displaySingleTransactionParams(inx: number, params: any) {
   console.log("Params", params)
+  lastSignerId = params.signerId;
   // signer and receiver
   const txContainerId = `tx_${inx}`
   const TEMPLATE1 = `

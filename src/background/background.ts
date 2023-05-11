@@ -110,6 +110,7 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
         sendResponse({ data: data });
       })
       .catch((ex: Error) => {
+        console.log("sendResponse, err", ex.message)
         sendResponse({ err: ex.message });
       });
   }
@@ -288,6 +289,7 @@ async function waitForPopupToOpen(
 async function commitActions(accessKey: any, params: any, privateKey: string): Promise<FinalExecutionOutcome> {
   // re-hydrate action POJO as class instances, for the borsh serializer
   const rehydratedActions = params.actions.map((action: any) => createCorrespondingAction(action))
+  //console.log("calling near.sendTransaction2",rehydratedActions)
   return near.sendTransaction2(
     accessKey,
     rehydratedActions,
@@ -414,16 +416,17 @@ function reflectTransfer(msg: any) {
         //throw Error(`invalid msg.code ${JSON.stringify(msg)}`);
       }
     }
+    if (modified) {
+      saveSecureState();
+    }
   } catch (ex) {
     console.error(ex);
-  }
-  if (modified) {
-    saveSecureState();
   }
 }
 
 // create a promise to resolve the action requested by the popup
 async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
+  //console.log("getPromiseMsgFromPopup",msg)
   switch (msg.code) {
     case "set-network": {
       Network.setCurrent(msg.network);
@@ -613,6 +616,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     case "sign-and-send-transaction": {
       const accInfo = getAccount(msg.params.signerId);
       if (!accInfo.privateKey) {
+        console.error(`account ${msg.params.signerId} is read-only`)
         throw Error(`account ${msg.params.signerId} is read-only`)
       }
       const accessKey = await near.getAccessKey(msg.params.signerId, accInfo.privateKey)
