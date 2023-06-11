@@ -22,7 +22,7 @@ import {
   askBackgroundGetState,
   askBackgroundIsLocked,
   askBackgroundSetNetwork,
-  passMsgToBackground,
+  //passMsgToBackground,
 } from "./askBackground.js";
 import { functionCall } from "./lib/near-api-lite/transaction.js";
 import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
@@ -58,7 +58,6 @@ const AVAILABLE = "available";
 
 const SELECT_NETWORK = "select-network";
 const DATA_CODE = "data-code";
-const NETWORKS_LIST = "networks-list";
 
 let isDark = true;
 
@@ -89,7 +88,7 @@ async function networkItemClicked(e: Event) {
     if (!networkName) return;
 
     //close dropdown
-    d.byId(NETWORKS_LIST).classList.remove(d.OPEN); //hides
+    d.byId(Main.NETWORKS_LIST_DIV).classList.remove(d.OPEN); //hides
 
     //update global state (background)
     await askBackgroundSetNetwork(networkName);
@@ -107,10 +106,10 @@ async function networkItemClicked(e: Event) {
 }
 
 function selectNetworkClicked(ev: Event) {
-  const selectionBox = d.byId(NETWORKS_LIST);
+  const selectionBox = d.byId(Main.NETWORKS_LIST_DIV);
   if (selectionBox == undefined) return;
   if (selectionBox.classList.contains(d.OPEN)) {
-    d.byId(NETWORKS_LIST).classList.remove(d.OPEN); //hides
+    d.byId(Main.NETWORKS_LIST_DIV).classList.remove(d.OPEN); //hides
     return;
   }
   //open drop down box
@@ -279,21 +278,21 @@ export function switchDarkLight(): string {
   return colorMode;
 }
 
-function selectAccountMru(event: Event) {
-  try {
-    // TODO: remember & select MRU accounts per network
-    const accName = (event.target as HTMLElement).innerText.split("(")[0].trim()
-    // log("selectAccountMru |"+accName+"|")
-    if (accName) {
-      hambClose()
-      closePopupList()
-      AccountSelected_show(accName)
-    }
-  }
-  catch (err) {
-    console.error(err)
-  }
-}
+// function selectAccountMru(event: Event) {
+//   try {
+//     // TODO: remember & select MRU accounts per network
+//     const accName = (event.target as HTMLElement).innerText.split("(")[0].trim()
+//     // log("selectAccountMru |"+accName+"|")
+//     if (accName) {
+//       hambClose()
+//       closePopupList()
+//       AccountSelected_show(accName)
+//     }
+//   }
+//   catch (err) {
+//     console.error(err)
+//   }
+// }
 
 //-----------------------
 // initPopup
@@ -414,7 +413,7 @@ chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSe
   }
 });
 // let everyone interested know that this popup is opened and ready to process messages
-chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" })
+chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" }); // no callback expected
 
 async function unlockClicked(ev: Event) {
   //const emailEl = d.inputById("unlock-email")

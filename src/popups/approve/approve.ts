@@ -27,7 +27,7 @@ async function approveOkClicked() {
   ThisApprovalMsg.src = "approve-popup"
   let acc = await askBackgroundGetAccountRecordCopy(lastSignerId)
   if (!acc || !acc.privateKey) {
-    console.log("this account is read-only")
+    //console.log("this account is read-only")
     d.showErr(`You can not sign. This account: ${lastSignerId}, is read-only`)
   }
   else {
@@ -119,7 +119,7 @@ function displayTx(msg: Msg) {
 }
 
 function displaySingleTransactionParams(inx: number, params: any) {
-  console.log("Params", params)
+  //console.log("Params", params)
   lastSignerId = params.signerId;
   // signer and receiver
   const txContainerId = `tx_${inx}`
@@ -183,7 +183,7 @@ window.addEventListener('beforeunload', function (event) {
 
 // Received message from bg
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
-  console.log("Msg", msg)
+  //console.log("Msg", msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   if (senderIsExt && msg.dest == "approve-popup") {
     try {

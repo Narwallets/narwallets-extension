@@ -37,11 +37,11 @@ export function askBackground(requestPayload: any): Promise<any> {
   });
 }
 
-// send direct msg to background
-export function passMsgToBackground(msg: any, sendResponse: Function) {
-  //console.log("Pass msg to background", msg)
-  chrome.runtime.sendMessage(msg, sendResponse);
-}
+// // send direct msg to background
+// export function passMsgToBackground(msg: any, sendResponse: Function) {
+//   //console.log("Pass msg to background", msg)
+//   chrome.runtime.sendMessage(msg, sendResponse);
+// }
 
 export function askBackgroundGetAccountRecordCopy(accName: string): Promise<Account> {
   return askBackground({
@@ -81,7 +81,7 @@ export function askBackgroundGetState(): Promise<StateStruct> {
 
 export var activeNetworkInfo: NetworkInfo;
 // function to check if the account matches active network
-export function accountMatchesNetwork(accName: string) : boolean {
+export function accountMatchesNetwork(accName: string): boolean {
   if (!accName) return false;
   if (activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)) return true;
   if (accName.length > 32) return true; // assume implicit account, e.g. 

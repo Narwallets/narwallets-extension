@@ -28,6 +28,7 @@ import { hideOkCancel } from "../util/okCancel.js";
 export const WELCOME_NEW_USER_PAGE = "welcome-new-user-page";
 export const CREATE_USER = "create-user";
 export const CHANGE_PASSWORD = "change-password";
+export const NETWORKS_LIST_DIV = "networks-list";
 
 export const UNLOCK = "unlock";
 
@@ -182,7 +183,7 @@ export async function show() {
 
     // here we have:
     // a user, unlocked, with accounts.
-    
+
     await tryReposition();
 
   } catch (ex) {

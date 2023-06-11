@@ -50,19 +50,20 @@ function runtimeMessageHandler(
 ) {
 
   //-- DEBUG
-  //logEnabled(1)
-  //console.log("runtimeMessage received ", sender, msg)
+  logEnabled(0)
+  log("runtimeMessage received ", sender, msg)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  //console.log("BKG: msg, senderIsExt", senderIsExt, msg);
-  // const jsonMsg = JSON.stringify(msg)
-  // log(
-  //   "BKG: msg senderIsExt:" + senderIsExt + " " +
-  //   jsonMsg?.substring(0, Math.min(120, jsonMsg.length))
-  // );
+  log("BKG: msg, senderIsExt", senderIsExt, msg);
+  const jsonMsg = JSON.stringify(msg)
+  log(
+    "BKG: msg senderIsExt:" + senderIsExt + " " +
+    jsonMsg?.substring(0, Math.min(120, jsonMsg.length))
+  );
   //-- END DEBUG
 
   // information messages to set global flags and finish waiting
   if (msg && msg.code === "popup-is-ready") {
+    console.error(JSON.stringify(msg))
     globalFlagPopupIsReadyMsgReceived = true
     return false // done, internal message no callback required
   }
@@ -251,21 +252,25 @@ function resolveUntrustedFromPage(
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
 
-  globalFlagPopupIsReadyMsgReceived = false
-  //load popup window for the user to approve
-  const width = 500;
-  const height = 540;
-  chrome.windows.create({
-    url: "popups/approve/approve.html",
-    type: "popup",
-    //left: 40,
-    top: 100,
-    width: width,
-    height: height,
-    focused: true,
-  });
+  chrome.windows.getCurrent((tabWindow) => {
 
-  waitForPopupToOpen("approve-popup", msg, sendResponse)
+    // Create a new window positioned relative to the current tab window
+    globalFlagPopupIsReadyMsgReceived = false
+    //load popup window for the user to approve
+    const width = 500;
+    const height = 540;
+    chrome.windows.create({
+      url: "popups/approve/approve.html",
+      type: "popup",
+      left: tabWindow.width ? (tabWindow.left || 0) + tabWindow.width - width - 10 : undefined,
+      top: 100,
+      width: width,
+      height: height,
+      focused: true,
+    });
+
+    waitForPopupToOpen("approve-popup", msg, sendResponse)
+  });
 }
 
 async function sleep(ms: number) {
@@ -496,12 +501,12 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       saveSecureState();
       return
     }
-    case "set-account-order": {
-      let accInfo = getAccount(msg.accountId);
-      accInfo.order = msg.order;
-      saveSecureState();
-      return
-    }
+    // case "set-account-order": {
+    //   let accInfo = getAccount(msg.accountId);
+    //   accInfo.order = msg.order;
+    //   saveSecureState();
+    //   return
+    // }
     case "remove-account": {
       if (msg.accountId) {
         delete secureState.accounts[Network.current][msg.accountId];

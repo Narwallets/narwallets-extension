@@ -12,6 +12,7 @@ import { log } from "../log.js"
 import { decodeBase64, encodeBase64, stringFromArray, stringFromUint8Array, Uint8ArrayFromString } from "../crypto-lite/encode.js";
 import { FinalExecutionOutcome, FinalExecutionStatus } from "./near-types.js";
 
+export let globalLastExecutionOutcome: FinalExecutionOutcome;
 
 //---------------------------
 //-- NEAR PROTOCOL RPC CALLS
@@ -177,7 +178,7 @@ export async function getAccessKey(signerId: string, privateKey: string): Promis
     const publicKey = keyPair.getPublicKey();
 
     const accessKey = await access_key(signerId, publicKey.toString());
-    console.log("Access Key", accessKey)
+    //console.log("Access Key", accessKey)
     if (accessKey.permission != "FullAccess") throw Error(`The key is not full access for account '${signerId}'`)
     return accessKey
 }
@@ -257,9 +258,9 @@ export async function sendTransactionAndParseResult(actions: TX.Action[], signer
 
     const signedTransaction = await signTransaction(actions, signerId, receiver, privateKey)
 
-    const executionOutcome = await sendSignedTransaction(signedTransaction)
+    globalLastExecutionOutcome = await sendSignedTransaction(signedTransaction)
 
-    return parseFinalExecutionOutcome(executionOutcome)
+    return parseFinalExecutionOutcome(globalLastExecutionOutcome)
 }
 
 //-------------------------------
@@ -274,7 +275,7 @@ export function parseFinalExecutionOutcome(executionOutcome: FinalExecutionOutco
         }
         else if (status.SuccessValue !== undefined) {
             if (status.SuccessValue === "") {
-                return "" // early exit para return void functions
+                return "" // early exit for "return void" functions
             }
             // decode from base64 and into string
             const sv = stringFromUint8Array(decodeBase64(status.SuccessValue))

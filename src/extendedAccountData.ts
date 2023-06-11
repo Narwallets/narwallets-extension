@@ -140,7 +140,7 @@ export async function asyncRefreshAccountInfoLastBalance(accName: string, info: 
   info.lastBalanceTimestamp = Date.now()
   // save updated balance
   if (save) {
-    askBackgroundSetAccount(accName, info);
+    await askBackgroundSetAccount(accName, info);
   }
 
 }

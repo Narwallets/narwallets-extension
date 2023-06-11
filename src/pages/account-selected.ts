@@ -83,11 +83,12 @@ import {
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo } from "../lib/near-api-lite/network.js";
-import { autoRefresh} from "../index.js";
+import { autoRefresh } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 import { tryAsyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 import { getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/price-data.js";
 import { Asset, assetDivId, ASSET_HISTORY_TEMPLATE, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { log } from "../lib/log.js";
 
 const ACCOUNT_SELECTED = "account-selected";
 
@@ -204,13 +205,16 @@ export async function selectAccountPopupList() {
   // this can be invoked anytime
   hideOkCancel()
   // show and what to do when clicked
+  d.byId("select-network").classList.add("hidden")
   popupListOpen(items, popupListAddressClicked, popupListAddressEscaped)
 }
 async function popupListAddressClicked(text: string, value: string) {
+  d.byId("select-network").classList.remove("hidden")
   if (!value) return;
   await show(value, undefined);
 }
 async function popupListAddressEscaped() {
+  d.byId("select-network").classList.remove("hidden")
   Main.show();
 }
 
@@ -230,7 +234,7 @@ export function historyLineClicked(ev: Event) {
 }
 
 export async function refreshSelectedAccountAndAssets() {
-
+  log("enter refreshSelectedAccountAndAssets")
   // save because user can set selectedAccountData.name="" (by going to the account list) in the middle of the refresh
   const accName = selectedAccountData.name
   const accInfo = selectedAccountData.accountInfo
@@ -241,8 +245,10 @@ export async function refreshSelectedAccountAndAssets() {
   }
 
   await selectedAccountData.refreshLastBalance()
+  log("call updateAccountHeaderDOM")
   updateAccountHeaderDOM();
 
+  log("call getNarwalletsMetrics")
   await getNarwalletsMetrics()
 
   for (let asset of accInfo.assets) {
@@ -267,6 +273,7 @@ export async function refreshSelectedAccountAndAssets() {
     }
   }
   // save updated info (even if partial)
+  log("save updated info (even if partial)")
   await askBackgroundSetAccount(accName, accInfo);
 
 }
@@ -447,12 +454,12 @@ export async function addAssetToken(contractId: string): Promise<Asset> {
 
 async function selectAndShowAccount(accName: string) {
 
-  // set as MRU
-  askBackground({
-    code: "set-account-order",
-    accountId: accName,
-    order: Date.now(),
-  }).catch(); //ignore if error
+  // // set as MRU
+  // askBackground({
+  //   code: "set-account-order",
+  //   accountId: accName,
+  //   order: Date.now(),
+  // }).catch(); //ignore if error
 
   const accInfo = await askBackgroundGetAccountRecordCopy(accName);
   if (!accInfo) {
@@ -870,7 +877,7 @@ async function performSend() {
     disableOKCancel();
     d.showWait();
 
-    await askBackgroundTransferNear(
+    let response = await askBackgroundTransferNear(
       selectedAccountData.name,
       toAccName,
       c.ntoy(amountToSend)
