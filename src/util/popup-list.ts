@@ -8,14 +8,14 @@ let originalList: PopupItem[];
 
 let searchString = "";
 
-export type PopupItem = { text: string, value: string, order?:number }
+export type PopupItem = { text: string, value: string, order?: number }
 
 export function initPopupHandlers() {
     d.onClickId(POPUP_LIST_APPFACE, escapePopup)
 }
 
 let popupClickHandler: Function;
-let popupEscapeHandler: Function|undefined;
+let popupEscapeHandler: Function | undefined;
 
 export let popupOpened: boolean = false;
 
@@ -71,7 +71,7 @@ function markItemAsSelected() {
     })
 }
 
-function escapePopup(){
+function escapePopup() {
     closePopupList();
     popupEscapeHandler && popupEscapeHandler()
 }
@@ -130,19 +130,19 @@ function onPopupKeyDown(event: KeyboardEvent) {
         d.byId("list-filter").classList.remove('hidden');
     }
 
-    var foundmatch = [];
-    //Search in the itemList a match, and add to foundmatch
+    var matchFound = [];
+    //Search in the itemList a match, and add to matchFound
     for (let i = 0; i < popupItemList.length; i++) {
         if (popupItemList[i].value.match(searchString.toLowerCase())) {
-            foundmatch.push(popupItemList[i]);
+            matchFound.push(popupItemList[i]);
         }
     }
-    //Edit div with searchstring
+    //Edit div with searchString
     d.byId("list-filter").innerHTML = searchString;
 
     // re-populate the popup
     if (searchString) {
-        populatePopupList(foundmatch);
+        populatePopupList(matchFound);
     }
     else {
         populatePopupList(popupItemList);
@@ -150,7 +150,7 @@ function onPopupKeyDown(event: KeyboardEvent) {
 }
 
 export let popupSelectedIndex: number = 0;
-export function popupListOpen(items: PopupItem[], clickHandler: Function, escapeHandler?:Function) {
+export function popupListOpen(items: PopupItem[], clickHandler: Function, escapeHandler?: Function) {
 
     // initial populate list
     popupClickHandler = clickHandler

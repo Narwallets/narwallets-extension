@@ -170,8 +170,7 @@ function inputChanged() {
       c.ntoy(value * Number(c.ytonFull(metaPoolContractData.st_near_price)))
     );
     fee_bp = get_discount_basis_points(liquidity, receiveNear);
-    const realReceive: BigInt =
-      receiveNear - (receiveNear * BigInt(fee_bp)) / BigInt(10000);
+    const realReceive = BigInt(receiveNear - (receiveNear * BigInt(fee_bp)) / BigInt(10000));
     const nearAmount = c.yton(realReceive.toString());
     extraMsg = ` - receive ${c.toStringDec(nearAmount)} \u24c3`;
     extraMsg += ` ~  ${c.toStringDec(nearAmount * nearDollarPrice)} USD`;

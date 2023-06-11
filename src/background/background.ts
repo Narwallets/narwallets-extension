@@ -64,7 +64,7 @@ function runtimeMessageHandler(
   // information messages to set global flags and finish waiting
   if (msg && msg.code === "popup-is-ready") {
     globalFlagPopupIsReadyMsgReceived = true
-    return true // done, internal message no callback required
+    return false // done, internal message no callback required
   }
   if (!msg || msg.dest != "ext") {
     log("bkg handler, not for me!")
