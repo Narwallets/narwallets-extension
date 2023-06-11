@@ -12,8 +12,6 @@ import { log } from "../log.js"
 import { decodeBase64, encodeBase64, stringFromArray, stringFromUint8Array, Uint8ArrayFromString } from "../crypto-lite/encode.js";
 import { FinalExecutionOutcome, FinalExecutionStatus } from "./near-types.js";
 
-export let globalLastExecutionOutcome: FinalExecutionOutcome;
-
 //---------------------------
 //-- NEAR PROTOCOL RPC CALLS
 //---------------------------
@@ -252,15 +250,20 @@ export async function sendTransaction2(accessKey: any, actions: TX.Action[], sig
     return sendSignedTransaction(signedTransaction)
 }
 
+export type ParseTxResult = { successValue: any; transactionHash: string }
 //-------------------------------
 export async function sendTransactionAndParseResult(actions: TX.Action[], signerId: string, receiver: string, privateKey: string)
-    : Promise<FinalExecutionOutcome> {
+    : Promise<ParseTxResult> {
 
     const signedTransaction = await signTransaction(actions, signerId, receiver, privateKey)
 
-    globalLastExecutionOutcome = await sendSignedTransaction(signedTransaction)
+    const finalExecutionOutcome = await sendSignedTransaction(signedTransaction)
 
-    return parseFinalExecutionOutcome(globalLastExecutionOutcome)
+    return {
+        // throw if err
+        successValue: parseFinalExecutionOutcome(finalExecutionOutcome),
+        transactionHash: finalExecutionOutcome?.transaction?.hash
+    }
 }
 
 //-------------------------------

@@ -10,6 +10,7 @@ import {
 import { log } from "./lib/log.js";
 import { GContact } from "./data/contact.js";
 import { Account } from "./structs/account-info.js";
+import { ParseTxResult } from "./lib/near-api-lite/near-rpc.js";
 
 // ask background, wait for response, return a Promise
 export function askBackground(requestPayload: any): Promise<any> {
@@ -153,7 +154,7 @@ export function askBackgroundCallMethod(
   signerId: string,
   gas?: string,
   attached?: string
-): Promise<any> {
+): Promise<ParseTxResult> {
   const batchTx = new BatchTransaction(contractId);
   batchTx.addItem(new FunctionCall(method, params, gas, attached));
   return askBackground({ code: "apply", signerId: signerId, tx: batchTx });
@@ -163,7 +164,7 @@ export function askBackgroundTransferNear(
   fromAccountId: string,
   receiverId: string,
   attached: string
-): Promise<any> {
+): Promise<ParseTxResult> {
   const batchTx = new BatchTransaction(receiverId);
   batchTx.addItem(new Transfer(attached));
   return askBackground({ code: "apply", signerId: fromAccountId, tx: batchTx });
@@ -172,7 +173,7 @@ export function askBackgroundApplyTxAction(
   receiverId: string,
   action: BatchAction,
   signerId: string
-): Promise<any> {
+): Promise<ParseTxResult> {
   const batchTx = new BatchTransaction(receiverId);
   batchTx.addItem(action);
   return askBackground({ code: "apply", signerId: signerId, tx: batchTx });
@@ -181,6 +182,6 @@ export function askBackgroundApplyTxAction(
 export function askBackgroundApplyBatchTx(
   signerId: string,
   batchTx: BatchTransaction
-): Promise<any> {
+): Promise<ParseTxResult> {
   return askBackground({ code: "apply", signerId: signerId, tx: batchTx });
 }

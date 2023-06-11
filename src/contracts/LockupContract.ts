@@ -14,6 +14,7 @@ import type { StakingPoolAccountInfoResult } from "./staking-pool.js";
 import { encodeHex, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
 import { Account, removeAsset } from "../structs/account-info.js";
+import { ParseTxResult } from "../lib/near-api-lite/near-rpc.js";
 
 
 const BASE_GAS = 25;
@@ -178,7 +179,7 @@ export class LockupContract {
   }
 
   //---------------------------------------------------
-  async unstakeAndWithdrawAll(signer: string, privateKey: string): Promise<string> {
+  async unstakeAndWithdrawAll(signer: string, privateKey: string): Promise<ParseTxResult & { msg: string }> {
 
     //refresh lockup acc info - get staking pool and balances
     if (!await this.tryRetrieveInfo()) throw Error("Error refreshing account info")
@@ -196,8 +197,8 @@ export class LockupContract {
 
       if (poolAccInfo.unstaked_balance == "0") {
         //nothing to withdraw either! unselect the staking pool
-        await this.call_method("unselect_staking_pool", {}, c.TGas(BASE_GAS))
-        return "No funds left in the pool. Clearing pool selection"
+        const result = await this.call_method("unselect_staking_pool", {}, c.TGas(BASE_GAS))
+        return { ...result, msg: "No funds left in the pool. Clearing pool selection" }
         //----------------
       }
 
@@ -208,15 +209,14 @@ export class LockupContract {
       }
 
       //ok we've unstaked funds and can withdraw 
-      await this.call_method("withdraw_all_from_staking_pool", {}, c.TGas(BASE_GAS * 8))
-      return "Withdrawing all from the pool"
+      const result = await this.call_method("withdraw_all_from_staking_pool", {}, c.TGas(BASE_GAS * 8))
+      return { ...result, msg: "Withdrawing all from the pool" }
       //----------------
     }
 
     //here we've staked balance in the pool, call unstake
-    await this.call_method("unstake_all", {}, c.TGas(BASE_GAS * 5))
-
-    return "Unstake requested, you must wait (36-48hs) to withdraw"
+    const result = await this.call_method("unstake_all", {}, c.TGas(BASE_GAS * 5))
+    return { ...result, msg: "Unstake requested, you must wait (36-48hs) to withdraw" }
   }
 
   //-------------------------------------------

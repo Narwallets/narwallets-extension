@@ -62,20 +62,22 @@ export class History {
     type: string = "send";
     amount: number = 0;
     destination: string = "";
+    transactionHash: string | undefined;
     icon: string | undefined = undefined; // auto-set on populate
 
-    constructor(type: string, amount: number, destination?: string) {
+    constructor(type: string, amount: number, destination?: string, hash?: string) {
         this.amount = amount;
         this.date = new Date().toISOString();
         this.type = type;
         this.destination = destination || "";
+        this.transactionHash = hash
     }
 }
 
 
 export const ASSET_HISTORY_TEMPLATE = `
     <div id="{key}">
-      <div class="history-line">
+      <div class="history-line" data-hash={transactionHash}>
         <div class="history-icon">{icon}</div>
         <div class="history-type">{type}&nbsp;
           <span class="history-contract-id">{destination}</span>
@@ -152,14 +154,17 @@ export function assetAmount(self: Asset, amountString: string): number {
 }
 
 // note: moved outside so it works with POJOs
-export function assetAddHistory(
-    self: Asset,
+export function addHistory(
+    self: { history: History[] },
     type: string,
     amount: number,
+    transactionHash: string,
     destination?: string,
-) {
-    let hist = new History(type, amount, destination);
+): History {
+    if (!self.history) self.history = []
+    let hist = new History(type, amount, destination, transactionHash);
     self.history.unshift(hist);
+    return hist
 }
 
 // note: moved outside so it works with POJOs

@@ -41,7 +41,7 @@ async function displayStakingPools() {
         slashed: item.is_slashed ? "yes" : "no",
         stake: c.ytonString(item.stake),
         stakeY: item.stake.padStart(50, "0"),
-        uptime: item.num_expected_blocks==0?0: Math.round(item.num_produced_blocks / item.num_expected_blocks * 100)
+        uptime: item.num_expected_blocks == 0 ? 0 : Math.round(item.num_produced_blocks / item.num_expected_blocks * 100)
       })
 
     }
@@ -74,7 +74,7 @@ async function displayStakingPools() {
           const elem = d.byId(item.name)
 
           if (item.uptime >= 90) {
-            // do not colorate low-perf nodes
+            // do not add color to low-perf nodes
             const feeSpan = d.byId(item.name + "-fee")
             feeSpan.innerText = fee.toString();
             const feeBox = feeSpan.parentElement;

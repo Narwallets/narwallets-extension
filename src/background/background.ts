@@ -20,7 +20,7 @@ import {
   secureStateOpened,
   state, stateIsEmpty, unlockSecureStateAsync, unlockSecureStateSHA
 } from "./background-state.js";
-import { Asset, assetAddHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { Asset, addHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
 import { askBackgroundGetNetworkInfo } from "../askBackground.js";
 
@@ -63,7 +63,6 @@ function runtimeMessageHandler(
 
   // information messages to set global flags and finish waiting
   if (msg && msg.code === "popup-is-ready") {
-    console.error(JSON.stringify(msg))
     globalFlagPopupIsReadyMsgReceived = true
     return false // done, internal message no callback required
   }
@@ -107,7 +106,7 @@ async function runtimeMessageHandlerAfterTryRetrieveData(
       .then((data: any) => {
         //promise resolved OK
         log("trusted msg", msg.code, "promise resolved OK", data)
-        reflectTransfer(msg); // add history entries, move amounts if accounts are in the wallet
+        reflectTransfer(msg, data); // add history entries, move amounts if accounts are in the wallet
         sendResponse({ data: data });
       })
       .catch((ex: Error) => {
@@ -318,18 +317,18 @@ function createCorrespondingAction(action: any): TX.Action {
   }
 }
 
-function reflectReception(receiver: string, amount: number, sender: string) {
+function reflectReception(receiver: string, amount: number, hash: string, sender: string) {
   const accounts = secureState.accounts[Network.current];
   // is the dest-account also in this wallet?
   const destAccount = accounts[receiver];
   if (destAccount == undefined) return;
   destAccount.lastBalance += amount
-  destAccount.history.unshift(new History("received", amount, sender))
+  addHistory(destAccount, "received", amount, hash, sender)
 }
 
 //-- reflect transfer in wallet accounts
 // no async
-function reflectTransfer(msg: any) {
+function reflectTransfer(msg: any, hash: string) {
   let modified = false;
   try {
     switch (msg.code) {
@@ -359,7 +358,7 @@ function reflectTransfer(msg: any) {
                   // if found, subtract amount from balance
                   sourceAsset.balance -= assetAmount(sourceAsset, amountY);
                   if (sourceAsset.balance < 0) sourceAsset.balance = 0;
-                  assetAddHistory(sourceAsset, "send", assetAmount(sourceAsset, amountY), receiver)
+                  addHistory(sourceAsset, "send", assetAmount(sourceAsset, amountY), hash, receiver)
                 }
 
                 // is the dest-account also in this wallet?
@@ -379,7 +378,7 @@ function reflectTransfer(msg: any) {
                   destAccount.assets.push(destAsset)
                 }
                 if (destAsset != undefined) {
-                  assetAddHistory(destAsset, "received", assetAmount(destAsset, amountY), sender)
+                  addHistory(destAsset, "received", assetAmount(destAsset, amountY), hash, sender)
                 }
                 modified = true;
               }
@@ -395,9 +394,8 @@ function reflectTransfer(msg: any) {
               sourceAccount.lastBalance -= c.yton(amountY)
               modified = true;
               if (sourceAccount.lastBalance < 0) sourceAccount.lastBalance = 0;
-              sourceAccount.history.unshift(new History("send", c.yton(amountY), receiver))
-
-              reflectReception(receiver, c.yton(amountY), sender);
+              addHistory(sourceAccount, "send", c.yton(amountY), hash, receiver)
+              reflectReception(receiver, c.yton(amountY), hash, sender);
             }
               break;
 
@@ -576,6 +574,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       // {code:"apply", signerId:<account>, tx:BatchTransaction}
       // V3: when resolved, extract result, send msg to content-script->page
       // Note: V4 uses signAndSendTransaction and returns FinalExecutionOutcome (full return data, needs to be parsed to extract results)
+      console.log(msg)
       const signerId = msg.signerId || "...";
       const accInfo = getAccount(signerId);
       if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);

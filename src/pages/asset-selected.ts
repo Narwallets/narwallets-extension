@@ -60,7 +60,8 @@ import { backToSelectAccount, setLastSelectedAsset } from "./main.js";
 import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import { nearDollarPrice } from "../data/price-data.js";
-import { Asset, assetAddHistory, ASSET_HISTORY_TEMPLATE, findAsset, findAssetIndex, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { Asset, addHistory, ASSET_HISTORY_TEMPLATE, findAsset, findAssetIndex, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { ParseTxResult, parseFinalExecutionOutcome } from "../lib/near-api-lite/near-rpc.js";
 
 const THIS_PAGE = "AccountAssetDetail";
 
@@ -292,19 +293,20 @@ async function confirmWithdraw() {
       poolAccInfo.unstaked_balance
     ); // round user amount
 
+    let execResult
     if (selectedAccountData.isLockup) {
-      await performLockupContractUnstakeAndWithdrawAll()
+      execResult = await performLockupContractUnstakeAndWithdrawAll()
     }
     else {
       if (yoctosToWithdraw == poolAccInfo.unstaked_balance) {
-        await askBackgroundCallMethod(
+        execResult = await askBackgroundCallMethod(
           asset_selected.contractId,
           "withdraw_all",
           {},
           selectedAccountData.name
         );
       } else {
-        await askBackgroundCallMethod(
+        execResult = await askBackgroundCallMethod(
           asset_selected.contractId,
           "withdraw",
           { amount: yoctosToWithdraw },
@@ -316,7 +318,7 @@ async function confirmWithdraw() {
       );
     }
 
-    assetAddHistory(asset_selected, "withdraw", amount);
+    addHistory(asset_selected, "withdraw", amount, execResult?.transactionHash);
     if (asset_selected.balance) asset_selected.balance = asset_selected.balance - c.yton(yoctosToWithdraw);
 
     if (asset_selected.balance == 0) {
@@ -338,7 +340,7 @@ async function confirmWithdraw() {
   }
 }
 
-async function performLockupContractUnstakeAndWithdrawAll() {
+async function performLockupContractUnstakeAndWithdrawAll(): Promise<ParseTxResult> {
 
   const info = selectedAccountData.accountInfo;
   if (!info.ownerId) {
@@ -353,12 +355,12 @@ async function performLockupContractUnstakeAndWithdrawAll() {
   const lc = new LockupContract(info);
   await lc.computeContractAccount();
 
-  const message = await lc.unstakeAndWithdrawAll(
+  const result = await lc.unstakeAndWithdrawAll(
     info.ownerId,
     owner.privateKey
   );
-  d.showSuccess(message);
-
+  d.showSuccess(result.msg);
+  return result;
 }
 
 async function assetWithdrawClicked() {
@@ -497,15 +499,16 @@ async function LiquidUnstakeOk() {
 
     let yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
 
-    var liquidUnstakeResult = await askBackgroundCallMethod(
+    const callResult = await askBackgroundCallMethod(
       actualSP,
       "liquid_unstake",
       { st_near_to_burn: yoctosToUnstake, min_expected_near: "0" },
       selectedAccountData.name
     );
+    const liquidUnstakeResult = callResult.successValue;
 
     if (asset_selected.balance) asset_selected.balance -= c.yton(yoctosToUnstake);
-    assetAddHistory(asset_selected, "liquid-unstake", c.yton(yoctosToUnstake));
+    addHistory(asset_selected, "liquid-unstake", c.yton(yoctosToUnstake), callResult.transactionHash);
 
     await refreshSaveSelectedAccount();
     hideOkCancel();
@@ -518,9 +521,8 @@ async function LiquidUnstakeOk() {
 
     // leave this for last in case it fails to add the $META asset
     if (liquidUnstakeResult.near != "0") {
-      // add also liquid-unstake to main account, with the NEAR amount received
-      let hist = new History("liquid-unstake", c.yton(liquidUnstakeResult.near));
-      selectedAccountData.accountInfo.history.unshift(hist)
+      // add also liquid-unstake to main account, with the NEAR amount received (main account is in NEAR)
+      addHistory(selectedAccountData.accountInfo, "liquid-unstake", c.yton(liquidUnstakeResult.near), callResult.transactionHash);
     }
 
     // leave this for last in case it fails to add the $META asset
@@ -569,7 +571,7 @@ async function restakeOkClicked() {
       poolAccInfo.unstaked_balance
     ); // round user amount
 
-    await askBackgroundCallMethod(
+    const callResult = await askBackgroundCallMethod(
       actualSP,
       "stake",
       { amount: yoctosToRestake },
@@ -577,7 +579,7 @@ async function restakeOkClicked() {
     );
 
     if (asset_selected.balance) asset_selected.balance -= c.yton(yoctosToRestake);
-    assetAddHistory(asset_selected, "restake", c.yton(yoctosToRestake));
+    addHistory(asset_selected, "restake", c.yton(yoctosToRestake), callResult.transactionHash);
 
     // since we're re-staking we need to increase staked amount (or initialize it)
     let foundAsset: Asset = getOrCreateAsset(
@@ -587,7 +589,7 @@ async function restakeOkClicked() {
       "STAKE"
     );
     if (foundAsset.balance != undefined) foundAsset.balance += c.yton(yoctosToRestake);
-    assetAddHistory(foundAsset, "stake", c.yton(yoctosToRestake));
+    addHistory(foundAsset, "stake", c.yton(yoctosToRestake), callResult.transactionHash);
 
     hideOkCancel();
     renderAssetPage();
@@ -639,22 +641,23 @@ async function delayedUnstakeOkClicked() {
     }
 
     let yoctosToUnstake = poolAccInfo.staked_balance
+    let callResult
     if (selectedAccountData.isLockup) {
-      await performLockupContractUnstakeAndWithdrawAll()
+      callResult = await performLockupContractUnstakeAndWithdrawAll()
     }
     else {
       const amount = c.toNum(d.inputById("delayed-unstake-amount").value);
       CheckValidAmount(amount)
       yoctosToUnstake = fixUserAmountInY(amount, poolAccInfo.staked_balance); // round user amount
       if (yoctosToUnstake == poolAccInfo.staked_balance) {
-        await askBackgroundCallMethod(
+        callResult = await askBackgroundCallMethod(
           actualSP,
           "unstake_all",
           {},
           selectedAccountData.name
         );
       } else {
-        await askBackgroundCallMethod(
+        callResult = await askBackgroundCallMethod(
           actualSP,
           "unstake",
           { amount: yoctosToUnstake },
@@ -663,7 +666,7 @@ async function delayedUnstakeOkClicked() {
       }
     }
 
-    await createOrUpdateAssetUnstake(poolAccInfo, c.yton(yoctosToUnstake));
+    await createOrUpdateAssetUnstake(poolAccInfo, c.yton(yoctosToUnstake), callResult.transactionHash);
     hideOkCancel();
     renderAssetPage();
     showInitialSubPage();
@@ -677,16 +680,15 @@ async function delayedUnstakeOkClicked() {
   }
 }
 
-async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
+async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number, hash: string) {
   let existAssetWithThisPool = false;
   let amountToUnstake: number = amount;
-
-  let hist = new History("unstake", amountToUnstake, asset_selected.contractId);
 
   let unstakedAsset: Asset | undefined = undefined;
   for (let asset of selectedAccountData.accountInfo.assets) {
     if (asset.contractId == asset_selected.contractId && asset.symbol == "UNSTAKED") {
       unstakedAsset = asset;
+      break;
     }
   };
 
@@ -704,19 +706,17 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number) {
       setAssetBalanceYoctos(unstakedAsset, c.ntoy(amountToUnstake));
       selectedAccountData.accountInfo.assets.push(unstakedAsset);
     } else if (asset_selected.symbol == "STNEAR") {
-      // Can't unstake STNEAR if there's no STNEAR asset
       // this is unreachable code
+      console.error("Can't unstake STNEAR if there's no STNEAR asset")
+      return;
     }
   }
-  // add asset history 
-  if (unstakedAsset) { unstakedAsset.history.unshift(hist) };
   // add account history
-  if (!selectedAccountData.accountInfo.history) {
-    selectedAccountData.accountInfo.history = [];
-  }
-  selectedAccountData.accountInfo.history.unshift(hist);
-  // add current asset history
-  asset_selected.history.unshift(hist);
+  addHistory(selectedAccountData.accountInfo, "unstake", amountToUnstake, hash, asset_selected.contractId);
+  // add asset history 
+  if (unstakedAsset) {
+    addHistory(unstakedAsset, "unstake", amountToUnstake, hash, asset_selected.contractId);
+  };
 
   // update balance of currently selected pool
   let balance = await StakingPool.getAccInfo(

@@ -82,13 +82,14 @@ import {
   UNSTAKE_DEFAULT_SVG,
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
-import { NetworkInfo } from "../lib/near-api-lite/network.js";
+import { NetworkInfo, NetworkList } from "../lib/near-api-lite/network.js";
 import { autoRefresh } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 import { tryAsyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 import { getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/price-data.js";
-import { Asset, assetDivId, ASSET_HISTORY_TEMPLATE, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { Asset, assetDivId, ASSET_HISTORY_TEMPLATE, findAsset, History, setAssetBalanceYoctos, addHistory } from "../structs/account-info.js";
 import { log } from "../lib/log.js";
+import { parseFinalExecutionOutcome } from "../lib/near-api-lite/near-rpc.js";
 
 const ACCOUNT_SELECTED = "account-selected";
 
@@ -227,8 +228,14 @@ export function historyLineClicked(ev: Event) {
   if (ev.target && ev.target instanceof HTMLElement) {
     const li = ev.target.closest("li");
     if (li) {
-      navigator.clipboard.writeText(li.innerText);
-      d.showMsg("copied", "info", 1000);
+      const hash = li.firstElementChild?.getAttribute("data-hash")
+      if (hash && !hash.startsWith("{")) {
+        chrome.tabs.create({ url: `${activeNetworkInfo.explorerUrl}transactions/${hash}` })
+      }
+      else {
+        navigator.clipboard.writeText(li.innerText);
+        d.showMsg("copied", "info", 1000);
+      }
     }
   }
 }
@@ -877,7 +884,7 @@ async function performSend() {
     disableOKCancel();
     d.showWait();
 
-    let response = await askBackgroundTransferNear(
+    let result = await askBackgroundTransferNear(
       selectedAccountData.name,
       toAccName,
       c.ntoy(amountToSend)
@@ -896,7 +903,11 @@ async function performSend() {
       tryAsyncRefreshAccountInfoLastBalance(toAccName, destAccInfo);
     }
 
-    d.showSuccess("Success: " + selectedAccountData.name + " transferred " + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName);
+    let msg = "Success: " + selectedAccountData.name + " transferred "
+      + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName
+      + `<br><a target=_blank href="${activeNetworkInfo.explorerUrl}transactions/${result.transactionHash}">See tx in the explorer</a>`
+    d.showSuccess(msg, 5000);
+    console.log(msg)
     await accountCheckContactList(toAccName);
   }
   catch (ex) {
@@ -1087,41 +1098,9 @@ async function performStake() {
       throw Error("Stake at least 1 NEAR");
     }
 
-    let poolAccInfo = {
-      //empty info
-      account_id: "",
-      unstaked_balance: "0",
-      staked_balance: "0",
-      can_withdraw: false,
-    };
-
-    if (c.yton(poolAccInfo.unstaked_balance) >= 10) {
-      //at least 10 deposited but unstaked, stake that
-      //just re-stake (maybe the user asked unstaking but now regrets it)
-      const amountToStakeY = fixUserAmountInY(
-        amountToStake,
-        poolAccInfo.unstaked_balance
-      );
-      if (amountToStakeY == poolAccInfo.unstaked_balance) {
-        await askBackgroundCallMethod(
-          newStakingPool,
-          "stake_all",
-          {},
-          selectedAccountData.name
-        );
-      } else {
-        await askBackgroundCallMethod(
-          newStakingPool,
-          "stake",
-          { amount: amountToStakeY },
-          selectedAccountData.name
-        );
-        //await near.call_method(newStakingPool, "stake", {amount:amountToStakeY}, selectedAccountData.name, selectedAccountData.accountInfo.privateKey, near.ONE_TGAS.muln(125))
-      }
-    } else {
-      //no unstaked funds
+    {
       //deposit and stake
-      await askBackgroundCallMethod(
+      const depositResult = await askBackgroundCallMethod(
         newStakingPool,
         "deposit_and_stake",
         {},
@@ -1131,7 +1110,7 @@ async function performStake() {
       );
 
       let newBalance;
-      if (stakeTabSelected == 1) {
+      if (liquidStake) {
         let metaPoolResult = await askBackgroundViewMethod(
           newStakingPool,
           "get_account_info",
@@ -1139,18 +1118,12 @@ async function performStake() {
         );
         newBalance = metaPoolResult.st_near;
       } else {
-        poolAccInfo = await StakingPool.getAccInfo(
+        let poolAccInfo = await StakingPool.getAccInfo(
           selectedAccountData.name,
           newStakingPool
         );
         newBalance = poolAccInfo.staked_balance;
       }
-
-      let hist = new History(
-        liquidStake ? "liquid-stake" : "stake",
-        amountToStake,
-        newStakingPool
-      );
 
       let foundAsset: Asset = new Asset();
       selectedAccountData.accountInfo.assets.forEach((asset) => {
@@ -1160,26 +1133,32 @@ async function performStake() {
         }
       });
 
-      if (existAssetWithThisPool) {
-        foundAsset.history.unshift(hist);
-        setAssetBalanceYoctos(foundAsset, newBalance);
-      } else {
-        let asset = new Asset(
+      if (!existAssetWithThisPool) {
+        foundAsset = new Asset(
           newStakingPool,
           "stake",
           stakeTabSelected == 1 ? "STNEAR" : "STAKED",
           stakeTabSelected == 1 ? STNEAR_SVG : STAKE_DEFAULT_SVG
         );
-        setAssetBalanceYoctos(asset, newBalance)
-        asset.history.unshift(hist);
-        selectedAccountData.accountInfo.assets.push(asset);
+        selectedAccountData.accountInfo.assets.push(foundAsset);
       }
+      setAssetBalanceYoctos(foundAsset, newBalance);
+
+      addHistory(foundAsset,
+        liquidStake ? "liquid-stake" : "stake",
+        amountToStake,
+        depositResult.transactionHash,
+        newStakingPool);
 
       // add account history
       if (!selectedAccountData.accountInfo.history) {
         selectedAccountData.accountInfo.history = [];
       }
-      selectedAccountData.accountInfo.history.unshift(hist);
+      addHistory(selectedAccountData.accountInfo,
+        liquidStake ? "liquid-stake" : "stake",
+        amountToStake,
+        depositResult.transactionHash,
+        newStakingPool);
 
       // await near.call_method(newStakingPool, "deposit_and_stake", {},
       //     selectedAccountData.name,

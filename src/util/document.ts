@@ -285,7 +285,7 @@ export function showMsg(
   if (!showMs) showMs = 3000; //default show for 3 seconds
   const errDiv = byId(ERR_DIV);
   const newDiv = document.createElement("DIV") as HTMLElement;
-  newDiv.innerText = msg;
+  newDiv.innerHTML = msg;
   if (extraClass) newDiv.classList.add(extraClass);
   if (!errDiv) {
     console.error("MISSING err-div ON THIS PAGE");
@@ -307,8 +307,8 @@ export function showMsg(
   return newDiv;
 }
 
-export function showSuccess(msg: string) {
-  showMsg(msg, "success");
+export function showSuccess(msg: string, showMs?: number) {
+  showMsg(msg, "success", showMs);
 }
 
 export function showWarn(msg: string) {
