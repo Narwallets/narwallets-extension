@@ -1,11 +1,9 @@
+import { getQuote } from "./quotes/quotes.js";
 
 export let nearDollarPrice: number = 0;
 export async function fetchNearDollarPrice() {
   try {
-    let result = await fetch("https://api.diadata.org/v1/quotation/NEAR");
-    let response = await result.json();
-    nearDollarPrice = response.Price;
-
+    nearDollarPrice = await getQuote("NEAR")
     document.querySelector("#usd-price-link")?.dispatchEvent(
       new CustomEvent("usdPriceReady", {
         detail: "Dollar price",

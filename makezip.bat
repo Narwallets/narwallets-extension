@@ -1,7 +1,7 @@
 rem 
 echo Remember: REMOVE LOG DEBUG
 echo Remember: REMOVE logEnabled(1,2)
-echo Remember: BUMP VERSION
+echo Remember: BUMP VERSION - package.json & manifest.json
 pause
 @echo on
 del out\extension.zip

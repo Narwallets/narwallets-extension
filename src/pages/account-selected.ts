@@ -230,7 +230,7 @@ export function historyLineClicked(ev: Event) {
     if (li) {
       const hash = li.firstElementChild?.getAttribute("data-hash")
       if (hash && !hash.startsWith("{")) {
-        chrome.tabs.create({ url: `${activeNetworkInfo.explorerUrl}transactions/${hash}` })
+        chrome.tabs.create({ url: `${activeNetworkInfo.explorerUrl}txns/${hash}` })
       }
       else {
         navigator.clipboard.writeText(li.innerText);
@@ -905,7 +905,7 @@ async function performSend() {
 
     let msg = "Success: " + selectedAccountData.name + " transferred "
       + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName
-      + `<br><a target=_blank href="${activeNetworkInfo.explorerUrl}transactions/${result.transactionHash}">See tx in the explorer</a>`
+      + `<br><a target=_blank href="${activeNetworkInfo.explorerUrl}txns/${result.transactionHash}">See tx in the explorer</a>`
     d.showSuccess(msg, 5000);
     console.log(msg)
     await accountCheckContactList(toAccName);

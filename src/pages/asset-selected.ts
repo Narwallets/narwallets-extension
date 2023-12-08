@@ -260,6 +260,9 @@ function renderAssetPage() {
     ASSET_HISTORY_TEMPLATE,
     historyWithIcons(asset_selected.history)
   );
+
+  // click on top account name, jumps to select account
+  d.qs("#selected-asset * .accountdetscuenta").onClick(selectAccountPopupList)
 }
 
 async function reStakeClicked() {
