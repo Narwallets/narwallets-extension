@@ -834,7 +834,7 @@ async function nep141_transfer(asset: Asset, amountToSend: number, toAccName: st
     );
   }
 
-  await askBackgroundCallMethod(
+  const execResult = await askBackgroundCallMethod(
     asset.contractId,
     "ft_transfer",
     {
@@ -846,6 +846,9 @@ async function nep141_transfer(asset: Asset, amountToSend: number, toAccName: st
     undefined,
     "1"
   );
+
+  addHistory(asset_selected, "send", amountToSend, execResult?.transactionHash, toAccName);
+  await saveSelectedAccount()
 
 }
 
@@ -936,7 +939,7 @@ async function addContactToList() {
   try {
     const contactToSave: GContact = {
       accountId: contactToAdd,
-      note: "",
+      note: new d.El("#token-add-contact-note").value,
     };
     await saveContactOnBook(contactToSave.accountId, contactToSave);
     showInitialSubPage();
