@@ -1370,7 +1370,7 @@ async function performUnstake() {
 async function exploreButtonClicked() {
   localStorageSet({ reposition: "account", account: selectedAccountData.name });
   chrome.windows.create({
-    url: activeNetworkInfo.explorerUrl + "accounts/" + selectedAccountData.name,
+    url: activeNetworkInfo.explorerUrl + "address/" + selectedAccountData.name,
     state: "maximized",
   });
 }
