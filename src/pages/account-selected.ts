@@ -177,7 +177,8 @@ function initPage() {
   d.onClickId("add-note", addNoteClicked);
   d.onClickId("detailed-rewards", detailedRewardsClicked);
   d.onClickId("explore", exploreButtonClicked);
-  d.onClickId("search-pools", searchMoreAssetsButtonClicked);
+  d.onClickId("search-tokens", searchMoreTokensButtonClicked);
+  d.onClickId("search-pools", searchMorePoolsButtonClicked);
   //d.onClickId("address-book-button", showAddressBook);
 
   //d.onClickId("refresh-button", refreshSelectedAcc);
@@ -381,16 +382,21 @@ export function getKnownNEP141Contracts(): PopupItem[] {
     return [
       { text: "stNEAR - meta-pool.near", value: "meta-pool.near" },
       { text: "$META - meta-token.near", value: "meta-token.near" },
+      { text: "USDT - usdt.tether-token.near", value: "usdt.tether-token.near" },
+      { text: "USDC - Circle", value: "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1" },
+      { text: "WETH - Wrapped Ether", value: "c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.factory.bridge.near" },
+      { text: "SOL.Allbridge - SOl Allbridge", value: "sol.token.a11bd.near" },
+      { text: "wNEAR - wrapped near", value: "wrap.near" },
       { text: "REF - ref.finance", value: "token.v2.ref-finance.near" },
       { text: "xREF - ref.finance", value: "xtoken.ref-finance.near" },
       { text: "Paras - token.paras.near", value: "token.paras.near" },
-      { text: "wNEAR - wrap.near", value: "wrap.near" },
-      { text: "nWBTC- (bridged)", value: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near" },
-      { text: "nUSDT- (bridged)", value: "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near" },
-      { text: "nUSDC- (bridged)", value: "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near" },
+      { text: "nWBTC - (bridged)", value: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near" },
+      { text: "USDT.e - (bridged)", value: "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near" },
+      { text: "USDC.e - (bridged)", value: "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near" },
+      { text: "LINK - (bridged)", value: "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near" },
+      { text: "MATIC - (bridged)", value: "7d1afa7b718fb893db30a3abc0cfc608aacfebb0.factory.bridge.near" },
       { text: "nDAI - (bridged)", value: "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near" },
       { text: "nUNI - (bridged)", value: "1f9840a85d5af5bf1d1762f925bdaddc4201f984.factory.bridge.near" },
-      { text: "nLINK- (bridged)", value: "514910771af9ca656af840dff83e8264ecf986ca.factory.bridge.near" },
       { text: "BANANA - berryclub.ek.near", value: "berryclub.ek.near" },
       { text: "DBIO - dbio.near", value: "dbio.near" },
       { text: "OCT - Octopus Network (bridged)", value: "f5cfbc74057c610c8ef151a439252680ac68c6dc.factory.bridge.near" },
@@ -523,15 +529,15 @@ export function populateAssets() {
   let assetList: (Asset & DivIdField)[] = [];
   // add divId field on the fly
   for (let item of selectedAccountData.accountInfo.assets) {
-    // note do not filter for asset.balance==0, it's confusing because the user do not sees the asset
+    // note do not filter for asset.balance==0, it's confusing because the user does not see the asset
     let object = {};
     Object.assign(object, item);
     const extended = object as (Asset & DivIdField & { usdvalue: string });
     extended.divId = assetDivId(item)
     extended.usdvalue = getUsdValue(item)
-    const staleSeconds =
-      (extended.symbol == "STAKED" || extended.symbol == "UNSTAKED") ? 30 * 60 : // 30 minutes staked/unstaked balance considered valid
-        60;
+    const isStake = (extended.symbol == "STAKED" || extended.symbol == "UNSTAKED")
+    if (isStake && extended.balance && extended.balance==0) continue;
+    const staleSeconds = isStake? 30 * 60 : 60; // 30 minutes staked/unstaked balance considered valid
     if (extended.balanceTimestamp == undefined || extended.balanceTimestamp < Date.now() - staleSeconds * 1000) {
       extended.balance = undefined;
     }
@@ -1522,12 +1528,23 @@ export async function searchMoreAssets(exAccData: ExtendedAccountData, includePo
 }
 
 //-------------------------------
-async function searchMoreAssetsButtonClicked() {
+async function searchMoreTokensButtonClicked() {
   d.showWait();
   try {
-    await searchMoreAssets(selectedAccountData)
+    await searchMoreAssets(selectedAccountData, false)
     await saveSelectedAccount()
-    await refreshSelectedAccountAndAssets()
+    await populateAssets()
+  } finally {
+    d.hideWait();
+  }
+}
+
+async function searchMorePoolsButtonClicked() {
+  d.showWait();
+  try {
+    await searchMoreAssets(selectedAccountData, true)
+    await saveSelectedAccount()
+    await populateAssets()
   } finally {
     d.hideWait();
   }
