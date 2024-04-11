@@ -12,7 +12,7 @@ zip -r ../out/extension.zip . -x '*.map'
 cd ..
 
 echo
-echo expandig zip on ./ext-test
+echo expanding zip on ./ext-test
 cd out
 rm -rf ext-test
 unzip extension.zip -d ext-test
