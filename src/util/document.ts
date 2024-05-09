@@ -32,12 +32,12 @@ export let activePage = "";
  * @param id
  */
 export function byId(id: string): HTMLElement {
-  try {
-    return document.getElementById(id) as HTMLElement;
-  } catch {
+  let result = document.getElementById(id);
+  if (result == null) {
     console.error(`document.getElementById(${id}) NOT FOUND`);
-    return new HTMLElement();
+    result = new HTMLElement();
   }
+  return result
 }
 
 /**

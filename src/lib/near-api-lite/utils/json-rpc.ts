@@ -6,6 +6,9 @@ let rpcUrl: string = "https://rpc.mainnet.near.org/"
 export function setRpcUrl(newUrl: string) {
     rpcUrl = newUrl;
 }
+export function getRpcUrl(): string {
+    return rpcUrl;
+}
 
 const fetchHeaders: Record<string, string> = { 'Content-type': 'application/json; charset=utf-8' }
 export function addHeader(name: string, value: string) {

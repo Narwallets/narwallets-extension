@@ -14,6 +14,7 @@ import {
 } from "../lib/near-api-lite/batch-transaction.js";
 
 import {
+  EmptySettings,
   changePasswordAsync, clearState, createUserAsync, getAccount, getAutoUnlockSeconds, getNetworkAccountsCount,
   getUnlockSHA,
   isLocked, lockWallet, recoverState, saveSecureState, secureState,
@@ -22,9 +23,6 @@ import {
 } from "./background-state.js";
 import { Asset, addHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
-import { askBackgroundGetNetworkInfo } from "../askBackground.js";
-
-
 
 //export let globalSendResponse: Function | undefined = undefined
 
@@ -240,7 +238,7 @@ function resolveUntrustedFromPage(
       break
     case WALLET_SELECTOR_CODES.GET_NETWORK:
       const networkInfo: Network.NetworkInfo = Network.currentInfo()
-      sendResponse({ code: msg.code, data: { networkId: networkInfo.name, nodeUrl: networkInfo.rpc } })
+      sendResponse({ code: msg.code, data: { networkId: networkInfo.name, nodeUrl: Network.getSelectedRpcUrl(networkInfo) } })
       break
 
     default:
@@ -318,7 +316,7 @@ function createCorrespondingAction(action: any): TX.Action {
 }
 
 function reflectReception(receiver: string, amount: number, hash: string, sender: string) {
-  const accounts = secureState.accounts[Network.current];
+  const accounts = secureState.accounts[Network.currentNetworkName];
   // is the dest-account also in this wallet?
   const destAccount = accounts[receiver];
   if (destAccount == undefined) return;
@@ -336,7 +334,7 @@ function reflectTransfer(msg: any, hash: string) {
         // apply transaction request from popup
         // {code:"apply", signerId:<account>, tx:BatchTransaction}
         // when resolved, send msg to content-script->page
-        const accounts = secureState.accounts[Network.current];
+        const accounts = secureState.accounts[Network.currentNetworkName];
         if (accounts == undefined) return;
         const signerId = msg.signerId || "...";
         for (let item of msg.tx.items) {
@@ -432,8 +430,9 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
   //console.log("getPromiseMsgFromPopup",msg)
   switch (msg.code) {
     case "set-network": {
-      Network.setCurrent(msg.network);
-      localStorageSet({ selectedNetwork: Network.current });
+      const data = msg.data as Network.SetNetworkArgs
+      Network.setCurrent(data);
+      localStorageSet({ selectedNetwork: Network.currentNetworkName });
       return Network.currentInfo()
     }
     case "get-network-info": {
@@ -458,22 +457,20 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       return changePasswordAsync(msg.email, msg.password)
     }
     case "set-options": {
-      secureState.advancedMode = msg.advancedMode;
-      secureState.autoUnlockSeconds = msg.autoUnlockSeconds;
+      secureState.settings = msg.data
       saveSecureState();
+      Network.setCurrent({ networkName: Network.currentNetworkName, rpcIndex: secureState.settings.selectedRpcIndex[Network.currentNetworkName]})
       return
     }
-    case "get-options": {
-      return {
-        advancedMode: secureState.advancedMode,
-        autoUnlockSeconds: secureState.autoUnlockSeconds,
-      }
+    case "get-settings": {
+      if (!secureState.settings) return Object.assign({}, EmptySettings)
+      return secureState.settings
     }
     case "get-account": {
-      if (!secureState.accounts[Network.current]) {
+      if (!secureState.accounts[Network.currentNetworkName]) {
         return undefined;
       }
-      return secureState.accounts[Network.current][msg.accountId]
+      return secureState.accounts[Network.currentNetworkName][msg.accountId]
     }
     case "set-account": {
       if (!msg.accountId) throw Error("!msg.accountId");
@@ -492,10 +489,10 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     case "add-contact": {
       if (!msg.name) throw Error("!msg.name");
       if (!secureState.contacts) secureState.contacts = {};
-      if (!secureState.contacts[Network.current]) {
-        secureState.contacts[Network.current] = {};
+      if (!secureState.contacts[Network.currentNetworkName]) {
+        secureState.contacts[Network.currentNetworkName] = {};
       }
-      secureState.contacts[Network.current][msg.name] = msg.contact;
+      secureState.contacts[Network.currentNetworkName][msg.name] = msg.contact;
       saveSecureState();
       return
     }
@@ -507,7 +504,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     // }
     case "remove-account": {
       if (msg.accountId) {
-        delete secureState.accounts[Network.current][msg.accountId];
+        delete secureState.accounts[Network.currentNetworkName][msg.accountId];
       }
       //persist
       saveSecureState();
@@ -520,11 +517,11 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       if (!secureState.contacts) {
         return {};
       } else {
-        return secureState.contacts[Network.current];
+        return secureState.contacts[Network.currentNetworkName];
       }
     }
     case "all-network-accounts": {
-      return secureState.accounts[Network.current] || {}
+      return secureState.accounts[Network.currentNetworkName] || {}
     }
     // case "connect": {
     //   if (!msg.network) msg.network = Network.current;
@@ -556,13 +553,13 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     }
     case "set-address-book": {
       if (!msg.accountId) throw Error("!msg.accountId");
-      if (!secureState.contacts[Network.current]) secureState.contacts[Network.current] = {};
-      secureState.contacts[Network.current][msg.accountId] = msg.contact;
+      if (!secureState.contacts[Network.currentNetworkName]) secureState.contacts[Network.currentNetworkName] = {};
+      secureState.contacts[Network.currentNetworkName][msg.accountId] = msg.contact;
       saveSecureState();
       return
     }
     case "remove-address": {
-      delete secureState.contacts[Network.current][msg.accountId];
+      delete secureState.contacts[Network.currentNetworkName][msg.accountId];
       //persist
       saveSecureState();
       return
@@ -1082,8 +1079,8 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
     // recover base state
     await recoverState();
     // recover last set network
-    const nw = (await localStorageGet("selectedNetwork")) as string;
-    if (nw) Network.setCurrent(nw);
+    const setNetworkArgs = (await localStorageGet("selectedNetwork")) as Network.SetNetworkArgs;
+    if (setNetworkArgs) Network.setCurrent(setNetworkArgs);
   }
 
   const locked = isLocked()

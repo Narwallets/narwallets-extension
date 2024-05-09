@@ -7,8 +7,9 @@ export type StateStruct = {
   currentUser: string;
 }
 
-export type SecureOptions = {
+export type SecureSettings = {
   autoUnlockSeconds: number;
+  selectedRpcIndex: Record<string, number>
   advancedMode: boolean;
 }
 

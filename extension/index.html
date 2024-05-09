@@ -94,7 +94,7 @@
 				</svg>
 				Lock
 			</li>
-			<li id="options">Options</li>
+			<li id="options">Settings</li>
 			<li id="address-book-side">Address Book</li>
 			<li id="change-password">Change Password</li>
 			<!--<li id="create-user">Create a new User</li>-->
@@ -653,7 +653,7 @@
 						</button>
 						 -->
 
-						 <button class="button morepage" id="search-tokens">
+						<button class="button morepage" id="search-tokens">
 							<h1>Search More Tokens</h1>
 							<h2>
 								Searches for tokens you may have and adds it to your asset list
@@ -1217,15 +1217,31 @@
 
 	<!--#region OPTIONS -->
 	<div id="options" class="appface hidden slide-hide">
-		<h2>Options</h2>
+		<h2>Settings</h2>
+		<hr>
 		<h3>Auto-Lock(seconds):</h3>
 		<h4>The wallet will auto-lock after x seconds (min:60)</h4>
 		<input id="autolock-seconds-input" type="text" />
 
+		<hr>
+		<h3>RPC Server</h3>
+		<div class="form-field-label">
+			<div class="formgeneric spaced-list-item" id="settings-select-rpc-0">
+				<input id="select-rpc-0" type="radio" name="rpc-selection" checked>
+				<label for="select-rpc-0">rpc-0</label>
+			</div>
+			<div class="formgeneric spaced-list-item" id="settings-select-rpc-1">
+				<input id="select-rpc-1" type="radio" name="rpc-selection" checked>
+				<label for="select-rpc-1">rpc-1</label>
+			</div>
+		</div>
+
+		<hr>
 		<div class="button-group">
 			<button class="ok" id="save-settings">OK</button>
 			<button class="cancel" id="cancel-security-settings">Cancel</button>
 		</div>
+
 	</div>
 	<!--#endregion -->
 

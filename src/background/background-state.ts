@@ -22,7 +22,7 @@ import {
 } from "../lib/crypto-lite/encode.js";
 
 import type { NetworkInfo } from "../lib/near-api-lite/network.js";
-import type { StateStruct } from "../structs/state-structs.js";
+import type { SecureSettings as SecureSettings, StateStruct } from "../structs/state-structs.js";
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 import { GContact } from "../data/contact.js";
 //import { activeNetworkInfo } from "../index.js";
@@ -58,18 +58,22 @@ type AccountIdType = string;
 type NarwalletSecureData = {
     dataVersion: string;
     hashedPass?: string;
-    autoUnlockSeconds: number;
-    advancedMode: boolean;
+    settings: SecureSettings;
     // SecureState.accounts => { network { accountId { ...info
     accounts: Record<NetworkNameType, Record<AccountIdType, Account>>;
     contacts: Record<NetworkNameType, Record<AccountIdType, GContact>>;
 };
 
+export const EmptySettings: SecureSettings = {
+    autoUnlockSeconds: 600, // 10 minutes
+    advancedMode: false,
+    selectedRpcIndex: { mainnet: 0 },
+}
+
 const EmptySecureState: NarwalletSecureData = {
     dataVersion: DATA_VERSION,
     hashedPass: undefined,
-    autoUnlockSeconds: 600, // 10 minutes
-    advancedMode: false,
+    settings: EmptySettings,
     accounts: {},
     contacts: {},
 };
@@ -266,7 +270,7 @@ export async function unlockSecureStateSHA(
 export function getAccount(accName: string): Account {
     log("getAccount", accName);
     if (isLocked()) throw Error(`Narwallets: Wallet is locked`);
-    const network = Network.current;
+    const network = Network.currentNetworkName;
     if (!network)
         throw Error(`Narwallets: No network selected. Unlock the wallet`);
     const accounts = secureState.accounts[network];
@@ -299,13 +303,13 @@ export function saveAccount(accName: string, accountInfo: Account) {
 }
 
 export function getNetworkAccountsCount() {
-    const accounts = secureState.accounts[Network.current];
+    const accounts = secureState.accounts[Network.currentNetworkName];
     if (!accounts) return 0;
     return Object.keys(accounts).length;
 }
 
 export function getAutoUnlockSeconds() {
-    let aul = secureState.autoUnlockSeconds;
+    let aul = secureState?.settings?.autoUnlockSeconds;
     // min for chrome.alarm is 1 minute
     if (!aul || aul < 60) aul = 60;
     return aul;

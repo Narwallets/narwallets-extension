@@ -1,5 +1,5 @@
-import type { StateStruct, SecureOptions } from "./structs/state-structs.js";
-import { NetworkInfo } from "./lib/near-api-lite/network.js";
+import type { StateStruct, SecureSettings } from "./structs/state-structs.js";
+import { NetworkInfo, SetNetworkArgs } from "./lib/near-api-lite/network.js";
 
 import {
   BatchAction,
@@ -90,18 +90,18 @@ export function accountMatchesNetwork(accName: string): boolean {
 }
 
 export async function askBackgroundSetNetwork(
-  networkName: string
+  data: SetNetworkArgs
 ): Promise<NetworkInfo> {
   // save active NetworkInfo 
-  activeNetworkInfo = await askBackground({ code: "set-network", network: networkName })
+  activeNetworkInfo = await askBackground({ code: "set-network", data })
   return activeNetworkInfo
 }
 export async function askBackgroundGetNetworkInfo(): Promise<NetworkInfo> {
   activeNetworkInfo = await askBackground({ code: "get-network-info" });
   return activeNetworkInfo
 }
-export function askBackgroundGetOptions(): Promise<SecureOptions> {
-  return askBackground({ code: "get-options" }) as Promise<SecureOptions>;
+export function askBackgroundGetSettings(): Promise<SecureSettings> {
+  return askBackground({ code: "get-settings" }) as Promise<SecureSettings>;
 }
 export function askBackgroundAllNetworkAccounts(): Promise<
   Record<string, Account>

@@ -1,6 +1,6 @@
 import * as d from "./util/document.js";
 import * as Main from "./pages/main.js";
-import { NetworkList } from "./lib/near-api-lite/network.js";
+import { getInfo, NetworkList } from "./lib/near-api-lite/network.js";
 
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ChangePass_addListeners } from "./pages/change-pass.js";
@@ -90,8 +90,9 @@ async function networkItemClicked(e: Event) {
     //close dropdown
     d.byId(Main.NETWORKS_LIST_DIV).classList.remove(d.OPEN); //hides
 
+    const networkInfo = getInfo(networkName)
     //update global state (background)
-    await askBackgroundSetNetwork(networkName);
+    await askBackgroundSetNetwork({networkName:networkInfo.name, rpcIndex:networkInfo.currentRpcIndex});
     //update indicator visual state
     updateNetworkIndicatorVisualState();
     Import_onNetworkChanged();

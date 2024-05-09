@@ -31,7 +31,6 @@ import {
   askBackgroundApplyTxAction,
   askBackgroundApplyBatchTx,
   askBackgroundCallMethod,
-  askBackgroundGetOptions,
   askBackgroundGetValidators,
   askBackgroundTransferNear,
   askBackgroundGetAccessKey,
@@ -410,7 +409,7 @@ export function getKnownNEP141Contracts(): PopupItem[] {
 
 
 
-      
+
 
     ]
   }
@@ -518,7 +517,9 @@ export function getUsdValue(asset: Asset): string {
   else if (asset.symbol == "$META" && narwalletsMetrics) {
     assetUsdValue = asset.balance * narwalletsMetrics.ref_meta_price * narwalletsMetrics.st_near_price * nearDollarPrice;
   }
-
+  else if (asset.symbol == "mpDAO" && narwalletsMetrics) {
+    assetUsdValue = asset.balance * narwalletsMetrics.mpDaoUsdtOnEthMain;
+  }
   else if (asset.symbol == "STAKED"
     || asset.symbol == "UNSTAKED"
     || asset.symbol == "wNEAR"
@@ -546,12 +547,14 @@ export function populateAssets() {
     extended.divId = assetDivId(item)
     extended.usdvalue = getUsdValue(item)
     const isStake = (extended.symbol == "STAKED" || extended.symbol == "UNSTAKED")
-    if (isStake && extended.balance && extended.balance==0) continue;
-    const staleSeconds = isStake? 30 * 60 : 60; // 30 minutes staked/unstaked balance considered valid
+    if (isStake && extended.balance && extended.balance == 0) continue;
+    const staleSeconds = isStake ? 30 * 60 : 60; // 30 minutes staked/unstaked balance considered valid
     if (extended.balanceTimestamp == undefined || extended.balanceTimestamp < Date.now() - staleSeconds * 1000) {
       extended.balance = undefined;
     }
-    assetList.push(extended);
+    if (extended.balance == undefined || extended.balance > 0.0001) {
+      assetList.push(extended);
+    }
   }
   const TEMPLATE = `
     <div class="asset-item" id="{divId}">

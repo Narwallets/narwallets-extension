@@ -47,7 +47,10 @@ export type NarwalletsMetrics = {
   staking_pools_count: number;
   staked_pools_count: number;
   min_deposit_amount: number;
+
   near_usd_price: number;
+  eth_usd_price: number;
+
   operator_balance_near: number;
   ref_meta_price: number;
   ref_meta_price_usd: number;
@@ -57,7 +60,12 @@ export type NarwalletsMetrics = {
   aurora_st_near_price: number;
   validator_seat_price: number;
   validator_next_seat_price: number;
+
+  // de https://eth-metapool.narwallets.com/votes/metrics
+  mpDaoUsdtOnEthMain: number;
 }
+
+
 
 export let narwalletsMetrics: NarwalletsMetrics | undefined;
 const FETCH_INTERVAL_MS = 10 * 1000 * 60; // 10 minutes in milliseconds
@@ -76,6 +84,11 @@ export async function getNarwalletsMetrics() {
       //   "get_contract_state",
       //   {});
       // stNEARPrice = yton(data.st_near_price)
+      if (narwalletsMetrics){
+        const response = await fetch("https://eth-metapool.narwallets.com/votes/metrics_json")
+        const dataBuyBackBot = await response.json()
+        if (dataBuyBackBot) narwalletsMetrics.mpDaoUsdtOnEthMain = dataBuyBackBot.mpDaoUsdtOnEthMain
+      }
     } catch (ex) {
       console.log(ex);
     }

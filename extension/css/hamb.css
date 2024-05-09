@@ -79,7 +79,7 @@ aside.open {
   background-color: black;
 }
 
-aside>nav>hr {
+hr {
   border: 0;
   width : 90%;
   height: 1px;

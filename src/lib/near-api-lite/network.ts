@@ -1,11 +1,12 @@
-import { setRpcUrl } from "./utils/json-rpc.js";
+import * as JsonRPC from "./utils/json-rpc.js";
 
 export type NetworkInfo = {
   name: string;
   rootAccount: string;
   displayName: string;
   color: string;
-  rpc: string;
+  rpcUrls: string[];
+  currentRpcIndex: number;
   explorerUrl: string;
   NearWebWalletUrl: string;
   liquidStakingContract: string;
@@ -16,9 +17,16 @@ export type NetworkInfo = {
 export const NetworkList: NetworkInfo[] = [
 
   {
-    name: "mainnet", rootAccount: "near", displayName: "NEAR Mainnet", color: "green",
-    rpc: "https://rpc.mainnet.near.org/", explorerUrl: "https://nearblocks.io/", NearWebWalletUrl: "https://wallet.near.org/",
-    liquidStakingContract: "meta-pool.near", liquidStakingGovToken: "meta-token.near",
+    name: "mainnet",
+    rootAccount: "near",
+    displayName: "NEAR Mainnet",
+    color: "green",
+    rpcUrls: ["https://rpc.mainnet.near.org", "https://near.lava.build"],
+    currentRpcIndex: 0,
+    explorerUrl: "https://nearblocks.io/",
+    NearWebWalletUrl: "https://app.mynearwallet.com/",
+    liquidStakingContract: "meta-pool.near",
+    liquidStakingGovToken: "meta-token.near",
   },
 
   // { name: "guildnet", rootAccount: "guildnet", displayName: "OSA Guildnet", color: "cyan", 
@@ -28,7 +36,9 @@ export const NetworkList: NetworkInfo[] = [
 
   {
     name: "testnet", rootAccount: "testnet", displayName: "NEAR Testnet", color: "yellow",
-    rpc: "https://rpc.testnet.near.org/", explorerUrl: "https://testnet.nearblocks.io/", NearWebWalletUrl: "https://wallet.testnet.near.org/",
+    rpcUrls: ["https://rpc.testnet.near.org"],
+    currentRpcIndex: 0,
+    explorerUrl: "https://testnet.nearblocks.io/", NearWebWalletUrl: "https://wallet.testnet.near.org/",
     liquidStakingContract: "meta-v2.pool.testnet", liquidStakingGovToken: "token.meta.pool.testnet",
   },
 
@@ -39,21 +49,37 @@ export const NetworkList: NetworkInfo[] = [
 
   {
     name: "local", rootAccount: "local", displayName: "Local Network", color: "red",
-    rpc: "http://127.0.0.1/rpc", explorerUrl: "http://127.0..0.1/explorer/", NearWebWalletUrl: "http://127.0..0.1/wallet/",
+    rpcUrls: ["http://127.0.0.1/rpc"],
+    currentRpcIndex: 0,
+    explorerUrl: "http://127.0..0.1/explorer/", NearWebWalletUrl: "http://127.0..0.1/wallet/",
     liquidStakingContract: "meta.pool.local", liquidStakingGovToken: "token.meta.pool.local",
   },
 ];
 
-export const defaultName = "mainnet"; //default network
-export let current = defaultName;
+export type SetNetworkArgs = {
+  networkName: string,
+  rpcIndex: number
+}
 
-export function setCurrent(networkName: string): void {
-  const info = getInfo(networkName); //get & check
-  if (networkName == current) { //no change
-    return;
+export function getSelectedRpcUrl(info: NetworkInfo): string {
+  let index = info.currentRpcIndex
+  if (index < 0 || index > info.rpcUrls.length - 1) index = 0;
+  return info.rpcUrls[index]
+}
+
+export const defaultName = "mainnet"; //default network
+export let currentNetworkName = defaultName;
+
+export function setCurrent(data: SetNetworkArgs): void {
+  let info
+  try {
+    info = getInfo(data.networkName); // get & check
+  } catch (ex) {
+    info = NetworkList[0]
   }
-  current = networkName
-  setRpcUrl(info.rpc)
+  info.currentRpcIndex = data.rpcIndex || 0
+  JsonRPC.setRpcUrl(getSelectedRpcUrl(info))
+  currentNetworkName = info.name
   //COMMENTED: this is called from processMsgFromPage-- better not broadcast changes
   //chrome.runtime.sendMessage({ code: "network-changed", network:current, networkInfo:info });
 };
@@ -63,5 +89,5 @@ export function getInfo(name: string): NetworkInfo {
   throw new Error("invalid network name: " + name);
 }
 
-export function currentInfo(): NetworkInfo { return getInfo(current) };
+export function currentInfo(): NetworkInfo { return getInfo(currentNetworkName) };
 
