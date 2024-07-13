@@ -1,3 +1,7 @@
+v4.0.11
+* default RPC to free.rpc.fastnear.com
+* add rpcUrl selection in settings
+
 v4.0.10
 * add more coins to the default token list
 * use 2 sources for usd price data
