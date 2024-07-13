@@ -21,7 +21,10 @@ export const NetworkList: NetworkInfo[] = [
     rootAccount: "near",
     displayName: "NEAR Mainnet",
     color: "green",
-    rpcUrls: ["https://rpc.mainnet.near.org", "https://near.lava.build"],
+    rpcUrls: ["https://free.rpc.fastnear.com",
+      "https://rpc.mainnet.near.org",
+      "https://near.lava.build"
+    ],
     currentRpcIndex: 0,
     explorerUrl: "https://nearblocks.io/",
     NearWebWalletUrl: "https://app.mynearwallet.com/",

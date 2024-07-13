@@ -56,7 +56,10 @@ async function showInitial() {
   }
   d.inputById("autolock-seconds-input").value = readData.autoUnlockSeconds.toString();
 
-  const info = Network.getInfo(Network.currentNetworkName); // get & check
+  // get default network info
+  const info = Network.getInfo(Network.currentNetworkName); 
+  // set saved index
+  info.currentRpcIndex = readData.selectedRpcIndex[Network.currentNetworkName] 
   for (let i = 0; i < 5; i++) {
     const rpcServerRadio = document.getElementById(`select-rpc-${i}`) as HTMLInputElement
     if (rpcServerRadio == null) break;
