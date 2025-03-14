@@ -1,27 +1,23 @@
 import * as d from "../util/document.js";
 import * as c from "../util/conversions.js";
 
-import { Account, Asset, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { Asset } from "../structs/account-info.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
-import { selectAccountPopupList, selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
+import { selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
 import { showUnlockPage } from "../index.js";
 
 import {
   localStorageGet,
   localStorageGetAndRemove,
   localStorageRemove,
-  localStorageSet,
 } from "../data/local-storage.js";
 import {
   accountMatchesNetwork, activeNetworkInfo,
   askBackground,
-  askBackgroundAllNetworkAccounts,
   askBackgroundGetState,
   askBackgroundIsLocked,
 } from "../askBackground.js";
-import { D } from "../lib/tweetnacl/core/core.js";
-import * as StakingPool from "../contracts/staking-pool.js";
-import { asideSwitchMode, autoRefresh, hamb, setIsDark } from "../index.js";
+import { hamb } from "../index.js";
 import { hideOkCancel } from "../util/okCancel.js";
 
 //--- content sections at MAIN popup.html
@@ -221,10 +217,11 @@ async function tryReposition() {
     case "stake": {
       const account = await localStorageGetAndRemove("account");
       const assetIndex = await localStorageGetAndRemove("assetIndex");
+      const assetName = await localStorageGetAndRemove("assetName");
       const isLocked = await askBackgroundIsLocked();
       if (!isLocked) {
         //console.log("reposition ", account, reposition, assetIndex)
-        AccountSelectedPage_show(account, reposition, assetIndex);
+        AccountSelectedPage_show(account, reposition, assetIndex, assetName);
       }
     }
       break;

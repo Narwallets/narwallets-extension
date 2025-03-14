@@ -1,11 +1,8 @@
-import { LockupContract } from "./contracts/LockupContract.js";
-import { getLockupContract } from "./util/search-accounts.js";
-
 import { activeNetworkInfo, askBackground, askBackgroundSetAccount, askBackgroundViewMethod } from "./askBackground.js";
 import { yton } from "./util/conversions.js";
-import { nearDollarPrice } from "./data/price-data.js";
 import { Account } from "./structs/account-info.js";
-
+import { nearDollarPrice } from "./index.js";
+import { sleep } from "./util/sleep.js";
 
 export class ExtendedAccountData {
   //type: string; //small-type + note
@@ -77,7 +74,7 @@ export class ExtendedAccountData {
     }
     else {
       this.total = this.accountInfo.lastBalance;
-      this.totalUSD = this.total * nearDollarPrice;
+      this.totalUSD = this.total * (nearDollarPrice || 0);
     }
   }
 
@@ -112,14 +109,14 @@ export class ExtendedAccountData {
 /// try AsyncRefreshAccountInfoLastBalance and just log error if failure (network timeout, bad account, etc)
 export async function tryAsyncRefreshAccountInfoLastBalance(accName: string, info: Account, save: boolean = true) {
   try {
-    await asyncRefreshAccountInfoLastBalance(accName,info,save)
+    await asyncRefreshAccountInfoLastBalance(accName, info, save)
   }
-  catch(ex){
+  catch (ex) {
     console.error(JSON.stringify(ex))
   }
 }
 
-/// AsyncRefreshAccountInfoLastBalance and throw if error 
+/// AsyncRefreshAccountInfoLastBalance and throw if error
 export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account, save: boolean = true) {
 
   let stateResultYoctos;
@@ -128,6 +125,7 @@ export async function asyncRefreshAccountInfoLastBalance(accName: string, info: 
       code: "query-near-account",
       accountId: accName,
     });
+    sleep(250)
   } catch (ex) {
     console.error(ex)
     const err = ex as Error

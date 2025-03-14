@@ -201,4 +201,4 @@ chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSe
   }
 });
 // let everyone interested know that this popup is opened and ready to process messages
-setTimeout(() => { chrome.runtime.sendMessage({ code: "popup-is-ready", src: "approve" }) }, 1000)
+setTimeout(() => { chrome.runtime.sendMessage({ code: "popup-is-ready", src: "approve" }) }, 500)

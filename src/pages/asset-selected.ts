@@ -59,9 +59,9 @@ import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 import { backToSelectAccount, setLastSelectedAsset } from "./main.js";
 import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { nearDollarPrice } from "../data/price-data.js";
 import { Asset, addHistory, ASSET_HISTORY_TEMPLATE, findAsset, findAssetIndex, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { ParseTxResult, parseFinalExecutionOutcome } from "../lib/near-api-lite/near-rpc.js";
+import { nearDollarPrice } from "../index.js";
 
 const THIS_PAGE = "AccountAssetDetail";
 
@@ -174,7 +174,7 @@ function inputChanged() {
     const realReceive = BigInt(receiveNear - (receiveNear * BigInt(fee_bp)) / BigInt(10000));
     const nearAmount = c.yton(realReceive.toString());
     extraMsg = ` - receive ${c.toStringDec(nearAmount)} \u24c3`;
-    extraMsg += ` ~  ${c.toStringDec(nearAmount * nearDollarPrice)} USD`;
+    if (nearDollarPrice) extraMsg += ` ~  ${c.toStringDec(nearAmount * nearDollarPrice)} USD`;
     if (liquidity < realReceive) extraMsg = " - Not enough liquidity";
   }
   d.byId("fee-amount").innerText = `Fee: ${(
@@ -716,7 +716,7 @@ async function createOrUpdateAssetUnstake(poolAccInfo: any, amount: number, hash
   }
   // add account history
   addHistory(selectedAccountData.accountInfo, "unstake", amountToUnstake, hash, asset_selected.contractId);
-  // add asset history 
+  // add asset history
   if (unstakedAsset) {
     addHistory(unstakedAsset, "unstake", amountToUnstake, hash, asset_selected.contractId);
   };

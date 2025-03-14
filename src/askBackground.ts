@@ -11,6 +11,7 @@ import { log } from "./lib/log.js";
 import { GContact } from "./data/contact.js";
 import { Account } from "./structs/account-info.js";
 import { ParseTxResult } from "./lib/near-api-lite/near-rpc.js";
+import { JsonPerfDataAndExtras, NarwalletsMetrics } from "./types/backend-data-types.js";
 
 // ask background, wait for response, return a Promise
 export function askBackground(requestPayload: any): Promise<any> {
@@ -25,6 +26,11 @@ export function askBackground(requestPayload: any): Promise<any> {
       //-- DEBUG
       const jsonAsText = JSON.stringify(response)
       log("response to ", requestPayload.code, jsonAsText?.substring(0, Math.min(120, jsonAsText.length)));
+      //----
+      if (chrome.runtime.lastError) {
+        console.error("Error:", chrome.runtime.lastError.message);
+        return reject(Error(chrome.runtime.lastError.message));
+      }
       //----
       if (!response) {
         log("for ", requestPayload.code, "response is empty")
@@ -85,14 +91,14 @@ export var activeNetworkInfo: NetworkInfo;
 export function accountMatchesNetwork(accName: string): boolean {
   if (!accName) return false;
   if (activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)) return true;
-  if (accName.length > 32) return true; // assume implicit account, e.g. 
+  if (accName.length > 32) return true; // assume implicit account, e.g.
   return false;
 }
 
 export async function askBackgroundSetNetwork(
   data: SetNetworkArgs
 ): Promise<NetworkInfo> {
-  // save active NetworkInfo 
+  // save active NetworkInfo
   activeNetworkInfo = await askBackground({ code: "set-network", data })
   return activeNetworkInfo
 }
@@ -114,6 +120,12 @@ export function askBackgroundAllNetworkAccounts(): Promise<
 export function askBackgroundGetValidators(): Promise<any> {
   return askBackground({ code: "get-validators" });
 }
+export function askBackgroundGetBackendData(): Promise<{
+  metrics: NarwalletsMetrics | undefined,
+  perfData: JsonPerfDataAndExtras | undefined
+}> {
+  return askBackground({ code: "get-narwallets-backend-data" });
+}
 
 export function askBackgroundGetAccessKey(
   accountId: string,
@@ -126,7 +138,7 @@ export function askBackgroundGetAccessKey(
   });
 }
 
-export function askBackgroundViewMethod(
+export async function askBackgroundViewMethod(
   contract: string,
   method: string,
   args: Object

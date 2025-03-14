@@ -3,6 +3,7 @@ import * as c from "../util/conversions.js";
 import { TOKEN_DEFAULT_SVG } from "../util/svg_const.js";
 import * as StakingPool from "../contracts/staking-pool.js"
 import { Asset, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { sleep } from "../util/sleep.js";
 
 export async function assetUpdateBalance(asset: Asset, accountId: string): Promise<void> {
 
@@ -17,6 +18,7 @@ export async function assetUpdateBalance(asset: Asset, accountId: string): Promi
             } else if (asset.symbol == "STAKED") {
                 setAssetBalanceYoctos(asset, poolAccInfo.staked_balance);
             }
+            sleep(250)
         }
     }
     else if (asset.type == "ft") {

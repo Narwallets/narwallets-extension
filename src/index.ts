@@ -10,30 +10,25 @@ import {
   onNetworkChanged as Import_onNetworkChanged,
 } from "./pages/import.js";
 
-import { refreshSelectedAccountAndAssets, selectAccountPopupList, selectedAccountData, show as AccountSelected_show } from "./pages/account-selected.js";
-import { getAccountsForPopupList, show as AddressBook_show } from "./pages/address-book.js";
+import { refreshSelectedAccountAndAssets, selectAccountPopupList } from "./pages/account-selected.js";
+import { show as AddressBook_show } from "./pages/address-book.js";
 import { show as Options_show } from "./pages/options.js";
 import { show as MainPage_show } from "./pages/main.js";
 
 import { localStorageRemove, localStorageSet, showPassword } from "./data/local-storage.js";
 import {
   askBackground,
+  askBackgroundGetBackendData,
   askBackgroundGetNetworkInfo,
-  askBackgroundGetState,
   askBackgroundIsLocked,
   askBackgroundSetNetwork,
   //passMsgToBackground,
 } from "./askBackground.js";
-import { functionCall } from "./lib/near-api-lite/transaction.js";
-import { isValidEmail } from "./lib/near-api-lite/utils/valid.js";
 
-import type { NetworkInfo } from "./lib/near-api-lite/network.js";
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 import { closePopupList, initPopupHandlers } from "./util/popup-list.js";
-import { log, logEnabled } from "./lib/log.js";
-import { fetchNearDollarPrice } from "./data/price-data.js";
 import { activeNetworkInfo } from "./askBackground.js";
-import { WALLET_SELECTOR_CODES } from "./background/background.js";
+import { NarwalletsMetrics } from "./types/backend-data-types.js";
 
 // used in injected-script.ts
 declare global {
@@ -295,14 +290,18 @@ export function switchDarkLight(): string {
 //   }
 // }
 
+// popup scope metrics (arrives async)
+export let narwalletsMetrics: NarwalletsMetrics | undefined;
+export let nearDollarPrice: number | undefined;
+
+// let everyone interested know that this popup is opened and ready to process messages
+chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" }); // no callback expected
+
 //-----------------------
 // initPopup
 //-----------------------
 document.addEventListener('DOMContentLoaded', initPopup);
 async function initPopup() {
-
-  // let everyone interested know that this popup is opened and ready to process messages
-  chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" }); // no callback expected
 
   //logEnabled(1);
 
@@ -353,7 +352,12 @@ async function initPopup() {
 
   // Account_onNetworkChanged(activeNetworkInfo);
 
-  fetchNearDollarPrice();
+  // get metrics & prices from backend async
+  askBackgroundGetBackendData()
+    .then((data) => {
+      narwalletsMetrics = data.metrics
+      nearDollarPrice = data.metrics?.near_usd_price
+    })
 
   initPopupHandlers()
 

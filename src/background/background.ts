@@ -23,6 +23,7 @@ import {
 } from "./background-state.js";
 import { Asset, addHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
+import { getNarwalletsDataFromApi } from "./api-sourced-data.js";
 
 //export let globalSendResponse: Function | undefined = undefined
 
@@ -48,15 +49,14 @@ function runtimeMessageHandler(
 ) {
 
   //-- DEBUG
-  logEnabled(0)
-  log("runtimeMessage received ", sender, msg)
+  logEnabled(1)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  log("BKG: msg, senderIsExt", senderIsExt, msg);
+  log("BKG: runtimeMessage received: '"+msg?.code+"', senderIsExt", senderIsExt, msg);
   const jsonMsg = JSON.stringify(msg)
-  log(
-    "BKG: msg senderIsExt:" + senderIsExt + " " +
-    jsonMsg?.substring(0, Math.min(120, jsonMsg.length))
-  );
+  // log(
+  //   "BKG: msg senderIsExt:" + senderIsExt + " " +
+  //   jsonMsg?.substring(0, Math.min(120, jsonMsg.length))
+  // );
   //-- END DEBUG
 
   // information messages to set global flags and finish waiting
@@ -69,7 +69,7 @@ function runtimeMessageHandler(
     // continue to process
   }
   else if (!msg || msg.dest != "ext") {
-    log("bkg handler, not for me!")
+    log("--- bkg handler, msg.dest!=ext, not for me! --------")
     return false;
   }
 
@@ -91,14 +91,20 @@ async function asyncRuntimeMessageHandlerAfterTryRetrieveData(
   sendResponse: SendResponseFunction
 ) {
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  if (msg.code === "unlocked-ok" && afterUnlockMessage) {
+  if (msg.code === "unlocked-ok") {
+    if (!afterUnlockMessage) {
+      console.error("unlocked-ok but afterUnlockMessage is undefined")
+      sendResponse({ err: "afterUnlockMessage is undefined" });
+      return
+    }
     // unlocked ok, process original message and send response
     sendResponse = afterUnlockSendResponse
     msg = afterUnlockMessage
+    log("unlocked-ok so msg is now", msg)
     // clear
     afterUnlockMessage = undefined
   }
-  else if (msg.code === "unlock-popup-closed" && afterUnlockMessage != undefined) {
+  else if (msg.code === "unlock-popup-closed") {
     // unlock-popup closed without unlocking
     log("wallet unlock failed!")
     afterUnlockSendResponse && afterUnlockSendResponse({ err: "Wallet unlock failed" });
@@ -127,7 +133,7 @@ async function asyncRuntimeMessageHandlerAfterTryRetrieveData(
         sendResponse({ data: data });
       })
       .catch((ex: Error) => {
-        console.log("sendResponse, err", ex.message)
+        console.log("promise rejected, about to sendResponse, err", ex.message)
         sendResponse({ err: ex.message });
       });
   }
@@ -151,16 +157,14 @@ export const WALLET_SELECTOR_CODES = {
 let afterUnlockSendResponse: SendResponseFunction
 let afterUnlockMessage: any
 
-/// MUST call sendResponse
-async function firstUnlockThen(msg: Record<string, any>, sendResponse: SendResponseFunction) {
+function openExtensionPopup(url: string, then?: Function) {
   globalFlagPopupIsReadyMsgReceived = false
   chrome.windows.getCurrent((tabWindow) => {
-
     const width = 500;
     const height = 600;
     // open detached main wallet popup
     chrome.windows.create({
-      url: "index.html",
+      url,
       type: "popup",
       left: tabWindow.width ? (tabWindow.left || 0) + tabWindow.width - width - 10 : undefined,
       top: 100,
@@ -168,7 +172,13 @@ async function firstUnlockThen(msg: Record<string, any>, sendResponse: SendRespo
       height: height,
       focused: true,
     })
-    //
+    then && then()
+  })
+}
+
+/// MUST call sendResponse
+async function firstUnlockThen(msg: Record<string, any>, sendResponse: SendResponseFunction) {
+  openExtensionPopup("index.html", () => {
     waitForPopupReadyAndSend({ code: "unlock-popup" })
     afterUnlockMessage = msg
     afterUnlockSendResponse = sendResponse
@@ -235,6 +245,18 @@ async function resolveUntrustedFromPage(
           sendResponse({ data: accName, code: msg.code })
         }
       });
+      if (msg.params && msg.params.extraData && msg.params.extraData.reposition) {
+        // open in a particular position
+        const repo = msg.params.extraData.reposition
+        log("reposition", repo)
+        localStorageSet({
+          reposition: repo.code,
+          account: repo.account,
+          assetName: repo.assetName,
+          assetIndex: undefined,
+        });
+        openExtensionPopup("index.html")
+      }
       break
 
     case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTION:
@@ -290,22 +312,7 @@ async function resolveUntrustedFromPage(
 
 function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: SendResponseFunction) {
 
-  chrome.windows.getCurrent((tabWindow) => {
-
-    // Create a new window positioned relative to the current tab window
-    globalFlagPopupIsReadyMsgReceived = false
-    //load popup window for the user to approve
-    const width = 500;
-    const height = 540;
-    chrome.windows.create({
-      url: "popups/approve/approve.html",
-      type: "popup",
-      left: tabWindow.width ? (tabWindow.left || 0) + tabWindow.width - width - 10 : undefined,
-      top: 100,
-      width: width,
-      height: height,
-      focused: true,
-    });
+  openExtensionPopup("popups/approve/approve.html", () => {
     // *** change msg destination, wait for popup & send to it ***
     msg.dest = "approve-popup"
     waitForPopupReadyAndSend(msg, sendResponse)
@@ -585,6 +592,10 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     case "get-validators": {
       //view-call request
       return near.getValidators();
+    }
+    case "get-narwallets-backend-data": {
+      //view-call request
+      return getNarwalletsDataFromApi();
     }
     case "access-key": {
       //check access-key exists and get nonce
@@ -1134,6 +1145,7 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
   //log(`locked ${locked} dataVersion ${state.dataVersion} || user ${state.currentUser}`);
   // validate dataVersion
   if (!state.dataVersion) {
+    log("!state.dataVersion, clearing state !!!")
     clearState();
   }
 
@@ -1149,7 +1161,7 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
 
   if (secureStateOpened()) {
     // it was cached, the service worker is still active
-    log("BK-init secureState already opened, has ", getNetworkAccountsCount(), "accounts")
+    // log("BK-init secureState already opened, has ", getNetworkAccountsCount(), "accounts")
     // set alarm to lock after x minutes
     setAutoLockAlarm()
     return

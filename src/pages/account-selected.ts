@@ -39,6 +39,7 @@ import {
   askBackgroundViewMethod,
   askBackgroundGetState,
   askBackgroundGetAccountRecordCopy,
+  askBackgroundGetBackendData,
 } from "../askBackground.js";
 import {
   BatchTransaction,
@@ -82,13 +83,15 @@ import {
   WITHDRAW_SVG,
 } from "../util/svg_const.js";
 import { NetworkInfo, NetworkList } from "../lib/near-api-lite/network.js";
-import { autoRefresh } from "../index.js";
+import { autoRefresh, narwalletsMetrics, nearDollarPrice } from "../index.js";
 import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 import { tryAsyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
-import { getNarwalletsMetrics, narwalletsMetrics, nearDollarPrice } from "../data/price-data.js";
+
 import { Asset, assetDivId, ASSET_HISTORY_TEMPLATE, findAsset, History, setAssetBalanceYoctos, addHistory } from "../structs/account-info.js";
 import { log } from "../lib/log.js";
 import { parseFinalExecutionOutcome } from "../lib/near-api-lite/near-rpc.js";
+import { NarwalletsMetrics } from "../types/backend-data-types.js";
+import { sleep } from "../util/sleep.js";
 
 const ACCOUNT_SELECTED = "account-selected";
 
@@ -110,7 +113,8 @@ const TOKEN_LIST = "token-list";
 export async function show(
   accName: string,
   reposition?: string,
-  assetIndex?: number
+  assetIndex?: number,
+  assetName?: string
 ) {
 
   // ask to select another if account does not matches network
@@ -124,9 +128,25 @@ export async function show(
   await selectAndShowAccount(accName);
   d.showPage(ACCOUNT_SELECTED);
   if (reposition) {
+    console.log("reposition ", reposition, accName, assetIndex, assetName)
     switch (reposition) {
       case "stake": {
-        stakeClicked();
+        if (assetName) {
+          for (let index = 0; index < selectedAccountData.accountInfo.assets.length; index++) {
+            const item = selectedAccountData.accountInfo.assets[index];
+            if (item.symbol == assetName || item.contractId == assetName) {
+              assetIndex = index;
+              console.log(item)
+              if (item.symbol != 'UNSTAKED') break;
+            }
+          }
+        }
+        if (assetIndex != undefined) {
+          AssetSelected_show(assetIndex);
+        }
+        else {
+          stakeClicked();
+        }
         break;
       }
       case "asset": {
@@ -240,6 +260,7 @@ export function historyLineClicked(ev: Event) {
   }
 }
 
+
 export async function refreshSelectedAccountAndAssets() {
   log("enter refreshSelectedAccountAndAssets")
   // save because user can set selectedAccountData.name="" (by going to the account list) in the middle of the refresh
@@ -254,9 +275,6 @@ export async function refreshSelectedAccountAndAssets() {
   await selectedAccountData.refreshLastBalance()
   log("call updateAccountHeaderDOM")
   updateAccountHeaderDOM();
-
-  log("call getNarwalletsMetrics")
-  await getNarwalletsMetrics()
 
   for (let asset of accInfo.assets) {
     if (d.activePage !== "account-selected" && d.activePage !== "AccountAssetDetail") {
@@ -292,7 +310,7 @@ export async function refreshSelectedAccountAndAssets() {
 // }
 
 export async function usdPriceReady() {
-  if (selectedAccountData == undefined) return;
+  if (selectedAccountData == undefined || nearDollarPrice == undefined) return;
   if (selectedAccountData.total) selectedAccountData.totalUSD = selectedAccountData.total * nearDollarPrice;
   const selector = ".accountdetsfiat"
   if (document.querySelectorAll(selector).length == 0) return;
@@ -510,6 +528,7 @@ type DivIdField = { divId: string };
 
 export function getUsdValue(asset: Asset): string {
   if (!nearDollarPrice || !asset.balance) return "";
+
   let assetUsdValue;
   if (asset.symbol == "STNEAR" && narwalletsMetrics) {
     assetUsdValue = asset.balance * narwalletsMetrics.st_near_price * nearDollarPrice;
@@ -1418,6 +1437,7 @@ type PoolInfo = {
 //---------------------------------------------
 export async function searchMoreAssets(exAccData: ExtendedAccountData, includePools: boolean = true) {
   let doingDiv;
+
   try {
     doingDiv = d.showMsg("Searching Assets...", "info", -1);
 
@@ -1458,18 +1478,26 @@ export async function searchMoreAssets(exAccData: ExtendedAccountData, includePo
       validators.prev_epoch_kickout,
       validators.current_proposals
     );
+    const { metrics, perfData } = await askBackgroundGetBackendData()
+    if (perfData?.asArray) {
+      for (let item of perfData?.asArray) {
+        allOfThem.push({ account_id: item.name });
+      }
+    }
 
+    let baseWaitTime = 250
     for (let pool of allOfThem) {
       if (!checked[pool.account_id]) {
         doingDiv.innerText = "Check pool " + pool.account_id;
         let isStakingPool = true;
-        let poolAccInfo;
+        let poolAccInfo = undefined;
         try {
           poolAccInfo = await StakingPool.getAccInfo(
             exAccData.name,
             pool.account_id
           );
         } catch (ex) {
+          console.log(ex)
           if (
             ex.message.indexOf("cannot find contract code for account") != -1 ||
             ex.message.indexOf(
@@ -1479,9 +1507,10 @@ export async function searchMoreAssets(exAccData: ExtendedAccountData, includePo
             //validator is not a staking pool - ignore
             isStakingPool = false;
           } else {
-            //just ignore
+            // report
+            console.error("checking ",pool.account_id, ex)
+            // continue with next pool
             continue;
-            //throw (ex)
           }
         }
         checked[pool.account_id] = true;
@@ -1938,7 +1967,7 @@ export function removePrivateKeyClicked(ev: Event) {
 async function removeAccountClicked(ev: Event) {
   try {
     if (selectedAccountData.isFullAccess) {
-      // has full access - remove access and then the account 
+      // has full access - remove access and then the account
       localGlobalAlsoRemoveAccount = true;
       startProcessRemovePrivKey();
     }
