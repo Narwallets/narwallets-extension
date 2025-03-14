@@ -4,13 +4,17 @@
 
 @import url('https://rsms.me/inter/inter.css');
 
-body, button {
+body,
+button {
 	font-family: 'Inter', sans-serif !important;
 	font-size: 11pt;
 }
 
 @supports (font-variation-settings: normal) {
-	body, button, input {
+
+	body,
+	button,
+	input {
 		font-family: 'Inter var', sans-serif !important;
 	}
 }
@@ -28,47 +32,48 @@ body, button {
 
 	/*#region Color dark */
 
-	--Background:rgb(8, 21, 44);
+	--Background: rgb(8, 21, 44);
 
-	--Block:rgb(2, 6, 17);
+	--Block: rgb(2, 6, 17);
 
-	--BlockText:rgb(255, 255, 255);
+	--BlockText: rgb(255, 255, 255);
 
-	--TextColor                   :rgb(93, 142, 216);
-	--TextRemark:rgb(197 187 99);
+	--TextColor: rgb(93, 142, 216);
+	--TextRemark: rgb(197 187 99);
 
-	--TextGeneric:rgb(203 223 255);
+	--TextGeneric: rgb(203 223 255);
 
-	--HoverColor:rgb(83 96 139 / 27%);
-	--SelectedColor:rgb(36, 51, 100);
+	--HoverColor: rgba(101, 117, 170, 0.27);
+	--SelectedColor: rgb(36, 51, 100);
 	/* color de hover y selected en las listas */
 
-	--HighLight:rgb(189, 139, 1);
+	--HighLight: rgb(189, 139, 1);
 	/* color para textos importantes */
 
-	--ButtonBorder:rgb(189, 139, 1);
-	--InputBorder:rgb(189, 139, 1);
+	--ButtonBorder: rgb(189, 139, 1);
+	--InputBorder: rgb(189, 139, 1);
 
-	--ControlBackgroud:rgb(36, 51, 100);
+	--ControlBackgroud: rgb(36, 51, 100);
 
-	--ControlText:rgb(255, 255, 255);
+	--ControlText: rgb(255, 255, 255);
 
-	--ControlAltText:rgb(255, 255, 255);
+	--ControlAltText: rgb(255, 255, 255);
 
-	--ControlAccent:rgb(32, 106, 216);
+	--ControlAccent: rgb(32, 106, 216);
 
-	/*#endregion */}
+	/*#endregion */
+}
 
 
 body {
 	/*font-family:segoe Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";*/
-	width           : 480px;
-	height          : 600px;
-	margin          : 0px;
-	overflow        : hidden;
-	padding         : 0px;
-	border-style    : none;
-	border-width    : 1px;
+	width: 480px;
+	height: 600px;
+	margin: 0px;
+	overflow: hidden;
+	padding: 0px;
+	border-style: none;
+	border-width: 1px;
 	background-color: var(--Background);
-	color           : var(--TextColor);
+	color: var(--TextColor);
 }
