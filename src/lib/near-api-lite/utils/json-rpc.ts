@@ -1,4 +1,5 @@
 
+import { sleep } from "../../../util/sleep.js";
 import { log } from "../../log.js";
 
 let rpcUrl: string = "https://rpc.mainnet.near.org/"
@@ -72,6 +73,17 @@ export function formatJSONErr(obj: any): any {
     return text
 }
 
+export type NearRpcJsonResponse = {
+    error: {
+        message: string;
+        data: any | undefined;
+    }
+    result: {
+        error: string;
+        logs: [];
+    }
+}
+
 let id = 0
 export async function jsonRpcInternal(payload: Record<string, any>): Promise<any> {
 
@@ -83,17 +95,34 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
         }
 
         let timeoutRetries = 0;
+        let tooManyReqRetries = 0;
         let accountDoesNotExistsRetries = 0;
+        let timeoutOccurred: boolean;
         while (true) {
+            timeoutOccurred = false
             let fetchResult = await fetch(rpcUrl, rpcOptions);
-            if (fetchResult.status!==200) {
+            if (fetchResult?.status == 429) {
+                tooManyReqRetries++
+                if (tooManyReqRetries > 10) {
+                    throw new Error(rpcUrl + " " + fetchResult.status + " " + fetchResult.statusText)
+                }
+                const sleepTime = 500 + 250 * tooManyReqRetries
+                console.error("429 too many requests, sleeping", sleepTime, "and RETRY #", tooManyReqRetries);
+                await sleep(sleepTime)
+                continue;
+            }
+            else if (fetchResult?.status == 408) { // timeout
+                timeoutOccurred = true
+            }
+            else if (fetchResult?.status !== 200) {
                 throw new Error(rpcUrl + " " + fetchResult.status + " " + fetchResult.statusText)
             }
-            let response 
+
+            let response
             try {
-                response = await fetchResult.json()
+                response = await fetchResult.json() as NearRpcJsonResponse
             }
-            catch(ex){
+            catch (ex) {
                 throw new Error(rpcUrl + " no a valid json response " + ex.message)
             }
             if (!fetchResult.ok) {
@@ -105,33 +134,43 @@ export async function jsonRpcInternal(payload: Record<string, any>): Promise<any
                 if (response.result.logs && response.result.logs.length) {
                     console.log("response.result.logs:", response.result.logs);
                 }
-                error = {
-                    message: response.result.error
-                }
+                error = { message: response.result.error, data: undefined }
             }
+
+            // some kind of error
             if (error) {
-                
                 const errorMessage = formatJSONErr(error);
                 if (error.data === 'Timeout' || errorMessage.indexOf('Timeout error') != -1) {
-                    const err = new Error('jsonRpc has timed out')
-                    if (timeoutRetries < 3) {
-                        timeoutRetries++;
-                        log(err.message, "RETRY #", timeoutRetries);
-                        continue;
-                    }
-                    err.name = 'TimeoutError'
-                    throw err;
+                    timeoutOccurred = true
                 }
                 else if (rpcUrl.indexOf("mainnet") == -1 && errorMessage.indexOf("does not exist") != -1 && accountDoesNotExistsRetries < 2) {
                     //often in testnet there's failure searching existing accounts. Retry
+                    await sleep(300)
                     accountDoesNotExistsRetries++;
                     continue;
                 }
                 else {
-                    throw new Error(errorMessage);
+                    throw new Error("Error: " + errorMessage);
                 }
             }
-            return response.result;
+            else {
+                // not error, then assume some response
+                if (!response.result) {
+                    console.log("EMPTY response.result=", response.result)
+                }
+                return response.result;
+            }
+
+            if (timeoutOccurred) {
+                const err = new Error('jsonRpc has timed out')
+                if (timeoutRetries < 5) {
+                    timeoutRetries++;
+                    console.error(err.message, "RETRY #", timeoutRetries);
+                    continue;
+                }
+                err.name = 'TimeoutError'
+                throw err;
+            }
         }
     }
     catch (ex) {
