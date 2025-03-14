@@ -1,34 +1,55 @@
-# Narwallet Chrome Extension 
+# Narwallets - Chrome Extension Wallet for NEAR Blockchain
 
 ## Installation
 
 Install [Narwallets v4 from the Chrome Web Store](https://chrome.google.com/webstore/detail/narwallets-v4/lkpeokpdkmcdaiadpmnnpimlgmdobkdj)
 
-## Objectives
-* Be the deafult chrome-extension wallet for NEAR DApps
-* What Metamask does for ethereum, we intend to do for NEAR
+## Changelog
+* 2025-03-14 v4.0.14
+  * handle 429 from RPC servers
+  * custom open-on-asset message
+  * cache backend data - better isolation for background worker
+  * better contrast "more" menu
+* 2025-03-14 v4.0.12
+  * better integration with near-wallet-selector
+* 2024-07-12
+  * default RPC to rpc.fastnear.com
+* 2024-04-11
+  * update default token list, use nearblocks explorer
+* 2023-12-08
+  * backup source for quotes
+* 2023-05-01
+  * simpler account selection
+* 2023-01-11 v4.0.6
+  * Implement NEP-408 for wallet-selector
+* 2022-12-28 v4.0.5
+  * quick select account
+* 2022-10-09 v4
+  * Integrate with wallet-selector
+* 2022-04-02
+  * Better auto-refresh of on-chain balances
 
-## Comparision with NEAR Official Web Wallet
-* Narwallets-extension aims to be a simpler and complemetary tool to the official NEAR Web wallet
+
+## Differences with NEAR Web Wallets
+* Narwallets-extension aims to be a simpler and complementary tool to the official NEAR Web wallet
 * Narwallets is designed for a desktop/laptop experience with a chromium based browser, NEAR Web wallet works on any browser and mobile
 * Narwallets is available only in english, NEAR Web wallet supports multiple languages
 * Narwallets is not yet integrated with Ledger or other HW Wallets
-* Narwallets has only one option regading account recovery: Write-down the seed phrase. NEAR Web Wallet has other user-friendly recovery options (email & phone recovery).
+* Narwallets has only one option regarding account recovery: Write-down the seed phrase. NEAR Web Wallet has other user-friendly recovery options (email & phone recovery).
 * Narwallets, aiming at simplicity, has no 2FA support yet.
 
 The good:
-* It's an extension-wallet: You'll be able to interact with DApps without leaving the DApp web site
+* It is an extension-wallet: You'll be able to interact with DApps without leaving the DApp web site
 * Provides a similar experience as Metamask/other extension-wallets, easing the onboard of ethereum users into the NEAR ecosystem.
 * Each wallet can have multiple accounts. You can see the sum of all your accounts in the wallet
-* You can have multiple wallets by providing different user/passwords. 
+* You can have multiple wallets by providing different user/passwords.
 * Accounts are first added to in safe-by-default read-only mode (no keys)
 * All private data is stored encrypted on chrome local storage
- - [x] Create free *implict accounts* (no near required)
+ - [x] Create free *implicit accounts* (no near required)
  - [x] Lockup contract accounts are auto-discovered and treated as another account in the group
  - [x] Advanced mode allows you to take full control of your lockup contract account
  - [x] Integration with DApps. New model: wallet initiated connection to active tab, resulting in chain & wallet agnostic DApps. See [Wallet integration API Documentation here](API-design.md)
 
-![multiple accounts and total](docs/images/multiple-accounts-and-total.png)
 
 ## Road Map
 * Trello Board at https://trello.com/b/SRbigp2g
@@ -40,7 +61,7 @@ The good:
 
 ## Dev Tooling (v0.1)
 * This project uses typescript
-* Being a chrome extension, no bundler/minimizer is needed 
+* Being a chrome extension, no bundler/minimizer is needed
 * No frameworks are used neither, this is plain typescript and a main index.html
 
 ## Dev Flow (v0.1)
@@ -54,7 +75,7 @@ The good:
  - [ ] npm i eslint --save-dev
  - [ ] When wallet-API was added a lot of functions became `async`. Add `npm install eslint-plugin-no-floating-promise --save-dev`
 
-We're using base crypto libs as a bundle (The ideal solution would be to have typescript versions of each lib and compile to ES2020 modules) 
+We're using base crypto libs as a bundle (The ideal solution would be to have typescript versions of each lib and compile to ES2020 modules)
  - [ ] Replace bundle with typescript versions of basic crypto tools
 
 We need to reduce the bundle's size. Bundle is at https://github.com/Narwallets/bundled-crypto-libs.git
@@ -65,7 +86,7 @@ Bundle includes:
 * globalThis.BN = BN
 * globalThis.bip39 = bip39
 * globalThis.pbkdf2 = pbkdf2
-* globalThis.createHmacPackage = {createHmac:createHmac} 
+* globalThis.createHmacPackage = {createHmac:createHmac}
 
 ## Beta Test Installation (Latest Unstable Version)
 
