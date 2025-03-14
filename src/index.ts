@@ -44,7 +44,7 @@ declare global {
 
 export const SINGLE_USER_EMAIL = "unique-user@narwallets.com"
 
-const AUTO_LOCK_SECONDS = 15; //auto-lock wallet after 1hr
+const AUTO_LOCK_SECONDS = 300; //auto-lock wallet after 5 minutes
 
 //--- content sections at MAIN popup.html
 
@@ -92,7 +92,7 @@ async function networkItemClicked(e: Event) {
 
     const networkInfo = getInfo(networkName)
     //update global state (background)
-    await askBackgroundSetNetwork({networkName:networkInfo.name, rpcIndex:networkInfo.currentRpcIndex});
+    await askBackgroundSetNetwork({ networkName: networkInfo.name, rpcIndex: networkInfo.currentRpcIndex });
     //update indicator visual state
     updateNetworkIndicatorVisualState();
     Import_onNetworkChanged();
@@ -301,6 +301,9 @@ export function switchDarkLight(): string {
 document.addEventListener('DOMContentLoaded', initPopup);
 async function initPopup() {
 
+  // let everyone interested know that this popup is opened and ready to process messages
+  chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" }); // no callback expected
+
   //logEnabled(1);
 
   // update network indicator visual state
@@ -397,24 +400,23 @@ function openTermsOfUseOnNewWindow() {
 }
 
 type SendResponseFunction = (response: any) => void
-let thisUnlockSendResponse: SendResponseFunction | undefined
-let thisUnlockReceivedMessage: any
+let thisIsUnlockSendMessage: boolean = false;
 // Received message from background (when acting as unlock-popup)
 chrome.runtime.onMessage.addListener((msg: any, sender: chrome.runtime.MessageSender, sendResponse: SendResponseFunction) => {
-  //debug("INDEX POPUP ONMESSAGE "+chrome.runtime.id+JSON.stringify(msg))
-  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  //console.log("INDEX POPUP ONMESSAGE, senderIsExt:", chrome.runtime.id, msg)
-  if (senderIsExt && msg.dest == "unlock-popup") {
-    thisUnlockSendResponse = sendResponse
-    thisUnlockReceivedMessage = msg
-    // show request origin
-    //if (sender.url) d.byId("web-page").innerText = sender.url.split(/[?#]/)[0]; // remove querystring and/or hash
-    // ack, it's for me, sendResponse will be called later
-    return true;
+  if (msg.code == "unlock-popup") {
+    // background letting us know that this popup is the unlock-popup
+    thisIsUnlockSendMessage = true; // sendMessage when unlocked ok
+    // normally this is called when the wallet is locked, so we assume this popup is already showing the unlock page
+  }
+  return false;
+});
+
+/// before closing the popup, if this was an unlock, let the background know that the popup was closed
+window.addEventListener("beforeunload", () => {
+  if (thisIsUnlockSendMessage) { // sendMessage when unlocked
+    chrome.runtime.sendMessage({ code: "unlock-popup-closed", src: "unlock-popup" });
   }
 });
-// let everyone interested know that this popup is opened and ready to process messages
-chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" }); // no callback expected
 
 async function unlockClicked(ev: Event) {
   //const emailEl = d.inputById("unlock-email")
@@ -431,18 +433,14 @@ async function unlockClicked(ev: Event) {
     //console.error("Accounts: ", numAccounts)
     //console.error("thisUnlockSendResponse?", thisUnlockSendResponse?"YES":"NO")
     if (numAccounts == 0) {
-      d.showPage("import-or-create"); // auto-add account after unlock      
+      d.showPage("import-or-create"); // auto-add account after unlock
     } else {
-      if (thisUnlockSendResponse) {
+      if (thisIsUnlockSendMessage) {
+        thisIsUnlockSendMessage = false
         // this unlock is to execute a transaction or other page request
-        // send directly to background to process and respond
-        let passMsg = Object.assign({}, thisUnlockReceivedMessage)
-        passMsg.src = "page"
-        passMsg.dest = "ext"
-        // for sign-in & get-account-id respond here
-        let account = await Main.asyncGetLastAccountName()
-        thisUnlockSendResponse({ data: account, code: WALLET_SELECTOR_CODES.SIGN_IN })
-
+        // we let the background know that the unlock was successful
+        chrome.runtime.sendMessage({ code: "unlocked-ok", src: "unlock-popup" });
+        // close this unlock popup
         setTimeout(window.close, 200);
       }
       else {

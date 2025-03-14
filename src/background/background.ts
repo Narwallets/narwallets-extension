@@ -64,7 +64,11 @@ function runtimeMessageHandler(
     globalFlagPopupIsReadyMsgReceived = true
     return false // done, internal message no callback required
   }
-  if (!msg || msg.dest != "ext") {
+  else if (msg && (msg.code === "unlocked-ok" || msg.code === "unlock-popup-closed")) {
+    // internal message no callback required
+    // continue to process
+  }
+  else if (!msg || msg.dest != "ext") {
     log("bkg handler, not for me!")
     return false;
   }
@@ -72,28 +76,43 @@ function runtimeMessageHandler(
   // launch recover data
   tryRetrieveBgInfoFromStorage().
     then(() => { // launch async processing
-      runtimeMessageHandlerAfterTryRetrieveData(msg, sender, sendResponse)
+      asyncRuntimeMessageHandlerAfterTryRetrieveData(msg, sender, sendResponse)
     });
 
-  return true; // will be resolved later on retrieveBgInfoFromStorage.then()
+  return true; // signal that we will call sendResponse later on asyncRuntimeMessageHandlerAfterTryRetrieveData()
 }
 
 // after recovering the background data
 // process the message, use sendResponse({err:, data:}) to respond
-async function runtimeMessageHandlerAfterTryRetrieveData(
+// MUST finally call sendResponse
+async function asyncRuntimeMessageHandlerAfterTryRetrieveData(
   msg: any,
   sender: chrome.runtime.MessageSender,
   sendResponse: SendResponseFunction
 ) {
+  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
+  if (msg.code === "unlocked-ok" && afterUnlockMessage) {
+    // unlocked ok, process original message and send response
+    sendResponse = afterUnlockSendResponse
+    msg = afterUnlockMessage
+    // clear
+    afterUnlockMessage = undefined
+  }
+  else if (msg.code === "unlock-popup-closed" && afterUnlockMessage != undefined) {
+    // unlock-popup closed without unlocking
+    log("wallet unlock failed!")
+    afterUnlockSendResponse && afterUnlockSendResponse({ err: "Wallet unlock failed" });
+    return
+  }
+
   // check if it comes from the web-page or from this extension
   // TODO: CHECK: can still a malicious page make a postMessage and get here as "fromExtension"
   // can the malicious page do it if the wallet is locked (will trigger unlock and send message from the unlock popup)
-  const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
   //console.log("BK w/data sender is ext", senderIsExt, msg)
-  if (!senderIsExt || msg.src === "page") {
+  if (!senderIsExt || msg.src === "ws" || msg.src === "page") { // ws == wallet-selector
     // from web-app/tab or wallet-selector -> content-script -> here
-    // process separated from internal requests for security. 
-    // We don't trust the page, 
+    // process separated from internal requests for security.
+    // We don't trust the page,
     // Actions require user approval
     resolveUntrustedFromPage(sender, msg, sendResponse)
   }
@@ -129,24 +148,36 @@ export const WALLET_SELECTOR_CODES = {
   DISCONNECT: "disconnect",
 }
 
-async function handleUnlock(msg: Record<string, any>, sendResponse: SendResponseFunction) {
+let afterUnlockSendResponse: SendResponseFunction
+let afterUnlockMessage: any
+
+/// MUST call sendResponse
+async function firstUnlockThen(msg: Record<string, any>, sendResponse: SendResponseFunction) {
   globalFlagPopupIsReadyMsgReceived = false
-  const width = 500;
-  const height = 600;
-  chrome.windows.create({
-    url: "index.html",
-    type: "popup",
-    //left: 40,
-    top: 100,
-    width: width,
-    height: height,
-    focused: true,
+  chrome.windows.getCurrent((tabWindow) => {
+
+    const width = 500;
+    const height = 600;
+    // open detached main wallet popup
+    chrome.windows.create({
+      url: "index.html",
+      type: "popup",
+      left: tabWindow.width ? (tabWindow.left || 0) + tabWindow.width - width - 10 : undefined,
+      top: 100,
+      width: width,
+      height: height,
+      focused: true,
+    })
+    //
+    waitForPopupReadyAndSend({ code: "unlock-popup" })
+    afterUnlockMessage = msg
+    afterUnlockSendResponse = sendResponse
   })
-  waitForPopupToOpen("unlock-popup", msg, sendResponse)
 }
 
-/// this function should call sendResponse now, or else return true and call sendResponse later
-function resolveUntrustedFromPage(
+/// this function MUST call sendResponse
+/// or start a process that eventually will call sendResponse
+async function resolveUntrustedFromPage(
   sender: chrome.runtime.MessageSender,
   msg: Record<string, any>,
   sendResponse: SendResponseFunction) {
@@ -157,17 +188,26 @@ function resolveUntrustedFromPage(
 
   switch (msg.code) {
 
-    case WALLET_SELECTOR_CODES.CONNECT:
-      if (isLocked()) {
-        handleUnlock(msg, sendResponse)
-      } else {
-        // not locked
-        localStorageGet("currentAccountId").then(accName => {
-          const accInfo = getAccount(accName);
-          sendResponse({ data: accInfo, code: msg.code })
-        })
-      }
-      break
+    // case WALLET_SELECTOR_CODES.CONNECT:
+    //   if (isLocked()) {
+    //     handleUnlock(msg, sendResponse)
+    //   } else {
+    //     // not locked
+    //     localStorageGet("currentAccountId").then(accName => {
+    //       const accInfo = getAccount(accName);
+    //       sendResponse({
+    //         data: {
+    //           accountId: accName,
+    //           balance: accInfo.lastBalance,
+    //           network: accInfo.network,
+    //           assets: accInfo.assets
+    //         }
+    //         , code: msg.code
+    //       })
+    //     })
+    //   }
+    //   break
+
     case WALLET_SELECTOR_CODES.IS_INSTALLED:
       sendResponse({ data: true, code: msg.code })
       return;
@@ -179,27 +219,27 @@ function resolveUntrustedFromPage(
     case WALLET_SELECTOR_CODES.DISCONNECT:
     case WALLET_SELECTOR_CODES.SIGN_OUT:
       // await disconnectFromWebPage()
-      lockWallet("sign-out")
+      // lockWallet("sign-out")
       sendResponse({ data: true, code: msg.code })
       // ctinfo.acceptedConnection = false;
       return;
 
+    case WALLET_SELECTOR_CODES.CONNECT:
     case WALLET_SELECTOR_CODES.SIGN_IN:
     case WALLET_SELECTOR_CODES.GET_ACCOUNT_ID:
-      if (isLocked()) {
-        handleUnlock(msg, sendResponse)
-      } else {
-        // not locked
-        localStorageGet("currentAccountId").then(accName => {
+      localStorageGet("currentAccountId").then(accName => {
+        if (!accName) {
+          firstUnlockThen(msg, sendResponse)
+        }
+        else {
           sendResponse({ data: accName, code: msg.code })
-        })
-      }
-
+        }
+      });
       break
 
     case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTION:
       if (isLocked()) {
-        handleUnlock(msg, sendResponse)
+        firstUnlockThen(msg, sendResponse)
       } else {
         // The standard sends the transaction information inside a transaction object, but it wasn't previously done like this.
         // Consider changing the way narwallets builds this object.
@@ -212,12 +252,12 @@ function resolveUntrustedFromPage(
           })
         }
         prepareAndOpenApprovePopup(msg, sendResponse)
-        return true; // the approve popup will call sendResponse later
       }
       break
+
     case WALLET_SELECTOR_CODES.SIGN_AND_SEND_TRANSACTIONS:
       if (isLocked()) {
-        handleUnlock(msg, sendResponse)
+        firstUnlockThen(msg, sendResponse)
       } else {
         // The standard sends the transaction information inside a transaction object, but it wasn't previously done like this.
         // Consider changing the way narwallets builds this object.
@@ -233,11 +273,12 @@ function resolveUntrustedFromPage(
           })
         }
         prepareAndOpenApprovePopup(msg, sendResponse)
-        return true; // the approve popup will call sendResponse later
       }
       break
+
     case WALLET_SELECTOR_CODES.GET_NETWORK:
       const networkInfo: Network.NetworkInfo = Network.currentInfo()
+      console.log("response to", msg.code, { networkId: networkInfo.name, nodeUrl: Network.getSelectedRpcUrl(networkInfo) })
       sendResponse({ code: msg.code, data: { networkId: networkInfo.name, nodeUrl: Network.getSelectedRpcUrl(networkInfo) } })
       break
 
@@ -265,8 +306,9 @@ function prepareAndOpenApprovePopup(msg: Record<string, any>, sendResponse: Send
       height: height,
       focused: true,
     });
-
-    waitForPopupToOpen("approve-popup", msg, sendResponse)
+    // *** change msg destination, wait for popup & send to it ***
+    msg.dest = "approve-popup"
+    waitForPopupReadyAndSend(msg, sendResponse)
   });
 }
 
@@ -276,15 +318,20 @@ async function sleep(ms: number) {
 
 let globalFlagPopupIsReadyMsgReceived: boolean;
 
-async function waitForPopupToOpen(
-  dest: string,
+async function waitForPopupReadyAndSend(
   msg: Record<string, any>,
-  sendResponse: SendResponseFunction) {
-  msg.dest = dest
+  sendResponse?: SendResponseFunction) {
+  // wait
   while (!globalFlagPopupIsReadyMsgReceived) {
     await sleep(100)
   }
-  chrome.runtime.sendMessage(msg, sendResponse)
+  if (sendResponse) {
+    chrome.runtime.sendMessage(msg, sendResponse)
+  }
+  else {
+    // no sendResponse, just send the message
+    chrome.runtime.sendMessage(msg)
+  }
   // await sleep(1000)
 }
 
@@ -459,7 +506,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     case "set-options": {
       secureState.settings = msg.data
       saveSecureState();
-      Network.setCurrent({ networkName: Network.currentNetworkName, rpcIndex: secureState.settings.selectedRpcIndex[Network.currentNetworkName]})
+      Network.setCurrent({ networkName: Network.currentNetworkName, rpcIndex: secureState.settings.selectedRpcIndex[Network.currentNetworkName] })
       return
     }
     case "get-settings": {
