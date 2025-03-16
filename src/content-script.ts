@@ -12,7 +12,7 @@ window.addEventListener("message", (event) => {
     return;
   }
   const msg = event.data
-  console.log("content-script, window.addEventListener(message), received: ", msg)
+  // console.log("content-script, window.addEventListener(message), received: ", msg)
   if (msg && msg.type && (msg.type == "nw") && msg.dest == "ext") {
     /** pass the message to narwallets extension background service worker
      * using chrome.runtime.sendMessage.
@@ -26,7 +26,7 @@ window.addEventListener("message", (event) => {
     * If the response is true, it will consider the message was received and will wait a response called by sendResponse
     *   and received by the second parameter of sendMessage which is a function with one parameter that will be called response
      */
-    console.log("content-script, sending via chrome.runtime.sendMessage")
+    // console.log("content-script, sending via chrome.runtime.sendMessage")
     chrome.runtime.sendMessage(msg, function (response) {
 
       /**
@@ -43,7 +43,7 @@ window.addEventListener("message", (event) => {
        */
       let postBackMsg = Object.assign({}, msg)
       try {
-        console.log("content-script, response received via send-response-fn:", response)
+        // console.log("content-script, response received via send-response-fn:", response)
         if (!response) {
           if (chrome.runtime.lastError) {
             console.error("content-script, chrome.runtime.lastError:", chrome.runtime.lastError.message);
@@ -76,7 +76,7 @@ window.addEventListener("message", (event) => {
         * it is received by a window.addEventListener("message", (event) => {}) call
         * This call does not expect any response
          */
-        console.log("content-script, sending back via window.postMessage:", postBackMsg)
+        // console.log("content-script, sending back via window.postMessage:", postBackMsg)
         window.postMessage(postBackMsg);
       }
     });
