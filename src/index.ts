@@ -29,6 +29,7 @@ import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 import { closePopupList, initPopupHandlers } from "./util/popup-list.js";
 import { activeNetworkInfo } from "./askBackground.js";
 import { NarwalletsMetrics } from "./types/backend-data-types.js";
+import { log, logEnabled } from "./lib/log.js";
 
 // used in injected-script.ts
 declare global {
@@ -302,8 +303,6 @@ chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" }); // no call
 //-----------------------
 document.addEventListener('DOMContentLoaded', initPopup);
 async function initPopup() {
-
-  //logEnabled(1);
 
   // update network indicator visual state
   await askBackgroundGetNetworkInfo();
