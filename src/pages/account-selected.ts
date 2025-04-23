@@ -14,8 +14,7 @@ import {
   parseSeedPhraseAsync,
 } from "../lib/near-api-lite/utils/seed-phrase.js";
 import {
-  CurveAndArrayKey,
-  KeyPairEd25519,
+  KeyPairEd25519
 } from "../lib/near-api-lite/utils/key-pair.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
@@ -24,13 +23,10 @@ import {
   assetUpdateBalance,
 } from "../data/asset-update.js";
 
-import { localStorageGetAndRemove, localStorageSet, showPassword } from "../data/local-storage.js";
+import { localStorageSet, showPassword } from "../data/local-storage.js";
 import {
-  accountMatchesNetwork, activeNetworkInfo,
   askBackground,
-  askBackgroundApplyTxAction,
-  askBackgroundApplyBatchTx,
-  askBackgroundCallMethod,
+  askBackgroundApplyTxAction, askBackgroundCallMethod,
   askBackgroundGetValidators,
   askBackgroundTransferNear,
   askBackgroundGetAccessKey,
@@ -42,69 +38,45 @@ import {
   askBackgroundGetBackendData,
 } from "../askBackground.js";
 import {
-  BatchTransaction,
-  DeleteAccountToBeneficiary,
+  DeleteAccountToBeneficiary
 } from "../lib/near-api-lite/batch-transaction.js";
 
-import { show as AccountPages_show } from "./main.js";
 import { show as AssetSelected_show } from "./asset-selected.js";
 import {
-  contactExists,
-  initAddressArr,
-  saveContactOnBook,
-  show as AddressBook_show,
-  getAddressesForPopupList,
+  contactExists, saveContactOnBook, getAddressesForPopupList,
   getAccountsForPopupList
 } from "./address-book.js";
 
-import type { AnyElement, ClickHandler } from "../util/document.js";
-import { D } from "../lib/tweetnacl/core/core.js";
 import {
-  confirmClicked,
-  cancelClicked,
   OkCancelInit,
   disableOKCancel,
   enableOKCancel,
   showOKCancel,
-  hideOkCancel,
+  hideOkCancel
 } from "../util/okCancel.js";
 
-import { addressContacts } from "./address-book.js";
-import { box_overheadLength } from "../lib/naclfast-secret-box/nacl-fast.js";
 import { GContact } from "../data/contact.js";
 import {
   LIQUID_STAKE_DEFAULT_SVG,
   RECEIVE_SVG,
   SEND_SVG,
   STAKE_DEFAULT_SVG,
-  STNEAR_SVG,
-  TOKEN_DEFAULT_SVG,
-  UNSTAKE_DEFAULT_SVG,
-  WITHDRAW_SVG,
+  STNEAR_SVG, UNSTAKE_DEFAULT_SVG
 } from "../util/svg_const.js";
-import { NetworkInfo, NetworkList } from "../lib/near-api-lite/network.js";
-import { autoRefresh, narwalletsMetrics, nearDollarPrice } from "../index.js";
-import { closePopupList, popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
+
+import { autoRefresh, narwalletsMetrics, nearDollarPrice, networkIndicatorNetwork } from "../index.js";
+import { popupComboConfigure, PopupItem, popupListOpen } from "../util/popup-list.js";
 import { tryAsyncRefreshAccountInfoLastBalance, ExtendedAccountData } from "../extendedAccountData.js";
 
 import { Asset, assetDivId, ASSET_HISTORY_TEMPLATE, findAsset, History, setAssetBalanceYoctos, addHistory } from "../structs/account-info.js";
 import { log } from "../lib/log.js";
-import { parseFinalExecutionOutcome } from "../lib/near-api-lite/near-rpc.js";
-import { NarwalletsMetrics } from "../types/backend-data-types.js";
-import { sleep } from "../util/sleep.js";
 
 const ACCOUNT_SELECTED = "account-selected";
 
 export let selectedAccountData: ExtendedAccountData;
 
-
-let removeButton: d.El;
-
 let seedTextElem: d.El;
-let isMoreOptionsOpen = false;
 let stakeTabSelected: number = 1;
-
-let intervalIdShow: any;
 
 // Added for add token datalist patch
 const TOKEN_LIST = "token-list";
@@ -118,7 +90,7 @@ export async function show(
 ) {
 
   // ask to select another if account does not matches network
-  if (!accName || !accountMatchesNetwork(accName)) {
+  if (!accName || !Main.isAccountGoodForNetwork(accName, networkIndicatorNetwork.rootAccount)) {
     //loop exit if last account was removed, is empty or not valid
     selectAccountPopupList()
     return;
@@ -166,7 +138,7 @@ export async function show(
     reposition: "account",
     account: accName
   };
-  payload["lastSelectedAccountByNetwork_" + activeNetworkInfo.name] = accName
+  payload["lastSelectedAccountByNetwork_" + networkIndicatorNetwork.name] = accName
   localStorageSet(payload)
   //checkConnectOrDisconnect();
   autoRefresh()
@@ -250,7 +222,7 @@ export function historyLineClicked(ev: Event) {
     if (li) {
       const hash = li.firstElementChild?.getAttribute("data-hash")
       if (hash && !hash.startsWith("{")) {
-        chrome.tabs.create({ url: `${activeNetworkInfo.explorerUrl}txns/${hash}` })
+        chrome.tabs.create({ url: `${networkIndicatorNetwork.explorerUrl}txns/${hash}` })
       }
       else {
         navigator.clipboard.writeText(li.innerText);
@@ -267,7 +239,7 @@ export async function refreshSelectedAccountAndAssets() {
   const accName = selectedAccountData.name
   const accInfo = selectedAccountData.accountInfo
 
-  if (accName == "" || accInfo.network !== activeNetworkInfo.name) {
+  if (accName == "" || accInfo.network !== networkIndicatorNetwork.name) {
     // exit if no acc selected or network changed
     return;
   }
@@ -389,11 +361,12 @@ function addClicked() {
 }
 
 export function getKnownNEP141Contracts(): PopupItem[] {
-  if (activeNetworkInfo.name == "testnet") {
+  if (networkIndicatorNetwork.name == "testnet") {
     return [
+      { text: "mpDAO - mpdao-token.testnet", value: "mpdao-token.testnet" },
       { text: "stNEAR - meta-v2.pool.testnet", value: "meta-v2.pool.testnet" },
-      { text: "$META - token.meta.pool.testnet", value: "token.meta.pool.testnet" },
       { text: "CHDR - token.cheddar.testnet", value: "token.cheddar.testnet" },
+      { text: "$META - token.meta.pool.testnet", value: "token.meta.pool.testnet" },
     ]
   } else {
     return [
@@ -943,7 +916,7 @@ async function performSend() {
 
     let msg = "Success: " + selectedAccountData.name + " transferred "
       + c.toStringDec(amountToSend) + "\u{24c3} to " + toAccName
-      + `<br><a target=_blank href="${activeNetworkInfo.explorerUrl}txns/${result.transactionHash}">See tx in the explorer</a>`
+      + `<br><a target=_blank href="${networkIndicatorNetwork.explorerUrl}txns/${result.transactionHash}">See tx in the explorer</a>`
     d.showSuccess(msg, 5000);
     console.log(msg)
     await accountCheckContactList(toAccName);
@@ -1117,7 +1090,7 @@ async function performStake() {
 
     const liquidStake = stakeTabSelected == 1;
     if (liquidStake) {
-      newStakingPool = activeNetworkInfo.liquidStakingContract;
+      newStakingPool = networkIndicatorNetwork.liquidStakingContract;
       amountToStake = c.toNum(d.inputById("stake-amount-liquid").value);
     } else {
       newStakingPool = d.inputById("stake-with-staking-pool").value.trim();
@@ -1408,14 +1381,14 @@ async function performUnstake() {
 async function exploreButtonClicked() {
   localStorageSet({ reposition: "account", account: selectedAccountData.name });
   chrome.windows.create({
-    url: activeNetworkInfo.explorerUrl + "address/" + selectedAccountData.name,
+    url: networkIndicatorNetwork.explorerUrl + "address/" + selectedAccountData.name,
     state: "maximized",
   });
 }
 
 async function detailedRewardsClicked() {
   localStorageSet({ reposition: "account", account: selectedAccountData.name });
-  if (activeNetworkInfo.name != "mainnet") {
+  if (networkIndicatorNetwork.name != "mainnet") {
     d.showErr("This function is only available in mainnet");
   } else {
     chrome.windows.create({
@@ -1508,7 +1481,7 @@ export async function searchMoreAssets(exAccData: ExtendedAccountData, includePo
             isStakingPool = false;
           } else {
             // report
-            console.error("checking ",pool.account_id, ex)
+            console.error("checking ", pool.account_id, ex)
             // continue with next pool
             continue;
           }
@@ -1981,7 +1954,7 @@ async function removeAccountClicked(ev: Event) {
 }
 
 export async function refreshSaveSelectedAccount(fromTimer?: boolean) {
-  if (selectedAccountData.accountInfo.network !== activeNetworkInfo.name) {
+  if (selectedAccountData.accountInfo.network !== networkIndicatorNetwork.name) {
     //network changed
     return;
   }

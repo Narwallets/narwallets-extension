@@ -47,21 +47,17 @@ async function cancelOkClicked() {
 }
 
 
-
-
 function humanReadableValue(value: Object): string {
-  if (typeof value == "string") {
-    if (/\d{20}/.test(value)) {
-      //at least 20 digits. we assume YOCTOS
-      return toStringDecMin(yton(value))
+  let text = value.toString()
+  if (/\d{20}/.test(text)) {
+    //at least 20 digits. we add a "'" at 24th decimals
+    if (text.length < 25) {
+      text = "0".repeat(25 - text.length) + text // add leading zeroes
     }
-    else {
-      return `"${value}"`;
-    }
+    // add a "'" at 24th decimal
+    text = text.slice(0, -24) + "'" + text.slice(-24)
   }
-  else {
-    return value.toString();
-  }
+  return text
 }
 
 function humanReadableCallArgs(args: Object): string {

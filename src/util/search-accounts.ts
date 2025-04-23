@@ -1,9 +1,9 @@
-import * as c from "./conversions.js";
 
 import { LockupContract } from "../contracts/LockupContract.js";
 import { Account, newAccount } from "../structs/account-info.js";
-import { activeNetworkInfo, askBackground, askBackgroundGetNetworkInfo } from "../askBackground.js";
+import { askBackgroundQueryNearAccount } from "../askBackground.js";
 import { asyncRefreshAccountInfoLastBalance } from "../extendedAccountData.js";
+import { networkIndicatorNetwork } from "../index.js";
 
 function checkNotLockup(accName: string) {
   const suffix = LockupContract.getLockupSuffix();
@@ -30,20 +30,17 @@ export async function getLockupContract(
 
 export async function checkIfAccountExists(accName: string): Promise<boolean> {
   try {
-    await askBackground({
-      code: "query-near-account",
-      accountId: accName,
-    });
+    let stateResult = await askBackgroundQueryNearAccount(accName);
     return true;
-  } catch (ex) {
-    // const reason = ex.message.replace("while viewing", "");
+  }
+  catch (ex) {
     return false;
   }
 }
 
 export async function searchAccount(accName: string): Promise<Account> {
   checkNotLockup(accName);
-  let newAccInfo = newAccount(activeNetworkInfo.name);
+  let newAccInfo = newAccount(networkIndicatorNetwork.name);
   await asyncRefreshAccountInfoLastBalance(accName, newAccInfo, false);
   return newAccInfo;
 }

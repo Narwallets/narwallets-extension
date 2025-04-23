@@ -1,20 +1,19 @@
-import * as c from "../util/conversions.js"
-import * as d from "../util/document.js"
+import * as c from "../util/conversions.js";
 
-import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js"
+import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js";
 
 //import * as near from "../api/near-rpc.js";
 import * as StakingPool from "./staking-pool.js";
 //import * as TX from "../api/transaction.js";
 import { isValidAccountID, CheckValidAmount } from "../lib/near-api-lite/utils/valid.js";
-import { activeNetworkInfo, askBackground, askBackgroundApplyTxAction, askBackgroundCallMethod, askBackgroundViewMethod } from "../askBackground.js";
+import { askBackgroundApplyTxAction, askBackgroundQueryNearAccount, askBackgroundViewMethod } from "../askBackground.js";
 import { FunctionCall } from "../lib/near-api-lite/batch-transaction.js";
 
-import type { StakingPoolAccountInfoResult } from "./staking-pool.js";
 import { encodeHex, Uint8ArrayFromString } from "../lib/crypto-lite/encode.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
 import { Account, removeAsset } from "../structs/account-info.js";
 import { ParseTxResult } from "../lib/near-api-lite/near-rpc.js";
+import { networkIndicatorNetwork } from "../index.js";
 
 
 const BASE_GAS = 25;
@@ -41,8 +40,8 @@ export class LockupContract {
   static getLockupSuffix() {
     //HACK to test lockup contracts in testnet - until core developers provide a way to
     //create xxx.lockup.testnet accounts- we use .lockupy.testnet, that we created
-    const lockupSuffix = (activeNetworkInfo.name == "testnet" ? "lockupy" : "lockup")
-    return "." + lockupSuffix + "." + activeNetworkInfo.rootAccount;
+    const lockupSuffix = (networkIndicatorNetwork.rootAccount == "testnet" ? "lockupy" : "lockup")
+    return "." + lockupSuffix + "." + networkIndicatorNetwork.rootAccount;
   }
 
   async computeContractAccount() {
@@ -63,10 +62,7 @@ export class LockupContract {
     let firstOneOK = false;
 
     try {
-      let stateResultYoctos = await askBackground({
-        code: "query-near-account",
-        accountId: this.contractAccount,
-      });
+      let stateResultYoctos = await askBackgroundQueryNearAccount(this.contractAccount);
       this.accountInfo.lastBalance = c.yton(stateResultYoctos.amount)
       this.accountInfo.lastBalanceTimestamp = Date.now()
       firstOneOK = true;
@@ -208,7 +204,7 @@ export class LockupContract {
         //----------------
       }
 
-      //ok we've unstaked funds and can withdraw 
+      //ok we've unstaked funds and can withdraw
       const result = await this.call_method("withdraw_all_from_staking_pool", {}, c.TGas(BASE_GAS * 8))
       return { ...result, msg: "Withdrawing all from the pool" }
       //----------------

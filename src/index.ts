@@ -1,14 +1,9 @@
 import * as d from "./util/document.js";
 import * as Main from "./pages/main.js";
-import { getInfo, NetworkList } from "./lib/near-api-lite/network.js";
 
 import { addListeners as CreateUser_addListeners } from "./pages/create-pass.js";
 import { addListeners as ChangePass_addListeners } from "./pages/change-pass.js";
 import { addListeners as ImportOrCreate_addListeners } from "./pages/import-or-create.js";
-import {
-  addListeners as Import_addListeners,
-  onNetworkChanged as Import_onNetworkChanged,
-} from "./pages/import.js";
 
 import { refreshSelectedAccountAndAssets, selectAccountPopupList } from "./pages/account-selected.js";
 import { show as AddressBook_show } from "./pages/address-book.js";
@@ -27,9 +22,8 @@ import {
 
 import { hideOkCancel, OkCancelInit } from "./util/okCancel.js";
 import { closePopupList, initPopupHandlers } from "./util/popup-list.js";
-import { activeNetworkInfo } from "./askBackground.js";
 import { NarwalletsMetrics } from "./types/backend-data-types.js";
-import { log, logEnabled } from "./lib/log.js";
+import { getNetworkConfig, NetworkConfig, NetworkList } from "./lib/near-api-lite/network-types.js";
 
 // used in injected-script.ts
 declare global {
@@ -62,10 +56,13 @@ let aside: d.El;
 
 let hambIsOpen = false;
 
-function updateNetworkIndicatorVisualState() {
+export let networkIndicatorNetwork: NetworkConfig = NetworkList[0];
+
+function setNetworkIndicator(networkName: string) {
+  networkIndicatorNetwork = getNetworkConfig(networkName)
   const currentNetworkDisplayName = new d.El("#current-network-display-name");
-  currentNetworkDisplayName.innerText = activeNetworkInfo.displayName; //set name
-  currentNetworkDisplayName.el.className = "circle " + activeNetworkInfo.color; //set indicator color
+  currentNetworkDisplayName.innerText = networkIndicatorNetwork.displayName; //set name
+  currentNetworkDisplayName.el.className = "circle " + networkIndicatorNetwork.color; //set indicator color
 }
 
 export function setIsDark(d: boolean) {
@@ -86,12 +83,11 @@ async function networkItemClicked(e: Event) {
     //close dropdown
     d.byId(Main.NETWORKS_LIST_DIV).classList.remove(d.OPEN); //hides
 
-    const networkInfo = getInfo(networkName)
     //update global state (background)
-    await askBackgroundSetNetwork({ networkName: networkInfo.name, rpcIndex: networkInfo.currentRpcIndex });
+    await askBackgroundSetNetwork({ name: networkName });
     //update indicator visual state
-    updateNetworkIndicatorVisualState();
-    Import_onNetworkChanged();
+    setNetworkIndicator(networkName);
+    Main.show(); // reset flow
 
     // Account_onNetworkChanged(activeNetworkInfo);
     //on network-change restart the page-flow
@@ -302,12 +298,12 @@ chrome.runtime.sendMessage({ code: "popup-is-ready", src: "index" }); // no call
 // initPopup
 //-----------------------
 document.addEventListener('DOMContentLoaded', initPopup);
+
 async function initPopup() {
 
   // update network indicator visual state
-  await askBackgroundGetNetworkInfo();
-  updateNetworkIndicatorVisualState();
-  Import_onNetworkChanged();
+  const currentNetwork = await askBackgroundGetNetworkInfo();
+  setNetworkIndicator(currentNetwork.name);
 
   hamb = new d.El(".hamb");
   aside = new d.El("aside");
@@ -346,8 +342,6 @@ async function initPopup() {
   d.onClickId("open-terms-of-use", openTermsOfUseOnNewWindow);
   CreateUser_addListeners();
   ImportOrCreate_addListeners();
-
-  Import_addListeners();
 
   // Account_onNetworkChanged(activeNetworkInfo);
 

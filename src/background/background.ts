@@ -1,11 +1,8 @@
 import * as c from "../util/conversions.js";
 import { log, logEnabled } from "../lib/log.js";
 
-import * as Network from "../lib/near-api-lite/network.js";
-//import * as nearAccounts from "../util/search-accounts.js";
-
 import * as near from "../lib/near-api-lite/near-rpc.js";
-import { localStorageSet, localStorageGet } from "../data/local-storage.js";
+import { localStorageSet, localStorageGet, recoverFromLocalStorage, localStorageSave } from "../data/local-storage.js";
 import * as TX from "../lib/near-api-lite/transaction.js";
 
 import {
@@ -15,7 +12,7 @@ import {
 
 import {
   EmptySettings,
-  changePasswordAsync, clearState, createUserAsync, getAccount, getAutoUnlockSeconds, getNetworkAccountsCount,
+  changePasswordAsync, clearState, createUserAsync, getAccountPrivKey, getAutoUnlockSeconds, getNetworkAccountsCount,
   getUnlockSHA,
   isLocked, lockWallet, recoverState, saveSecureState, secureState,
   secureStateOpened,
@@ -24,6 +21,8 @@ import {
 import { Asset, addHistory, assetAmount, findAsset, History, setAssetBalanceYoctos } from "../structs/account-info.js";
 import { FinalExecutionOutcome } from "../lib/near-api-lite/near-types.js";
 import { getNarwalletsDataFromApi } from "./api-sourced-data.js";
+import { defaultNetwork, getNetworkRpcUrl, NetworkNameAndRpcIndex } from "../lib/near-api-lite/network-types.js";
+import { setRpcUrl } from "../lib/near-api-lite/utils/json-rpc.js";
 
 //export let globalSendResponse: Function | undefined = undefined
 
@@ -32,6 +31,21 @@ function semver(major: number, minor: number, version: number): number {
   return major * 1e6 + minor * 1e3 + version;
 }
 const WALLET_VERSION = semver(2, 0, 0);
+
+let currentNetwork: NetworkNameAndRpcIndex = {
+  name: defaultNetwork,
+  rpcIndex: 0
+}
+
+export function setCurrentNetwork(args: NetworkNameAndRpcIndex) {
+  currentNetwork = {
+    name: args.name || defaultNetwork,
+    rpcIndex: args.rpcIndex
+  }
+  setRpcUrl(getNetworkRpcUrl(currentNetwork))
+  //COMMENTED: this is called from processMsgFromPage-- better not broadcast changes
+  //chrome.runtime.sendMessage({ code: "network-changed", network:current, networkInfo:info });
+}
 
 //----------------------------------------
 //-- LISTEN to "chrome.runtime.message" from own POPUPs or from content-scripts
@@ -51,7 +65,7 @@ function runtimeMessageHandler(
   //-- DEBUG
   logEnabled(1)
   const senderIsExt = sender.url && sender.url.startsWith("chrome-extension://" + chrome.runtime.id + "/");
-  log("BKG: runtimeMessage received: '"+msg?.code+"', senderIsExt", senderIsExt, msg);
+  log("BKG: runtimeMessage received: '" + msg?.code + "', senderIsExt", senderIsExt, msg);
   const jsonMsg = JSON.stringify(msg)
   // log(
   //   "BKG: msg senderIsExt:" + senderIsExt + " " +
@@ -299,9 +313,12 @@ async function resolveUntrustedFromPage(
       break
 
     case WALLET_SELECTOR_CODES.GET_NETWORK:
-      const networkInfo: Network.NetworkInfo = Network.currentInfo()
-      console.log("response to", msg.code, { networkId: networkInfo.name, nodeUrl: Network.getSelectedRpcUrl(networkInfo) })
-      sendResponse({ code: msg.code, data: { networkId: networkInfo.name, nodeUrl: Network.getSelectedRpcUrl(networkInfo) } })
+      {
+        // get-network-info
+        const response = { networkId: currentNetwork.name, nodeUrl: getNetworkRpcUrl(currentNetwork) }
+        console.log("response to", msg.code, response)
+        sendResponse({ code: msg.code, data: response })
+      }
       break
 
     default:
@@ -370,7 +387,7 @@ function createCorrespondingAction(action: any): TX.Action {
 }
 
 function reflectReception(receiver: string, amount: number, hash: string, sender: string) {
-  const accounts = secureState.accounts[Network.currentNetworkName];
+  const accounts = secureState.accounts[currentNetwork.name];
   // is the dest-account also in this wallet?
   const destAccount = accounts[receiver];
   if (destAccount == undefined) return;
@@ -388,7 +405,7 @@ function reflectTransfer(msg: any, hash: string) {
         // apply transaction request from popup
         // {code:"apply", signerId:<account>, tx:BatchTransaction}
         // when resolved, send msg to content-script->page
-        const accounts = secureState.accounts[Network.currentNetworkName];
+        const accounts = secureState.accounts[currentNetwork.name];
         if (accounts == undefined) return;
         const signerId = msg.signerId || "...";
         for (let item of msg.tx.items) {
@@ -479,18 +496,26 @@ function reflectTransfer(msg: any, hash: string) {
   }
 }
 
+function getSelectedRpcIndex(networkName: string): number {
+  if (isLocked() || !secureState?.settings?.selectedRpcIndex) return 0
+  return secureState.settings.selectedRpcIndex[networkName] || 0
+}
+
 // create a promise to resolve the action requested by the popup
 async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
   //console.log("getPromiseMsgFromPopup",msg)
   switch (msg.code) {
     case "set-network": {
-      const data = msg.data as Network.SetNetworkArgs
-      Network.setCurrent(data);
-      localStorageSet({ selectedNetwork: Network.currentNetworkName });
-      return Network.currentInfo()
+      const newNetworkConfig: NetworkNameAndRpcIndex = {
+        name: msg.data.name,
+        rpcIndex: getSelectedRpcIndex(msg.data.name)
+      }
+      setCurrentNetwork(newNetworkConfig);
+      localStorageSave("last network selected", "lastNetworkSelected", newNetworkConfig);
+      return
     }
     case "get-network-info": {
-      return Network.currentInfo()
+      return currentNetwork
     }
     case "get-state": {
       return state
@@ -513,7 +538,11 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     case "set-options": {
       secureState.settings = msg.data
       saveSecureState();
-      Network.setCurrent({ networkName: Network.currentNetworkName, rpcIndex: secureState.settings.selectedRpcIndex[Network.currentNetworkName] })
+      // set new rpc if changed
+      const selectedRpcIndex = getSelectedRpcIndex(currentNetwork.name)
+      if (currentNetwork.rpcIndex !== selectedRpcIndex) {
+        setCurrentNetwork({ name: currentNetwork.name, rpcIndex: selectedRpcIndex })
+      }
       return
     }
     case "get-settings": {
@@ -521,10 +550,10 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       return secureState.settings
     }
     case "get-account": {
-      if (!secureState.accounts[Network.currentNetworkName]) {
+      if (!secureState.accounts[currentNetwork.name]) {
         return undefined;
       }
-      return secureState.accounts[Network.currentNetworkName][msg.accountId]
+      return secureState.accounts[currentNetwork.name][msg.accountId]
     }
     case "set-account": {
       if (!msg.accountId) throw Error("!msg.accountId");
@@ -543,10 +572,10 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     case "add-contact": {
       if (!msg.name) throw Error("!msg.name");
       if (!secureState.contacts) secureState.contacts = {};
-      if (!secureState.contacts[Network.currentNetworkName]) {
-        secureState.contacts[Network.currentNetworkName] = {};
+      if (!secureState.contacts[currentNetwork.name]) {
+        secureState.contacts[currentNetwork.name] = {};
       }
-      secureState.contacts[Network.currentNetworkName][msg.name] = msg.contact;
+      secureState.contacts[currentNetwork.name][msg.name] = msg.contact;
       saveSecureState();
       return
     }
@@ -558,24 +587,24 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     // }
     case "remove-account": {
       if (msg.accountId) {
-        delete secureState.accounts[Network.currentNetworkName][msg.accountId];
+        delete secureState.accounts[currentNetwork.name][msg.accountId];
       }
       //persist
       saveSecureState();
       return
     }
     case "getNetworkAccountsCount": {
-      return getNetworkAccountsCount()
+      return getNetworkAccountsCount(currentNetwork.name)
     }
     case "all-address-contacts": {
       if (!secureState.contacts) {
         return {};
       } else {
-        return secureState.contacts[Network.currentNetworkName];
+        return secureState.contacts[currentNetwork.name];
       }
     }
     case "all-network-accounts": {
-      return secureState.accounts[Network.currentNetworkName] || {}
+      return secureState.accounts[currentNetwork.name] || {}
     }
     // case "connect": {
     //   if (!msg.network) msg.network = Network.current;
@@ -611,13 +640,13 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     }
     case "set-address-book": {
       if (!msg.accountId) throw Error("!msg.accountId");
-      if (!secureState.contacts[Network.currentNetworkName]) secureState.contacts[Network.currentNetworkName] = {};
-      secureState.contacts[Network.currentNetworkName][msg.accountId] = msg.contact;
+      if (!secureState.contacts[currentNetwork.name]) secureState.contacts[currentNetwork.name] = {};
+      secureState.contacts[currentNetwork.name][msg.accountId] = msg.contact;
       saveSecureState();
       return
     }
     case "remove-address": {
-      delete secureState.contacts[Network.currentNetworkName][msg.accountId];
+      delete secureState.contacts[currentNetwork.name][msg.accountId];
       //persist
       saveSecureState();
       return
@@ -631,8 +660,8 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       // Note: V4 uses signAndSendTransaction and returns FinalExecutionOutcome (full return data, needs to be parsed to extract results)
       console.log(msg)
       const signerId = msg.signerId || "...";
-      const accInfo = getAccount(signerId);
-      if (!accInfo.privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);
+      const privateKey = getAccountPrivKey(signerId);
+      if (!privateKey) throw Error(`Narwallets: account ${signerId} is read-only`);
       //convert wallet-api actions to near.TX.Action
       const actions: TX.Action[] = [];
       for (let item of msg.tx.items) {
@@ -665,7 +694,7 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
         actions,
         signerId,
         msg.tx.receiver,
-        accInfo.privateKey || ""
+        privateKey || ""
       );
     }
       break
@@ -673,13 +702,9 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
     // new v4 - wallet-connect mode
     // Note: sign-and-send-transaction should return a FinalExecutionOutcome struct
     case "sign-and-send-transaction": {
-      const accInfo = getAccount(msg.params.signerId);
-      if (!accInfo.privateKey) {
-        console.error(`account ${msg.params.signerId} is read-only`)
-        throw Error(`account ${msg.params.signerId} is read-only`)
-      }
-      const accessKey = await near.getAccessKey(msg.params.signerId, accInfo.privateKey)
-      return commitActions(accessKey, msg.params, accInfo.privateKey)
+      const privateKey = getAccountPrivKey(msg.params.signerId);
+      const accessKey = await near.getAccessKey(msg.params.signerId, privateKey)
+      return commitActions(accessKey, msg.params, privateKey)
     }
 
     case "sign-and-send-transactions": {
@@ -689,13 +714,10 @@ async function getPromiseMsgFromPopup(msg: Record<string, any>): Promise<any> {
       for (let tx of msg.params) {
         if (tx.signerId != signerId) throw new Error("Sign and Send Transactions with many signerIds")
       }
-      const accInfo = getAccount(signerId);
-      if (!accInfo.privateKey) {
-        throw Error(`account ${signerId} is read-only`)
-      }
-      const accessKey = await near.getAccessKey(signerId, accInfo.privateKey)
+      const privateKey = getAccountPrivKey(signerId);
+      const accessKey = await near.getAccessKey(signerId, privateKey)
       for (let tx of msg.params) {
-        promises.push(commitActions(accessKey, tx, accInfo.privateKey))
+        promises.push(commitActions(accessKey, tx, privateKey))
       }
       return Promise.all(promises)
     }
@@ -1136,9 +1158,9 @@ async function tryRetrieveBgInfoFromStorage(): Promise<void> {
   if (stateIsEmpty()) {
     // recover base state
     await recoverState();
-    // recover last set network
-    const setNetworkArgs = (await localStorageGet("selectedNetwork")) as Network.SetNetworkArgs;
-    if (setNetworkArgs) Network.setCurrent(setNetworkArgs);
+    // recover last network selected
+    const lastNetworkSelected = await recoverFromLocalStorage("last network selected", "lastNetworkSelected", { name: "mainnet", rpcIndex: 0 });
+    setCurrentNetwork(lastNetworkSelected);
   }
 
   const locked = isLocked()

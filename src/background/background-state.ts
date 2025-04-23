@@ -1,6 +1,4 @@
 import * as secret from "../lib/naclfast-secret-box/nacl-fast.js";
-import { sha256Async } from "../lib/crypto-lite/crypto-primitives-browser.js";
-import * as Network from "../lib/near-api-lite/network.js";
 import {
     localStorageRemove,
     recoverFromLocalStorage,
@@ -21,12 +19,9 @@ import {
     Uint8ArrayFromString,
 } from "../lib/crypto-lite/encode.js";
 
-import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import type { SecureSettings as SecureSettings, StateStruct } from "../structs/state-structs.js";
 import { isValidEmail } from "../lib/near-api-lite/utils/valid.js";
 import { GContact } from "../data/contact.js";
-//import { activeNetworkInfo } from "../index.js";
-import { yton } from "../util/conversions.js";
 import { Account } from "../structs/account-info.js";
 
 const DATA_VERSION = "0.1";
@@ -267,21 +262,21 @@ export async function unlockSecureStateSHA(
 
 //------------------
 // get existing account on Network.current or throw
-export function getAccount(accName: string): Account {
-    log("getAccount", accName);
+export function getAccountPrivKey(accName: string): string {
+    log("getAccountPrivKey", accName);
+    let wasReadOnly = false;
     if (isLocked()) throw Error(`Narwallets: Wallet is locked`);
-    const network = Network.currentNetworkName;
-    if (!network)
-        throw Error(`Narwallets: No network selected. Unlock the wallet`);
-    const accounts = secureState.accounts[network];
-    if (!accounts)
-        throw Error(`Narwallets: No info on ${network}. Unlock the wallet`);
-    const accInfo = accounts[accName];
-    if (!accInfo)
-        throw Error(
-            `Narwallets: account ${accName} NOT FOUND on wallet. Network:${network}`
-        );
-    return accInfo;
+    for (let network in secureState.accounts) {
+        const accounts = secureState.accounts[network];
+        if (accounts) {
+            const accInfo = accounts[accName];
+            if (accInfo) {
+                if (accInfo.privateKey) return accInfo.privateKey;
+                wasReadOnly = true
+            }
+        }
+    }
+    throw Error(`Narwallets: account ${accName} ${wasReadOnly ? "is read-only" : "NOT FOUND on wallet"}`);
 }
 //------------------
 export function saveAccount(accName: string, accountInfo: Account) {
@@ -302,8 +297,8 @@ export function saveAccount(accName: string, accountInfo: Account) {
     saveSecureState();
 }
 
-export function getNetworkAccountsCount() {
-    const accounts = secureState.accounts[Network.currentNetworkName];
+export function getNetworkAccountsCount(networkName: string) {
+    const accounts = secureState.accounts[networkName];
     if (!accounts) return 0;
     return Object.keys(accounts).length;
 }

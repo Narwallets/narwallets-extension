@@ -4,7 +4,7 @@ import * as c from "../util/conversions.js";
 import { Asset } from "../structs/account-info.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
 import { selectedAccountData, show as AccountSelectedPage_show } from "./account-selected.js";
-import { showUnlockPage } from "../index.js";
+import { networkIndicatorNetwork, showUnlockPage } from "../index.js";
 
 import {
   localStorageGet,
@@ -12,10 +12,8 @@ import {
   localStorageRemove,
 } from "../data/local-storage.js";
 import {
-  accountMatchesNetwork, activeNetworkInfo,
-  askBackground,
-  askBackgroundGetState,
-  askBackgroundIsLocked,
+  askBackground, askBackgroundGetState,
+  askBackgroundIsLocked
 } from "../askBackground.js";
 import { hamb } from "../index.js";
 import { hideOkCancel } from "../util/okCancel.js";
@@ -196,10 +194,23 @@ export function backToMainPageClicked() {
   hideOkCancel()
 }
 
+// function to check if it is an implicit account
+export function isImplicitAccount(accName: string): boolean {
+  return accName.length == 64 // NEAR implicit account, e.g. 98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de
+    || (accName.length == 42 && accName.startsWith("0x")); // ethereum-compatible implicit accounts in NEAR
+}
+
+// function to check if the account matches active network
+export function isAccountGoodForNetwork(accName: string, networkName: string): boolean {
+  if (isImplicitAccount(accName)) return true; // implicit accounts are good for all networks
+  if (networkName == "testnet" && !accName.endsWith(".testnet")) return false; // if we're in testnet, all accounts must end in .testnet
+  return true // other suffixes .near, .tg, .hot are ok for mainnet and others
+}
+
 export async function asyncGetLastAccountName() {
-  let account: string | undefined = await localStorageGet("lastSelectedAccountByNetwork_" + activeNetworkInfo.name)
+  let account: string | undefined = await localStorageGet("lastSelectedAccountByNetwork_" + networkIndicatorNetwork.name)
   if (!account) account = await localStorageGet("currentAccountId")
-  if (account && !accountMatchesNetwork(account)) account = undefined
+  if (account && !isAccountGoodForNetwork(account, networkIndicatorNetwork.rootAccount)) account = undefined
   return account
 }
 
@@ -238,7 +249,7 @@ export async function backToSelectAccount() {
   //remove selected account auto-click
   localStorageRemove("account");
   localStorageRemove("currentAccountId")
-  localStorageRemove("lastSelectedAccountByNetwork_" + activeNetworkInfo.name)
+  localStorageRemove("lastSelectedAccountByNetwork_" + networkIndicatorNetwork.name)
   if (selectedAccountData) selectedAccountData.name = ""; // mark as no account selected
   await show();
   //autoRefresh();

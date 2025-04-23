@@ -1,5 +1,4 @@
 import type { StateStruct, SecureSettings } from "./structs/state-structs.js";
-import { NetworkInfo, SetNetworkArgs } from "./lib/near-api-lite/network.js";
 
 import {
   BatchAction,
@@ -10,8 +9,9 @@ import {
 import { log } from "./lib/log.js";
 import { GContact } from "./data/contact.js";
 import { Account } from "./structs/account-info.js";
-import { ParseTxResult } from "./lib/near-api-lite/near-rpc.js";
+import { ParseTxResult, StateResult } from "./lib/near-api-lite/near-rpc.js";
 import { JsonPerfDataAndExtras, NarwalletsMetrics } from "./types/backend-data-types.js";
+import { getNetworkConfig, NetworkNameAndRpcIndex } from "./lib/near-api-lite/network-types.js";
 
 // ask background, wait for response, return a Promise
 export function askBackground(requestPayload: any): Promise<any> {
@@ -86,25 +86,12 @@ export function askBackgroundGetState(): Promise<StateStruct> {
   return askBackground({ code: "get-state" }) as Promise<StateStruct>;
 }
 
-export var activeNetworkInfo: NetworkInfo;
-// function to check if the account matches active network
-export function accountMatchesNetwork(accName: string): boolean {
-  if (!accName) return false;
-  if (activeNetworkInfo && accName.endsWith("." + activeNetworkInfo.rootAccount)) return true;
-  if (accName.length > 32) return true; // assume implicit account, e.g.
-  return false;
-}
-
-export async function askBackgroundSetNetwork(
-  data: SetNetworkArgs
-): Promise<NetworkInfo> {
+export async function askBackgroundSetNetwork(args: NetworkNameAndRpcIndex) {
   // save active NetworkInfo
-  activeNetworkInfo = await askBackground({ code: "set-network", data })
-  return activeNetworkInfo
+  return askBackground({ code: "set-network", data: args })
 }
-export async function askBackgroundGetNetworkInfo(): Promise<NetworkInfo> {
-  activeNetworkInfo = await askBackground({ code: "get-network-info" });
-  return activeNetworkInfo
+export async function askBackgroundGetNetworkInfo(): Promise<NetworkNameAndRpcIndex> {
+  return askBackground({ code: "get-network-info" });
 }
 export function askBackgroundGetSettings(): Promise<SecureSettings> {
   return askBackground({ code: "get-settings" }) as Promise<SecureSettings>;
@@ -196,4 +183,11 @@ export function askBackgroundApplyBatchTx(
   batchTx: BatchTransaction
 ): Promise<ParseTxResult> {
   return askBackground({ code: "apply", signerId: signerId, tx: batchTx });
+}
+
+export function askBackgroundQueryNearAccount(accountId: string): Promise<StateResult> {
+  return askBackground({
+    code: "query-near-account",
+    accountId,
+  })
 }

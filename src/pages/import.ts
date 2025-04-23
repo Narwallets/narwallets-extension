@@ -1,5 +1,4 @@
 import * as d from "../util/document.js";
-import * as c from "../util/conversions.js";
 
 import * as searchAccounts from "../util/search-accounts.js";
 import { isValidAccountID } from "../lib/near-api-lite/utils/valid.js";
@@ -8,27 +7,21 @@ import * as Pages from "../pages/main.js";
 import { Account, newAccount } from "../structs/account-info.js";
 import { LockupContract } from "../contracts/LockupContract.js";
 import {
-  askPrivateKey,
   searchMoreAssets,
-  show as AccountSelectedPage_show,
+  show as AccountSelectedPage_show
 } from "./account-selected.js";
 import {
-  activeNetworkInfo,
-  askBackground,
-  askBackgroundAllNetworkAccounts,
-  askBackgroundGetValidators,
-  askBackgroundSetAccount,
+  askBackgroundAllNetworkAccounts, askBackgroundSetAccount
 } from "../askBackground.js";
 
-import type { NetworkInfo } from "../lib/near-api-lite/network.js";
 import { ExtendedAccountData } from "../extendedAccountData.js";
-import { hamb } from "../index.js";
+import { hamb, networkIndicatorNetwork } from "../index.js";
 
 const NET_NAME = "net-name";
 const NET_ROOT = "net-root";
 
 const IMPORT_OR_CREATE = "import-or-create";
-const IMPORT_ACCOUNT = "import-account";
+export const IMPORT_ACCOUNT_PAGE_ID = "import-account";
 
 //const accountName = new d.El("input#account-name");
 let messageLine: d.El;
@@ -84,7 +77,7 @@ function importExistingAccount() {
   //accountInfoName.innerText=""
   hideSearchResultExtraData();
   d.inputById("search-account-name").focus();
-  d.showPage(IMPORT_ACCOUNT);
+  d.showPage(IMPORT_ACCOUNT_PAGE_ID);
 }
 
 function displayAccountInfoAt(
@@ -149,7 +142,7 @@ async function searchTheAccountName(accName: string) {
 
     //lockup contract?
     let lockupExtData;
-    const accInfo = newAccount(activeNetworkInfo.name);
+    const accInfo = newAccount(networkIndicatorNetwork.name);
     accInfo.ownerId = accName;
     const lockupContract = await searchAccounts.getLockupContract(accInfo);
     if (lockupContract) {
@@ -273,12 +266,12 @@ async function searchClicked(ev: Event) {
     // let accName = accountInfoName.innerText; //d.byId(ACCOUNT_INFO_NAME).innerText;
     const input = d.inputById("search-account-name");
     let accName = input.value.trim().toLowerCase();
-    const root = activeNetworkInfo.rootAccount;
+    const root = networkIndicatorNetwork.rootAccount;
     if (
       accName &&
       accName.length < 60 &&
       !accName.endsWith(root) &&
-      !(activeNetworkInfo.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
+      !(networkIndicatorNetwork.name == "testnet" && /dev-[0-9]{13}-[0-9]{7}/.test(accName))
     ) {
       accName = accName + "." + root;
     }
@@ -312,18 +305,12 @@ async function searchClicked(ev: Event) {
 //   messageLine.hide()
 // }
 
-export async function onNetworkChanged() {
-  //update .root-account
-  d.byId(NET_NAME).innerText = activeNetworkInfo.name; //search button
-  d.byId(NET_ROOT).innerText = "." + activeNetworkInfo.rootAccount; //account name label
-}
-
 function createAccountClicked(ev: Event) {
   //d.showPage(CREATE_ACCOUNT)
 }
 
 // on document load
-export async function addListeners() {
+export async function importAccountAddListeners() {
   //const accountName = new d.El("input#account-name");
   messageLine = new d.El("#account-get-message-line");
   searchButton = new d.El("button#search");
@@ -344,12 +331,8 @@ export async function addListeners() {
   searchButton.onClick(searchClicked);
   importButton.onClick(importClicked);
 
-  onNetworkChanged();
+  // set root-account to use
+  d.byId(NET_NAME).innerText = networkIndicatorNetwork.name; //search button
+  d.byId(NET_ROOT).innerText = "." + networkIndicatorNetwork.rootAccount; //account name label
 }
 
-//listen to extension messages
-chrome.runtime.onMessage.addListener(function (msg) {
-  if (msg.code == "network-changed") {
-    onNetworkChanged();
-  }
-});

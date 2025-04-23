@@ -1,8 +1,7 @@
-import { activeNetworkInfo, askBackground, askBackgroundSetAccount, askBackgroundViewMethod } from "./askBackground.js";
+import { askBackgroundQueryNearAccount, askBackgroundSetAccount, askBackgroundViewMethod } from "./askBackground.js";
 import { yton } from "./util/conversions.js";
 import { Account } from "./structs/account-info.js";
 import { nearDollarPrice } from "./index.js";
-import { sleep } from "./util/sleep.js";
 
 export class ExtendedAccountData {
   //type: string; //small-type + note
@@ -118,22 +117,8 @@ export async function tryAsyncRefreshAccountInfoLastBalance(accName: string, inf
 
 /// AsyncRefreshAccountInfoLastBalance and throw if error
 export async function asyncRefreshAccountInfoLastBalance(accName: string, info: Account, save: boolean = true) {
-
-  let stateResultYoctos;
-  try {
-    stateResultYoctos = await askBackground({
-      code: "query-near-account",
-      accountId: accName,
-    });
-    sleep(250)
-  } catch (ex) {
-    console.error(ex)
-    const err = ex as Error
-    let reason = (err.message && err.message.includes("name:UNKNOWN_ACCOUNT")) ? `not found in ${activeNetworkInfo.name}` : err.message;
-    throw Error(`account:"${accName}", Error:${reason}`);
-  }
+  let stateResultYoctos = await askBackgroundQueryNearAccount(accName);
   let newBalance = yton(stateResultYoctos.amount);
-
   info.lastBalance = newBalance
   info.lastBalanceTimestamp = Date.now()
   // save updated balance

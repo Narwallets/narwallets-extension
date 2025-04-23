@@ -42,13 +42,12 @@ export function localStorageSet(payload: any) {
 export function localStorageRemove(code: string) {
   chrome.storage.local.remove(code);
 }
-
 // recover for complex objects like state
-export async function recoverFromLocalStorage(
+export async function recoverFromLocalStorage<T>(
   title: string,
   code: string,
-  defaultValue: any
-): Promise<any> {
+  defaultValue: T
+): Promise<T> {
   return new Promise((resolve, reject) => {
     try {
       chrome.storage.local.get(code, (keys) => {
@@ -56,24 +55,15 @@ export async function recoverFromLocalStorage(
           console.error(JSON.stringify(chrome.runtime.lastError));
         }
         let result = keys[code] || {};
-        if (Object.keys(result).length == 0)
+        if (Object.keys(result).length == 0) { // empty object
           Object.assign(result, defaultValue);
+        }
         return resolve(result);
       });
-      // const stringState = localStorage.getItem("S")
-      // if (stringState) {
-      //   try {
-      //     State = JSON.parse(stringState);
-      //   }
-      //   catch {
-      //     alert("CRITICAL. Invalid state. State reset");
-      //   }
-      //   finally { }
-      // }
-    } catch (err) {
+    }
+    catch (err) {
       console.error("CRITICAL. Can't recover " + title, err.message);
       reject();
-    } finally {
     }
   });
 }
@@ -94,11 +84,11 @@ export function localStorageSave(title: string, code: string, value: any) {
   });
 }
 
-export function showPassword(e :Event){
-  
+export function showPassword(e: Event) {
+
   const showHideButton = e.target as HTMLButtonElement;
   const input = showHideButton.previousSibling?.previousSibling as HTMLInputElement;
-  
+
   if (input?.type === "password") {
     input.type = "text";
     showHideButton.classList.add("text-strike-through")

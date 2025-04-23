@@ -8,24 +8,24 @@ svg {
 }
 
 svg line {
-  stroke      : currentColor;
+  stroke: currentColor;
   stroke-width: 3;
-  transition  : transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 }
 
 .hamb {
-  position      : absolute;
-  top           : 4px;
-  left          : 5px;
-  border-radius : 6px;
-  max-width     : 40px;
-  padding       : 5px;
-  cursor        : pointer;
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  border-radius: 6px;
+  max-width: 40px;
+  padding: 5px;
+  cursor: pointer;
   --text-opacity: 1;
-  color         : #a0aec0;
-  color         : rgba(160, 174, 192, var(--text-opacity));
-  border-style  : none;
-  z-index       : 120;
+  color: #a0aec0;
+  color: rgba(160, 174, 192, var(--text-opacity));
+  border-style: none;
+  z-index: 120;
 }
 
 .open svg {
@@ -48,18 +48,18 @@ svg line {
 --  ASIDE
 -------------------*/
 aside {
-  position        : absolute;
-  line-height     : 2;
-  top             : 0;
-  left            : -493px;
-  transition      : transform 0.2s ease-in-out;
+  position: absolute;
+  line-height: 2;
+  top: 0;
+  left: -493px;
+  transition: transform 0.2s ease-in-out;
   background-color: var(--Background);
-  z-index         : 101;
-  opacity         : 1;
-  width           : 100%;
-  height          : 100%;
-  padding-top     : 45px;
-  font-size       : 7pt;
+  z-index: 101;
+  opacity: 1;
+  width: 100%;
+  height: 100%;
+  padding-top: 45px;
+  font-size: 7pt;
 }
 
 aside.open {
@@ -71,48 +71,48 @@ aside.open {
 }
 
 .backblur.open {
-  position        : absolute;
-  width           : 100%;
-  height          : 100%;
-  opacity         : 1;
-  transition      : opacity 1s ease-in-out;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
   background-color: black;
 }
 
 hr {
   border: 0;
-  width : 90%;
+  width: 90%;
   height: 1px;
   background-image: linear-gradient(to left,
       rgb(39 98 252 / 2%),
       rgb(1 157 177),
       rgb(1 157 177));
-  opacity  : 0.7;
+  opacity: 0.7;
   /* margin: 3px 0px; */
 }
 
 aside>nav {
-  flex-flow  : column nowrap;
+  flex-flow: column nowrap;
   align-items: flex-start;
-  display    : flex;
+  display: flex;
 }
 
 aside>nav>li {
-  flex        : 1 1;
-  width       : 419px;
-  text-align  : left;
-  padding     : 4px 10px;
-  margin-left : 18px;
-  line-height : 1.5em;
-  font-size   : 1.5em;
-  font-weight : 250;
-  z-index     : 93;
+  flex: 1 1;
+  width: 419px;
+  text-align: left;
+  padding: 4px 10px;
+  margin-left: 18px;
+  line-height: 1.5em;
+  font-size: 1.5em;
+  font-weight: 250;
+  z-index: 93;
   margin-right: 10px;
 }
 
 aside>nav>li:hover {
   background-color: var(--HoverColor);
-  cursor          : pointer;
+  cursor: pointer;
 }
 
 aside>nav>li>svg {
@@ -122,13 +122,13 @@ aside>nav>li>svg {
   width: 14px;
 }
 
-/* more-than 640px 
+/* more-than 640px
 @media (min-width: 640px) {
     .open {
         left: 400px;
     }
 }
- more-than 1200px 
+ more-than 1200px
 @media (min-width: 1200px) {
     .open {
         left: 600px;
@@ -137,14 +137,14 @@ aside>nav>li>svg {
 */
 
 aside .logo-128 {
-  opacity : 0.88;
+  opacity: 0.88;
   position: absolute;
-  bottom  : 64px;
-  right   : 20px;
-  z-index : 94;
+  bottom: 64px;
+  right: 20px;
+  z-index: 94;
 }
 
-/* 
+/*
 ----------------------
 NETWORK selection drop-down
 ----------------------
@@ -153,51 +153,51 @@ NETWORK selection drop-down
 .network-component.pointer {
   /* border       : 1px solid var(--ControlAccent); */
   border-radius: 24px;
-  margin-left  : 167px;
-  padding      : 2px;
-  width        : 157px;
-  flex         : 0 0 auto;
-  display      : flex;
-  z-index      : 99;
-  margin-top   : 4px;
+  margin-left: 167px;
+  padding: 2px;
+  width: 157px;
+  flex: 0 0 auto;
+  display: flex;
+  z-index: 99;
+  margin-top: 4px;
 }
 
 .network-indicator {
-  display    : flex;
-  width      : 146px;
+  display: flex;
+  width: 146px;
   align-items: center;
-  color      : var(--Block);
+  color: var(--Block);
   font-weight: 400;
-  flex-flow  : row nowrap;
-  height     : 22px;
+  flex-flow: row nowrap;
+  height: 22px;
 }
 
 li {
   list-style-type: none;
-  overflow-x     : hidden;
-  color          : var(--TextGeneric);
-  white-space    : nowrap;
+  overflow-x: hidden;
+  color: var(--TextGeneric);
+  white-space: nowrap;
 }
 
 li#current-network-display-name {
   max-height: 20px;
-  width     : 125px;
-  color     : var(--TextGeneric);
-  cursor    : pointer;
-  font-size : 98%;
+  width: 125px;
+  color: var(--TextGeneric);
+  cursor: pointer;
+  font-size: 98%;
 }
 
 .circle:before {
-  display      : inline-block;
-  content      : "";
-  border       : 2px solid #7f8186bd;
-  margin       : -2px 6px;
-  padding-top  : 1px;
-  width        : 10px;
-  height       : 10px;
+  display: inline-block;
+  content: "";
+  border: 2px solid #7f8186bd;
+  margin: -2px 6px;
+  padding-top: 1px;
+  width: 10px;
+  height: 10px;
   border-radius: 7px;
   /* position  : relative; */
-  top          : 1px;
+  top: 1px;
 }
 
 .circle.green:before {
@@ -221,107 +221,110 @@ li#current-network-display-name {
 }
 
 .networks-list-box {
-  position  : absolute;
-  top       : 42px;
-  left      : 277px;
-  z-index   : 55;
-  right     : 12px;
-  max-height: 0px;
-  overflow  : hidden;
-  opacity   : 0.25;
-  transition: top 0.25s ease-in-out, max-height 0.25s ease-in-out,
-    opacity 0.45s ease-in-out;
+  position: absolute;
+  top: 40px;
+  left: 100vw;
+  z-index: 55;
+  overflow: hidden;
   z-index: 99;
+
+  /* Initial state */
+  opacity: .25;
+  transform: translateX(0px);
+
+  transition:
+    transform 0.15s ease-in-out,
+    opacity 0.1s ease-in-out;
 }
 
 .networks-list-box.open {
-  max-height: 700px;
-  opacity   : 0.9;
-  top       : 40px;
+  /* final state */
+  transform: translateX(-180px);
+  opacity: 0.9;
 }
 
 .combo-list-appface {
-  position  : absolute;
-  top       : 600px;
-  left      : 0px;
-  right     : 0px;
-  bottom    : 0px;
-  opacity   : 0;
+  position: absolute;
+  top: 600px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  opacity: 0;
   transition: opacity 0.25s ease-in-out;
-  z-index   : 99;
-  padding   : 20px;
-  margin    : 0px;
+  z-index: 99;
+  padding: 20px;
+  margin: 0px;
 }
 
 .combo-list-appface.open {
-  top                : 48px;
-  opacity            : 0.96;
-  background-color   : var(--Background);
+  top: 48px;
+  opacity: 0.96;
+  background-color: var(--Background);
   /* border          : 1px solid var(--HighLight); */
-  text-align         : center;
-  box-shadow         : 0px 0px 7px var(--HighLight);
-  margin-top         : 0px;
+  text-align: center;
+  box-shadow: 0px 0px 7px var(--HighLight);
+  margin-top: 0px;
 }
 
 .combo-list-title {
   text-align: left;
-  color     : var(--TextGeneric);
+  color: var(--TextGeneric);
 }
 
 .combo-list-filter {
-  top             : 51px;
-  position        : absolute;
-  right           : 20px;
-  max-height      : 15px;
-  overflow-y      : scroll;
-  opacity         : 1;
-  transition      : opacity 0.25s ease-in-out;
-  z-index         : 150;
-  padding         : 2px;
-  border          : 1px solid var(--HighLight);
-  text-align      : center;
-  box-shadow      : 0px 0px 7px var(--HighLight);
+  top: 51px;
+  position: absolute;
+  right: 20px;
+  max-height: 15px;
+  overflow-y: scroll;
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+  z-index: 150;
+  padding: 2px;
+  border: 1px solid var(--HighLight);
+  text-align: center;
+  box-shadow: 0px 0px 7px var(--HighLight);
   background-color: #4e2828;
 }
 
 .combo-list-box {
   position: absolute;
-  opacity : 0;
-  top     : 700;
-  left    : 20px;
-  right   : 20px;
+  opacity: 0;
+  top: 700;
+  left: 20px;
+  right: 20px;
 }
 
 .combo-list-box.open {
-  color           : var(--ControlText);
-  top             : 29px;
-  margin-top      : 22px;
-  bottom          : 20px;
-  max-height      : 520px;
-  overflow-y      : scroll;
-  opacity         : 1;
-  transition      : opacity 0.25s ease-in-out;
-  z-index         : 99;
-  padding         : 2px;
+  color: var(--ControlText);
+  top: 29px;
+  margin-top: 22px;
+  bottom: 20px;
+  max-height: 520px;
+  overflow-y: scroll;
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+  z-index: 99;
+  padding: 2px;
   background-color: var(--Background);
-  border          : 1px solid var(--HighLight);
-  text-align      : center;
-  box-shadow      : 0px 0px 7px var(--HighLight);
-  border-radius   : 6px;
+  border: 1px solid var(--HighLight);
+  text-align: center;
+  box-shadow: 0px 0px 7px var(--HighLight);
+  border-radius: 6px;
 }
 
 option {
-  font-size       : 16px;
-  padding         : 4px 0px;
-  cursor          : pointer;
-  word-break      : break-all;
-  display         : block;
+  font-size: 16px;
+  padding: 4px 0px;
+  cursor: pointer;
+  word-break: break-all;
+  display: block;
   /* max-width    : 400px; */
-  height          : auto;
-  overflow        : hidden;
-  text-overflow   : ellipsis;
-  min-width       : 409px;
-  margin          : 0px;
+  height: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 409px;
+  margin: 0px;
 }
 
 option:hover {
@@ -334,19 +337,19 @@ option.selected {
 
 .networks-list-content {
   border-radius: 4px;
-  padding      : 18px 8px;
-  background   : rgb(16 16 16);
+  padding: 8px 8px;
+  background: rgb(16 16 16);
   /* box-shadow: rgb(255 255 255) 11px 7px 2px 8px; */
-  border       : 1px solid;
+  border: 1px solid;
 }
 
 .network-box-header .title {
-  color            : var(--ControlAccent) smoke;
-  color            : white;
+  color: var(--ControlAccent) smoke;
+  color: white;
   /* font-size     : 14pt; */
-  padding-bottom   : 1px;
-  padding-left     : 4px;
-  padding-top      : 0px;
+  padding-bottom: 1px;
+  padding-left: 4px;
+  padding-top: 0px;
 }
 
 .down-arrow {
@@ -362,42 +365,42 @@ option.selected {
   min-height         : 10px;
   color              : white;
   */
-  cursor      : pointer;
+  cursor: pointer;
   padding-left: 3px;
-  padding-top : 2px;
-  font-size   : 0.85em;
+  padding-top: 2px;
+  font-size: 0.85em;
 }
 
 .down-arrow:after {
-  content  : "▽";
+  content: "▽";
   font-size: 0.8em;
-  color    : var(--BlockText);
-  opacity  : 0.7;
+  color: var(--BlockText);
+  opacity: 0.7;
 }
 
 .network-box-header hr {
   border-color: #7090ab;
-  width       : 90%;
+  width: 90%;
 }
 
 .networks-list-content li:hover {
   background-color: rgb(64 64 64);
-  border-radius   : 4px;
-  opacity         : 1;
+  border-radius: 4px;
+  opacity: 1;
 }
 
 .networks-list-content li {
-  color          : rgb(243 243 243);
-  list-style     : none;
-  padding        : 5px 22px 5px 1px;
-  font-size      : 16px;
-  font-style     : normal;
-  cursor         : pointer;
-  display        : flex;
+  color: rgb(243 243 243);
+  list-style: none;
+  padding: 5px 22px 5px 1px;
+  font-size: 16px;
+  font-style: normal;
+  cursor: pointer;
+  display: flex;
   justify-content: flex-start;
-  align-items    : center;
-  line-height    : 20px;
-  border-color   : rgb(3, 135, 137);
+  align-items: center;
+  line-height: 20px;
+  border-color: rgb(3, 135, 137);
 }
 
 .networks-list-content li span {

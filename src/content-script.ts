@@ -53,7 +53,7 @@ window.addEventListener("message", (event) => {
           throw new Error("Response is empty")
         }
         if (response.err) {
-          console.error("content-script, response.err!-null:", response.err)
+          //console.error("content-script, response.err!-null:", response.err)
           throw new Error(response.err)
         }
 

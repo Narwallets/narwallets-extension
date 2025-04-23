@@ -1,27 +1,28 @@
-import * as d from "../util/document.js"
-import { activeNetworkInfo, askBackgroundSetAccount } from "../askBackground.js";
+import * as d from "../util/document.js";
+import { askBackgroundSetAccount } from "../askBackground.js";
 import { KeyPairEd25519 } from "../lib/near-api-lite/utils/key-pair.js";
 import * as bs58 from '../lib/crypto-lite/bs58.js';
-import { show as AccountPage_show, showPrivateKeyClicked } from "./account-selected.js";
-import { Account, newAccount } from "../structs/account-info.js";
+import { show as AccountPage_show } from "./account-selected.js";
+import { newAccount } from "../structs/account-info.js";
 
 import { generateSeedPhraseAsync } from "../lib/near-api-lite/utils/seed-phrase.js";
 import type { SeedPhraseResult } from "../lib/near-api-lite/utils/seed-phrase.js";
 import { backToSelectAccount, backToMainPageClicked } from "./main.js";
 import { encodeHex } from "../lib/crypto-lite/encode.js";
+import { networkIndicatorNetwork } from "../index.js";
+import { IMPORT_ACCOUNT_PAGE_ID, importAccountAddListeners } from "./import.js";
 
-
-const IMPORT_ACCOUNT = "import-account"
 
 async function createAccountClicked(ev: Event) {
   chrome.windows.create({
-    url: activeNetworkInfo.NearWebWalletUrl + "create",
+    url: networkIndicatorNetwork.NearWebWalletUrl + "create",
     state: "maximized"
   });
 }
 
 function importAccountClicked(ev: Event) {
-  d.showPage(IMPORT_ACCOUNT);
+  d.showPage(IMPORT_ACCOUNT_PAGE_ID);
+  importAccountAddListeners();
   d.onClickId("import-existing-account-back-to-account", backToMainPageClicked);
 }
 
@@ -74,7 +75,7 @@ async function createImplicitAccount_Step3() {
     d.hideErr()
     const newKeyPair = KeyPairEd25519.fromString(seedResult.secretKey);
     const accountId = encodeHex(newKeyPair.getPublicKey().data)
-    const accInfo = newAccount(activeNetworkInfo.name)
+    const accInfo = newAccount(networkIndicatorNetwork.name)
 
     accInfo.privateKey = bs58.encode(newKeyPair.getSecretKey())
     await askBackgroundSetAccount(accountId, accInfo)

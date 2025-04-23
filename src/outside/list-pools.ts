@@ -3,9 +3,6 @@ import * as c from "../util/conversions.js"
 import * as StakingPool from "../contracts/staking-pool.js"
 
 import { askBackgroundGetNetworkInfo, askBackgroundGetValidators } from "../askBackground.js"
-import { activeNetworkInfo } from "../askBackground.js"
-
-
 
 type PoolInfo = {
   name: string;
@@ -25,14 +22,14 @@ function clicked(name: string) {
 }
 
 // ---------------------
-async function displayStakingPools() {
+async function displayStakingPools(networkName: string) {
 
   d.showWait()
   try {
 
     const data = await askBackgroundGetValidators()
 
-    d.byId("net-name").innerText = activeNetworkInfo.displayName;
+    d.byId("net-name").innerText = networkName;
 
     const list: PoolInfo[] = []
     for (let item of data.current_validators) {
@@ -97,7 +94,7 @@ async function displayStakingPools() {
           console.log(ex)
           //no contract on account_id
           const elem = d.byId(item.name)
-          elem.classList.add("hidden") //bye bye 
+          elem.classList.add("hidden") //bye bye
         })
     }
 
@@ -115,8 +112,8 @@ async function displayStakingPools() {
 // ---------------------
 async function init() {
   try {
-    await askBackgroundGetNetworkInfo();
-    displayStakingPools();
+    const networkInfo = await askBackgroundGetNetworkInfo();
+    displayStakingPools(networkInfo.name);
   }
   catch (ex) {
     d.showErr(ex.message);

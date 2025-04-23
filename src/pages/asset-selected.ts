@@ -1,17 +1,8 @@
 import * as c from "../util/conversions.js";
 import {
-  activeNetworkInfo,
-  askBackground,
-  askBackgroundAllNetworkAccounts,
   askBackgroundCallMethod,
-  askBackgroundGetAccountRecordCopy,
-  askBackgroundSetAccount,
-  askBackgroundViewMethod,
+  askBackgroundGetAccountRecordCopy, askBackgroundViewMethod
 } from "../askBackground.js";
-import {
-  assetUpdateBalance, assetUpdateMetadata,
-  newTokenFromMetadata, updateTokenAssetFromMetadata
-} from "../data/asset-update";
 import {
   isValidAccountID,
   CheckValidAmount,
@@ -25,7 +16,6 @@ import {
 } from "../util/okCancel.js";
 import * as searchAccounts from "../util/search-accounts.js";
 import {
-  addAssetToken,
   fixUserAmountInY,
   populateAssets,
   selectedAccountData,
@@ -40,27 +30,21 @@ import {
   selectAccountPopupList
 } from "./account-selected.js";
 import * as StakingPool from "../contracts/staking-pool.js";
-import { addressContacts, getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
+import { getAddressesForPopupList, saveContactOnBook } from "./address-book.js";
 import { GContact } from "../data/contact.js";
 import { localStorageSet } from "../data/local-storage.js";
-import { contactExists } from '../pages/address-book.js'
+import { contactExists } from '../pages/address-book.js';
 import {
-  META_SVG,
-  SEND_SVG,
-  STAKE_DEFAULT_SVG,
-  STNEAR_SVG,
-  TOKEN_DEFAULT_SVG,
-  UNSTAKE_DEFAULT_SVG,
-  WITHDRAW_SVG,
+  UNSTAKE_DEFAULT_SVG
 } from "../util/svg_const.js";
 import { MetaPool } from "../contracts/meta-pool.js";
 import { MetaPoolContractState } from "../contracts/meta-pool-structs.js";
 
-import { backToSelectAccount, setLastSelectedAsset } from "./main.js";
+import { setLastSelectedAsset } from "./main.js";
 import { popupComboConfigure, popupListOpen } from "../util/popup-list.js";
 import { LockupContract } from "../contracts/LockupContract.js";
-import { Asset, addHistory, ASSET_HISTORY_TEMPLATE, findAsset, findAssetIndex, History, setAssetBalanceYoctos } from "../structs/account-info.js";
-import { ParseTxResult, parseFinalExecutionOutcome } from "../lib/near-api-lite/near-rpc.js";
+import { Asset, addHistory, ASSET_HISTORY_TEMPLATE, findAsset, findAssetIndex, setAssetBalanceYoctos } from "../structs/account-info.js";
+import { ParseTxResult } from "../lib/near-api-lite/near-rpc.js";
 import { nearDollarPrice } from "../index.js";
 
 const THIS_PAGE = "AccountAssetDetail";
