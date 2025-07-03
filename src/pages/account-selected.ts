@@ -102,14 +102,14 @@ export async function show(
   if (reposition) {
     console.log("reposition ", reposition, accName, assetIndex, assetName)
     switch (reposition) {
-      case "stake": {
+      case "stake": case "unstake": {
         if (assetName) {
           for (let index = 0; index < selectedAccountData.accountInfo.assets.length; index++) {
             const item = selectedAccountData.accountInfo.assets[index];
             if (item.symbol == assetName || item.contractId == assetName) {
               assetIndex = index;
-              console.log(item)
-              if (item.symbol != 'UNSTAKED') break;
+              console.log("reposition item", item)
+              if (item.type == reposition) break;
             }
           }
         }

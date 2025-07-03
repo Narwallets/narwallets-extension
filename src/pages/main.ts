@@ -225,16 +225,18 @@ async function tryReposition() {
     }
     case "account":
     case "asset":
-    case "stake": {
-      const account = await localStorageGetAndRemove("account");
-      const assetIndex = await localStorageGetAndRemove("assetIndex");
-      const assetName = await localStorageGetAndRemove("assetName");
-      const isLocked = await askBackgroundIsLocked();
-      if (!isLocked) {
-        //console.log("reposition ", account, reposition, assetIndex)
-        AccountSelectedPage_show(account, reposition, assetIndex, assetName);
+    case "stake":
+    case "unstake":
+      {
+        const account = await localStorageGetAndRemove("account");
+        const assetIndex = await localStorageGetAndRemove("assetIndex");
+        const assetName = await localStorageGetAndRemove("assetName");
+        const isLocked = await askBackgroundIsLocked();
+        if (!isLocked) {
+          //console.log("reposition ", account, reposition, assetIndex)
+          AccountSelectedPage_show(account, reposition, assetIndex, assetName);
+        }
       }
-    }
       break;
     default: {
       // in ALL cases we have to call AccountSelectedPage_show (it will show a select account popup if the account is not valid)
