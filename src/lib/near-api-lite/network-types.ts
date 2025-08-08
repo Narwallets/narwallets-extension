@@ -31,7 +31,7 @@ export const NetworkList: NetworkConfig[] = [
     explorerUrl: "https://nearblocks.io/",
     NearWebWalletUrl: "https://app.mynearwallet.com/",
     liquidStakingContract: "meta-pool.near",
-    liquidStakingGovToken: "meta-token.near",
+    liquidStakingGovToken: "mpdao-token.near",
   },
 
   // { name: "guildnet", rootAccount: "guildnet", displayName: "OSA Guildnet", color: "cyan",
@@ -41,9 +41,9 @@ export const NetworkList: NetworkConfig[] = [
 
   {
     name: "testnet", rootAccount: "testnet", displayName: "NEAR Testnet", color: "yellow",
-    rpcUrls: ["https://rpc.testnet.near.org"],
-    explorerUrl: "https://testnet.nearblocks.io/", NearWebWalletUrl: "https://wallet.testnet.near.org/",
-    liquidStakingContract: "meta-v2.pool.testnet", liquidStakingGovToken: "token.meta.pool.testnet",
+    rpcUrls: ["https://archival-rpc.testnet.near.org", "https://rpc.testnet.fastnear.com"],
+    explorerUrl: "https://testnet.nearblocks.io/", NearWebWalletUrl: "https://testnet.mynearwallet.com/",
+    liquidStakingContract: "meta-v2.pool.testnet", liquidStakingGovToken: "mpdao-token.testnet",
   },
 
   // { name: "betanet", rootAccount: "betanet", displayName: "NEAR Betanet", color: "violet",
@@ -55,7 +55,7 @@ export const NetworkList: NetworkConfig[] = [
     name: "local", rootAccount: "local", displayName: "Local Network", color: "red",
     rpcUrls: ["http://127.0.0.1/rpc"],
     explorerUrl: "http://127.0..0.1/explorer/", NearWebWalletUrl: "http://127.0..0.1/wallet/",
-    liquidStakingContract: "meta.pool.local", liquidStakingGovToken: "token.meta.pool.local",
+    liquidStakingContract: "meta.pool.local", liquidStakingGovToken: "mpdao-token.local",
   },
 ];
 
