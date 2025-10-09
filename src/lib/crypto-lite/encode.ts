@@ -2,7 +2,7 @@
 //--- Encode/Decode to/from Uint8Array
 //------------------------------------
 
-export function Uint8ArrayFromString(s: string): Uint8Array {
+export function Uint8ArrayFromString(s: string): Uint8Array<ArrayBuffer> {
   return new TextEncoder().encode(s)
 }
 export function stringFromUint8Array(u8arr: Uint8Array): string {
@@ -11,7 +11,7 @@ export function stringFromUint8Array(u8arr: Uint8Array): string {
 
 export function stringFromArray(arr: number[]): string {
   let u8arr = new Uint8Array(arr.length)
-  for (let i = 0; i < arr.length; i++) u8arr[i]=arr[i];
+  for (let i = 0; i < arr.length; i++) u8arr[i] = arr[i];
   return stringFromUint8Array(u8arr);
 
   // var s = [];
@@ -49,7 +49,7 @@ export function encodeHex(unit8Arr: Uint8Array): string {
     .map(b => b.toString(16).padStart(2, "0"))
     .join("");
 }
- 
+
 
 export function decodeHex(hexString: string): Uint8Array {
   if (hexString.slice(0, 2) == "0x") hexString = hexString.slice(2);

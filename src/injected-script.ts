@@ -219,7 +219,7 @@ async function supportsNetwork(networkId: string): Promise<boolean> {
 /**
  * Request visibility for one or more accounts from the wallet. This should explicitly prompt the user to select from their list of imported accounts. dApps can use the accounts property once connected to retrieve the list of visible accounts.
  * Note: Calling this method when already connected will allow users to modify their selection, triggering the 'accountsChanged' event.
- * @param params 
+ * @param params
  * @returns An array with the selected account id (on wallet-selector they want an array in case someone wants to have more accounts to decide)
  */
 async function connect(params: ConnectParams): Promise<Array<Account>> {
@@ -232,8 +232,8 @@ async function connect(params: ConnectParams): Promise<Array<Account>> {
 /**
  * Add FunctionCall access key(s) for one or more accounts. This request should require explicit approval from the user.
  * https://docs.near.org/concepts/basics/accounts/access-keys
- * @param params 
- * @returns 
+ * @param params
+ * @returns
  */
 async function signIn(params: SignInParams): Promise<void> {
     connect({ networkId: window.narwallets.network.networkId })
@@ -242,8 +242,8 @@ async function signIn(params: SignInParams): Promise<void> {
 /**
  * Delete FunctionCall access key(s) for one or more accounts. This request should require explicit approval from the user.
  * Since on Narwallets there will only be one user in accounts, it isn't needed the SignOutParams
- * @param param 
- * @returns 
+ * @param param
+ * @returns
  */
 async function signOut(param?: SignOutParams): Promise<void> {
     if (!(await isSignedIn())) {
@@ -275,7 +275,7 @@ async function signOut(param?: SignOutParams): Promise<void> {
 
 /**
  * Requests explicit approval from user to transaction
- * @param params 
+ * @param params
  * @returns Type SignedTransaction is not properly defined yet, so FinalExecutionOutcome will be returned
  */
 async function signTransaction(params: SignTransactionParams): Promise<SignedTransaction> {
@@ -301,9 +301,9 @@ async function disconnect(): Promise<void> {
 /**
  * Triggered whenever accounts are updated (e.g. calling connect or disconnect).
  * Documentation only explicitly says to have an `accountsChanged` event, but it doesn't tell what it has to do
- * @param event 
- * @param callback 
- * @returns 
+ * @param event
+ * @param callback
+ * @returns
  */
 function on<EventName extends keyof Events>(event: EventName, callback: (params: Events[EventName]) => void): Unsubscribe {
     switch (event) {
@@ -317,8 +317,8 @@ function on<EventName extends keyof Events>(event: EventName, callback: (params:
 
 /**
  * Not documented at all
- * @param event 
- * @param callback 
+ * @param event
+ * @param callback
  */
 function off<EventName extends keyof Events>(event: EventName, callback?: () => void): void {
 
@@ -375,6 +375,7 @@ const NARWALLETS_CODES = {
     GET_ACCOUNT_ID: "get-account-id",
     SIGN_AND_SEND_TRANSACTION: "sign-and-send-transaction",
     SIGN_AND_SEND_TRANSACTIONS: "sign-and-send-transactions",
+    SIGN_MESSAGE: "sign-message",
     GET_NETWORK: "get-network",
     DISCONNECT: "disconnect",
 };

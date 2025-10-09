@@ -35,22 +35,22 @@ export class BinaryWriter {
     maybe_resize() {
         if (this.buf.byteLength < this.length + 16) {
             const newArray = new Uint8Array(this.buf.byteLength + INITIAL_LENGTH);
-            newArray.set(this.buf.slice(0,this.length))
+            newArray.set(this.buf.slice(0, this.length))
             this.buf = newArray
         }
     }
 
     public write_u8(value: number) {
-        if (value<0||value>0xff) throw Error("u8 out fo range")
+        if (value < 0 || value > 0xff) throw Error("u8 out fo range")
         this.maybe_resize();
-        this.buf[this.length]=value
+        this.buf[this.length] = value
         this.length += 1;
     }
 
     public write_u32(value: number) {
-        if (value<0||value>0xffffffff) throw Error("u32 out fo range")
+        if (value < 0 || value > 0xffffffff) throw Error("u32 out fo range")
         this.maybe_resize();
-        // writeUInt32LE 
+        // writeUInt32LE
         this.buf[this.length + 3] = (value >>> 24)
         this.buf[this.length + 2] = (value >>> 16)
         this.buf[this.length + 1] = (value >>> 8)
@@ -60,16 +60,16 @@ export class BinaryWriter {
 
     public write_u64(value: bigint) {
         this.maybe_resize();
-        this.write_buffer(toBufferLE(value,8));
+        this.write_buffer(toBufferLE(value, 8));
     }
 
     public write_u128(value: bigint) {
         this.maybe_resize();
-        this.write_buffer(toBufferLE(value,16));
+        this.write_buffer(toBufferLE(value, 16));
     }
 
     private write_buffer(toAppend: Uint8Array) {
-        this.buf = concatU8Arrays(this.buf.slice(0,this.length), toAppend ) 
+        this.buf = concatU8Arrays(this.buf.slice(0, this.length), toAppend)
         this.length += toAppend.length;
     }
 
@@ -100,11 +100,11 @@ export class BinaryWriter {
 
 function handlingRangeError(target: any, propertyKey: string, propertyDescriptor: PropertyDescriptor) {
     const originalMethod = propertyDescriptor.value;
-    propertyDescriptor.value = function(...args: any[]) {
+    propertyDescriptor.value = function (...args: any[]) {
         try {
             return originalMethod.apply(this, args);
         } catch (e) {
-            if (e instanceof RangeError ) {
+            if (e instanceof RangeError) {
                 const code = (e as any).code;
                 if (['ERR_BUFFER_OUT_OF_BOUNDS', 'ERR_OUT_OF_RANGE'].indexOf(code) >= 0) {
                     throw new BorshError('Reached the end of uint8array when deserializing');
@@ -206,19 +206,19 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
             }
         } else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
-            case 'option': {
-                if (value === null) {
-                    writer.write_u8(0);
-                } else {
-                    writer.write_u8(1);
-                    serializeField(schema, fieldName, value, fieldType.type, writer);
+                case 'option': {
+                    if (value === null) {
+                        writer.write_u8(0);
+                    } else {
+                        writer.write_u8(1);
+                        serializeField(schema, fieldName, value, fieldType.type, writer);
+                    }
+                    break;
                 }
-                break;
-            }
-            default: throw new BorshError(`FieldType ${fieldType} unrecognized`);
+                default: throw new BorshError(`FieldType ${fieldType} unrecognized`);
             }
         } else {
-            if (!value){
+            if (!value) {
                 console.error("fieldname:", fieldName, value, fieldType)
                 throw new Error("serialize struct null/undefined value")
             }
@@ -295,7 +295,7 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
     }
 
     if (structSchema.kind === 'struct') {
-        const result:Record<string,any> = {};
+        const result: Record<string, any> = {};
         for (const [fieldName, fieldType] of schema.get(classType).fields) {
             result[fieldName] = deserializeField(schema, fieldName, fieldType, reader);
         }
