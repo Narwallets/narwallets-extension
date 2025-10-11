@@ -28,8 +28,9 @@ async function entropyToMnemonicAsync(entropy: Uint8Array): Promise<string[]> {
   const checksumBitsBinaryString = await deriveChecksumBitsBinaryString(entropy);
   //join bits+checksum as per BIP-39 spec, to make bit-length a byte-compatible multiple of 8
   const bits = `${entropyBitsBinaryString}${checksumBitsBinaryString}`;
-  //split in chunks of 11-bits, 11-bits => 2048, that's why there are 2048 words in the wordlist
-  //for each 11-bit-chunk, get the word in the wordlist
+  // cSpell:words wordlist
+  // split in chunks of 11-bits, 11-bits => 2048, that's why there are 2048 words in the wordlist
+  // for each 11-bit-chunk, get the word in the wordlist
   let words = []
   for (let n = 0; n < bits.length; n += 11) words.push(wordlist[binaryToByte(bits.slice(n, n + 11))]);
   return words;
@@ -38,6 +39,7 @@ async function entropyToMnemonicAsync(entropy: Uint8Array): Promise<string[]> {
 function salt(password?: string): string {
   return 'mnemonic' + (password ? password.normalize('NFKD') : '');
 }
+// cSpell:words lpad
 function lpad(str: string, padString: string, length: number) {
   return str.padStart(length, padString);
 }
@@ -45,12 +47,12 @@ function binaryToByte(bin: string) {
   return parseInt(bin, 2);
 }
 function bytesToBinaryString(bytes: Uint8Array): string {
-  //for each item, convert to string, base 2, padLeft to 8 with zeroes, 
+  //for each item, convert to string, base 2, padLeft to 8 with zeroes,
   let result = []
   for (let n = 0; n < bytes.byteLength; n++) result.push(lpad(bytes[n].toString(2), '0', 8));
   return result.join('');
 }
-async function deriveChecksumBitsBinaryString(entropyBuffer: ArrayBuffer): Promise<string> {
+async function deriveChecksumBitsBinaryString(entropyBuffer: Uint8Array): Promise<string> {
   const hash = await sha256Async(entropyBuffer);
   const ENT = entropyBuffer.byteLength * 8;
   const CS = ENT / 32;

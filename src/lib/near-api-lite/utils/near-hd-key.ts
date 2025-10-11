@@ -49,7 +49,7 @@ async function hmac_sha512_Async(seed: ArrayBuffer, passwordSalt: ArrayBuffer): 
 export async function getMasterKeyFromSeed(seed: ArrayBuffer): Promise<Keys> {
 
     var pwdSalt = new TextEncoder().encode(ED25519_CURVE_SEED)
-    const I = new Uint8Array(await hmac_sha512_Async(seed, pwdSalt))
+    const I = new Uint8Array(await hmac_sha512_Async(seed, pwdSalt.buffer as ArrayBuffer))
     const IL: Uint8Array = I.slice(0, 32)
     const IR: Uint8Array = I.slice(32)
     return {
@@ -63,7 +63,7 @@ export async function CKDPrivAsync(k: Keys, index: number): Promise<Keys> {
     const indexAsU8Arr = new Uint8Array(4)
     writeUInt32BE(indexAsU8Arr, index, 0)
     const data = concat3U8Arrays(new Uint8Array(1), k.key, indexAsU8Arr)
-    const I = new Uint8Array(await hmac_sha512_Async(data, k.chainCode))
+    const I = new Uint8Array(await hmac_sha512_Async(data.buffer as ArrayBuffer, k.chainCode.buffer as ArrayBuffer))
     const IL = I.slice(0, 32);
     const IR = I.slice(32);
     return {

@@ -7,19 +7,19 @@
 //
 
 //random
-export function getRandomValues(byteLength:number):Uint8Array { 
+export function getRandomValues(byteLength:number):Uint8Array {
   return crypto.getRandomValues(new Uint8Array(byteLength))
 }
 
 //sha256
-export async function sha256Async(byt:Uint8Array|ArrayBuffer) 
+export async function sha256Async(byt:Uint8Array)
 : Promise<ArrayBuffer>  {
-  return crypto.subtle.digest("SHA-256", byt)
+  return crypto.subtle.digest("SHA-256", byt.buffer as ArrayBuffer)
 }
 //sha512
-export async function sha512Async(byt:Uint8Array|ArrayBuffer) 
+export async function sha512Async(byt:Uint8Array)
 : Promise<ArrayBuffer>  {
-  return crypto.subtle.digest("SHA-512", byt);
+  return crypto.subtle.digest("SHA-512", byt.buffer as ArrayBuffer);
 }
 
 // export pbkdf2_sha256_Async
@@ -37,7 +37,7 @@ export async function pbkdf2_sha512_Async(key:string, salt:string, iterations:nu
 //-- Internal common
 async function pbkdf2Async(key:string, salt:string, iterations:number, shaAlgo:string, dkLenBits:number)
   :Promise<ArrayBuffer> {
-  
+
   const te = new TextEncoder()
 
   // turn password into a key object

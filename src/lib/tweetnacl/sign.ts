@@ -97,7 +97,7 @@ export function sign_keyPair_fromSecretKey(secretKey: ByteArray): SignKeyPair {
 
     for (let i = 0; i < pk.length; i++) pk[i] = secretKey[32 + i];
 
-    return { publicKey: pk, secretKey: ByteArray(secretKey) };
+    return { publicKey: pk, secretKey };
 }
 
 export function sign_keyPair_fromSeed(seed: ByteArray): SignKeyPair {
